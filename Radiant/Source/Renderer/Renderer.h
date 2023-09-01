@@ -11,6 +11,7 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
+#include "Gui/Gui.h"
 
 namespace Radiant {
 
@@ -67,6 +68,9 @@ namespace Radiant {
 		IBO_ID m_current_ibo;
 		ShaderID m_current_shader;
 
+		// For ImGui instances.
+		std::vector<GuiTemplate*> m_GUIs;
+
 	public:
 
 		// *****************************************************
@@ -109,9 +113,22 @@ namespace Radiant {
 		static bool ShouldWindowClose() { return glfwWindowShouldClose(m_instance->m_window); }
 
 		/*
+			Gets the current window instance's width
+		*/
+		static unsigned int GetWindowWidth() { return m_instance->m_window_width; }
+
+		/*
+			Gets the current window instance's height
+		*/
+		static unsigned int GetWindowHeight() { return m_instance->m_window_height; }
+
+
+		/*
 			Clears the screen with the defined background color.
 		*/
 		static void Clear() { glClear(GL_COLOR_BUFFER_BIT); }
+
+		static void Update(float deltaTime) { m_instance->UpdateImpl(deltaTime); }
 
 		/*
 			Runs the draw command queue, drawing all objects to the screen.
@@ -133,12 +150,25 @@ namespace Radiant {
 		*/
 		static void AddPolygon(const Polygon& polygon) { m_instance->AddPolygonImpl(polygon); }
 
+		/*
+			Sets the draw color for polygons, which will be used on the next polygon.
+		*/
 		static void SetPolygonColor(const Color& color) { m_instance->SetPolygonColorImpl(color); }
+
+		/*
+			Sets the draw color for polygons, which will be used on the next polygon.
+		*/
 		static void SetPolygonColor(ColorType color) { m_instance->SetPolygonColorImpl(Color(color)); }
+
+		/*
+			Attaches a Gui instance, which will be drawn at the end of the draw command queue.
+		*/
+		static void AttachGui(GuiTemplate* gui) { m_instance->m_GUIs.push_back(gui); }
 
 	private:
 		void CreateWindowImpl(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight);
 
+		void UpdateImpl(float deltaTime);
 		void DrawImpl();
 
 		void BeginImpl(unsigned int layer);

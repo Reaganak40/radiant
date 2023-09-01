@@ -1,30 +1,30 @@
-#include "Radiant.h"
+#include "Pong.h"
 
 using namespace Radiant;
 
 int main(void)
 {
-    Renderer::Initialize();
-    Renderer::CreateWindow("Pong", 1280, 720);
+    Application pongApp;
+    pongApp.Start("Pong");
 
     Rect shape(Vec2d(100, 200.0), 100.0, 100.0);
 
+    Renderer::AttachGui(new DiagnosticsGUI);
 
     /* Loop until the user closes the window */
-    while (!Renderer::ShouldWindowClose())
+    while (pongApp.IsRunning())
     {
-        Renderer::Clear();
+        pongApp.Update();
 
         Renderer::Begin();
         Renderer::SetPolygonColor(ColorType::Green);
         Renderer::AddPolygon(shape);
         Renderer::End();
 
+        pongApp.Render();
 
-        Renderer::Draw();
     }
 
-    Renderer::Destroy();
 
     return 0;
 }

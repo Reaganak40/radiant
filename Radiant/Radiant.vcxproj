@@ -151,6 +151,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Application.cpp" />
+    <ClCompile Include="Source\Gui\Diagnostics.cpp" />
+    <ClCompile Include="Source\Gui\Gui.cpp" />
     <ClCompile Include="Source\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">pch.h</PrecompiledHeaderFile>
@@ -176,7 +179,7 @@
     <ClCompile Include="Source\Renderer\Texture.cpp" />
     <ClCompile Include="Source\Renderer\VertexArray.cpp" />
     <ClCompile Include="Source\Renderer\VertexBuffer.cpp" />
-    <ClCompile Include="Source\UniqueID.cpp" />
+    <ClCompile Include="Source\Utils\UniqueID.cpp" />
     <ClCompile Include="Source\Utils\Color.cpp" />
     <ClCompile Include="Vendor\GLAD\glad.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -236,6 +239,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Application.h" />
+    <ClInclude Include="Source\Gui\Diagnostics.h" />
+    <ClInclude Include="Source\Gui\Gui.h" />
     <ClInclude Include="Source\Utils\Color.h" />
     <ClInclude Include="Source\Utils\MathTypes.h" />
     <ClInclude Include="Source\pch.h" />
@@ -251,7 +257,7 @@
     <ClInclude Include="Source\Renderer\Texture.h" />
     <ClInclude Include="Source\Renderer\VertexArray.h" />
     <ClInclude Include="Source\Renderer\VertexBuffer.h" />
-    <ClInclude Include="Source\UniqueID.h" />
+    <ClInclude Include="Source\Utils\UniqueID.h" />
     <ClInclude Include="Vendor\GLAD\glad.h" />
     <ClInclude Include="Vendor\GLFW\glfw3.h" />
     <ClInclude Include="Vendor\GLFW\glfw3native.h" />

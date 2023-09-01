@@ -31,7 +31,12 @@ namespace Radiant {
         for (auto& shader : m_shaders) {
             delete shader;
         }
+
         delete m_vertex_array;
+
+        for (const auto& gui : m_GUIs) {
+            delete gui;
+        }
 
         glfwTerminate();
     }
@@ -87,7 +92,17 @@ namespace Radiant {
         // if a certain extension/version is available.
         printf("OpenGL %d.%d\n", GLVersion.major, GLVersion.minor);
 
+        // For opengl error handling
         EnableErrorCallback();
+
+        // Initialize ImGui
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGuiIO& io = ImGui::GetIO(); (void)io;
+        ImGui::StyleColorsDark();
+        ImGui_ImplGlfw_InitForOpenGL(m_window, true);
+        ImGui_ImplOpenGL3_Init("#version 330");
+
 
         // set default background color
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -112,6 +127,20 @@ namespace Radiant {
 
         // Set to 60 FPS
         glfwSwapInterval(1);
+
+    }
+
+    void Renderer::UpdateImpl(float deltaTime)
+    {
+        if (m_GUIs.size() > 0) {
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+
+            for (const auto& gui : m_GUIs) {
+                gui->OnUpdate(deltaTime);
+            }
+        }
 
     }
 
@@ -153,6 +182,9 @@ namespace Radiant {
             layer++;
         }
 
+        for (const auto& gui : m_GUIs) {
+            gui->OnRender();
+        }
 
         /* Swap front and back buffers */
         glfwSwapBuffers(m_window);
