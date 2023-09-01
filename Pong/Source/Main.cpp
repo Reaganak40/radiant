@@ -1,6 +1,4 @@
-#include "pch.h"
-#include "Renderer/Renderer.h"
-#include "Polygon/Triangle.h"
+#include "Radiant.h"
 
 using namespace Radiant;
 

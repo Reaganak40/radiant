@@ -7,12 +7,17 @@ namespace Radiant {
     Renderer* Renderer::m_instance = nullptr;
 
     Renderer::Renderer()
-        : m_window(nullptr), m_window_name(""), m_window_width(0), m_window_height(0), m_vertex_array(nullptr)
+        : m_window(nullptr), m_window_name(""), m_window_width(0), m_window_height(0), m_vertex_array(nullptr),
+        m_current_vbo(0), m_current_ibo(0), m_current_shader(0), m_current_layer(0)
     {
         /* Initialize the library */
         if (!glfwInit()) {
             ASSERT(false);
         }
+
+        m_proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f , -1.0f, 1.0f);
+        m_view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+        m_model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
     }
 
 
@@ -96,8 +101,6 @@ namespace Radiant {
 
         // Setup Camera (model view project matrix)
         m_proj = glm::ortho(0.0f, (float)m_window_width, 0.0f, (float)m_window_height, -1.0f, 1.0f);
-        m_view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-        m_model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
         m_screen_origin = Vec3f(0.0f, 0.0f, 0.0f);
 
         SetShader(m_shaders[0]->GetID());
@@ -227,7 +230,7 @@ namespace Radiant {
     void Renderer::AddDefaultShader()
     {
         Shader* shader = new Shader;
-        shader->LoadShader("resources/shaders/vertex.glsl", "resources/shaders/fragment.glsl");
+        shader->LoadShader("../Radiant/Resources/Shaders/vertex.glsl", "../Radiant/Resources/Shaders/fragment.glsl");
 
         if (m_shaders.size() != 0) {
             m_shaders.insert(m_shaders.begin(), shader);
