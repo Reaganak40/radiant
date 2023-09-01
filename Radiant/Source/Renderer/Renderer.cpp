@@ -4,7 +4,7 @@
 Renderer* Renderer::m_instance = nullptr;
 
 Renderer::Renderer()
-    : m_window(nullptr), m_window_name(""), m_window_width(0), m_window_height(0)
+    : m_window(nullptr), m_window_name(""), m_window_width(0), m_window_height(0), m_vertex_array(nullptr)
 {
     /* Initialize the library */
     if (!glfwInit()) {
@@ -15,6 +15,16 @@ Renderer::Renderer()
 
 Renderer::~Renderer()
 {
+    for (auto& unit : m_render_units) {
+        delete unit.m_VBO;
+        delete unit.m_IBO;
+    }
+
+    for (auto& shader : m_shaders) {
+        delete shader;
+    }
+    delete m_vertex_array;
+
     glfwTerminate();
 }
 
@@ -69,14 +79,170 @@ void Renderer::CreateWindowImpl(const std::string& windowName, unsigned int wind
     // if a certain extension/version is available.
     printf("OpenGL %d.%d\n", GLVersion.major, GLVersion.minor);
 
+    EnableErrorCallback();
+
+    // set default background color
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+
+    // set default VAO
+    m_vertex_array = new VertexArray;
+    VertexArray::Bind(m_vertex_array->GetID());
+
+    // set default shader
+    AddDefaultShader();
+
+    // Setup Camera (model view project matrix)
+    m_proj = glm::ortho(0.0f, (float)m_window_width, 0.0f, (float)m_window_height, -1.0f, 1.0f);
+    m_view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+    m_model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+    m_screen_origin = Vec3f(0.0f, 0.0f, 0.0f);
+
+    SetShader(m_shaders[0]->GetID());
+    glm::mat4 mvp = m_proj * m_view * m_model;
+    m_shaders[0]->SetUniform<glm::mat4>("uMVP", mvp);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // Set to 60 FPS
+    glfwSwapInterval(1);
+
 }
 
 void Renderer::DrawImpl()
 {
+    while (m_render_units.size() < m_mesh_queue.size()) {
+        AddRenderUnit();
+    }
+
+    unsigned int layer = 0;
+    for (const auto& unit : m_render_units) {
+        SetVBO(unit.vboID);
+        SetIBO(unit.iboID);
+        SetShader(unit.shaderID);
+
+        unit.m_VBO->Flush();
+        unit.m_IBO->Flush();
+        while (!m_mesh_queue[layer].empty()) {
+            
+            unit.m_VBO->PushToBatch(
+                m_mesh_cache.GetMesh(m_mesh_queue[layer].front()).vertices
+            );
+
+            unit.m_IBO->PushToBatch(
+                m_mesh_cache.GetMesh(m_mesh_queue[layer].front()).indices,
+                m_mesh_cache.GetMesh(m_mesh_queue[layer].front()).vertices.size()
+            );
+
+            m_mesh_queue[layer].pop();
+        }
+        
+        unit.m_VBO->Update();
+        unit.m_IBO->Update();
+
+        m_vertex_array->DefineVertexBufferLayout();
+
+        glDrawElements(GL_TRIANGLES, unit.m_IBO->GetIndexCount(), GL_UNSIGNED_INT, nullptr);
+
+        layer++;
+    }
+
+
     /* Swap front and back buffers */
     glfwSwapBuffers(m_window);
 
     /* Poll for and process events */
     glfwPollEvents();
+}
+
+void Renderer::BeginImpl(unsigned int layer)
+{
+    while (m_mesh_queue.size() <= layer) {
+        m_mesh_queue.push_back({});
+    }
+
+    m_current_layer = layer;
+}
+
+void Renderer::EndImpl()
+{
+}
+
+void Renderer::AddPolygonImpl(const Polygon& polygon)
+{
+    Mesh& pMesh = m_mesh_cache.GetMesh(polygon.GetUUID());
+
+    if (pMesh.indices.size() != polygon.GetIndices().size()) {
+        pMesh.indices = polygon.GetIndices();
+    }
+
+    int index = 0;
+    for (const auto& vertex : polygon.GetVertices()) {
+        if (pMesh.vertices.size() == index) {
+            
+            pMesh.vertices.push_back(
+                Vertex(
+                    Vec3f((float)vertex.x, (float)vertex.y)
+                )
+            );
+        }
+        else {
+            pMesh.vertices[index].position = Vec3f((float)vertex.x, (float)vertex.y);
+        }
+        index++;
+    }
+
+    pMesh.layer = m_current_layer;
+
+    m_mesh_queue[m_current_layer].push(polygon.GetUUID());
+}
+
+void Renderer::SetVBO(VBO_ID vbo)
+{
+    if (vbo != m_current_vbo) {
+        VertexBuffer::Bind(vbo);
+        m_current_vbo = vbo;
+    }
+}
+
+void Renderer::SetIBO(IBO_ID ibo)
+{
+    if (ibo != m_current_ibo) {
+        IndexBuffer::Bind(ibo);
+        m_current_ibo = ibo;
+    }
+}
+
+void Renderer::SetShader(ShaderID shader)
+{
+    if (shader != m_current_shader) {
+        Shader::Bind(shader);
+        m_current_shader = shader;
+    }
+}
+
+void Renderer::AddDefaultShader()
+{
+    Shader* shader = new Shader;
+    shader->LoadShader("resources/shaders/vertex.glsl", "resources/shaders/fragment.glsl");
+
+    if (m_shaders.size() != 0) {
+        m_shaders.insert(m_shaders.begin(), shader);
+    }
+    else {
+        m_shaders.push_back(shader);
+    }
+
+}
+
+void Renderer::AddRenderUnit()
+{
+    m_render_units.push_back({});
+
+    m_render_units.back().m_VBO = new VertexBuffer;
+    m_render_units.back().m_IBO = new IndexBuffer;
+
+    m_render_units.back().vboID = m_render_units.back().m_VBO->GetID();
+    m_render_units.back().iboID = m_render_units.back().m_IBO->GetID();
+    m_render_units.back().shaderID = m_shaders.front()->GetID();
 }
