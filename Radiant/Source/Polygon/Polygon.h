@@ -3,21 +3,24 @@
 #include "Math/MathTypes.h"
 #include "UniqueID.h"
 
-class Polygon {
-private:
-	UniqueID m_UUID;
-protected:
-	std::vector<Vec2d> m_vertices;
-	std::vector<unsigned int> m_indices;
+namespace Radiant {
 
-	Vec2d m_origin;
-public:
-	Polygon() : m_UUID(GetUniqueID()) {}
-	~Polygon() {}
+	class Polygon {
+	private:
+		UniqueID m_UUID;
+	protected:
+		std::vector<Vec2d> m_vertices;
+		std::vector<unsigned int> m_indices;
 
-	const std::vector<Vec2d>& GetVertices() const;
-	const std::vector<unsigned int> GetIndices() const;
-	const UniqueID GetUUID() const;
+		Vec2d m_origin;
+	public:
+		Polygon() : m_UUID(GetUniqueID()) {}
+		~Polygon() {}
 
-	void Move(double dx, double dy);
-};
+		const std::vector<Vec2d>& GetVertices() const;
+		const std::vector<unsigned int> GetIndices() const;
+		const UniqueID GetUUID() const;
+
+		void Move(double dx, double dy);
+	};
+}

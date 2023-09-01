@@ -2,6 +2,8 @@
 #include "Renderer/Renderer.h"
 #include "Polygon/Triangle.h"
 
+using namespace Radiant;
+
 int main(void)
 {
     Renderer::Initialize();

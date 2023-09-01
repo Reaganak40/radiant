@@ -1,17 +1,21 @@
 #pragma once
 
-typedef unsigned int VAO_ID;
+namespace Radiant {
 
-class VertexArray {
-private:
-	VAO_ID m_ID;
-public:
-	VertexArray();
-	~VertexArray();
+	typedef unsigned int VAO_ID;
 
-	static void Bind(VAO_ID id);
-	inline VAO_ID GetID() { return m_ID; }
+	class VertexArray {
+	private:
+		VAO_ID m_ID;
+	public:
+		VertexArray();
+		~VertexArray();
 
-	void DefineVertexBufferLayout();
+		static void Bind(VAO_ID id);
+		inline VAO_ID GetID() { return m_ID; }
 
-};
+		void DefineVertexBufferLayout();
+
+	};
+
+}
