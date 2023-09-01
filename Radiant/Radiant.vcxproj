@@ -160,6 +160,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Source\Polygon\Polygon.cpp" />
+    <ClCompile Include="Source\Polygon\Rect.cpp" />
     <ClCompile Include="Source\Polygon\Triangle.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -176,6 +177,7 @@
     <ClCompile Include="Source\Renderer\VertexArray.cpp" />
     <ClCompile Include="Source\Renderer\VertexBuffer.cpp" />
     <ClCompile Include="Source\UniqueID.cpp" />
+    <ClCompile Include="Source\Utils\Color.cpp" />
     <ClCompile Include="Vendor\GLAD\glad.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -234,9 +236,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\Math\MathTypes.h" />
+    <ClInclude Include="Source\Utils\Color.h" />
+    <ClInclude Include="Source\Utils\MathTypes.h" />
     <ClInclude Include="Source\pch.h" />
     <ClInclude Include="Source\Polygon\Polygon.h" />
+    <ClInclude Include="Source\Polygon\Rect.h" />
     <ClInclude Include="Source\Polygon\Triangle.h" />
     <ClInclude Include="Source\Radiant.h" />
     <ClInclude Include="Source\Renderer\ErrorHandling.h" />

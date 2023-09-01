@@ -1,6 +1,6 @@
 #pragma once
 #include "pch.h"
-#include "Math/MathTypes.h"
+#include "Utils/MathTypes.h"
 #include "UniqueID.h"
 
 namespace Radiant {

@@ -24,6 +24,42 @@ namespace Radiant {
         CreateShader(vertexShader, fragmentShader);
     }
 
+    void Shader::LoadDefaultShader()
+    {
+        std::string vertexShader =
+            "#version 450 core                     \n"
+            "layout(location = 0) in vec4 position;\n"
+            "layout (location = 1) in vec4 color;  \n"
+            "                                      \n"
+            "smooth out vec4 vColor;               \n"
+            "                                      \n"
+            "uniform mat4 uMVP;                    \n"
+            "                                      \n"
+            "void main() {                         \n"
+            "    gl_Position = uMVP * position;    \n"
+            "                                      \n"
+            "    vColor = color;                   \n"
+            "    //vTexCoords = texCoords;         \n"
+            "                                      \n"
+            "    //vTexIndex = texIndex;           \n"
+            "};                                    \n";
+
+
+        std::string fragmentShader =
+            "#version 450 core                   \n"
+            "                                    \n"
+            "smooth in vec4 vColor;              \n"
+            "                                    \n"
+            "layout(location = 0) out vec4 color;\n"
+            "                                    \n"
+            "                                    \n"
+            "void main() {                       \n"
+            "    color = vColor;                 \n"
+            "}                                   \n";
+
+        CreateShader(vertexShader, fragmentShader);
+    }
+
     int Shader::CompileShader(unsigned int type, const std::string& source) {
         unsigned int id = glCreateShader(type);
         const char* src = source.c_str();

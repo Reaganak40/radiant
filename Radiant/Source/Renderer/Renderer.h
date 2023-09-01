@@ -4,6 +4,7 @@
 // For Render API
 #include "Polygon/Polygon.h"
 #include "Mesh.h"
+#include "Utils/Color.h"
 
 // For Opengl rendering
 #include "VertexArray.h"
@@ -35,6 +36,8 @@ namespace Radiant {
 		unsigned int m_current_layer;
 		MeshCache m_mesh_cache;
 		std::vector<std::queue<UniqueID>> m_mesh_queue;
+
+		Color m_polygon_color;
 
 		// *****************************************************
 		// 
@@ -130,6 +133,9 @@ namespace Radiant {
 		*/
 		static void AddPolygon(const Polygon& polygon) { m_instance->AddPolygonImpl(polygon); }
 
+		static void SetPolygonColor(const Color& color) { m_instance->SetPolygonColorImpl(color); }
+		static void SetPolygonColor(ColorType color) { m_instance->SetPolygonColorImpl(Color(color)); }
+
 	private:
 		void CreateWindowImpl(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight);
 
@@ -138,6 +144,7 @@ namespace Radiant {
 		void BeginImpl(unsigned int layer);
 		void EndImpl();
 		void AddPolygonImpl(const Polygon& polygon);
+		void SetPolygonColorImpl(const Color& color);
 
 
 		void SetVBO(VBO_ID vbo);

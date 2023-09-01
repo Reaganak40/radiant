@@ -81,6 +81,12 @@
     <ClCompile Include="Source\Renderer\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Polygon\Rect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Utils\Color.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vendor\GLAD\glad.h">
@@ -983,7 +989,7 @@
     <ClInclude Include="Source\Polygon\Polygon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Math\MathTypes.h">
+    <ClInclude Include="Source\Utils\MathTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Polygon\Triangle.h">
@@ -1011,6 +1017,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Radiant.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Polygon\Rect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Utils\Color.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,14 +1,15 @@
 #pragma once
-#include "Math/MathTypes.h"
+#include "Utils/MathTypes.h"
 #include "UniqueID.h"
 
 namespace Radiant {
 
 	struct Vertex {
 		Vec3f position;
+		Vec4f color;
 
-		Vertex(Vec3f nPosition)
-			: position(nPosition) {}
+		Vertex(Vec3f nPosition, Vec4f nColor)
+			: position(nPosition), color(nColor) {}
 	};
 
 	struct Mesh {

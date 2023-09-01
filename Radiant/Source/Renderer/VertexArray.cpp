@@ -26,8 +26,8 @@ namespace Radiant {
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, position));
 
 		// define color coordinates
-		//glEnableVertexAttribArray(1);
-		//glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, color));
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, color));
 
 		//// define texture coordinates
 		//glEnableVertexAttribArray(2);

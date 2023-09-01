@@ -15,6 +15,7 @@ namespace Radiant {
 		~Shader();
 
 		void LoadShader(const std::string& vertexFilepath, const std::string& fragmentFilepath);
+		void LoadDefaultShader();
 		void CreateShader(const std::string& vertexShader, const std::string& fragmentShader);
 
 		static void Bind(ShaderID program);

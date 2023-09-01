@@ -188,7 +188,7 @@ namespace Radiant {
 
                 pMesh.vertices.push_back(
                     Vertex(
-                        Vec3f((float)vertex.x, (float)vertex.y)
+                        Vec3f((float)vertex.x, (float)vertex.y), m_polygon_color.GetColor()
                     )
                 );
             }
@@ -201,6 +201,11 @@ namespace Radiant {
         pMesh.layer = m_current_layer;
 
         m_mesh_queue[m_current_layer].push(polygon.GetUUID());
+    }
+
+    void Renderer::SetPolygonColorImpl(const Color& color)
+    {
+        m_polygon_color = color;
     }
 
     void Renderer::SetVBO(VBO_ID vbo)
@@ -230,7 +235,7 @@ namespace Radiant {
     void Renderer::AddDefaultShader()
     {
         Shader* shader = new Shader;
-        shader->LoadShader("../Radiant/Resources/Shaders/vertex.glsl", "../Radiant/Resources/Shaders/fragment.glsl");
+        shader->LoadDefaultShader();
 
         if (m_shaders.size() != 0) {
             m_shaders.insert(m_shaders.begin(), shader);
