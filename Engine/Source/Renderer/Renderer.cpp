@@ -60,8 +60,10 @@ namespace Radiant {
 
     void Renderer::Destroy()
     {
-        delete m_instance;
-        m_instance = nullptr;
+        if (m_instance != nullptr) {
+            delete m_instance;
+            m_instance = nullptr;
+        }
     }
 
     void Renderer::CreateWindowImpl(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight)
@@ -130,7 +132,7 @@ namespace Radiant {
 
     }
 
-    void Renderer::UpdateImpl(float deltaTime)
+    void Renderer::UpdateImpl(const float deltaTime)
     {
         if (m_GUIs.size() > 0) {
             ImGui_ImplOpenGL3_NewFrame();
@@ -144,7 +146,7 @@ namespace Radiant {
 
     }
 
-    void Renderer::DrawImpl()
+    void Renderer::RenderImpl()
     {
         while (m_render_units.size() < m_mesh_queue.size()) {
             AddRenderUnit();

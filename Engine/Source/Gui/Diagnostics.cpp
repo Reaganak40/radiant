@@ -10,7 +10,7 @@ namespace Radiant {
 		m_window_height = Renderer::GetWindowHeight();
 	}
 
-	void DiagnosticsGUI::OnUpdate(float deltaTime)
+	void DiagnosticsGUI::OnUpdate(const float deltaTime)
 	{
 	}
 

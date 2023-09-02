@@ -12,7 +12,7 @@ namespace Radiant {
 	public:
 		DiagnosticsGUI();
 
-		void OnUpdate(float deltaTime) override;
+		void OnUpdate(const float deltaTime) override;
 		void OnRender() override;
 	};
 }

@@ -24,6 +24,7 @@
     <ProjectGuid>{2d3b0ce8-fe47-442e-921f-fc210f6dffa0}</ProjectGuid>
     <RootNamespace>Radiant</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Engine</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -76,7 +77,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Radiant\Vendor;$(SolutionDir)Radiant\Source</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Engine\Vendor;$(SolutionDir)Engine\Source</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -96,7 +97,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Radiant\Vendor;$(SolutionDir)Radiant\Source</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Engine\Vendor;$(SolutionDir)Engine\Source</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -179,6 +180,7 @@
     <ClCompile Include="Source\Renderer\Texture.cpp" />
     <ClCompile Include="Source\Renderer\VertexArray.cpp" />
     <ClCompile Include="Source\Renderer\VertexBuffer.cpp" />
+    <ClCompile Include="Source\Utils\Input.cpp" />
     <ClCompile Include="Source\Utils\UniqueID.cpp" />
     <ClCompile Include="Source\Utils\Color.cpp" />
     <ClCompile Include="Vendor\GLAD\glad.c">
@@ -243,6 +245,7 @@
     <ClInclude Include="Source\Gui\Diagnostics.h" />
     <ClInclude Include="Source\Gui\Gui.h" />
     <ClInclude Include="Source\Utils\Color.h" />
+    <ClInclude Include="Source\Utils\Input.h" />
     <ClInclude Include="Source\Utils\MathTypes.h" />
     <ClInclude Include="Source\pch.h" />
     <ClInclude Include="Source\Polygon\Polygon.h" />
@@ -257,6 +260,7 @@
     <ClInclude Include="Source\Renderer\Texture.h" />
     <ClInclude Include="Source\Renderer\VertexArray.h" />
     <ClInclude Include="Source\Renderer\VertexBuffer.h" />
+    <ClInclude Include="Source\Utils\Timestep.h" />
     <ClInclude Include="Source\Utils\UniqueID.h" />
     <ClInclude Include="Vendor\GLAD\glad.h" />
     <ClInclude Include="Vendor\GLFW\glfw3.h" />

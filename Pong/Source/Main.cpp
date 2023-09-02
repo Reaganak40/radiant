@@ -23,6 +23,8 @@ int main(void)
 
         pongApp.Render();
 
+        pongApp.EndFrame();
+
     }
 
 

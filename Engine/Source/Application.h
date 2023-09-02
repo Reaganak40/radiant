@@ -1,10 +1,11 @@
 #pragma once
 #include "pch.h"
+#include "Utils/Timestep.h"
 
 namespace Radiant {
 	class Application {
 	private:
-
+		Timestep m_timestep;
 	public:
 		Application();
 		~Application();
@@ -29,6 +30,11 @@ namespace Radiant {
 			Runs the renderer draw command queue, resulting in a new frame.
 		*/
 		void Render();
+
+		/*
+			Polls inputs and events, getting ready for next frame of the game loop.
+		*/
+		void EndFrame();
 
 	};
 }

@@ -128,12 +128,12 @@ namespace Radiant {
 		*/
 		static void Clear() { glClear(GL_COLOR_BUFFER_BIT); }
 
-		static void Update(float deltaTime) { m_instance->UpdateImpl(deltaTime); }
+		static void Update(const float deltaTime) { m_instance->UpdateImpl(deltaTime); }
 
 		/*
 			Runs the draw command queue, drawing all objects to the screen.
 		*/
-		static void Draw() { m_instance->DrawImpl(); }
+		static void Render() { m_instance->RenderImpl(); }
 
 		/*
 			Starts a new render command session context.
@@ -165,11 +165,13 @@ namespace Radiant {
 		*/
 		static void AttachGui(GuiTemplate* gui) { m_instance->m_GUIs.push_back(gui); }
 
+		friend class Input;
+
 	private:
 		void CreateWindowImpl(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight);
 
-		void UpdateImpl(float deltaTime);
-		void DrawImpl();
+		void UpdateImpl(const float deltaTime);
+		void RenderImpl();
 
 		void BeginImpl(unsigned int layer);
 		void EndImpl();

@@ -76,7 +76,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)Source;$(SolutionDir)Radiant\Vendor;$(SolutionDir)Radiant\Source</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Source;$(SolutionDir)Engine\Vendor;$(SolutionDir)Engine\Source</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -93,7 +93,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)Source;$(SolutionDir)Radiant\Vendor;$(SolutionDir)Radiant\Source</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Source;$(SolutionDir)Engine\Vendor;$(SolutionDir)Engine\Source</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -136,12 +136,12 @@
     <ClCompile Include="Source\Main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Radiant\Radiant.vcxproj">
-      <Project>{2d3b0ce8-fe47-442e-921f-fc210f6dffa0}</Project>
-    </ProjectReference>
+    <ClInclude Include="Source\Pong.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\Pong.h" />
+    <ProjectReference Include="..\Engine\Engine.vcxproj">
+      <Project>{2d3b0ce8-fe47-442e-921f-fc210f6dffa0}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
