@@ -36,5 +36,10 @@ namespace Radiant {
 		*/
 		void EndFrame();
 
+		/*
+			Gets this frame's deltaTime.
+		*/
+		const float GetDeltaTime() { return m_timestep.deltaTime; }
+
 	};
 }

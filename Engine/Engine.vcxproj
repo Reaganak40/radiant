@@ -163,6 +163,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Source\Physics\Physics.cpp" />
     <ClCompile Include="Source\Polygon\Polygon.cpp" />
     <ClCompile Include="Source\Polygon\Rect.cpp" />
     <ClCompile Include="Source\Polygon\Triangle.cpp">
@@ -181,6 +182,7 @@
     <ClCompile Include="Source\Renderer\VertexArray.cpp" />
     <ClCompile Include="Source\Renderer\VertexBuffer.cpp" />
     <ClCompile Include="Source\Utils\Input.cpp" />
+    <ClCompile Include="Source\Utils\MathTypes.cpp" />
     <ClCompile Include="Source\Utils\UniqueID.cpp" />
     <ClCompile Include="Source\Utils\Color.cpp" />
     <ClCompile Include="Vendor\GLAD\glad.c">
@@ -242,8 +244,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Application.h" />
+    <ClInclude Include="Source\GameObject.h" />
     <ClInclude Include="Source\Gui\Diagnostics.h" />
     <ClInclude Include="Source\Gui\Gui.h" />
+    <ClInclude Include="Source\Physics\Physics.h" />
     <ClInclude Include="Source\Utils\Color.h" />
     <ClInclude Include="Source\Utils\Input.h" />
     <ClInclude Include="Source\Utils\MathTypes.h" />

@@ -1,4 +1,5 @@
 #include "Pong.h"
+#include "GameObjects/Ball.h"
 
 using namespace Radiant;
 
@@ -7,7 +8,7 @@ int main(void)
     Application pongApp;
     pongApp.Start("Pong");
 
-    Rect shape(Vec2d(100, 200.0), 100.0, 100.0);
+    Ball ball(300.0, 300.0);
 
     Renderer::AttachGui(new DiagnosticsGUI);
 
@@ -15,15 +16,13 @@ int main(void)
     while (pongApp.IsRunning())
     {
         pongApp.Update();
+        ball.OnUpdate(pongApp.GetDeltaTime());
 
-        Renderer::Begin();
-        Renderer::SetPolygonColor(ColorType::Green);
-        Renderer::AddPolygon(shape);
-        Renderer::End();
-
+        ball.OnRender();
         pongApp.Render();
 
         pongApp.EndFrame();
+        ball.OnEndFrame();
 
     }
 

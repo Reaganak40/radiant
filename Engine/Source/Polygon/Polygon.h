@@ -22,5 +22,7 @@ namespace Radiant {
 		const UniqueID GetUUID() const;
 
 		void Move(double dx, double dy);
+
+		friend class Translation;
 	};
 }
