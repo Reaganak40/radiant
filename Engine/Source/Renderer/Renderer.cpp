@@ -228,6 +228,7 @@ namespace Radiant {
             }
             else {
                 pMesh.vertices[index].position = Vec3f((float)vertex.x, (float)vertex.y);
+                pMesh.vertices[index].color = m_polygon_color.GetColor();
             }
             index++;
         }

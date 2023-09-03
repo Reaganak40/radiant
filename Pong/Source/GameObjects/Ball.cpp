@@ -62,9 +62,19 @@ void Ball::OnEndFrame()
 	m_translation.OnEndFrame();
 }
 
-void Ball::SetColor(Radiant::Color nColor)
+void Ball::SetSpriteColor(Radiant::Color nColor)
 {
 	m_sprite_color = nColor;
+}
+
+void Ball::SetTransparent(bool transparency)
+{
+	if (transparency) {
+		m_sprite_color.SetAlpha(0.3f);
+	}
+	else {
+		m_sprite_color.SetAlpha(1.0f);
+	}
 }
 
 void Ball::SetLeftControl(const std::vector <Radiant::InputState>& conditions)

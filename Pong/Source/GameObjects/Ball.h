@@ -23,10 +23,14 @@ public:
 	void OnRender() override final;
 	void OnEndFrame() override final;
 
-	void SetColor(Radiant::Color nColor);
+	void SetSpriteColor(Radiant::Color nColor);
+	void SetTransparent(bool transparency);
 
 	void SetLeftControl(const std::vector <Radiant::InputState>& conditions);
 	void SetRightControl(const std::vector <Radiant::InputState>& conditions);
 	void SetUpControl(const std::vector <Radiant::InputState>& conditions);
 	void SetDownControl(const std::vector <Radiant::InputState>& conditions);
+
+	const Radiant::Polygon& GetPolygon() { return m_sprite; }
+
 };

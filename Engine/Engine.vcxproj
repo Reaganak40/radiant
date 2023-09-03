@@ -163,6 +163,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Source\Physics\Collision.cpp" />
     <ClCompile Include="Source\Physics\Translation.cpp" />
     <ClCompile Include="Source\Polygon\Polygon.cpp" />
     <ClCompile Include="Source\Polygon\Rect.cpp" />

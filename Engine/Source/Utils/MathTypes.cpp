@@ -23,4 +23,14 @@ namespace Radiant {
         return Vec2d(abs(vector.x), abs(vector.y));
     }
 
+    Vec2d Vec2d::Normal()
+    {
+        return Vec2d(y, -x);
+    }
+
+    double Vec2d::DotProduct(const Vec2d& A, const Vec2d& B)
+    {
+        return (A.x * B.x) + (A.y * B.y);
+    }
+
 }

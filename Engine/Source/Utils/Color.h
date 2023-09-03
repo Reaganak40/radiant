@@ -28,5 +28,11 @@ namespace Radiant {
 			SetColor(nColor);
 			return (*this);
 		}
+
+		const Vec4f& SetRed(float r, bool normalized=true);
+		const Vec4f& SetGreen(float g, bool normalized = true);
+		const Vec4f& SetBlue(float b, bool normalized = true);
+		const Vec4f& SetAlpha(float a, bool normalized = true);
+
 	};
 }
