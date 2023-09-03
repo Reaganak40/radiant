@@ -41,5 +41,15 @@ namespace Radiant {
 		*/
 		const float GetDeltaTime() { return m_timestep.deltaTime; }
 
+		/*
+			Get the width in pixels of the window.
+		*/
+		const int WindowWidth();
+
+		/*
+			Get the height in pixels of the window.
+		*/
+		const int WindowHeight();
+
 	};
 }

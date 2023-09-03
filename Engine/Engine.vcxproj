@@ -187,6 +187,7 @@
     <ClCompile Include="Source\Utils\MathTypes.cpp" />
     <ClCompile Include="Source\Utils\UniqueID.cpp" />
     <ClCompile Include="Source\Utils\Color.cpp" />
+    <ClCompile Include="Source\Utils\Utils.cpp" />
     <ClCompile Include="Vendor\GLAD\glad.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -271,6 +272,7 @@
     <ClInclude Include="Source\Renderer\VertexBuffer.h" />
     <ClInclude Include="Source\Utils\Timestep.h" />
     <ClInclude Include="Source\Utils\UniqueID.h" />
+    <ClInclude Include="Source\Utils\Utils.h" />
     <ClInclude Include="Vendor\GLAD\glad.h" />
     <ClInclude Include="Vendor\GLFW\glfw3.h" />
     <ClInclude Include="Vendor\GLFW\glfw3native.h" />

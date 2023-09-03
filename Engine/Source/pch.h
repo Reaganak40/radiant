@@ -1,5 +1,8 @@
 #pragma once
 
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 // Vendor Libraries
 #include <GLAD/glad.h>
 #include <GLFW/glfw3.h>
@@ -12,6 +15,8 @@
 // Standard Libraries
 #include <stdio.h>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <unordered_map>

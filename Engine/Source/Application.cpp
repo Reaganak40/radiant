@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "Renderer/Renderer.h"
 #include "Utils/Input.h"
+#include "Utils/Utils.h"
 
 namespace Radiant
 {
@@ -18,6 +19,8 @@ namespace Radiant
 
 	void Application::Start(std::string appName, unsigned int windowWidth, unsigned int windowHeight)
 	{
+		Utils::SetRandomSeed();
+
 		Renderer::CreateWindow(appName, windowWidth, windowHeight);
 		Input::Initialize();
 	}
@@ -45,5 +48,11 @@ namespace Radiant
 		Input::PollInputs();
 	}
 
+	const int Application::WindowWidth() {
+		return Renderer::GetWindowWidth();
+	}
 
+	const int Application::WindowHeight() {
+		return Renderer::GetWindowHeight();
+	}
 }

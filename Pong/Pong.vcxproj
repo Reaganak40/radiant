@@ -134,10 +134,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\GameObjects\Ball.cpp" />
+    <ClCompile Include="Source\GameObjects\Padel.cpp" />
     <ClCompile Include="Source\Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\GameObjects\Ball.h" />
+    <ClInclude Include="Source\GameObjects\Padel.h" />
     <ClInclude Include="Source\Pong.h" />
   </ItemGroup>
   <ItemGroup>
