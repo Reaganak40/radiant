@@ -163,7 +163,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Source\Physics\Physics.cpp" />
+    <ClCompile Include="Source\Physics\Translation.cpp" />
     <ClCompile Include="Source\Polygon\Polygon.cpp" />
     <ClCompile Include="Source\Polygon\Rect.cpp" />
     <ClCompile Include="Source\Polygon\Triangle.cpp">
@@ -181,6 +181,7 @@
     <ClCompile Include="Source\Renderer\Texture.cpp" />
     <ClCompile Include="Source\Renderer\VertexArray.cpp" />
     <ClCompile Include="Source\Renderer\VertexBuffer.cpp" />
+    <ClCompile Include="Source\Utils\BitSet.cpp" />
     <ClCompile Include="Source\Utils\Input.cpp" />
     <ClCompile Include="Source\Utils\MathTypes.cpp" />
     <ClCompile Include="Source\Utils\UniqueID.cpp" />
@@ -247,7 +248,10 @@
     <ClInclude Include="Source\GameObject.h" />
     <ClInclude Include="Source\Gui\Diagnostics.h" />
     <ClInclude Include="Source\Gui\Gui.h" />
+    <ClInclude Include="Source\Physics\Collision.h" />
     <ClInclude Include="Source\Physics\Physics.h" />
+    <ClInclude Include="Source\Physics\Translation.h" />
+    <ClInclude Include="Source\Utils\BitSet.h" />
     <ClInclude Include="Source\Utils\Color.h" />
     <ClInclude Include="Source\Utils\Input.h" />
     <ClInclude Include="Source\Utils\MathTypes.h" />

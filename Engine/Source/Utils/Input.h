@@ -1,24 +1,121 @@
 #pragma once
 #include "pch.h"
 #include "MathTypes.h"
+#include "BitSet.h"
 
-#define A_KEY_PRESS 1
-#define A_KEY_DOWN 2
-#define A_KEY_UP 4
-#define S_KEY_PRESS 8
-#define S_KEY_DOWN 16
-#define S_KEY_UP 32
-#define D_KEY_PRESS 64
-#define D_KEY_DOWN 128
-#define D_KEY_UP 256
-#define W_KEY_PRESS 512
-#define W_KEY_DOWN 1024
-#define W_KEY_UP 2048
-#define E_KEY_PRESS 4096
-#define E_KEY_DOWN 8192
-#define E_KEY_UP 16384
 
 namespace Radiant {
+
+    enum InputState {
+
+        A_KEY_PRESS,
+        A_KEY_DOWN,
+        A_KEY_UP,
+
+        B_KEY_PRESS,
+        B_KEY_DOWN,
+        B_KEY_UP,
+
+        C_KEY_PRESS,
+        C_KEY_DOWN,
+        C_KEY_UP,
+
+        D_KEY_PRESS,
+        D_KEY_DOWN,
+        D_KEY_UP,
+
+        E_KEY_PRESS,
+        E_KEY_DOWN,
+        E_KEY_UP,
+
+        F_KEY_PRESS,
+        F_KEY_DOWN,
+        F_KEY_UP,
+
+        G_KEY_PRESS,
+        G_KEY_DOWN,
+        G_KEY_UP,
+
+        H_KEY_PRESS,
+        H_KEY_DOWN,
+        H_KEY_UP,
+
+        I_KEY_PRESS,
+        I_KEY_DOWN,
+        I_KEY_UP,
+
+        J_KEY_PRESS,
+        J_KEY_DOWN,
+        J_KEY_UP,
+
+        K_KEY_PRESS,
+        K_KEY_DOWN,
+        K_KEY_UP,
+
+        L_KEY_PRESS,
+        L_KEY_DOWN,
+        L_KEY_UP,
+
+        M_KEY_PRESS,
+        M_KEY_DOWN,
+        M_KEY_UP,
+
+        N_KEY_PRESS,
+        N_KEY_DOWN,
+        N_KEY_UP,
+
+        O_KEY_PRESS,
+        O_KEY_DOWN,
+        O_KEY_UP,
+
+        P_KEY_PRESS,
+        P_KEY_DOWN,
+        P_KEY_UP,
+
+        Q_KEY_PRESS,
+        Q_KEY_DOWN,
+        Q_KEY_UP,
+
+        R_KEY_PRESS,
+        R_KEY_DOWN,
+        R_KEY_UP,
+
+        S_KEY_PRESS,
+        S_KEY_DOWN,
+        S_KEY_UP,
+
+        T_KEY_PRESS,
+        T_KEY_DOWN,
+        T_KEY_UP,
+
+        U_KEY_PRESS,
+        U_KEY_DOWN,
+        U_KEY_UP,
+
+        V_KEY_PRESS,
+        V_KEY_DOWN,
+        V_KEY_UP,
+
+        W_KEY_PRESS,
+        W_KEY_DOWN,
+        W_KEY_UP,
+
+        X_KEY_PRESS,
+        X_KEY_DOWN,
+        X_KEY_UP,
+
+        Y_KEY_PRESS,
+        Y_KEY_DOWN,
+        Y_KEY_UP,
+
+        Z_KEY_PRESS,
+        Z_KEY_DOWN,
+        Z_KEY_UP,
+
+        NAIS // Not an input state
+    };
+
+
 
     enum KeyState {
         KeyPressed,
@@ -32,23 +129,6 @@ namespace Radiant {
         D_KEYCODE,
         W_KEYCODE,
         E_KEYCODE,
-    };
-
-    struct InputState {
-        unsigned int state;
-
-        InputState()
-            : state(0) {}
-
-        bool CheckState(unsigned int query) {
-            return (bool)(state & query);
-        }
-        void AddState(unsigned int nState) {
-            state |= nState;
-        }
-        void ClearState() {
-            state = 0;
-        }
     };
 
     struct MouseState {
@@ -72,11 +152,11 @@ namespace Radiant {
         static Input* m_singleton;
 
         GLFWwindow* m_window;
+        BitSet m_keyboard_state[2];
+        int m_current_state;
 
-        InputState m_keyboard_state[2];
         MouseState m_mouse_state[2];
         WindowState m_window_state[2];
-        int m_current_state;
         bool m_mouse_changed;
 
     public:
@@ -99,7 +179,7 @@ namespace Radiant {
         static void PollInputs() { m_singleton->PollInputsImpl(); }
 
         /* Get all trigged events by their assigned ListenerIDs. */
-        static bool CheckKeyboardState(unsigned int stateCode) { return m_singleton->CheckStateImpl(stateCode); }
+        static bool CheckKeyboardState(const std::vector<InputState>& stateQuery);
 
         static inline MouseState& GetMouseState() { return m_singleton->GetMouseStateImpl(); }
 
@@ -107,7 +187,7 @@ namespace Radiant {
 
     private:
         void PollInputsImpl();
-        bool CheckStateImpl(unsigned int stateCode);
+        bool CheckStateImpl(unsigned int* stateQuery, unsigned int count);
         MouseState& GetMouseStateImpl();
         bool CheckWindowResizeImpl();
 

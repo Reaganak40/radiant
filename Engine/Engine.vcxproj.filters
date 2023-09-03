@@ -99,10 +99,13 @@
     <ClCompile Include="Source\Utils\Input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Physics\Physics.cpp">
+    <ClCompile Include="Source\Physics\Translation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Utils\MathTypes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Utils\BitSet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1061,7 +1064,16 @@
     <ClInclude Include="Source\GameObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Physics\Translation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Physics\Physics.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Physics\Collision.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Utils\BitSet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

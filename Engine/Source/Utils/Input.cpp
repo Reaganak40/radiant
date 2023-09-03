@@ -6,11 +6,9 @@ namespace Radiant {
     Input* Input::m_singleton = nullptr;
 
     Input::Input()
-        : m_window(nullptr), m_mouse_changed(false)
+        : m_window(nullptr), m_mouse_changed(false),
+        m_keyboard_state{BitSet(InputState::NAIS), BitSet(InputState::NAIS)}
     {
-        for (int i = 0; i < 2; i++) {
-            m_keyboard_state[i].state = 0;
-        }
         m_current_state = 0;
     }
 
@@ -21,10 +19,7 @@ namespace Radiant {
 
     void Input::Initialize()
     {
-        if (m_singleton != nullptr) {
-            delete m_singleton;
-            m_singleton = nullptr;
-        }
+        Destroy();
         GetInstance();
         m_singleton->m_window = Renderer::GetInstance()->m_window;
 
@@ -45,30 +40,25 @@ namespace Radiant {
     void Input::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
     {
         ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
-        int change = 0;
-        switch (key) {
-        case GLFW_KEY_A:
-            change = A_KEY_PRESS;
-            break;
-        case GLFW_KEY_S:
-            change = S_KEY_PRESS;
-            break;
-        case GLFW_KEY_D:
-            change = D_KEY_PRESS;
-            break;
-        case GLFW_KEY_W:
-            change = W_KEY_PRESS;
-            break;
-        case GLFW_KEY_E:
-            change = E_KEY_PRESS;
-            break;
+        int flag = 0;
+
+        // InputStates follow this order
+        // Key Press = offset 0
+        // Key Down  = offset 1
+        // Key Up    = offset 3
+
+        if (key >= GLFW_KEY_A && key <= GLFW_KEY_Z) {
+            flag = (key - GLFW_KEY_A) * 3;
+        }
+        else {
+            return;
         }
 
         switch (action) {
         case GLFW_PRESS:
             break;
         case GLFW_RELEASE:
-            change <<= 2; // bitshift left by 2 to set to KEY_UP
+            flag += 2; 
             break;
         case GLFW_REPEAT:
             // Does not currently support text input (typing)
@@ -78,7 +68,8 @@ namespace Radiant {
             return;
         }
 
-        m_singleton->m_keyboard_state[m_singleton->m_current_state].AddState(change);
+        m_singleton->m_keyboard_state[m_singleton->m_current_state].ActivateFlag(flag);
+
     }
 
     void Input::CursorPositionCallback(GLFWwindow* window, double xpos, double ypos)
@@ -100,23 +91,38 @@ namespace Radiant {
         m_singleton->m_window_state[m_singleton->m_current_state].windowResize = true;
     }
 
+    bool Input::CheckKeyboardState(const std::vector<InputState>& stateQuery)
+    {
+        return m_singleton->CheckStateImpl((unsigned int*)stateQuery.data(), stateQuery.size());
+    }
+
     void Input::PollInputsImpl()
     {
+        // InputStates follow this order
+        // Key Press = offset 0
+        // Key Down  = offset 1
+        // Key Up    = offset 3
 
-        for (unsigned int stateCode = A_KEY_PRESS; stateCode <= E_KEY_UP; stateCode <<= 3) {
+        unsigned int stateQuery[2];
+
+        for (unsigned int stateCode = A_KEY_PRESS; stateCode < (NAIS-2); stateCode += 3) {
 
             // if key has not been released
-            if (!m_keyboard_state[m_current_state].CheckState(stateCode << 2)) {
+            if (!m_keyboard_state[m_current_state].CheckFlag(stateCode + 2)) {
+                stateQuery[0] = stateCode;
+                stateQuery[1] = stateCode + 1;
+
                 // if not a key press event
-                if (CheckStateImpl(stateCode | (stateCode << 1))) {
+                if (CheckStateImpl(stateQuery, 2)) {
+                    
                     // add key down state
-                    m_keyboard_state[m_current_state].AddState(stateCode << 1);
+                    m_keyboard_state[m_current_state].ActivateFlag(stateCode + 1);
                 }
             }
         }
 
         m_current_state = (m_current_state == 0 ? 1 : 0);
-        m_keyboard_state[m_current_state].ClearState();
+        m_keyboard_state[m_current_state].Clear();
 
         if (!m_mouse_changed) {
             m_mouse_state[m_current_state] = GetMouseStateImpl();
@@ -127,9 +133,9 @@ namespace Radiant {
 
     }
 
-    bool Input::CheckStateImpl(unsigned int stateCode)
+    bool Input::CheckStateImpl(unsigned int* stateQuery, unsigned int count)
     {
-        return m_keyboard_state[(m_current_state == 0 ? 1 : 0)].CheckState(stateCode);
+        return m_keyboard_state[(m_current_state == 0 ? 1 : 0)].CheckFlags(stateQuery, count);
     }
 
     MouseState& Input::GetMouseStateImpl()
