@@ -1,50 +1,77 @@
 #include "pch.h"
 #include "Utils.h"
 
-namespace Utils {
-    
-    void SetRandomSeed()
-    {
-        srand(time(NULL));
-    }
+namespace Radiant {
+    namespace Utils {
 
-    float RandomFloat(float min, float max, unsigned int precision)
-    {
-        float val = min + ((max - min) * (std::rand() / (float)RAND_MAX));
-        return val;
-    }
-
-    int RandInt(const int min, const int max)
-    {
-        return (rand() % (max - min + 1)) + min;
-    }
-
-    void ReadTextFile(const std::string& filepath, std::string& outContents)
-    {
-        outContents.clear();
-
-        // Read from the text file
-        std::ifstream infile(filepath);
-
-        if (!infile.is_open()) {
-            printf("Warning: Could not open file: [%s]\n", filepath.c_str());
-            return;
+        void SetRandomSeed()
+        {
+            srand(time(NULL));
         }
 
-        // Use a while loop together with the getline() function to read the file line by line
-        std::string line;
-        while (std::getline(infile, line)) {
-            // Output the text from the file
-            outContents += line + "\n";
+        float RandomFloat(float min, float max, unsigned int precision)
+        {
+            float val = min + ((max - min) * (std::rand() / (float)RAND_MAX));
+            return val;
         }
 
-        // Close the file
-        infile.close();
-    }
+        int RandInt(const int min, const int max)
+        {
+            return (rand() % (max - min + 1)) + min;
+        }
 
-    unsigned int GetMax(unsigned int x, unsigned int y)
-    {
-        return (x > y ? x : y);
+        void ReadTextFile(const std::string& filepath, std::string& outContents)
+        {
+            outContents.clear();
+
+            // Read from the text file
+            std::ifstream infile(filepath);
+
+            if (!infile.is_open()) {
+                printf("Warning: Could not open file: [%s]\n", filepath.c_str());
+                return;
+            }
+
+            // Use a while loop together with the getline() function to read the file line by line
+            std::string line;
+            while (std::getline(infile, line)) {
+                // Output the text from the file
+                outContents += line + "\n";
+            }
+
+            // Close the file
+            infile.close();
+        }
+
+        unsigned int GetMax(unsigned int x, unsigned int y)
+        {
+            return (x > y ? x : y);
+        }
+        void Swap(double& A, double& B)
+        {
+            double temp = A;
+            A = B;
+            B = temp;
+        }
+        Vec2d GetClosestVertex(const std::vector<Vec2d>& vertices, const Vec2d& point)
+        {
+            double minDistance = std::numeric_limits<float>::max();
+            unsigned int minIndex = 0;
+
+            for (unsigned int i = 0; i < vertices.size(); i++) {
+                double distance = GetDistance(vertices[i], point);
+
+                if (distance < minDistance) {
+                    distance = minDistance;
+                    minIndex = i;
+                }
+            }
+
+            return vertices[minIndex];
+        }
+        double GetDistance(const Vec2d& pointA, const Vec2d& pointB)
+        {
+            return sqrt(pow(pointB.x - pointA.x, 2) + pow(pointB.y - pointA.y, 2));
+        }
     }
-    
 }

@@ -32,13 +32,13 @@ namespace Radiant {
 	const Vec4f& Color::SetColor(const ColorType& nColor)
 	{
 		switch (nColor) {
-		case ColorType::Blue:
+		case ColorType::BLUE:
 			m_color = Vec4f(0.2f, 0.2f, 0.8f, 1.0f);
 			break;
-		case ColorType::Red:
+		case ColorType::RED:
 			m_color = Vec4f(0.8f, 0.2f, 0.2f, 1.0f);
 			break;
-		case ColorType::Green:
+		case ColorType::GREEN:
 			m_color = Vec4f(0.2f, 0.8f, 0.2f, 1.0f);
 			break;
 		default:

@@ -1,11 +1,14 @@
 #pragma once
 #include "pch.h"
 #include "Utils/Timestep.h"
+#include "GameObject.h"
 
 namespace Radiant {
 	class Application {
 	private:
 		Timestep m_timestep;
+		std::vector<GameObject*> m_game_objects;
+
 	public:
 		Application();
 		~Application();
@@ -24,7 +27,24 @@ namespace Radiant {
 			Start of game loop, clears the window, gets new deltaTime and prepares internals
 			for following update procedures.
 		*/
-		void Update();
+		void BeginFrame();
+
+		/*
+			Runs the OnProcessInput on game objects, which will result in requests
+			made in game space and the physics API.
+		*/
+		void ProcessInput();
+
+		/*
+			Updated the physical world one timestep, triggers collisions, resolving them
+			and sending messages back to game objects.
+		*/
+		void UpdateWorld();
+
+		/*
+			Runs the OnFinalUpdate() on all game objects for final changes before render.
+		*/
+		void FinalUpdate();
 
 		/*
 			Runs the renderer draw command queue, resulting in a new frame.
@@ -50,6 +70,12 @@ namespace Radiant {
 			Get the height in pixels of the window.
 		*/
 		const int WindowHeight();
+
+		/*
+			Adds a game object to the world. Note: the application will now own this pointer
+			and instance and is responsible for freeing it.
+		*/
+		const UniqueID AddGameObject(GameObject* nGameObject);
 
 	};
 }

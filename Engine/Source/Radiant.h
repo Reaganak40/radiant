@@ -4,9 +4,11 @@
 #include "Utils/Input.h"
 #include "Physics/Physics.h"
 
+#include "Physics/Pobject.h"
 
 #include "GameObject.h"
 #include "Gui/Diagnostics.h"
 #include "Polygon/Triangle.h"
 #include "Polygon/Rect.h"
+#include "Polygon/Circle.h"
 #include "Utils/Utils.h"

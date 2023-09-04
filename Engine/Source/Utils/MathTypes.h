@@ -21,15 +21,29 @@ namespace Radiant {
 		}
 
 		/*
-			Returns the normal of this vector.
+			Returns the magnitude of this vector.
 		*/
-		Vec2d Normal();
+		double Magnitude() const;
 
-		static double DotProduct(const Vec2d& A, const Vec2d& B);
+		/*
+			Returns the normal (perpendicular) of this vector.
+		*/
+		Vec2d Normal() const;
+
+		/*
+			Returns the unit vector.
+		*/
+		Vec2d Normalize() const;
+
+		static double Dot(const Vec2d& A, const Vec2d& B);
 	};
 	Vec2d operator* (float multiplier, const Vec2d& vector);
 	Vec2d operator* (const Vec2d& vector, float multiplier);
+	Vec2d operator* (double multiplier, const Vec2d& vector);
+	Vec2d operator* (const Vec2d& vector, double multiplier);
 	Vec2d operator+ (const Vec2d& vector1, const Vec2d& vector2);
+	Vec2d operator- (const Vec2d& vector1, const Vec2d& vector2);
+	Vec2d operator/ (const Vec2d& vector, const double divider);
 
 	/*
 		Returns an absolute vector with all positive values.

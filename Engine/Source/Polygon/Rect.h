@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Polygon.h"
 namespace Radiant {
 	class Rect : public Polygon {

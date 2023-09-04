@@ -25,6 +25,14 @@ namespace Radiant {
 		m_friction = 1 - fmin(frictionMagnitude, 1);
 	}
 
+	void Translation::SetVelocity(const Vec2d nVelocity) {
+		m_current_velocity = nVelocity;
+	}
+
+	Vec2d Translation::GetVelocity() {
+		return m_current_velocity;
+	}
+
 	void Translation::UpdateVelocity(const float deltaTime)
 	{
 		m_current_velocity += deltaTime * m_acceleration;

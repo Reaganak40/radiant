@@ -33,6 +33,16 @@ namespace Radiant {
 		void SetFriction(double frictionMagnitude);
 
 		/*
+			Sets the current velocity to the provided vector.
+		*/
+		void SetVelocity(const Vec2d nVelocity);
+
+		/*
+			Gets the current velocity vector.
+		*/
+		Vec2d GetVelocity();
+		
+		/*
 			Updates the velocity vector according to dt and acceleration.
 		*/
 		void UpdateVelocity(const float deltaTime);
@@ -76,6 +86,8 @@ namespace Radiant {
 			Saves a snapshot of final calculations this frame for future dt calculations.
 		*/
 		void OnEndFrame();
+
+
 	};
 
 }

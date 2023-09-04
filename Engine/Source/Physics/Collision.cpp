@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Collision.h"
 #include "Utils/MathTypes.h"
+#include "Utils/Utils.h"
 
 bool Radiant::Collision::CheckCollisionSAT(const Polygon& A, const Polygon& B)
 {
@@ -51,7 +52,110 @@ bool Radiant::Collision::CheckCollisionSAT(const Polygon& A, const Polygon& B)
 		}
 	}
 
+	
+
     return true;
+}
+
+bool Radiant::Collision::CheckCollisionSAT(const Circle& A, const Polygon& B)
+{
+	/*
+		Step 1: Get the normal of each edge for the polygon B.
+	*/
+	std::vector<Vec2d> B_normals;
+
+	unsigned int B_vertex_count = B.GetVertices().size();
+	for (unsigned int i = 0; i < B_vertex_count; i++) {
+		B_normals.push_back(Vec2d(
+			B.GetVertices().at((i + 1) % B_vertex_count).x - B.GetVertices().at(i).x,
+			B.GetVertices().at((i + 1) % B_vertex_count).y - B.GetVertices().at(i).y).Normal());
+	}
+
+	/*
+		Step 2: Check each axis of each normal for seperation
+	*/
+	for (const auto& axis : B_normals) {
+		double Amin, Amax;
+		double Bmin, Bmax;
+
+		GetProjections(A.GetOrigin(), A.GetRadius(), axis, Amin, Amax);
+		GetProjections(B.GetVertices(), axis, Bmin, Bmax);
+
+		if (Amax < Bmin || Bmax < Amin) {
+			return false;
+		}
+	}
+
+	/*
+		Step 3: Check to see if the polygons closest vertex is in the radius of the circle.
+	*/
+
+	Vec2d closestVertex = Utils::GetClosestVertex(B.GetVertices(), A.GetOrigin());
+
+	return true;
+}
+
+bool Radiant::Collision::CheckCollisionAABB(const Rect& A, const Rect& B)
+{
+	const std::vector<Vec2d>& A_vertices = A.GetVertices();
+	const std::vector<Vec2d>& B_vertices = B.GetVertices();
+
+	return !((A_vertices[1].x < B_vertices[0].x || B_vertices[1].x < A_vertices[0].x) ||
+		(A_vertices[2].y < B_vertices[1].y || B_vertices[2].y < A_vertices[1].y));
+}
+
+bool Radiant::Collision::StaticCollisionDiags(Polygon& dynamicPoly, Polygon& staticPoly)
+{
+	Polygon* poly1;
+	Polygon* poly2;
+	bool displaced = false;
+
+	for (int i = 0; i < 2; i++) {
+
+		if (i == 0) {
+			poly1 = &dynamicPoly;
+			poly2 = &staticPoly;
+		}
+		else {
+			poly1 = &staticPoly;
+			poly2 = &dynamicPoly;
+		}
+
+		// Check diagnals of each polygon
+		for (int i = 0; i < poly1->GetVertices().size(); i++) {
+			Vec2d p1_lineP1 = poly1->GetOrigin();
+			Vec2d p1_lineP2 = poly1->GetVertices()[i];
+
+			Vec2d displacement = Vec2d(0, 0);
+
+			for (int j = 0; j < poly2->GetVertices().size(); j++) {
+				Vec2d p2_lineP1 = poly2->GetVertices()[j];
+				Vec2d p2_lineP2 = poly2->GetVertices()[(j + 1) % poly2->GetVertices().size()];
+
+				// Standard "off the shelf" line segment intersection
+				double h = (p2_lineP2.x - p2_lineP1.x) * (p1_lineP1.y - p1_lineP2.y) - (p1_lineP1.x - p1_lineP2.x) * (p2_lineP2.y - p2_lineP1.y);
+				double t1 = ((p2_lineP1.y - p2_lineP2.y) * (p1_lineP1.x - p2_lineP1.x) + (p2_lineP2.x - p2_lineP1.x) * (p1_lineP1.y - p2_lineP1.y)) / h;
+				double t2 = ((p1_lineP1.y - p1_lineP2.y) * (p1_lineP1.x - p2_lineP1.x) + (p1_lineP2.x - p1_lineP1.x) * (p1_lineP1.y - p2_lineP1.y)) / h;
+
+				if (t1 >= 0.0f && t1 < 1.0f && t2 >= 0.0f && t2 < 1.0f)
+				{
+					displacement.x += (1.0 - t1) * (p1_lineP2.x - p1_lineP1.x);
+					displacement.y += (1.0 - t1) * (p1_lineP2.y - p1_lineP1.y);
+					displaced = true;
+				}
+			}
+
+			dynamicPoly.Move(displacement.x, displacement.y);
+		}
+	}
+
+	return displaced;
+}
+
+bool Radiant::Collision::PointVsRect(const Vec2d& point, Rect& rect)
+{
+	const std::vector<Vec2d>& vertices = rect.GetVertices();
+	return (point.x >= vertices[0].x && point.x <= vertices[1].x && point.y >= vertices[1].y && point.y <= vertices[2].y);
 }
 
 void Radiant::Collision::GetProjections(const std::vector<Vec2d>& vertices, const Vec2d& axis, double& outMin, double& outMax)
@@ -60,10 +164,26 @@ void Radiant::Collision::GetProjections(const std::vector<Vec2d>& vertices, cons
 	outMax = std::numeric_limits<float>::min();
 
 	for (const auto& vertex : vertices) {
-		double product = Vec2d::DotProduct(vertex, axis);
+		double product = Vec2d::Dot(vertex, axis);
 
 		outMin = (product < outMin ? product : outMin);
 		outMax = (product > outMax ? product : outMax);
 
+	}
+}
+
+void Radiant::Collision::GetProjections(const Vec2d& origin, const double radius, const Vec2d& axis, double& outMin, double& outMax)
+{
+	Vec2d direction = axis.Normalize();
+	Vec2d directionAndRadius = direction * radius;
+
+	Vec2d p1 = origin + directionAndRadius;
+	Vec2d p2 = origin - directionAndRadius;
+
+	outMin = Vec2d::Dot(p1, axis);
+	outMax = Vec2d::Dot(p2, axis);
+
+	if (outMin > outMax) {
+		Utils::Swap(outMin, outMax);
 	}
 }

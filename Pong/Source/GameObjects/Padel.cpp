@@ -1,15 +1,11 @@
 #include "Padel.h"
 
 Padel::Padel(double xPos, double yPos)
-	: m_sprite(Radiant::Rect(Radiant::Vec2d(xPos, yPos), PADEL_WIDTH, PADEL_HEIGHT)),
-	m_translation((0, 0), (0, 0))
 {
 	using namespace Radiant;
 
-	m_translation.SetMaxVelocity(Vec2d(500, 500));
-	acceleration = 550;
-
-	m_sprite_color = ColorType::Red;
+	spawnPos = Vec2d(xPos, yPos);
+	m_sprite_color = RED;
 
 	SetLeftControl(std::vector<InputState>{A_KEY_PRESS, A_KEY_DOWN});
 	SetRightControl(std::vector<InputState>{D_KEY_PRESS, D_KEY_DOWN});
@@ -21,30 +17,18 @@ Padel::~Padel()
 {
 }
 
-void Padel::OnUpdate(const float deltaTime)
+void Padel::OnRegister()
 {
 	using namespace Radiant;
-	
-	m_translation.SetAcceleration(Vec2d(0, 0));
+	m_model_ID = Physics::CreateObject(Rect(spawnPos, PADEL_WIDTH, PADEL_HEIGHT));
+}
 
-	if (Input::CheckKeyboardState(right_cond)) {
-		m_translation.SetAccelerationX(acceleration);
-	}
+void Padel::OnProcessInput(const float deltaTIme)
+{
+}
 
-	if (Input::CheckKeyboardState(left_cond)) {
-		m_translation.SetAccelerationX(-acceleration);
-	}
-
-	if (Input::CheckKeyboardState(up_cond)) {
-		m_translation.SetAccelerationY(acceleration);
-	}
-
-	if (Input::CheckKeyboardState(down_cond)) {
-		m_translation.SetAccelerationY(-acceleration);
-	}
-
-	m_translation.UpdateVelocity(deltaTime);
-	m_translation.Translate(m_sprite, deltaTime);
+void Padel::OnFinalUpdate()
+{
 }
 
 void Padel::OnRender()
@@ -53,13 +37,8 @@ void Padel::OnRender()
 	
 	Renderer::Begin();
 	Renderer::SetPolygonColor(m_sprite_color);
-	Renderer::AddPolygon(m_sprite);
+	Renderer::AddPolygon(Physics::GetPolygon(m_model_ID));
 	Renderer::End();
-}
-
-void Padel::OnEndFrame()
-{
-	m_translation.OnEndFrame();
 }
 
 void Padel::SetSpriteColor(Radiant::Color nColor)

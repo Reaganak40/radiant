@@ -3,6 +3,8 @@
 #include "Renderer/Renderer.h"
 #include "Utils/Input.h"
 #include "Utils/Utils.h"
+#include "Physics/Physics.h"
+
 
 namespace Radiant
 {
@@ -13,6 +15,12 @@ namespace Radiant
 
 	Application::~Application()
 	{
+
+		for (const auto& gameObject : m_game_objects) {
+			delete gameObject;
+		}
+
+		Physics::Destroy();
 		Input::Destroy();
 		Renderer::Destroy();
 	}
@@ -23,6 +31,7 @@ namespace Radiant
 
 		Renderer::CreateWindow(appName, windowWidth, windowHeight);
 		Input::Initialize();
+		Physics::Initialize();
 	}
 
 	bool Application::IsRunning()
@@ -30,7 +39,7 @@ namespace Radiant
 		return !Renderer::ShouldWindowClose();
 	}
 
-	void Application::Update()
+	void Application::BeginFrame()
 	{
 		m_timestep.Update();
 
@@ -38,8 +47,29 @@ namespace Radiant
 		Renderer::Update(m_timestep.deltaTime);
 	}
 
+	void Application::ProcessInput()
+	{
+		for (const auto& gameObject : m_game_objects) {
+			gameObject->OnProcessInput(m_timestep.deltaTime);
+		}
+	}
+
+	void Application::UpdateWorld()
+	{
+	}
+
+	void Application::FinalUpdate()
+	{
+		for (const auto& gameObject : m_game_objects) {
+			gameObject->OnFinalUpdate();
+		}
+	}
+
 	void Application::Render()
 	{
+		for (const auto& gameObject : m_game_objects) {
+			gameObject->OnRender();
+		}
 		Renderer::Render();
 	}
 
@@ -54,5 +84,13 @@ namespace Radiant
 
 	const int Application::WindowHeight() {
 		return Renderer::GetWindowHeight();
+	}
+
+	const UniqueID Application::AddGameObject(GameObject* nGameObject)
+	{
+		nGameObject->OnRegister();
+		m_game_objects.push_back(nGameObject);
+
+		return nGameObject->GetUUID();
 	}
 }

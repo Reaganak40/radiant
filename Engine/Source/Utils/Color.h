@@ -3,9 +3,9 @@
 
 namespace Radiant {
 	enum ColorType {
-		Blue,
-		Red,
-		Green,
+		BLUE,
+		RED,
+		GREEN,
 	};
 
 	class Color {

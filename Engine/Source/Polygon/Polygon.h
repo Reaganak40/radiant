@@ -19,6 +19,8 @@ namespace Radiant {
 
 		const std::vector<Vec2d>& GetVertices() const;
 		const std::vector<unsigned int> GetIndices() const;
+		Vec2d GetOrigin() const;
+
 		const UniqueID GetUUID() const;
 
 		void Move(double dx, double dy);

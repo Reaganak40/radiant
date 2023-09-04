@@ -1,3 +1,4 @@
+#pragma once
 #include "Gui.h"
 
 namespace Radiant {

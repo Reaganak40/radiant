@@ -13,6 +13,11 @@ namespace Radiant {
         return m_indices;
     }
 
+    Vec2d Polygon::GetOrigin() const
+    {
+        return m_origin;
+    }
+
     const UniqueID Polygon::GetUUID() const
     {
         return m_UUID;

@@ -5,26 +5,35 @@ namespace Radiant {
 	class GameObject {
 	private:
 		UniqueID m_UUID;
+	protected:
+		UniqueID m_model_ID;
+
 	public:
-		GameObject() : m_UUID(GetUniqueID()) {}
+		GameObject() : m_UUID(GetUniqueID()), m_model_ID(0) {}
 		~GameObject() {}
 
 		const UniqueID GetUUID() { return m_UUID; }
 
 		/*
+			To implement function when object is being registered as a game object
+			with the game application.
+		*/
+		virtual void OnRegister() {}
+
+		/*
 			To implement function when object needs to perform update procedures.
 		*/
-		virtual void OnUpdate(const float deltaTIme) {}
+		virtual void OnProcessInput(const float deltaTIme) {}
+
+		/*
+			To implement function when object needs to perform final update procedures.
+		*/
+		virtual void OnFinalUpdate() {}
 		
 		/*
 			To implement function when object needs to perform rendering procedures.
 		*/
 		virtual void OnRender() {}
-
-		/*
-			To implement function when object needs to perform end of frame procedures.
-		*/
-		virtual void OnEndFrame() {}
 
 	};
 }
