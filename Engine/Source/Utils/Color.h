@@ -7,6 +7,7 @@ namespace Radiant {
 		RED,
 		GREEN,
 		ORANGE,
+		BLACK,
 	};
 
 	class Color {

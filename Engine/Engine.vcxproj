@@ -170,6 +170,7 @@
     <ClCompile Include="Source\Physics\Pobject.cpp" />
     <ClCompile Include="Source\Physics\Translation.cpp" />
     <ClCompile Include="Source\Polygon\Circle.cpp" />
+    <ClCompile Include="Source\Polygon\Line.cpp" />
     <ClCompile Include="Source\Polygon\Polygon.cpp" />
     <ClCompile Include="Source\Polygon\Rect.cpp" />
     <ClCompile Include="Source\Polygon\Triangle.cpp">
@@ -179,7 +180,7 @@
     <ClCompile Include="Source\Renderer\ErrorHandling.cpp" />
     <ClCompile Include="Source\Renderer\GeoMode.cpp" />
     <ClCompile Include="Source\Renderer\IndexBuffer.cpp" />
-    <ClCompile Include="Source\Renderer\Mesh.cpp" />
+    <ClCompile Include="Source\Renderer\RenderCache.cpp" />
     <ClCompile Include="Source\Renderer\Renderer.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -261,7 +262,9 @@
     <ClInclude Include="Source\Physics\Pobject.h" />
     <ClInclude Include="Source\Physics\Translation.h" />
     <ClInclude Include="Source\Polygon\Circle.h" />
+    <ClInclude Include="Source\Polygon\Line.h" />
     <ClInclude Include="Source\Renderer\GeoMode.h" />
+    <ClInclude Include="Source\Renderer\RenderCache.h" />
     <ClInclude Include="Source\Utils\BitSet.h" />
     <ClInclude Include="Source\Utils\Color.h" />
     <ClInclude Include="Source\Utils\Input.h" />

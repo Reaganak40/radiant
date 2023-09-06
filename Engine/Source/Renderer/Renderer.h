@@ -4,8 +4,10 @@
 // For Render API
 #include "Polygon/Polygon.h"
 #include "Polygon/Rect.h"
+#include "Polygon/Line.h"
 #include "Mesh.h"
 #include "Utils/Color.h"
+#include "RenderCache.h"
 
 // For Opengl rendering
 #include "VertexArray.h"
@@ -19,7 +21,8 @@ namespace Radiant {
 
 	enum RenderCond {
 		NoConditions  = 0,
-		DrawOutline = 1 // fill by default
+		DrawOutline = 1, // fill by default
+		DrawLines = 2, // draw triangles by default
 	};
 
 
@@ -59,14 +62,11 @@ namespace Radiant {
 
 		unsigned int m_current_layer;
 		unsigned int m_current_render_cond;
-		MeshCache m_mesh_cache;
+		RenderCache m_render_cache;
 		std::queue<DrawCommand> m_command_queue;
 
 		Color m_polygon_color;
-
-		std::vector<Rect> m_rect_cache;
-		unsigned int m_rect_index;
-
+		Color m_line_color;
 
 		// *****************************************************
 		// 
@@ -85,11 +85,16 @@ namespace Radiant {
 		};
 
 		// Container for layers in a scene with their own unique specifications.
-#define glLayerFillUnits 0
-#define glLayerOutlineUnits 1
 
+		enum glRenderUnitType {
+			FillUnit = 0,
+			OutlineUnit,
+			LineUnit
+		};
+
+		const glRenderUnitType renderUnitOrder[3] = { FillUnit, OutlineUnit, LineUnit };
 		struct glLayer {
-			std::vector<glRenderUnit> renderUnits[2];
+			std::vector<glRenderUnit> renderUnits[3];
 
 			glLayer() {}
 		};
@@ -198,6 +203,14 @@ namespace Radiant {
 		}
 
 		/*
+			Utility function for quickly drawing a Line to the screen.
+		*/
+		static void DrawLine(const Vec2d& start, const Vec2d& end, const Color& color,
+			const unsigned int rendCond = 0, unsigned int layer = 0) {
+			m_instance->DrawLineImpl(start, end, color, rendCond, layer);
+		}
+
+		/*
 			Starts a new render command session context.
 		*/
 		static void Begin(unsigned int layer = 0) { m_instance->BeginImpl(layer); }
@@ -218,6 +231,21 @@ namespace Radiant {
 		static void AddPolygon(const Polygon& polygon) { m_instance->AddPolygonImpl(polygon); }
 
 		/*
+			Adds a line to the render queue to be drawn next frame.
+		*/
+		static void AddLine(const Line& line) { m_instance->AddLineImpl(line); }
+
+		/*
+			Sets the draw color for lines, which will be used on the next line.
+		*/
+		static void SetLineColor(const Color& color) { m_instance->SetLineColorImpl(color); }
+
+		/*
+			Sets the draw color for lines, which will be used on the next line.
+		*/
+		static void SetLineColor(ColorType color) { m_instance->SetLineColorImpl(color); }
+
+		/*
 			Sets the draw color for polygons, which will be used on the next polygon.
 		*/
 		static void SetPolygonColor(const Color& color) { m_instance->SetPolygonColorImpl(color); }
@@ -225,7 +253,7 @@ namespace Radiant {
 		/*
 			Sets the draw color for polygons, which will be used on the next polygon.
 		*/
-		static void SetPolygonColor(ColorType color) { m_instance->SetPolygonColorImpl(Color(color)); }
+		static void SetPolygonColor(ColorType color) { m_instance->SetPolygonColorImpl(color); }
 
 		/*
 			Attaches a Gui instance, which will be drawn at the end of the draw command queue.
@@ -247,13 +275,16 @@ namespace Radiant {
 		void RenderImpl();
 		void OnEndFrameImpl();
 
-		void DrawRectImpl(const Vec2d& origin, const Vec2d& size, const Color& color, unsigned int layer, const unsigned int rendCond);
-
+		void DrawRectImpl(const Vec2d& origin, const Vec2d& size, const Color& color, const unsigned int rendCond, unsigned int layer);
+		void DrawLineImpl(const Vec2d& start, const Vec2d& end, const Color& color, const unsigned int rendCond, unsigned int layer);
+		
 		void BeginImpl(unsigned int layer);
 		void EndImpl();
 		void AddPolygonImpl(const Polygon& polygon);
+		void AddLineImpl(const Line& line);
 		void SetRenderCondImpl(const unsigned int rendCond);
 		void SetPolygonColorImpl(const Color& color);
+		void SetLineColorImpl(const Color& color);
 
 
 		void SetVBO(VBO_ID vbo);
@@ -264,7 +295,7 @@ namespace Radiant {
 		void AddDefaultShader();
 		void AddLayer();
 
-		void AddToRenderUnit(const Mesh& mesh, unsigned int rendCond);
+		void AddToRenderUnit(const Mesh& mesh, const glRenderUnitType type);
 
 		void FlushPolygonImpl(const UniqueID UUID);
 	};

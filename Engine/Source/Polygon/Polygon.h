@@ -6,7 +6,8 @@
 namespace Radiant {
 
 	enum PolygonProperies {
-		IsRect = 1
+		IsRect = 1,
+		IsLine = 2,
 	};
 
 	class Polygon {

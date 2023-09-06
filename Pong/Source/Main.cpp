@@ -27,7 +27,9 @@ int main(void)
         /* Final update of game objects before render. */
         pongApp.FinalUpdate();
 
-
+        if (Input::CheckKeyboardState(std::vector<InputState>{E_KEY_DOWN, E_KEY_PRESS})) {
+            Renderer::DrawRect(Vec2d(500.0, 300.0), Vec2d(150.0, 150.0), ORANGE, DrawOutline, 0);
+        }
         /* Render the current frame. */
         pongApp.Render();
 

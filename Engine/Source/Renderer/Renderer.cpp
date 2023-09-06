@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Renderer.h"
 #include "ErrorHandling.h"
-#include "Polygon/Rect.h"
 
 namespace Radiant {
 
@@ -9,7 +8,7 @@ namespace Radiant {
 
     Renderer::Renderer()
         : m_window(nullptr), m_window_name(""), m_window_width(0), m_window_height(0), m_vertex_array(nullptr),
-        m_current_vbo(0), m_current_ibo(0), m_current_shader(0), m_current_layer(0), m_rect_index(0), m_current_render_cond(0),
+        m_current_vbo(0), m_current_ibo(0), m_current_shader(0), m_current_layer(0), m_current_render_cond(0),
         m_current_mode(FillMode)
     {
         /* Initialize the library */
@@ -20,15 +19,16 @@ namespace Radiant {
         m_proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f , -1.0f, 1.0f);
         m_view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
         m_model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-    }
 
+        m_polygon_color = BLACK;
+        m_line_color = BLACK;
+    }
 
     Renderer::~Renderer()
     {
         // Delete all buffers from all layers
-        unsigned int unitTypes[2] = { glLayerFillUnits, glLayerOutlineUnits };
         for (const auto& layer : m_layers) {
-            for (const auto& type : unitTypes) {
+            for (const auto& type : renderUnitOrder) {
                 for (auto& unit : layer.renderUnits[type]) {
                     delete unit.m_IBO;
                     delete unit.m_VBO;
@@ -160,28 +160,36 @@ namespace Radiant {
     {
         while (!m_command_queue.empty()) {
             DrawCommand command = m_command_queue.front();
-            const Mesh& mesh = m_mesh_cache.GetMesh(command.meshIdentifier);
+            const Mesh& mesh = m_render_cache.GetMesh(command.meshIdentifier);
 
-            AddToRenderUnit(mesh, command.renderCond);
+            if (mesh.vertices.size() == 2) {
+                AddToRenderUnit(mesh, LineUnit);
+            }
+            else {
+                AddToRenderUnit(mesh, DrawCommand::HasRendCond(command.renderCond, DrawOutline) ? OutlineUnit : FillUnit);
+            }
+
             m_command_queue.pop();
         }
 
-        unsigned int unitTypes[2] = { glLayerFillUnits, glLayerOutlineUnits };
         for (const auto& layer : m_layers) {
-            for (const auto& type : unitTypes) {
+            for (const auto& type : renderUnitOrder) {
                 for (auto& unit : layer.renderUnits[type]) {
                     
                     // Draw Call Procedure
                     SetVBO(unit.vboID);
                     SetIBO(unit.iboID);
                     SetShader(unit.shaderID);
-                    SetMode(type == glLayerFillUnits ? FillMode : OutlineMode);
+                    SetMode(type == OutlineUnit ? OutlineMode : FillMode);
 
                     unit.m_VBO->Update();
                     unit.m_IBO->Update();
 
                     m_vertex_array->DefineVertexBufferLayout();
-                    glDrawElements(GL_TRIANGLES, unit.m_IBO->GetIndexCount(), GL_UNSIGNED_INT, nullptr);
+                    
+                    glDrawElements(
+                        type == LineUnit ? GL_LINES : GL_TRIANGLES,
+                        unit.m_IBO->GetIndexCount(), GL_UNSIGNED_INT, nullptr);
                 }
             }
         }
@@ -200,16 +208,11 @@ namespace Radiant {
         /* Poll for and process events */
         glfwPollEvents();
 
-
-        if (m_rect_cache.size() < m_rect_index) {
-            m_rect_cache.resize(m_rect_index);
-        }
-        m_rect_index = 0;
+        m_render_cache.OnEndFrame();
 
         // Reset the buffers of each layer.
-        unsigned int unitTypes[2] = { glLayerFillUnits, glLayerOutlineUnits };
         for (const auto& layer : m_layers) {
-            for (const auto& type : unitTypes) {
+            for (const auto& type : renderUnitOrder) {
                 for (auto& unit : layer.renderUnits[type]) {
                     unit.m_IBO->Flush();
                     unit.m_VBO->Flush();
@@ -220,30 +223,45 @@ namespace Radiant {
     }
 
     void Renderer::DrawRectImpl(const Vec2d& origin, const Vec2d& size, const Color& color,
-        unsigned int layer, const unsigned int rendCond)
+        unsigned int rendCond, const unsigned int layer)
     {
         // Use the rect cache for efficiency
-        if (m_rect_index == m_rect_cache.size()) {
-            m_rect_cache.push_back(Rect(origin, size.x, size.y));
+        std::shared_ptr<Rect> rect;
+
+        if ((rect = m_render_cache.GetFreeRect()) == nullptr) {
+            m_render_cache.AddRectToCache(std::shared_ptr<Rect>(new Rect(origin, size.x, size.y)));
+            rect = m_render_cache.GetFreeRect();
         }
         else {
-            m_rect_cache.at(m_rect_index).SetPosition(origin);
-            m_rect_cache.at(m_rect_index).SetSize(size);
+            rect->SetPosition(origin);
+            rect->SetSize(size);
         }
-
+        
         Color old_color = m_polygon_color;
 
         // Use draw API
         BeginImpl(layer);
         SetPolygonColorImpl(color);
         SetRenderCondImpl(rendCond);
-        AddPolygonImpl(m_rect_cache.at(m_rect_index));
+        AddPolygonImpl(*rect);
         EndImpl();
            
         // Go back to saved settings
         m_polygon_color = old_color;
+    }
 
-        m_rect_index++;
+    void Renderer::DrawLineImpl(const Vec2d& start, const Vec2d& end, const Color& color, const unsigned int rendCond, unsigned int layer)
+    {
+        Line line(start, end);
+        Color old_line_color = m_line_color;
+
+        BeginImpl(layer);
+        SetLineColorImpl(color);
+        SetRenderCondImpl(rendCond);
+        AddLineImpl(line);
+        EndImpl();
+
+        m_line_color = old_line_color;
     }
 
     void Renderer::BeginImpl(unsigned int layer)
@@ -262,7 +280,7 @@ namespace Radiant {
 
     void Renderer::AddPolygonImpl(const Polygon& polygon)
     {
-        Mesh& pMesh = m_mesh_cache.GetMesh(polygon.GetUUID());
+        Mesh& pMesh = m_render_cache.GetMesh(polygon.GetUUID());
 
         if (pMesh.indices.size() != polygon.GetIndices().size()) {
             pMesh.indices = polygon.GetIndices();
@@ -290,6 +308,37 @@ namespace Radiant {
         m_command_queue.push(DrawCommand(polygon.GetUUID(), m_current_render_cond));
     }
 
+    void Renderer::AddLineImpl(const Line& line)
+    {
+        Mesh& pMesh = m_render_cache.GetMesh(line.GetUUID());
+
+        if (pMesh.indices.size() != line.GetIndices().size()) {
+            pMesh.indices = line.GetIndices();
+        }
+
+        int index = 0;
+        for (const auto& vertex : line.GetVertices()) {
+            if (pMesh.vertices.size() == index) {
+
+                pMesh.vertices.push_back(
+                    Vertex(
+                        Vec3f((float)vertex.x, (float)vertex.y), m_line_color.GetColor()
+                    )
+                );
+            }
+            else {
+                pMesh.vertices[index].position = Vec3f((float)vertex.x, (float)vertex.y);
+                pMesh.vertices[index].color = m_line_color.GetColor();
+            }
+            index++;
+        }
+
+        pMesh.layer = m_current_layer;
+
+        m_command_queue.push(DrawCommand(line.GetUUID(), m_current_render_cond));
+
+    }
+
     void Renderer::SetRenderCondImpl(const unsigned int rendCond)
     {
         m_current_render_cond = 0;
@@ -299,6 +348,11 @@ namespace Radiant {
     void Renderer::SetPolygonColorImpl(const Color& color)
     {
         m_polygon_color = color;
+    }
+
+    void Renderer::SetLineColorImpl(const Color& color)
+    {
+        m_line_color = color;
     }
 
     void Renderer::SetVBO(VBO_ID vbo)
@@ -351,13 +405,12 @@ namespace Radiant {
         m_layers.push_back(glLayer());
     }
 
-    void Renderer::AddToRenderUnit(const Mesh& mesh, unsigned int rendCond)
+    void Renderer::AddToRenderUnit(const Mesh& mesh, const glRenderUnitType type)
     {
-        unsigned int targetArray = DrawCommand::HasRendCond(rendCond, DrawOutline) ? glLayerOutlineUnits : glLayerFillUnits;
 
-        if (m_layers.at(mesh.layer).renderUnits[targetArray].size() == 0) {
-            m_layers.at(mesh.layer).renderUnits[targetArray].push_back(glRenderUnit());
-            glRenderUnit& unit = m_layers.at(mesh.layer).renderUnits[targetArray].back();
+        if (m_layers.at(mesh.layer).renderUnits[type].size() == 0) {
+            m_layers.at(mesh.layer).renderUnits[type].push_back(glRenderUnit());
+            glRenderUnit& unit = m_layers.at(mesh.layer).renderUnits[type].back();
 
             unit.m_VBO = new VertexBuffer;
             unit.m_IBO = new IndexBuffer;
@@ -366,7 +419,7 @@ namespace Radiant {
             unit.iboID = unit.m_IBO->GetID();
             unit.shaderID = m_shaders.front()->GetID();
         }
-        glRenderUnit& unit = m_layers.at(mesh.layer).renderUnits[targetArray].back();
+        glRenderUnit& unit = m_layers.at(mesh.layer).renderUnits[type].back();
 
         unit.m_VBO->PushToBatch(mesh.vertices);
         unit.m_IBO->PushToBatch(mesh.indices, mesh.vertices.size());
@@ -374,7 +427,7 @@ namespace Radiant {
 
     void Renderer::FlushPolygonImpl(const UniqueID UUID)
     {
-        m_mesh_cache.Flush(UUID);
+        m_render_cache.Flush(UUID);
     }
 
     bool Renderer::DrawCommand::HasRendCond(unsigned int src, unsigned int condQuery)

@@ -20,18 +20,4 @@ namespace Radiant {
 
 		Mesh() : m_UUID(GetUniqueID()), layer(0) {}
 	};
-
-
-
-
-	class MeshCache {
-	private:
-		std::unordered_map<UniqueID, Mesh> m_cache;
-	public:
-		MeshCache();
-		~MeshCache();
-
-		Mesh& GetMesh(UniqueID meshIdentifier);
-		void Flush(const UniqueID meshIdentifier);
-	};
 }
