@@ -152,10 +152,109 @@ bool Radiant::Collision::StaticCollisionDiags(Polygon& dynamicPoly, Polygon& sta
 	return displaced;
 }
 
+bool Radiant::Collision::SweptAABB(Pobject& source, const Pobject& suspect, const float deltaTime)
+{
+	/*
+		Rect:
+
+		sp*------
+		  |     |
+		  |     |
+		  |     |
+		  ------* ep
+	*/
+	if (source.translation.GetVelocity() == Vec2d::Zero()) {
+		return false;
+	}
+
+	Vec2d ray = source.translation.GetChangeInPosition(deltaTime);
+
+	Vec2d sp = suspect.m_polygon.GetVertices()[3];
+	Vec2d ep = suspect.m_polygon.GetVertices()[1];
+
+	sp.x -= suspect.m_polygon.GetWidth() / 2;
+	sp.y += suspect.m_polygon.GetHeight() / 2;
+
+	ep.x += suspect.m_polygon.GetWidth() / 2;
+	ep.y -= suspect.m_polygon.GetHeight() / 2;
+
+
+	Vec2d start = source.m_polygon.GetOrigin();
+	Vec2d contactPoint;
+	Vec2d contactNormal;
+	float contactTime;
+
+	if (RayVsRect(start, ray, sp, ep, contactPoint, contactNormal, contactTime)) {
+
+		source.translation.m_current_velocity += contactNormal * source.translation.m_current_velocity * (contactTime);
+		return true;
+	}
+
+	return false;
+}
+
 bool Radiant::Collision::PointVsRect(const Vec2d& point, Rect& rect)
 {
 	const std::vector<Vec2d>& vertices = rect.GetVertices();
 	return (point.x >= vertices[0].x && point.x <= vertices[1].x && point.y >= vertices[1].y && point.y <= vertices[2].y);
+}
+
+bool Radiant::Collision::RayVsRect(const Vec2d& start, const Vec2d& ray, const Vec2d& rectTopLeft, const Vec2d& rectBottomRight,
+	Vec2d& contactPoint, Vec2d& contactNormal, float& contactTime)
+{
+	Vec2d tNear = (rectTopLeft - start) / ray;
+	Vec2d tFar = (rectBottomRight - start) / ray;
+
+	// Check for division by 0
+	if (std::isnan(tNear.x)) { tNear.x = -std::numeric_limits<double>::infinity(); }
+	if (std::isnan(tNear.y)) { tNear.y = -std::numeric_limits<double>::infinity(); }
+	if (std::isnan(tFar.x))  { tFar.x  =  std::numeric_limits<double>::infinity(); }
+	if (std::isnan(tFar.y))  { tFar.y  =  std::numeric_limits<double>::infinity(); }
+
+	// Sort
+	if (tNear.x > tFar.x) { Utils::Swap(tNear.x, tFar.x); }
+	if (tNear.y > tFar.y) { Utils::Swap(tNear.y, tFar.y); }
+
+
+	// Check for intersection
+	if (tNear.x > tFar.y || tNear.y > tFar.x) { return false; }
+
+
+	double tHitNear = Utils::Max(tNear.x, tNear.y);
+	double tHitFar = Utils::Min(tFar.x, tFar.y);
+
+	// Collision not in direction of ray
+	if (tHitNear < 0 || tHitNear > 1) {
+		return false;
+	}
+
+	contactPoint = start + (tHitFar * ray);
+	contactTime = tHitNear;
+
+	if (tNear.x > tNear.y) {
+		if (ray.x < 0) {
+			contactNormal = Vec2d(1, 0);
+			printf("Right\n");
+		}
+		else {
+			contactNormal = Vec2d(-1, 0);
+			printf("Left\n");
+		}
+	} else if (tNear.x < tNear.y) {
+		if (ray.y < 0) {
+			contactNormal = Vec2d(0, 1);
+			printf("Up\n");
+		}
+		else {
+			contactNormal = Vec2d(0, -1);
+			printf("Down\n");
+		}
+	}
+	else {
+		contactNormal = Vec2d::Zero();
+	}
+
+	return true;
 }
 
 void Radiant::Collision::GetProjections(const std::vector<Vec2d>& vertices, const Vec2d& axis, double& outMin, double& outMax)

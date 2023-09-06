@@ -6,7 +6,7 @@ namespace Radiant {
 
         void SetRandomSeed()
         {
-            srand(time(NULL));
+            srand((unsigned int)time(NULL));
         }
 
         float RandomFloat(float min, float max, unsigned int precision)
@@ -43,10 +43,20 @@ namespace Radiant {
             infile.close();
         }
 
-        unsigned int GetMax(unsigned int x, unsigned int y)
+        unsigned int Max(unsigned int x, unsigned int y)
         {
             return (x > y ? x : y);
         }
+        double Max(double x, double y)
+        {
+            return (x > y ? x : y);
+        }
+
+        double Min(double x, double y)
+        {
+            return (x > y ? y : x);
+        }
+
         void Swap(double& A, double& B)
         {
             double temp = A;
@@ -55,7 +65,7 @@ namespace Radiant {
         }
         Vec2d GetClosestVertex(const std::vector<Vec2d>& vertices, const Vec2d& point)
         {
-            double minDistance = std::numeric_limits<float>::max();
+            constexpr double minDistance = std::numeric_limits<double>::max();
             unsigned int minIndex = 0;
 
             for (unsigned int i = 0; i < vertices.size(); i++) {

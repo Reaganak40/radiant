@@ -32,5 +32,6 @@ namespace Radiant {
 		~MeshCache();
 
 		Mesh& GetMesh(UniqueID meshIdentifier);
+		void Flush(const UniqueID meshIdentifier);
 	};
 }

@@ -29,7 +29,17 @@ namespace Radiant {
         /*
             Returns the max between two unsigned integers
         */
-        unsigned int GetMax(unsigned int x, unsigned int y);
+        unsigned int Max(unsigned int x, unsigned int y);
+
+        /*
+            Returns the max between two doubles
+        */
+        double Max(double x, double y);
+
+        /*
+            Returns the minimum between two doubles
+        */
+        double Min(double x, double y);
 
         /*
             Swaps the contents of the two values.
@@ -45,5 +55,6 @@ namespace Radiant {
             Returns the distance between two points.
         */
         double GetDistance(const Vec2d& pointA, const Vec2d& pointB);
+
     }
 }

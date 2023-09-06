@@ -2,7 +2,11 @@
 #include "MathTypes.h"
 
 namespace Radiant {
-
+    
+    bool operator==(const Vec2d& vector1, const Vec2d& vector2)
+    {
+        return vector1.x == vector2.x && vector1.y == vector2.y;
+    }
     Vec2d operator*(float multiplier, const Vec2d& vector)
     {
         return Vec2d(multiplier * vector.x, multiplier * vector.y);
@@ -17,6 +21,11 @@ namespace Radiant {
     {
         return Vec2d(multiplier * vector.x, multiplier * vector.y);
 
+    }
+
+    Vec2d operator*(const Vec2d& vector1, const Vec2d& vector2)
+    {
+        return Vec2d(vector1.x * vector2.x, vector1.y * vector2.y);
     }
 
     Vec2d operator*(const Vec2d& vector, double multiplier)
@@ -40,6 +49,19 @@ namespace Radiant {
         return Vec2d(vector.x / divider, vector.y / divider);
     }
 
+    Vec2d operator/(const Vec2d& vector1, const Vec2d& vector2)
+    {
+        double x, y;
+
+        if (vector2.x == 0) x = NAN;
+        else x = vector1.x / vector2.x;
+
+        if (vector2.y == 0) y = NAN;
+        else y = vector1.y / vector2.y;
+
+        return Vec2d(x, y);
+    }
+
     Vec2d Vabs(Vec2d vector)
     {
         return Vec2d(abs(vector.x), abs(vector.y));
@@ -58,6 +80,10 @@ namespace Radiant {
     Vec2d Vec2d::Normalize() const
     {
         return (*this) / Magnitude();
+    }
+
+    Vec2d Vec2d::Zero() {
+        return Vec2d(0, 0);
     }
 
     double Vec2d::Dot(const Vec2d& A, const Vec2d& B)

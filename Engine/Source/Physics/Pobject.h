@@ -16,5 +16,6 @@ namespace Radiant {
 		const Polygon& GetPolygon() { return m_polygon; }
 
 		friend class Physics;
+		friend class Collision;
 	};
 }

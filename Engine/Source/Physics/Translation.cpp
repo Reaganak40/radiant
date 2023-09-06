@@ -7,6 +7,7 @@ namespace Radiant {
 		: m_old_velocity(0.0, 0.0), m_current_velocity(initial_velocity), m_acceleration(initial_acceleration),
 		m_friction(0.98)
 	{
+		use_old_velocity = true;
 		m_has_max_velocity = false;
 		m_max_velocity = (0.0, 0.0);
 	}
@@ -15,7 +16,7 @@ namespace Radiant {
 	{
 	}
 
-	void Translation::SetMaxVelocity(const Vec2d nMaxVelocity)
+	void Translation::SetMaxVelocity(const Vec2d& nMaxVelocity)
 	{
 		m_has_max_velocity = true;
 		m_max_velocity = Vabs(nMaxVelocity);
@@ -58,36 +59,27 @@ namespace Radiant {
 		}
 	}
 
+	void Translation::SetRealVelocity(Vec2d nVelocity)
+	{
+		m_current_velocity = nVelocity;
+		use_old_velocity = false;
+	}
+
 	void Translation::UpdateAcceleration(Vec2d dAcc)
 	{
 		m_acceleration += dAcc;
 	}
 
-	void Translation::SetAcceleration(Vec2d nAcceleration)
-	{
-		m_acceleration = nAcceleration;
-	}
-
-	void Translation::SetAccelerationX(double x)
-	{
-		m_acceleration.x = x;
-	}
-
-	void Translation::SetAccelerationY(double y)
-	{
-		m_acceleration.y = y;
-	}
-
 	void Translation::Translate(std::vector<Vec2d>& vertices, const float deltaTime)
 	{
 		for (auto& vertex : vertices) {
-			vertex = (vertex + ((0.5) * (m_old_velocity + m_current_velocity) * deltaTime));
+			Translate(vertex, deltaTime);
 		}
 	}
 
 	void Translation::Translate(Vec2d& point, const float deltaTime)
 	{
-		point = (point + ((0.5) * (m_old_velocity + m_current_velocity) * deltaTime));
+			point += m_current_velocity * deltaTime;
 	}
 
 	void Translation::Translate(Polygon& polygon, const float deltaTime)
@@ -96,8 +88,32 @@ namespace Radiant {
 		Translate(polygon.m_origin, deltaTime);
 	}
 
+	Vec2d Translation::GetChangeInPosition(const float deltaTime)
+	{
+		return (Vec2d::Zero() + ((0.5) * (m_old_velocity + m_current_velocity) * deltaTime));
+	}
+
+	Vec2d Translation::GetNextPositionPoint(const Vec2d& point, const float deltaTime)
+	{
+
+		return (point + ((0.5) * (m_old_velocity + m_current_velocity) * deltaTime));
+	}
+
+	std::vector<Vec2d> Translation::GetNextPositionVertices(const std::vector<Vec2d>& vertices, const float deltaTime)
+	{
+		std::vector<Vec2d> res = {};
+		res.reserve(vertices.size());
+
+		for (const auto& vertex : vertices) {
+			res.push_back(GetNextPositionPoint(vertex, deltaTime));
+		}
+
+		return res;
+	}
+
 	void Translation::OnEndFrame()
 	{
 		m_old_velocity = m_current_velocity;
+		use_old_velocity = true;
 	}
 }

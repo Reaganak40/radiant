@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Renderer.h"
 #include "ErrorHandling.h"
+#include "Polygon/Rect.h"
 
 namespace Radiant {
 
@@ -8,7 +9,7 @@ namespace Radiant {
 
     Renderer::Renderer()
         : m_window(nullptr), m_window_name(""), m_window_width(0), m_window_height(0), m_vertex_array(nullptr),
-        m_current_vbo(0), m_current_ibo(0), m_current_shader(0), m_current_layer(0)
+        m_current_vbo(0), m_current_ibo(0), m_current_shader(0), m_current_layer(0), m_rect_index(0)
     {
         /* Initialize the library */
         if (!glfwInit()) {
@@ -23,9 +24,15 @@ namespace Radiant {
 
     Renderer::~Renderer()
     {
-        for (auto& unit : m_render_units) {
-            delete unit.m_VBO;
-            delete unit.m_IBO;
+        // Delete all buffers from all layers
+        unsigned int unitTypes[2] = { glLayerFillUnits, glLayerOutlineUnits };
+        for (const auto& layer : m_layers) {
+            for (const auto& type : unitTypes) {
+                for (auto& unit : layer.renderUnits[type]) {
+                    delete unit.m_IBO;
+                    delete unit.m_VBO;
+                }
+            }
         }
 
         for (auto& shader : m_shaders) {
@@ -132,56 +139,50 @@ namespace Radiant {
 
     }
 
-    void Renderer::UpdateImpl(const float deltaTime)
+    void Renderer::OnBeginFrameImpl()
     {
         if (m_GUIs.size() > 0) {
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
-
-            for (const auto& gui : m_GUIs) {
-                gui->OnUpdate(deltaTime);
-            }
         }
+    }
 
+    void Renderer::OnUpdateImpl(const float deltaTime)
+    {
+        for (const auto& gui : m_GUIs) {
+            gui->OnUpdate(deltaTime);
+        }
     }
 
     void Renderer::RenderImpl()
     {
-        while (m_render_units.size() < m_mesh_queue.size()) {
-            AddRenderUnit();
+        while (!m_command_queue.empty()) {
+            DrawCommand command = m_command_queue.front();
+            const Mesh& mesh = m_mesh_cache.GetMesh(command.meshIdentifier);
+
+            AddToRenderUnit(mesh, command.renderCond);
+            m_command_queue.pop();
         }
 
-        unsigned int layer = 0;
-        for (const auto& unit : m_render_units) {
-            SetVBO(unit.vboID);
-            SetIBO(unit.iboID);
-            SetShader(unit.shaderID);
+        unsigned int unitTypes[2] = { glLayerFillUnits, glLayerOutlineUnits };
+        for (const auto& layer : m_layers) {
+            for (const auto& type : unitTypes) {
+                for (auto& unit : layer.renderUnits[type]) {
+                    
+                    // Draw Call Procedure
+                    SetVBO(unit.vboID);
+                    SetIBO(unit.iboID);
+                    SetShader(unit.shaderID);
+                    SetMode(type == glLayerFillUnits ? FillMode : OutlineMode);
 
-            unit.m_VBO->Flush();
-            unit.m_IBO->Flush();
-            while (!m_mesh_queue[layer].empty()) {
+                    unit.m_VBO->Update();
+                    unit.m_IBO->Update();
 
-                unit.m_VBO->PushToBatch(
-                    m_mesh_cache.GetMesh(m_mesh_queue[layer].front()).vertices
-                );
-
-                unit.m_IBO->PushToBatch(
-                    m_mesh_cache.GetMesh(m_mesh_queue[layer].front()).indices,
-                    m_mesh_cache.GetMesh(m_mesh_queue[layer].front()).vertices.size()
-                );
-
-                m_mesh_queue[layer].pop();
+                    m_vertex_array->DefineVertexBufferLayout();
+                    glDrawElements(GL_TRIANGLES, unit.m_IBO->GetIndexCount(), GL_UNSIGNED_INT, nullptr);
+                }
             }
-
-            unit.m_VBO->Update();
-            unit.m_IBO->Update();
-
-            m_vertex_array->DefineVertexBufferLayout();
-
-            glDrawElements(GL_TRIANGLES, unit.m_IBO->GetIndexCount(), GL_UNSIGNED_INT, nullptr);
-
-            layer++;
         }
 
         for (const auto& gui : m_GUIs) {
@@ -190,15 +191,62 @@ namespace Radiant {
 
         /* Swap front and back buffers */
         glfwSwapBuffers(m_window);
+    }
+
+    void Renderer::OnEndFrameImpl()
+    {
 
         /* Poll for and process events */
         glfwPollEvents();
+
+
+        if (m_rect_cache.size() < m_rect_index) {
+            m_rect_cache.resize(m_rect_index);
+        }
+        m_rect_index = 0;
+
+        // Reset the buffers of each layer.
+        unsigned int unitTypes[2] = { glLayerFillUnits, glLayerOutlineUnits };
+        for (const auto& layer : m_layers) {
+            for (const auto& type : unitTypes) {
+                for (auto& unit : layer.renderUnits[type]) {
+                    unit.m_IBO->Flush();
+                    unit.m_VBO->Flush();
+                }
+            }
+        }
+
+    }
+
+    void Renderer::DrawRectImpl(const Vec2d& origin, const Vec2d& size, const Color& color, unsigned int layer)
+    {
+        // Use the rect cache for efficiency
+        if (m_rect_index == m_rect_cache.size()) {
+            m_rect_cache.push_back(Rect(origin, size.x, size.y));
+        }
+        else {
+            m_rect_cache.at(m_rect_index).SetPosition(origin);
+            m_rect_cache.at(m_rect_index).SetSize(size);
+        }
+
+        Color old_color = m_polygon_color;
+
+        // Use draw API
+        BeginImpl(layer);
+        SetPolygonColorImpl(color);
+        AddPolygonImpl(m_rect_cache.at(m_rect_index));
+        EndImpl();
+           
+        // Go back to saved settings
+        m_polygon_color = old_color;
+
+        m_rect_index++;
     }
 
     void Renderer::BeginImpl(unsigned int layer)
     {
-        while (m_mesh_queue.size() <= layer) {
-            m_mesh_queue.push_back({});
+        while (m_layers.size() <= layer) {
+            m_layers.push_back(glLayer());
         }
 
         m_current_layer = layer;
@@ -235,7 +283,13 @@ namespace Radiant {
 
         pMesh.layer = m_current_layer;
 
-        m_mesh_queue[m_current_layer].push(polygon.GetUUID());
+        m_command_queue.push(DrawCommand(polygon.GetUUID(), m_current_render_cond));
+    }
+
+    void Renderer::SetRenderCondImpl(const unsigned int rendCond)
+    {
+        m_current_render_cond = 0;
+        m_current_render_cond = DrawCommand::AddRendCond(0, rendCond);
     }
 
     void Renderer::SetPolygonColorImpl(const Color& color)
@@ -267,6 +321,14 @@ namespace Radiant {
         }
     }
 
+    void Renderer::SetMode(GeoMode mode)
+    {
+        if (m_current_mode != mode) {
+            ActivateGeoMode(mode);
+            m_current_mode = mode;
+        }
+    }
+
     void Renderer::AddDefaultShader()
     {
         Shader* shader = new Shader;
@@ -278,19 +340,46 @@ namespace Radiant {
         else {
             m_shaders.push_back(shader);
         }
-
     }
 
-    void Renderer::AddRenderUnit()
+    void Renderer::AddLayer()
     {
-        m_render_units.push_back({});
-
-        m_render_units.back().m_VBO = new VertexBuffer;
-        m_render_units.back().m_IBO = new IndexBuffer;
-
-        m_render_units.back().vboID = m_render_units.back().m_VBO->GetID();
-        m_render_units.back().iboID = m_render_units.back().m_IBO->GetID();
-        m_render_units.back().shaderID = m_shaders.front()->GetID();
+        m_layers.push_back(glLayer());
     }
 
+    void Renderer::AddToRenderUnit(const Mesh& mesh, unsigned int rendCond)
+    {
+        unsigned int targetArray = DrawCommand::HasRendCond(rendCond, DrawOutline) ? glLayerOutlineUnits : glLayerFillUnits;
+
+        if (m_layers.at(mesh.layer).renderUnits[targetArray].size() == 0) {
+            m_layers.at(mesh.layer).renderUnits[targetArray].push_back(glRenderUnit());
+            glRenderUnit& unit = m_layers.at(mesh.layer).renderUnits[targetArray].back();
+
+            unit.m_VBO = new VertexBuffer;
+            unit.m_IBO = new IndexBuffer;
+
+            unit.vboID = unit.m_VBO->GetID();
+            unit.iboID = unit.m_IBO->GetID();
+            unit.shaderID = m_shaders.front()->GetID();
+        }
+        glRenderUnit& unit = m_layers.at(mesh.layer).renderUnits[targetArray].back();
+
+        unit.m_VBO->PushToBatch(mesh.vertices);
+        unit.m_IBO->PushToBatch(mesh.indices, mesh.vertices.size());
+    }
+
+    void Renderer::FlushPolygonImpl(const UniqueID UUID)
+    {
+        m_mesh_cache.Flush(UUID);
+    }
+
+    bool Renderer::DrawCommand::HasRendCond(unsigned int src, unsigned int condQuery)
+    {
+        return (bool)(src & condQuery);
+    }
+
+    unsigned int Renderer::DrawCommand::AddRendCond(unsigned int src, const unsigned int cond) 
+    {
+        return src | cond;
+    }
 }

@@ -5,6 +5,7 @@ class Padel : public Radiant::GameObject {
 private:
 	Radiant::Vec2d spawnPos;
 	Radiant::Color m_sprite_color;
+	double acceleration;
 
 	std::vector<Radiant::InputState> left_cond;
 	std::vector<Radiant::InputState> right_cond;

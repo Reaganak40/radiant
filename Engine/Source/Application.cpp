@@ -44,7 +44,7 @@ namespace Radiant
 		m_timestep.Update();
 
 		Renderer::Clear();
-		Renderer::Update(m_timestep.deltaTime);
+		Renderer::OnBeginFrame();
 	}
 
 	void Application::ProcessInput()
@@ -56,6 +56,7 @@ namespace Radiant
 
 	void Application::UpdateWorld()
 	{
+		Physics::OnUpdate(m_timestep.deltaTime);
 	}
 
 	void Application::FinalUpdate()
@@ -63,6 +64,8 @@ namespace Radiant
 		for (const auto& gameObject : m_game_objects) {
 			gameObject->OnFinalUpdate();
 		}
+
+		Renderer::OnUpdate(m_timestep.deltaTime);
 	}
 
 	void Application::Render()
@@ -70,11 +73,15 @@ namespace Radiant
 		for (const auto& gameObject : m_game_objects) {
 			gameObject->OnRender();
 		}
+
+		Renderer::DrawRect(Vec2d(300.0, 300.0), Vec2d(150.0, 150.0), BLUE);
+
 		Renderer::Render();
 	}
 
 	void Application::EndFrame()
 	{
+		Renderer::OnEndFrame();
 		Input::PollInputs();
 	}
 

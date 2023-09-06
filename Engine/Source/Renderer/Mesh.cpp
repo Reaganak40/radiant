@@ -20,4 +20,9 @@ namespace Radiant {
 		return m_cache.at(meshIdentifier);
 	}
 
+	void MeshCache::Flush(const UniqueID meshIdentifier)
+	{
+		m_cache.erase(meshIdentifier);
+	}
+
 }

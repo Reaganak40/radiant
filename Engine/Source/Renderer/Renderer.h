@@ -3,6 +3,7 @@
 
 // For Render API
 #include "Polygon/Polygon.h"
+#include "Polygon/Rect.h"
 #include "Mesh.h"
 #include "Utils/Color.h"
 
@@ -11,9 +12,16 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
+#include "GeoMode.h"
 #include "Gui/Gui.h"
 
 namespace Radiant {
+
+#define NO_RENDER_CONDITIONS 0
+	enum RenderCond {
+		DrawOutline = 1 // fill by default
+	};
+
 
 	class Renderer {
 	private:
@@ -33,12 +41,32 @@ namespace Radiant {
 		glm::mat4 m_model;
 		Vec3f m_screen_origin;
 
-		// Renderer API dependables
+		// *****************************************************
+		// 
+		//			  Renderer API dependables
+		// 
+		// *****************************************************
+		struct DrawCommand {
+			UniqueID meshIdentifier;
+			unsigned int renderCond;
+
+			DrawCommand(UniqueID nMeshIdentifier, unsigned int nRenderCond)
+				: meshIdentifier(nMeshIdentifier), renderCond(nRenderCond) {}
+
+			static bool HasRendCond(unsigned int src, unsigned int condQuery);
+			static unsigned int AddRendCond(unsigned int src, const unsigned int cond);
+		};
+
 		unsigned int m_current_layer;
+		unsigned int m_current_render_cond;
 		MeshCache m_mesh_cache;
-		std::vector<std::queue<UniqueID>> m_mesh_queue;
+		std::queue<DrawCommand> m_command_queue;
 
 		Color m_polygon_color;
+
+		std::vector<Rect> m_rect_cache;
+		unsigned int m_rect_index;
+
 
 		// *****************************************************
 		// 
@@ -56,9 +84,21 @@ namespace Radiant {
 			IndexBuffer* m_IBO;
 		};
 
+		// Container for layers in a scene with their own unique specifications.
+#define glLayerFillUnits 0
+#define glLayerOutlineUnits 1
+
+		struct glLayer {
+			std::vector<glRenderUnit> renderUnits[2];
+
+			glLayer() {}
+		};
+
 		// Use only one VAO
 		VertexArray* m_vertex_array;
-		std::vector<glRenderUnit> m_render_units;
+
+		// Each layer contains render units (specified draw calls).
+		std::vector<glLayer> m_layers;
 
 		// Keep shaders independent from render units.
 		std::vector<Shader*> m_shaders;
@@ -67,6 +107,7 @@ namespace Radiant {
 		VBO_ID m_current_vbo;
 		IBO_ID m_current_ibo;
 		ShaderID m_current_shader;
+		GeoMode m_current_mode;
 
 		// For ImGui instances.
 		std::vector<GuiTemplate*> m_GUIs;
@@ -128,12 +169,32 @@ namespace Radiant {
 		*/
 		static void Clear() { glClear(GL_COLOR_BUFFER_BIT); }
 
-		static void Update(const float deltaTime) { m_instance->UpdateImpl(deltaTime); }
+		/*
+			Runs start of frame procedures for the renderer.
+		*/
+		static void OnBeginFrame() { m_instance->OnBeginFrameImpl(); }
+
+		/*
+			Runs the renderer OnUpdate step.
+		*/
+		static void OnUpdate(const float deltaTime) { m_instance->OnUpdateImpl(deltaTime); }
 
 		/*
 			Runs the draw command queue, drawing all objects to the screen.
 		*/
 		static void Render() { m_instance->RenderImpl(); }
+
+		/*
+			Runs the end of frame procedures for the renderer.
+		*/
+		static void OnEndFrame() { m_instance->OnEndFrameImpl(); }
+
+		/*
+			Utility function for quickly drawing a Rect to the screen.
+		*/
+		static void DrawRect(const Vec2d& origin, const Vec2d& size, const Color& color) {
+			m_instance->DrawRectImpl(origin, size, color);
+		}
 
 		/*
 			Starts a new render command session context.
@@ -144,6 +205,11 @@ namespace Radiant {
 			Ends the current render command session context.
 		*/
 		static void End() { m_instance->EndImpl(); }
+
+		/*
+			Sets the render condition for the current context.
+		*/
+		static void SetRenderCond(const unsigned int rendCond) { m_instance->SetRenderCondImpl(rendCond); }
 
 		/*
 			Adds a polygon to the render queue to be drawn next frame.
@@ -165,27 +231,41 @@ namespace Radiant {
 		*/
 		static void AttachGui(GuiTemplate* gui) { m_instance->m_GUIs.push_back(gui); }
 
+		/*
+			Removes a polygon from renderer mesh cache.
+		*/
+		static void _FlushPolygon(const UniqueID UUID) { m_instance->FlushPolygonImpl(UUID); }
+
 		friend class Input;
 
 	private:
 		void CreateWindowImpl(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight);
 
-		void UpdateImpl(const float deltaTime);
+		void OnBeginFrameImpl();
+		void OnUpdateImpl(const float deltaTime);
 		void RenderImpl();
+		void OnEndFrameImpl();
+
+		void DrawRectImpl(const Vec2d& origin, const Vec2d& size, const Color& color, unsigned int layer = 0);
 
 		void BeginImpl(unsigned int layer);
 		void EndImpl();
 		void AddPolygonImpl(const Polygon& polygon);
+		void SetRenderCondImpl(const unsigned int rendCond);
 		void SetPolygonColorImpl(const Color& color);
 
 
 		void SetVBO(VBO_ID vbo);
 		void SetIBO(IBO_ID ibo);
 		void SetShader(ShaderID shader);
+		void SetMode(GeoMode mode);
 
 		void AddDefaultShader();
-		void AddRenderUnit();
+		void AddLayer();
 
+		void AddToRenderUnit(const Mesh& mesh, unsigned int rendCond);
+
+		void FlushPolygonImpl(const UniqueID UUID);
 	};
 
 }
