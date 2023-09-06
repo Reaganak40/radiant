@@ -55,6 +55,5 @@ namespace Radiant {
             Returns the distance between two points.
         */
         double GetDistance(const Vec2d& pointA, const Vec2d& pointB);
-
     }
 }

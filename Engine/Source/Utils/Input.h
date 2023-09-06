@@ -132,10 +132,10 @@ namespace Radiant {
     };
 
     struct MouseState {
-        Vec3f position;
+        Vec2d position;
 
         MouseState()
-            : position(Vec3f()) {}
+            : position(Vec2d(0, 0)) {}
     };
 
     struct WindowState {
@@ -143,6 +143,11 @@ namespace Radiant {
 
         WindowState()
             : windowResize(false) {}
+    };
+
+    enum MouseCond {
+        SCREEN_COORDS,
+        WORLD_COORDS
     };
 
     class Input {
@@ -181,15 +186,19 @@ namespace Radiant {
         /* Get all trigged events by their assigned ListenerIDs. */
         static bool CheckKeyboardState(const std::vector<InputState>& stateQuery);
 
-        static inline MouseState& GetMouseState() { return m_singleton->GetMouseStateImpl(); }
+        static inline MouseState GetMouseState() { return m_singleton->GetMouseStateImpl(); }
+
+        static Vec2d GetMouseCoords(const MouseCond cond) { return m_singleton->GetMouseCoordsImpl(cond); }
 
         static bool CheckWindowResize() { return m_singleton->CheckWindowResizeImpl(); }
 
     private:
         void PollInputsImpl();
         bool CheckStateImpl(unsigned int* stateQuery, unsigned int count);
-        MouseState& GetMouseStateImpl();
+        MouseState GetMouseStateImpl();
         bool CheckWindowResizeImpl();
+
+        Vec2d GetMouseCoordsImpl(const MouseCond cond);
 
     };
 

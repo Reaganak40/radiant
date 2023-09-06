@@ -29,7 +29,10 @@ int main(void)
         /* Final update of game objects before render. */
         pongApp.FinalUpdate();
 
-        Renderer::DrawLine(Vec2d(100, 100), RedPlayer->GetPosition(), ORANGE, 2);
+        
+        Vec2d mouseCoords = Input::GetMouseCoords(WORLD_COORDS);
+        Renderer::DrawLine(Vec2d(100, 500), mouseCoords, ORANGE, 2);
+
 
         /* Render the current frame. */
         pongApp.Render();

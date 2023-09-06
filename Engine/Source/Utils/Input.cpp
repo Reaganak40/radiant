@@ -75,8 +75,8 @@ namespace Radiant {
     void Input::CursorPositionCallback(GLFWwindow* window, double xpos, double ypos)
     {
         ImGui_ImplGlfw_CursorPosCallback(window, xpos, ypos);
-        m_singleton->m_mouse_state[m_singleton->m_current_state].position.x = (float)xpos;
-        m_singleton->m_mouse_state[m_singleton->m_current_state].position.y = (float)ypos;
+        m_singleton->m_mouse_state[m_singleton->m_current_state].position.x = xpos;
+        m_singleton->m_mouse_state[m_singleton->m_current_state].position.y = ypos;
         m_singleton->m_mouse_changed = true;
     }
 
@@ -138,7 +138,7 @@ namespace Radiant {
         return m_keyboard_state[(m_current_state == 0 ? 1 : 0)].CheckFlags(stateQuery, count);
     }
 
-    MouseState& Input::GetMouseStateImpl()
+    MouseState Input::GetMouseStateImpl()
     {
         return m_mouse_state[(m_current_state == 0 ? 1 : 0)];
     }
@@ -146,6 +146,17 @@ namespace Radiant {
     bool Input::CheckWindowResizeImpl()
     {
         return m_window_state[(m_current_state == 0 ? 1 : 0)].windowResize;
+    }
+
+    Vec2d Input::GetMouseCoordsImpl(MouseCond cond) {
+        MouseState ms = GetMouseStateImpl();
+
+        if (cond == SCREEN_COORDS) {
+            return ms.position;
+        }
+
+        ms.position.y = Renderer::GetWindowHeight() - ms.position.y;
+        return ms.position + Renderer::GetCameraCoordinates2D();
     }
 
 }

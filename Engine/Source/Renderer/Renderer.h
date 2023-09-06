@@ -168,6 +168,10 @@ namespace Radiant {
 		*/
 		static unsigned int GetWindowHeight() { return m_instance->m_window_height; }
 
+		/*
+			Gets the 2D camera coordinates based in the bottom left corner.
+		*/
+		static Vec2d GetCameraCoordinates2D() { return Vec2d(m_instance->m_screen_origin.x, m_instance->m_screen_origin.y); }
 
 		/*
 			Clears the screen with the defined background color.
