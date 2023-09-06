@@ -28,4 +28,6 @@ public:
 	void SetUpControl(const std::vector <Radiant::InputState>& conditions);
 	void SetDownControl(const std::vector <Radiant::InputState>& conditions);
 
+	Radiant::Vec2d GetPosition();
+
 };

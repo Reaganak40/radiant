@@ -32,6 +32,20 @@ namespace Radiant {
 		m_rect_cache.push_back(rect);
 	}
 
+	std::shared_ptr<Line> RenderCache::GetFreeLine()
+	{
+		if (m_line_index == m_line_cache.size()) {
+			return std::shared_ptr<Line>();
+		}
+
+		return m_line_cache.at(m_line_index++);
+	}
+
+	void RenderCache::AddLineToCache(std::shared_ptr<Line> line)
+	{
+		m_line_cache.push_back(line);
+	}
+
 	void RenderCache::Flush(const UniqueID meshIdentifier)
 	{
 		m_mesh_cache.erase(meshIdentifier);

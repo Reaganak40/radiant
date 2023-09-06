@@ -98,4 +98,14 @@ namespace Radiant
 
 		return nGameObject->GetUUID();
 	}
+	GameObject* Application::GetGameObject(UniqueID UUID)
+	{
+		for (auto& object : m_game_objects) {
+			if (object->GetUUID() == UUID) {
+				return object;
+			}
+		}
+
+		return nullptr;
+	}
 }

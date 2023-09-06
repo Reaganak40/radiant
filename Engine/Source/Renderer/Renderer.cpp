@@ -223,7 +223,7 @@ namespace Radiant {
     }
 
     void Renderer::DrawRectImpl(const Vec2d& origin, const Vec2d& size, const Color& color,
-        unsigned int rendCond, const unsigned int layer)
+        unsigned int layer, const unsigned int rendCond)
     {
         // Use the rect cache for efficiency
         std::shared_ptr<Rect> rect;
@@ -250,15 +250,27 @@ namespace Radiant {
         m_polygon_color = old_color;
     }
 
-    void Renderer::DrawLineImpl(const Vec2d& start, const Vec2d& end, const Color& color, const unsigned int rendCond, unsigned int layer)
+    void Renderer::DrawLineImpl(const Vec2d& start, const Vec2d& end, const Color& color, unsigned int layer, const unsigned int rendCond)
     {
-        Line line(start, end);
+        // Use the line cache for efficiency
+        std::shared_ptr<Line> line;
+
+        if ((line = m_render_cache.GetFreeLine()) == nullptr) {
+            m_render_cache.AddLineToCache(std::shared_ptr<Line>(new Line(start, end)));
+            line = m_render_cache.GetFreeLine();
+        }
+        else {
+            line->SetStart(start);
+            line->SetEnd(end);
+        }
+
         Color old_line_color = m_line_color;
 
+        // Use draw API
         BeginImpl(layer);
         SetLineColorImpl(color);
         SetRenderCondImpl(rendCond);
-        AddLineImpl(line);
+        AddLineImpl(*line);
         EndImpl();
 
         m_line_color = old_line_color;

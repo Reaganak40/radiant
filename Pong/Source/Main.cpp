@@ -8,7 +8,9 @@ int main(void)
     Application pongApp;
     pongApp.Start("Pong");
 
-    const UniqueID RedPlayer = pongApp.AddGameObject(new Padel(10.0 + (PADEL_WIDTH / 2), 300.0));
+    Padel* RedPlayer;
+    pongApp.AddGameObject(RedPlayer = new Padel(10.0 + (PADEL_WIDTH / 2), 300.0));
+    RedPlayer->SetSpriteColor(WHITE);
 
     Renderer::AttachGui(new DiagnosticsGUI);
 
@@ -27,9 +29,8 @@ int main(void)
         /* Final update of game objects before render. */
         pongApp.FinalUpdate();
 
-        if (Input::CheckKeyboardState(std::vector<InputState>{E_KEY_DOWN, E_KEY_PRESS})) {
-            Renderer::DrawRect(Vec2d(500.0, 300.0), Vec2d(150.0, 150.0), ORANGE, DrawOutline, 0);
-        }
+        Renderer::DrawLine(Vec2d(100, 100), RedPlayer->GetPosition(), ORANGE, 2);
+
         /* Render the current frame. */
         pongApp.Render();
 

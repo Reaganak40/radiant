@@ -8,6 +8,7 @@ namespace Radiant {
 		Line(const Vec2d& start, const Vec2d& end);
 		~Line() {}
 
-
+		void SetStart(const Vec2d& start);
+		void SetEnd(const Vec2d& end);
 	};
 }

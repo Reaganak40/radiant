@@ -32,7 +32,20 @@ namespace Radiant {
 		*/
 		std::shared_ptr<Rect> GetFreeRect();
 
+		/*
+			Adds a rect to the cache.
+		*/
 		void AddRectToCache(std::shared_ptr<Rect> rect);
+
+		/*
+			Gets an available Line for rendering purposes.
+		*/
+		std::shared_ptr<Line> GetFreeLine();
+
+		/*
+			Adds a line to the cache.
+		*/
+		void AddLineToCache(std::shared_ptr<Line> line);
 
 		/*
 			Removes the mesh from the cache that has this identifier.

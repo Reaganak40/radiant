@@ -99,3 +99,8 @@ void Padel::SetDownControl(const std::vector <Radiant::InputState>& conditions)
 {
 	down_cond = conditions;
 }
+
+Radiant::Vec2d Padel::GetPosition()
+{
+	return Radiant::Physics::GetPolygon(m_model_ID).GetOrigin();
+}

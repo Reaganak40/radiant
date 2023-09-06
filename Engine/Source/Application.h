@@ -77,5 +77,10 @@ namespace Radiant {
 		*/
 		const UniqueID AddGameObject(GameObject* nGameObject);
 
+		/*
+			Returns a pointer to an existing game object.
+		*/
+		GameObject* GetGameObject(UniqueID UUID);
+
 	};
 }

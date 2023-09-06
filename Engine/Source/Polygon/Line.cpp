@@ -17,4 +17,12 @@ namespace Radiant {
 		m_indices.push_back(0);
 		m_indices.push_back(1);
 	}
+	void Line::SetStart(const Vec2d& start)
+	{
+		m_vertices[0] = start;
+	}
+	void Line::SetEnd(const Vec2d& end)
+	{
+		m_vertices[1] = end;
+	}
 }

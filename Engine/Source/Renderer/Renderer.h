@@ -198,7 +198,7 @@ namespace Radiant {
 			Utility function for quickly drawing a Rect to the screen.
 		*/
 		static void DrawRect(const Vec2d& origin, const Vec2d& size, const Color& color, 
-			const unsigned int rendCond = 0, unsigned int layer = 0) {
+			unsigned int layer = 0, const unsigned int rendCond = NoConditions) {
 			m_instance->DrawRectImpl(origin, size, color, layer, rendCond);
 		}
 
@@ -206,8 +206,8 @@ namespace Radiant {
 			Utility function for quickly drawing a Line to the screen.
 		*/
 		static void DrawLine(const Vec2d& start, const Vec2d& end, const Color& color,
-			const unsigned int rendCond = 0, unsigned int layer = 0) {
-			m_instance->DrawLineImpl(start, end, color, rendCond, layer);
+			unsigned int layer = 0, const unsigned int rendCond = NoConditions) {
+			m_instance->DrawLineImpl(start, end, color, layer, rendCond);
 		}
 
 		/*
@@ -275,8 +275,8 @@ namespace Radiant {
 		void RenderImpl();
 		void OnEndFrameImpl();
 
-		void DrawRectImpl(const Vec2d& origin, const Vec2d& size, const Color& color, const unsigned int rendCond, unsigned int layer);
-		void DrawLineImpl(const Vec2d& start, const Vec2d& end, const Color& color, const unsigned int rendCond, unsigned int layer);
+		void DrawRectImpl(const Vec2d& origin, const Vec2d& size, const Color& color, unsigned int layer, const unsigned int rendCond);
+		void DrawLineImpl(const Vec2d& start, const Vec2d& end, const Color& color, unsigned int layer, const unsigned int rendCond);
 		
 		void BeginImpl(unsigned int layer);
 		void EndImpl();
