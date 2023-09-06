@@ -28,7 +28,7 @@ namespace Radiant {
 
 	bool BitSet::CheckFlags(unsigned int* flags, unsigned int flagCount)
 	{
-		for (int i = 0; i < flagCount; i++) {
+		for (unsigned int i = 0; i < flagCount; i++) {
 			if (CheckFlag(flags[i])) {
 				return true;
 			}

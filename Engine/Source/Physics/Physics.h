@@ -39,12 +39,12 @@ namespace Radiant {
 		/*
 			Adds an object to the physical world. Returns its UUID for future lookups. 
 		*/
-		static UniqueID CreateObject(const Polygon& nPolygon) { return m_instance->CreateObjectImpl(nPolygon); }
+		static UniqueID CreateObject(std::shared_ptr<Polygon> polygon) { return m_instance->CreateObjectImpl(polygon); }
 
 		/*
 			Gets a const reference to the polygon indiciated by the Unique identifier.
 		*/
-		static const Polygon& GetPolygon(UniqueID UUID) { return m_instance->m_objects.at(UUID).m_polygon; }
+		static const Polygon& GetPolygon(UniqueID UUID) { return *m_instance->m_objects.at(UUID).m_polygon; }
 
 
 		/*
@@ -73,8 +73,7 @@ namespace Radiant {
 		void OnUpdateImpl(const float deltaTime);
 		void OnEndFrameImpl();
 
-
-		UniqueID CreateObjectImpl(const Polygon& nPolygon);
+		UniqueID CreateObjectImpl(std::shared_ptr<Polygon> polygon);
 		void SetAccelerationImpl(UniqueID UUID, const Vec2d& nAcceleration);
 		void SetAccelerationXImpl(UniqueID UUID, const double nX);
 		void SetAccelerationYImpl(UniqueID UUID, const double nY);

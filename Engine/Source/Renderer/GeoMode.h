@@ -2,7 +2,7 @@
 #include "pch.h"
 
 namespace Radiant {
-	typedef enum GeoMode {
+	enum GeoMode {
 		FillMode = 1,
 		OutlineMode = 2
 	};

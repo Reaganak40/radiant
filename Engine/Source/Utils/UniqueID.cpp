@@ -27,11 +27,6 @@ namespace Radiant {
         if (freeIDs.size()) {
             res = freeIDs.back();
             freeIDs.pop_back();
-            printf("Re-using id\n");
-
-        }
-        else {
-            printf("New id generated\n");
         }
         return res;
     }

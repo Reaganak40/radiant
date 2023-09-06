@@ -17,8 +17,8 @@
 
 namespace Radiant {
 
-#define NO_RENDER_CONDITIONS 0
 	enum RenderCond {
+		NoConditions  = 0,
 		DrawOutline = 1 // fill by default
 	};
 
@@ -192,8 +192,9 @@ namespace Radiant {
 		/*
 			Utility function for quickly drawing a Rect to the screen.
 		*/
-		static void DrawRect(const Vec2d& origin, const Vec2d& size, const Color& color) {
-			m_instance->DrawRectImpl(origin, size, color);
+		static void DrawRect(const Vec2d& origin, const Vec2d& size, const Color& color, 
+			const unsigned int rendCond = 0, unsigned int layer = 0) {
+			m_instance->DrawRectImpl(origin, size, color, layer, rendCond);
 		}
 
 		/*
@@ -246,7 +247,7 @@ namespace Radiant {
 		void RenderImpl();
 		void OnEndFrameImpl();
 
-		void DrawRectImpl(const Vec2d& origin, const Vec2d& size, const Color& color, unsigned int layer = 0);
+		void DrawRectImpl(const Vec2d& origin, const Vec2d& size, const Color& color, unsigned int layer, const unsigned int rendCond);
 
 		void BeginImpl(unsigned int layer);
 		void EndImpl();

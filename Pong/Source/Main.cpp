@@ -27,6 +27,7 @@ int main(void)
         /* Final update of game objects before render. */
         pongApp.FinalUpdate();
 
+
         /* Render the current frame. */
         pongApp.Render();
 

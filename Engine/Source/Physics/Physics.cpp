@@ -49,7 +49,7 @@ namespace Radiant {
                 flag = Collision::SweptAABB(object1, object2, deltaTime);
             }
 
-            object1.translation.Translate(object1.m_polygon, deltaTime);
+            object1.translation.Translate(*object1.m_polygon, deltaTime);
         }
     }
 
@@ -60,10 +60,10 @@ namespace Radiant {
         }
     }
 
-    UniqueID Physics::CreateObjectImpl(const Polygon& nPolygon)
+    UniqueID Physics::CreateObjectImpl(std::shared_ptr<Polygon> polygon)
     {
         UniqueID nUUID = GetUniqueID();
-        m_objects[nUUID] = Pobject(nPolygon);
+        m_objects[nUUID] = Pobject(polygon);
 
         return nUUID;
     }

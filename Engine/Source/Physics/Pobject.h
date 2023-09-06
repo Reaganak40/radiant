@@ -5,15 +5,14 @@
 namespace Radiant {
 	class Pobject {
 	private:
-		Polygon m_polygon;
+		std::shared_ptr<Polygon> m_polygon;
 	public:
 		Translation translation;
 		
-		Pobject() {}
-		Pobject(const Polygon& polygon);
+		Pobject(std::shared_ptr<Polygon> m_polygon = std::shared_ptr<Polygon>());
 		~Pobject();
 
-		const Polygon& GetPolygon() { return m_polygon; }
+		const Polygon& GetPolygon() { return *m_polygon; }
 
 		friend class Physics;
 		friend class Collision;

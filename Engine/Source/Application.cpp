@@ -70,11 +70,11 @@ namespace Radiant
 
 	void Application::Render()
 	{
+		Renderer::DrawRect(Vec2d(500.0, 300.0), Vec2d(150.0, 150.0), ORANGE, DrawOutline, 0);
+		
 		for (const auto& gameObject : m_game_objects) {
 			gameObject->OnRender();
 		}
-
-		Renderer::DrawRect(Vec2d(300.0, 300.0), Vec2d(150.0, 150.0), BLUE);
 
 		Renderer::Render();
 	}

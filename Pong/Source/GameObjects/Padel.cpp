@@ -21,7 +21,7 @@ Padel::~Padel()
 void Padel::OnRegister()
 {
 	using namespace Radiant;
-	m_model_ID = Physics::CreateObject(Rect(spawnPos, 100, 100));
+	m_model_ID = Physics::CreateObject(std::make_shared<Rect>(spawnPos, 100, 100));
 
 	Physics::SetMaximumVelocity(m_model_ID, Vec2d(500, 500));
 }
@@ -31,7 +31,6 @@ void Padel::OnProcessInput(const float deltaTIme)
 	using namespace Radiant;
 
 	Physics::SetAcceleration(m_model_ID, Vec2d::Zero());
-
 
 	if (Input::CheckKeyboardState(right_cond)) {
 		Physics::SetAccelerationX(m_model_ID, acceleration);
@@ -58,7 +57,7 @@ void Padel::OnRender()
 {
 	using namespace Radiant;
 	
-	Renderer::Begin();
+	Renderer::Begin(1);
 	Renderer::SetPolygonColor(m_sprite_color);
 	Renderer::AddPolygon(Physics::GetPolygon(m_model_ID));
 	Renderer::End();

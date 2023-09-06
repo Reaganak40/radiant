@@ -41,6 +41,9 @@ namespace Radiant {
 		case ColorType::GREEN:
 			m_color = Vec4f(0.2f, 0.8f, 0.2f, 1.0f);
 			break;
+		case ColorType::ORANGE:
+			m_color = Vec4f(1.0f, 0.54f, 0.0f, 1.0f);
+			break;
 		default:
 			m_color = Vec4f(0.0f, 0.0f, 0.0f, 1.0f);
 			break;

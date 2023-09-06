@@ -122,13 +122,13 @@ bool Radiant::Collision::StaticCollisionDiags(Polygon& dynamicPoly, Polygon& sta
 		}
 
 		// Check diagnals of each polygon
-		for (int i = 0; i < poly1->GetVertices().size(); i++) {
+		for (unsigned int i = 0; i < poly1->GetVertices().size(); i++) {
 			Vec2d p1_lineP1 = poly1->GetOrigin();
 			Vec2d p1_lineP2 = poly1->GetVertices()[i];
 
 			Vec2d displacement = Vec2d(0, 0);
 
-			for (int j = 0; j < poly2->GetVertices().size(); j++) {
+			for (unsigned int j = 0; j < poly2->GetVertices().size(); j++) {
 				Vec2d p2_lineP1 = poly2->GetVertices()[j];
 				Vec2d p2_lineP2 = poly2->GetVertices()[(j + 1) % poly2->GetVertices().size()];
 
@@ -169,17 +169,17 @@ bool Radiant::Collision::SweptAABB(Pobject& source, const Pobject& suspect, cons
 
 	Vec2d ray = source.translation.GetChangeInPosition(deltaTime);
 
-	Vec2d sp = suspect.m_polygon.GetVertices()[3];
-	Vec2d ep = suspect.m_polygon.GetVertices()[1];
+	Vec2d sp = suspect.m_polygon->GetVertices()[3];
+	Vec2d ep = suspect.m_polygon->GetVertices()[1];
 
-	sp.x -= suspect.m_polygon.GetWidth() / 2;
-	sp.y += suspect.m_polygon.GetHeight() / 2;
+	sp.x -= suspect.m_polygon->GetWidth() / 2;
+	sp.y += suspect.m_polygon->GetHeight() / 2;
 
-	ep.x += suspect.m_polygon.GetWidth() / 2;
-	ep.y -= suspect.m_polygon.GetHeight() / 2;
+	ep.x += suspect.m_polygon->GetWidth() / 2;
+	ep.y -= suspect.m_polygon->GetHeight() / 2;
 
 
-	Vec2d start = source.m_polygon.GetOrigin();
+	Vec2d start = source.m_polygon->GetOrigin();
 	Vec2d contactPoint;
 	Vec2d contactNormal;
 	float contactTime;

@@ -9,7 +9,8 @@ namespace Radiant {
 
     Renderer::Renderer()
         : m_window(nullptr), m_window_name(""), m_window_width(0), m_window_height(0), m_vertex_array(nullptr),
-        m_current_vbo(0), m_current_ibo(0), m_current_shader(0), m_current_layer(0), m_rect_index(0)
+        m_current_vbo(0), m_current_ibo(0), m_current_shader(0), m_current_layer(0), m_rect_index(0), m_current_render_cond(0),
+        m_current_mode(FillMode)
     {
         /* Initialize the library */
         if (!glfwInit()) {
@@ -218,7 +219,8 @@ namespace Radiant {
 
     }
 
-    void Renderer::DrawRectImpl(const Vec2d& origin, const Vec2d& size, const Color& color, unsigned int layer)
+    void Renderer::DrawRectImpl(const Vec2d& origin, const Vec2d& size, const Color& color,
+        unsigned int layer, const unsigned int rendCond)
     {
         // Use the rect cache for efficiency
         if (m_rect_index == m_rect_cache.size()) {
@@ -234,6 +236,7 @@ namespace Radiant {
         // Use draw API
         BeginImpl(layer);
         SetPolygonColorImpl(color);
+        SetRenderCondImpl(rendCond);
         AddPolygonImpl(m_rect_cache.at(m_rect_index));
         EndImpl();
            
@@ -254,6 +257,7 @@ namespace Radiant {
 
     void Renderer::EndImpl()
     {
+        m_current_render_cond = 0;
     }
 
     void Renderer::AddPolygonImpl(const Polygon& polygon)
