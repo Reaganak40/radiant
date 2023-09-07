@@ -2,8 +2,20 @@
 #include "Utils.h"
 
 namespace Radiant {
-    namespace Utils {
 
+
+    namespace Utils {
+        double ApplyEpsilon(double d)
+        {
+            if (abs(d) - abs(int(d)) < FLOAT_EPSILON) {
+                return (int)d;
+            }
+            else if ((abs(ceil(d)) - abs(d)) < FLOAT_EPSILON) {
+                return ceil(d);
+            }
+
+            return d;
+        }
         void SetRandomSeed()
         {
             srand((unsigned int)time(NULL));

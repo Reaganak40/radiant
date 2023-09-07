@@ -37,12 +37,12 @@ namespace Radiant {
 		*/
 		static bool SweptAABB(Pobject& source, const Pobject& suspect, const float deltaTime);
 
-	private:
 		static bool PointVsRect(const Vec2d& point, Rect& rect);
 		
 		static bool RayVsRect(const Vec2d& start, const Vec2d& ray, const Vec2d& rectTopLeft, const Vec2d& rectBottomRight, 
 			Vec2d& contactPoint, Vec2d& contactNormal, float& contactTime);
 
+	private:
 		static void GetProjections(const std::vector<Vec2d>& vertices, const Vec2d& axis, double& outMin, double& outMax);
 		static void GetProjections(const Vec2d& origin, const double radius, const Vec2d& axis, double& outMin, double& outMax);
 	};

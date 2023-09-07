@@ -4,8 +4,16 @@
 #include "MathTypes.h"
 
 namespace Radiant {
+
+#define FLOAT_EPSILON 0.0001
+
     namespace Utils
     {
+        /*
+            Rounds the double to resolve inprecision in float math.
+        */
+        double ApplyEpsilon(double d);
+
         /*
             Sets the seed for random calls.
         */

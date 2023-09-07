@@ -1,13 +1,13 @@
 #include "pch.h"
 #include "Translation.h"
+#include "Utils/Utils.h"
 
 namespace Radiant {
 	
 	Translation::Translation(Vec2d initial_velocity, Vec2d initial_acceleration)
-		: m_old_velocity(0.0, 0.0), m_current_velocity(initial_velocity), m_acceleration(initial_acceleration),
+		: m_current_velocity(initial_velocity), m_acceleration(initial_acceleration),
 		m_friction(0.98)
 	{
-		use_old_velocity = true;
 		m_has_max_velocity = false;
 		m_max_velocity = (0.0, 0.0);
 	}
@@ -59,12 +59,6 @@ namespace Radiant {
 		}
 	}
 
-	void Translation::SetRealVelocity(Vec2d nVelocity)
-	{
-		m_current_velocity = nVelocity;
-		use_old_velocity = false;
-	}
-
 	void Translation::UpdateAcceleration(Vec2d dAcc)
 	{
 		m_acceleration += dAcc;
@@ -80,40 +74,25 @@ namespace Radiant {
 	void Translation::Translate(Vec2d& point, const float deltaTime)
 	{
 			point += m_current_velocity * deltaTime;
+			point.x = Utils::ApplyEpsilon(point.x);
+			point.y = Utils::ApplyEpsilon(point.y);
 	}
 
 	void Translation::Translate(Polygon& polygon, const float deltaTime)
 	{
+		if (m_current_velocity == Vec2d::Zero()) {
+			return;
+		}
 		Translate(polygon.m_vertices, deltaTime);
 		Translate(polygon.m_origin, deltaTime);
 	}
 
 	Vec2d Translation::GetChangeInPosition(const float deltaTime)
 	{
-		return (Vec2d::Zero() + ((0.5) * (m_old_velocity + m_current_velocity) * deltaTime));
-	}
-
-	Vec2d Translation::GetNextPositionPoint(const Vec2d& point, const float deltaTime)
-	{
-
-		return (point + ((0.5) * (m_old_velocity + m_current_velocity) * deltaTime));
-	}
-
-	std::vector<Vec2d> Translation::GetNextPositionVertices(const std::vector<Vec2d>& vertices, const float deltaTime)
-	{
-		std::vector<Vec2d> res = {};
-		res.reserve(vertices.size());
-
-		for (const auto& vertex : vertices) {
-			res.push_back(GetNextPositionPoint(vertex, deltaTime));
-		}
-
-		return res;
+		return m_current_velocity * deltaTime;
 	}
 
 	void Translation::OnEndFrame()
 	{
-		m_old_velocity = m_current_velocity;
-		use_old_velocity = true;
 	}
 }

@@ -2,6 +2,8 @@
 #include "Collision.h"
 #include "Utils/MathTypes.h"
 #include "Utils/Utils.h"
+#include "Renderer/Renderer.h"
+#include "Utils/Input.h"
 
 bool Radiant::Collision::CheckCollisionSAT(const Polygon& A, const Polygon& B)
 {
@@ -172,21 +174,19 @@ bool Radiant::Collision::SweptAABB(Pobject& source, const Pobject& suspect, cons
 	Vec2d sp = suspect.m_polygon->GetVertices()[3];
 	Vec2d ep = suspect.m_polygon->GetVertices()[1];
 
-	sp.x -= suspect.m_polygon->GetWidth() / 2;
-	sp.y += suspect.m_polygon->GetHeight() / 2;
+	sp.x -= source.m_polygon->GetWidth() / 2;
+	sp.y += source.m_polygon->GetHeight() / 2;
 
-	ep.x += suspect.m_polygon->GetWidth() / 2;
-	ep.y -= suspect.m_polygon->GetHeight() / 2;
-
+	ep.x += source.m_polygon->GetWidth() / 2;
+	ep.y -= source.m_polygon->GetHeight() / 2;
 
 	Vec2d start = source.m_polygon->GetOrigin();
 	Vec2d contactPoint;
 	Vec2d contactNormal;
-	float contactTime;
+	float contactTime = 1.0f;
 
 	if (RayVsRect(start, ray, sp, ep, contactPoint, contactNormal, contactTime)) {
-
-		source.translation.m_current_velocity += contactNormal * source.translation.m_current_velocity * (contactTime);
+		source.translation.m_current_velocity += contactNormal * Vabs(source.translation.m_current_velocity) * (1 - contactTime);
 		return true;
 	}
 
@@ -228,26 +228,22 @@ bool Radiant::Collision::RayVsRect(const Vec2d& start, const Vec2d& ray, const V
 		return false;
 	}
 
-	contactPoint = start + (tHitFar * ray);
+	contactPoint = start + (tHitNear * ray);
 	contactTime = tHitNear;
 
 	if (tNear.x > tNear.y) {
 		if (ray.x < 0) {
 			contactNormal = Vec2d(1, 0);
-			printf("Right\n");
 		}
 		else {
 			contactNormal = Vec2d(-1, 0);
-			printf("Left\n");
 		}
 	} else if (tNear.x < tNear.y) {
 		if (ray.y < 0) {
 			contactNormal = Vec2d(0, 1);
-			printf("Up\n");
 		}
 		else {
 			contactNormal = Vec2d(0, -1);
-			printf("Down\n");
 		}
 	}
 	else {

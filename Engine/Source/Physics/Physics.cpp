@@ -2,6 +2,9 @@
 #include "Physics.h"
 #include "Collision.h"
 
+#include "Utils/Input.h"
+#include "Renderer/Renderer.h"
+
 namespace Radiant {
 
     Physics* Physics::m_instance = nullptr;
@@ -37,16 +40,15 @@ namespace Radiant {
     }
     void Physics::OnUpdateImpl(const float deltaTime)
     {
-
         for (auto& [id1, object1] : m_objects) {
             object1.translation.UpdateVelocity(deltaTime);
-            bool flag = false;
+
             for (auto& [id2, object2] : m_objects) {
                 if (id1 == id2) {
                     continue;
-                }
+                } 
 
-                flag = Collision::SweptAABB(object1, object2, deltaTime);
+                Collision::SweptAABB(object1, object2, deltaTime);
             }
 
             object1.translation.Translate(*object1.m_polygon, deltaTime);

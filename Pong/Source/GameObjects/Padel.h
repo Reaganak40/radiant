@@ -6,6 +6,7 @@ private:
 	Radiant::Vec2d spawnPos;
 	Radiant::Color m_sprite_color;
 	double acceleration;
+	bool m_fill_sprite;
 
 	std::vector<Radiant::InputState> left_cond;
 	std::vector<Radiant::InputState> right_cond;
@@ -22,6 +23,8 @@ public:
 
 	void SetSpriteColor(Radiant::Color nColor);
 	void SetTransparent(bool transparency);
+
+	void FillSprite(bool fill);
 
 	void SetLeftControl(const std::vector <Radiant::InputState>& conditions);
 	void SetRightControl(const std::vector <Radiant::InputState>& conditions);

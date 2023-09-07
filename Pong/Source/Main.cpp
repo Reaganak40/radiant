@@ -9,8 +9,17 @@ int main(void)
     pongApp.Start("Pong");
 
     Padel* RedPlayer;
-    pongApp.AddGameObject(RedPlayer = new Padel(10.0 + (PADEL_WIDTH / 2), 300.0));
+    pongApp.AddGameObject(RedPlayer = new Padel(100 + (PADEL_WIDTH / 2), 600.0));
     RedPlayer->SetSpriteColor(WHITE);
+
+    Padel* BluePlayer;
+    pongApp.AddGameObject(BluePlayer = new Padel(500, 300));
+    BluePlayer->SetSpriteColor(BLUE);
+    BluePlayer->FillSprite(false);
+    BluePlayer->SetDownControl({});
+    BluePlayer->SetUpControl({});
+    BluePlayer->SetLeftControl({});
+    BluePlayer->SetRightControl({});
 
     Renderer::AttachGui(new DiagnosticsGUI);
 
@@ -28,11 +37,6 @@ int main(void)
 
         /* Final update of game objects before render. */
         pongApp.FinalUpdate();
-
-        
-        Vec2d mouseCoords = Input::GetMouseCoords(WORLD_COORDS);
-        Renderer::DrawLine(Vec2d(100, 500), mouseCoords, ORANGE, 2);
-
 
         /* Render the current frame. */
         pongApp.Render();

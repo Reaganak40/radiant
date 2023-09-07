@@ -1,6 +1,7 @@
 #include "Padel.h"
 
 Padel::Padel(double xPos, double yPos)
+	: m_fill_sprite(true)
 {
 	using namespace Radiant;
 
@@ -57,7 +58,10 @@ void Padel::OnRender()
 {
 	using namespace Radiant;
 	
-	Renderer::Begin(1);
+	Renderer::Begin(0);
+	if (!m_fill_sprite) {
+		Renderer::SetRenderCond(DrawOutline);
+	}
 	Renderer::SetPolygonColor(m_sprite_color);
 	Renderer::AddPolygon(Physics::GetPolygon(m_model_ID));
 	Renderer::End();
@@ -76,6 +80,11 @@ void Padel::SetTransparent(bool transparency)
 	else {
 		m_sprite_color.SetAlpha(1.0f);
 	}
+}
+
+void Padel::FillSprite(bool fill)
+{
+	m_fill_sprite = fill;
 }
 
 void Padel::SetLeftControl(const std::vector <Radiant::InputState>& conditions)
