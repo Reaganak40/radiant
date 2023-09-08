@@ -8,6 +8,7 @@ namespace Radiant {
     UniqueID GetUniqueID()
     {
         UniqueID UUID = UUID_Handler::GetID();
+        printf("ID given: %d\n", UUID == NO_UUID ? UUID_counter + 1 : UUID);
         return UUID == NO_UUID ? ++UUID_counter : UUID;
     }
 

@@ -2,6 +2,8 @@
 #include "pch.h"
 #include "Pobject.h"
 #include "Utils/UniqueID.h"
+#include "Realm.h"
+
 namespace Radiant {
 	class Physics {
 	private:
@@ -9,7 +11,10 @@ namespace Radiant {
 		~Physics();
 		static Physics* m_instance;
 
-		std::unordered_map<UniqueID, Pobject> m_objects;
+		std::unordered_map<UniqueID, Realm*> m_realms;
+		std::set<UniqueID> m_active_realms;
+
+		Polygon m_bad_poly;
 
 	public:
 		static Physics* GetInstance();
@@ -36,92 +41,117 @@ namespace Radiant {
 		*/
 		static void OnEndFrame() { m_instance->OnEndFrameImpl(); }
 
+
+		/*
+			Creates a new self-contained realm to add physical objects to.
+		*/
+
+		static UniqueID CreateRealm() { return m_instance->CreateRealmImpl(); }
+		
+		/*
+			Activates a realm, meaning that the objects in this realm will be updates
+			each update cycle.
+		*/
+		static void ActivateRealm(const UniqueID realmID) { m_instance->ActivateRealmImpl(realmID); }
+
+		/*
+			Deactivates an activated realm from the update cycle.
+		*/
+		static void DeactivateRealm(const UniqueID realmID) { m_instance->DeactivateRealmImpl(realmID); }
+
 		/*
 			Adds an object to the physical world. Returns its UUID for future lookups. 
 		*/
-		static UniqueID CreateObject(std::shared_ptr<Polygon> polygon) { return m_instance->CreateObjectImpl(polygon); }
+		static UniqueID CreateObject(const UniqueID realmID, std::shared_ptr<Polygon> polygon) { return m_instance->CreateObjectImpl(realmID, polygon); }
 
 		/*
 			Sets an existing objects properties in the physical world.
 		*/
-		static void SetObjectProperties(const UniqueID objectID, const unsigned int nProperties) {
-			m_instance->SetObjectPropertiesImpl(objectID, nProperties);
+		static void SetObjectProperties(const UniqueID realmID, const UniqueID objectID, const unsigned int nProperties) {
+			m_instance->SetObjectPropertiesImpl(realmID, objectID, nProperties);
 		}
 
 		/*
 			Removes an existing objects properties in the physical world.
 		*/
-		static void RemoveObjectProperties(const UniqueID objectID, const unsigned int rProperties) {
-			m_instance->RemoveObjectPropertiesImpl(objectID, rProperties);
+		static void RemoveObjectProperties(const UniqueID realmID, const UniqueID objectID, const unsigned int rProperties) {
+			m_instance->RemoveObjectPropertiesImpl(realmID, objectID, rProperties);
 		}
 
 		/*
 			Returns true if the queried object has any of the specified properties.
 		*/
-		static bool QueryObjectProperties(const UniqueID objectID, const unsigned int propertyQuery) {
-			return m_instance->QueryObjectPropertiesImpl(objectID, propertyQuery);
+		static bool QueryObjectProperties(const UniqueID realmID, const UniqueID objectID, const unsigned int propertyQuery) {
+			return m_instance->QueryObjectPropertiesImpl(realmID, objectID, propertyQuery);
 		}
 
 		/*
 			Gets a const reference to the polygon indiciated by the Unique identifier.
 		*/
-		static const Polygon& GetPolygon(UniqueID objectID) { return *m_instance->m_objects.at(objectID).m_polygon; }
+		static const Polygon& GetPolygon(const UniqueID realmID, const UniqueID objectID) { return m_instance->GetPolygonImpl(realmID, objectID); }
 
 		/*
 			Sets the friction magnitude of the specified object. [0 to 1], where 0 is
 			no friction, and 1 is maximum friction.
 		*/
-		static void SetFriction(const UniqueID objectID, const double friction) { m_instance->SetFrictionImpl(objectID, friction); }
+		static void SetFriction(const UniqueID realmID, const UniqueID objectID, const double friction) { m_instance->SetFrictionImpl(realmID, objectID, friction); }
 
 		/*
 			Sets the accerlation vector to the new provided vector.
 		*/
-		static void SetAcceleration(UniqueID objectID, const Vec2d& nAcceleration) { m_instance->SetAccelerationImpl(objectID, nAcceleration); }
+		static void SetAcceleration(const UniqueID realmID, const UniqueID objectID, const Vec2d& nAcceleration) { m_instance->SetAccelerationImpl(realmID, objectID, nAcceleration); }
 		
 		/*
 			Sets the acceleration vector in the x-direction
 		*/
-		static void SetAccelerationX(UniqueID objectID, const double nX) { m_instance->SetAccelerationXImpl(objectID, nX); }
+		static void SetAccelerationX(const UniqueID realmID, const UniqueID objectID, const double nX) { m_instance->SetAccelerationXImpl(realmID, objectID, nX); }
 		
 		/*
 			Sets the acceleration vector in the y-direction
 		*/
-		static void SetAccelerationY(UniqueID objectID, const double nY) { m_instance->SetAccelerationYImpl(objectID, nY); }
+		static void SetAccelerationY(const UniqueID realmID, const UniqueID objectID, const double nY) { m_instance->SetAccelerationYImpl(realmID, objectID, nY); }
 
 		/*
 			Sets a maximum velocity for the specified object.
 		*/
-		static void SetMaximumVelocity(UniqueID objectID, const Vec2d& nMaxVelocity) { m_instance->SetMaximumVelocityImpl(objectID, nMaxVelocity); }
+		static void SetMaximumVelocity(const UniqueID realmID, const UniqueID objectID, const Vec2d& nMaxVelocity) { m_instance->SetMaximumVelocityImpl(realmID, objectID, nMaxVelocity); }
 
 		/*
 			Sets the current velocity for the spciefied object.
 		*/
-		static void SetVelocity(const UniqueID objectID, Vec2d velocity) { m_instance->SetVelocityImpl(objectID, velocity); }
+		static void SetVelocity(const UniqueID realmID, const UniqueID objectID, Vec2d velocity) { m_instance->SetVelocityImpl(realmID, objectID, velocity); }
 
 		/*
 			Manually sets the current position of an object, effectively teleporting it.
 		*/
-		static void SetPosition(const UniqueID objectID, const Vec2d& nPosition) { m_instance->SetPositionImpl(objectID, nPosition); }
+		static void SetPosition(const UniqueID realmID, const UniqueID objectID, const Vec2d& nPosition) { m_instance->SetPositionImpl(realmID, objectID, nPosition); }
 	private:
 
 		void OnUpdateImpl(const float deltaTime);
 		void OnEndFrameImpl();
 
-		void SetObjectPropertiesImpl(const UniqueID objectID, const unsigned int nProperties);
-		void RemoveObjectPropertiesImpl(const UniqueID objectID, const unsigned int nProperties);
-		bool QueryObjectPropertiesImpl(const UniqueID objectID, const unsigned int propertyQuery);
+		UniqueID CreateRealmImpl();
+		void ActivateRealmImpl(const UniqueID realmID);
+		void DeactivateRealmImpl(const UniqueID realmID);
 
-		UniqueID CreateObjectImpl(std::shared_ptr<Polygon> polygon);
-		void SetAccelerationImpl(UniqueID UUID, const Vec2d& nAcceleration);
-		void SetAccelerationXImpl(UniqueID UUID, const double nX);
-		void SetAccelerationYImpl(UniqueID UUID, const double nY);
 
-		void SetVelocityImpl(const UniqueID ObjectID, Vec2d& nVelocity);
+		const Polygon& GetPolygonImpl(const UniqueID realmID, const UniqueID objectID);
+
+		void SetObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, const unsigned int nProperties);
+		void RemoveObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, const unsigned int nProperties);
+		bool QueryObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, const unsigned int propertyQuery);
+
+		UniqueID CreateObjectImpl(const UniqueID realmID, std::shared_ptr<Polygon> polygon);
+		void SetAccelerationImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nAcceleration);
+		void SetAccelerationXImpl(const UniqueID realmID, const UniqueID objectID, const double nX);
+		void SetAccelerationYImpl(const UniqueID realmID, const UniqueID objectID, const double nY);
+
+		void SetVelocityImpl(const UniqueID realmID, const UniqueID objectID, Vec2d& nVelocity);
 		
-		void SetMaximumVelocityImpl(UniqueID UUID, const Vec2d& nMaxVelocity);
+		void SetMaximumVelocityImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nMaxVelocity);
 
-		void SetFrictionImpl(const UniqueID objectID, const double friction);
+		void SetFrictionImpl(const UniqueID realmID, const UniqueID objectID, const double friction);
 
-		void SetPositionImpl(const UniqueID objectID, const Vec2d& nPosition);
+		void SetPositionImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nPosition);
 	};
 }

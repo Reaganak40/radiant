@@ -19,35 +19,35 @@ Padel::~Padel()
 {
 }
 
-void Padel::OnRegister()
+void Padel::OnBind()
 {
 	using namespace Radiant;
-	m_model_ID = Physics::CreateObject(std::make_shared<Rect>(spawnPos, PADEL_WIDTH, PADEL_HEIGHT));
+	m_model_ID = Physics::CreateObject(GetRealmID(), std::make_shared<Rect>(spawnPos, PADEL_WIDTH, PADEL_HEIGHT));
 
-	Physics::SetMaximumVelocity(m_model_ID, Vec2d(700, 700));
-	Physics::SetObjectProperties(m_model_ID, ppBouncy);
+	Physics::SetMaximumVelocity(GetRealmID(), m_model_ID, Vec2d(700, 700));
+	Physics::SetObjectProperties(GetRealmID(), m_model_ID, ppBouncy);
 }
 
 void Padel::OnProcessInput(const float deltaTIme)
 {
 	using namespace Radiant;
 
-	Physics::SetAcceleration(m_model_ID, Vec2d::Zero());
+	Physics::SetAcceleration(GetRealmID(), m_model_ID, Vec2d::Zero());
 
 	if (Input::CheckKeyboardState(right_cond)) {
-		Physics::SetAccelerationX(m_model_ID, acceleration);
+		Physics::SetAccelerationX(GetRealmID(), m_model_ID, acceleration);
 	}
 
 	if (Input::CheckKeyboardState(left_cond)) {
-		Physics::SetAccelerationX(m_model_ID, -acceleration);
+		Physics::SetAccelerationX(GetRealmID(), m_model_ID, -acceleration);
 	}
 
 	if (Input::CheckKeyboardState(up_cond)) {
-		Physics::SetAccelerationY(m_model_ID, acceleration);
+		Physics::SetAccelerationY(GetRealmID(), m_model_ID, acceleration);
 	}
 
 	if (Input::CheckKeyboardState(down_cond)) {
-		Physics::SetAccelerationY(m_model_ID, -acceleration);
+		Physics::SetAccelerationY(GetRealmID(), m_model_ID, -acceleration);
 	}
 }
 
@@ -64,7 +64,7 @@ void Padel::OnRender()
 		Renderer::SetRenderCond(DrawOutline);
 	}
 	Renderer::SetPolygonColor(m_sprite_color);
-	Renderer::AddPolygon(Physics::GetPolygon(m_model_ID));
+	Renderer::AddPolygon(Physics::GetPolygon(GetRealmID(), m_model_ID));
 	Renderer::End();
 }
 
@@ -112,5 +112,5 @@ void Padel::SetDownControl(const std::vector <Radiant::InputState>& conditions)
 
 Radiant::Vec2d Padel::GetPosition()
 {
-	return Radiant::Physics::GetPolygon(m_model_ID).GetOrigin();
+	return Radiant::Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
 }

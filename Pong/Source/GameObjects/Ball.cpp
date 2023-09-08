@@ -17,15 +17,15 @@ Ball::~Ball()
 {
 }
 
-void Ball::OnRegister()
+void Ball::OnBind()
 {
 	using namespace Radiant;
 	
-	m_model_ID = Physics::CreateObject(std::make_shared<Rect>(spawnPos, BALL_RADIUS * 2, BALL_RADIUS*2));
+	m_model_ID = Physics::CreateObject(GetRealmID(), std::make_shared<Rect>(spawnPos, BALL_RADIUS * 2, BALL_RADIUS * 2));
 
 	
-	Physics::SetFriction(m_model_ID, 0);
-	Physics::SetObjectProperties(m_model_ID, ppBouncy);
+	Physics::SetFriction(GetRealmID(), m_model_ID, 0);
+	Physics::SetObjectProperties(GetRealmID(), m_model_ID, ppBouncy);
 	
 	SetUpBall();
 	m_timer.Start();
@@ -48,7 +48,7 @@ void Ball::OnFinalUpdate()
 {
 	using namespace Radiant;
 
-	auto ballX = Physics::GetPolygon(m_model_ID).GetOrigin().x;
+	auto ballX = Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin().x;
 
 	if (ballX < -100 || ballX > WORLD_WIDTH + 100) {
 
@@ -71,7 +71,7 @@ void Ball::OnRender()
 
 	Renderer::Begin(BALL_LAYER);
 	Renderer::SetPolygonColor(m_sprite_color);
-	Renderer::AddPolygon(Physics::GetPolygon(m_model_ID));
+	Renderer::AddPolygon(Physics::GetPolygon(GetRealmID(), m_model_ID));
 	Renderer::End();
 
 }
@@ -80,9 +80,9 @@ void Ball::SetUpBall()
 {
 	using namespace Radiant;
 
-	Physics::SetPosition(m_model_ID, Vec2d(Renderer::GetWindowWidth() / 2, Renderer::GetWindowHeight() / 2));
-	Physics::SetVelocity(m_model_ID, Vec2d::Zero());
-	Physics::SetAccelerationX(m_model_ID, 0);
+	Physics::SetPosition(GetRealmID(), m_model_ID, Vec2d(WORLD_WIDTH / 2, WORLD_HEIGHT / 2));
+	Physics::SetVelocity(GetRealmID(), m_model_ID, Vec2d::Zero());
+	Physics::SetAccelerationX(GetRealmID(), m_model_ID, 0);
 }
 
 void Ball::StartMovingBall()
@@ -90,11 +90,11 @@ void Ball::StartMovingBall()
 	using namespace Radiant;
 
 	int direction = Utils::RandInt(0, 1) == 0 ? -1 : 1;
-	Physics::SetVelocity(m_model_ID, Vec2d(
+	Physics::SetVelocity(GetRealmID(), m_model_ID, Vec2d(
 		 direction * BALL_START_SPEED,
 		Utils::RandInt(0, 1) == 0 ? Utils::RandomFloat(100, 450) : -Utils::RandomFloat(100, 450)
 	));
-	Physics::SetAccelerationX(m_model_ID, direction * 40);
+	Physics::SetAccelerationX(GetRealmID(), m_model_ID, direction * 40);
 
 }
 

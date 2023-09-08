@@ -9,7 +9,7 @@ public:
 	Wall(double xPos, double yPos);
 	~Wall();
 
-	void OnRegister() override final;
+	void OnBind() override final;
 	void OnProcessInput(const float deltaTIme) override final;
 	void OnFinalUpdate() override final;
 	void OnRender() override final;

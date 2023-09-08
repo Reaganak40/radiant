@@ -9,15 +9,15 @@
 namespace Radiant
 {
 	Application::Application()
+		: m_current_scene(nullptr)
 	{
 		Renderer::Initialize();
 	}
 
 	Application::~Application()
 	{
-
-		for (const auto& gameObject : m_game_objects) {
-			delete gameObject;
+		for (auto& [id, scene] : m_scenes) {
+			delete scene;
 		}
 
 		Physics::Destroy();
@@ -53,8 +53,8 @@ namespace Radiant
 
 	void Application::ProcessInput()
 	{
-		for (const auto& gameObject : m_game_objects) {
-			gameObject->OnProcessInput(m_timestep.deltaTime);
+		if (m_current_scene != nullptr) {
+			m_current_scene->OnProcessInput(m_timestep.deltaTime);
 		}
 	}
 
@@ -65,8 +65,8 @@ namespace Radiant
 
 	void Application::FinalUpdate()
 	{
-		for (const auto& gameObject : m_game_objects) {
-			gameObject->OnFinalUpdate();
+		if (m_current_scene != nullptr) {
+			m_current_scene->OnFinalUpdate();
 		}
 
 		Renderer::OnUpdate(m_timestep.deltaTime);
@@ -74,8 +74,8 @@ namespace Radiant
 
 	void Application::Render()
 	{		
-		for (const auto& gameObject : m_game_objects) {
-			gameObject->OnRender();
+		if (m_current_scene != nullptr) {
+			m_current_scene->OnRender();
 		}
 
 		Renderer::Render();
@@ -95,21 +95,25 @@ namespace Radiant
 		return Renderer::GetWindowHeight();
 	}
 
-	const UniqueID Application::AddGameObject(GameObject* nGameObject)
+	const UniqueID Application::AddScene(Scene* nScene)
 	{
-		nGameObject->OnRegister();
-		m_game_objects.push_back(nGameObject);
+		nScene->OnRegister();
+		m_scenes[nScene->GetID()] = nScene;
 
-		return nGameObject->GetUUID();
+		return nScene->GetID();
 	}
-	GameObject* Application::GetGameObject(UniqueID UUID)
+
+	void Application::SetScene(UniqueID sceneUUID)
 	{
-		for (auto& object : m_game_objects) {
-			if (object->GetUUID() == UUID) {
-				return object;
-			}
+		if (m_scenes.find(sceneUUID) == m_scenes.end()) {
+			return;
 		}
 
-		return nullptr;
+		if (m_current_scene != nullptr) {
+			m_current_scene->OnRelease();
+		}
+
+		m_current_scene = m_scenes.at(sceneUUID);
+		m_current_scene->OnBind();
 	}
 }

@@ -25,6 +25,7 @@ namespace Radiant {
 		void RemoveProperties(const unsigned int rProperties);
 		bool HasProperties(const unsigned int propertyQuery);
 
+		friend class Realm;
 		friend class Physics;
 		friend class Collision;
 	};

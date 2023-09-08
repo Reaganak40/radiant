@@ -1,13 +1,16 @@
 #pragma once
 #include "pch.h"
 #include "Utils/Timestep.h"
-#include "GameObject.h"
+#include "GameObject/GameObject.h"
+#include "Scene/Scene.h"
 
 namespace Radiant {
 	class Application {
 	private:
 		Timestep m_timestep;
-		std::vector<GameObject*> m_game_objects;
+
+		std::unordered_map<UniqueID, Scene*> m_scenes;
+		Scene* m_current_scene;
 
 	public:
 		Application();
@@ -72,15 +75,17 @@ namespace Radiant {
 		const int WindowHeight();
 
 		/*
-			Adds a game object to the world. Note: the application will now own this pointer
-			and instance and is responsible for freeing it.
+			Registers a scene to the application called its OnRegister()
+			and adding it to its list of scenes.
 		*/
-		const UniqueID AddGameObject(GameObject* nGameObject);
+		const UniqueID AddScene(Scene* nScene);
 
 		/*
-			Returns a pointer to an existing game object.
+			Manually sets the scene in the application to the one that
+			owns this uniqueID. This will call the Scene's OnBind() before
+			it gets set and the current scene's OnRelease.
 		*/
-		GameObject* GetGameObject(UniqueID UUID);
+		void SetScene(UniqueID sceneUUID);
 
 	};
 }

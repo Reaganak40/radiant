@@ -168,6 +168,7 @@
     <ClCompile Include="Source\Physics\Collision.cpp" />
     <ClCompile Include="Source\Physics\Physics.cpp" />
     <ClCompile Include="Source\Physics\Pobject.cpp" />
+    <ClCompile Include="Source\Physics\Realm.cpp" />
     <ClCompile Include="Source\Physics\Translation.cpp" />
     <ClCompile Include="Source\Polygon\Circle.cpp" />
     <ClCompile Include="Source\Polygon\Line.cpp" />
@@ -189,6 +190,7 @@
     <ClCompile Include="Source\Renderer\Texture.cpp" />
     <ClCompile Include="Source\Renderer\VertexArray.cpp" />
     <ClCompile Include="Source\Renderer\VertexBuffer.cpp" />
+    <ClCompile Include="Source\Scene\Scene.cpp" />
     <ClCompile Include="Source\Utils\BitSet.cpp" />
     <ClCompile Include="Source\Utils\Input.cpp" />
     <ClCompile Include="Source\Utils\MathTypes.cpp" />
@@ -255,17 +257,19 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Application.h" />
-    <ClInclude Include="Source\GameObject.h" />
+    <ClInclude Include="Source\GameObject\GameObject.h" />
     <ClInclude Include="Source\Gui\Diagnostics.h" />
     <ClInclude Include="Source\Gui\Gui.h" />
     <ClInclude Include="Source\Physics\Collision.h" />
     <ClInclude Include="Source\Physics\Physics.h" />
     <ClInclude Include="Source\Physics\Pobject.h" />
+    <ClInclude Include="Source\Physics\Realm.h" />
     <ClInclude Include="Source\Physics\Translation.h" />
     <ClInclude Include="Source\Polygon\Circle.h" />
     <ClInclude Include="Source\Polygon\Line.h" />
     <ClInclude Include="Source\Renderer\GeoMode.h" />
     <ClInclude Include="Source\Renderer\RenderCache.h" />
+    <ClInclude Include="Source\Scene\Scene.h" />
     <ClInclude Include="Source\Utils\BitSet.h" />
     <ClInclude Include="Source\Utils\Color.h" />
     <ClInclude Include="Source\Utils\Input.h" />

@@ -6,7 +6,7 @@
 
 #include "Physics/Pobject.h"
 
-#include "GameObject.h"
+#include "GameObject/GameObject.h"
 #include "Gui/Diagnostics.h"
 #include "Polygon/Triangle.h"
 #include "Polygon/Rect.h"
