@@ -4,7 +4,7 @@
 #include "Utils/Input.h"
 #include "Utils/Utils.h"
 #include "Physics/Physics.h"
-
+#include "Gui/GuiManager.h"
 
 namespace Radiant
 {
@@ -20,6 +20,7 @@ namespace Radiant
 			delete scene;
 		}
 
+		GuiManager::Destroy();
 		Physics::Destroy();
 		Input::Destroy();
 		Renderer::Destroy();
@@ -32,6 +33,7 @@ namespace Radiant
 		Renderer::CreateWindow(appName, windowWidth, windowHeight);
 		Input::Initialize();
 		Physics::Initialize();
+		GuiManager::Initialize();
 	}
 
 	bool Application::IsRunning()

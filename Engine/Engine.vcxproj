@@ -157,6 +157,7 @@
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\Gui\Diagnostics.cpp" />
     <ClCompile Include="Source\Gui\Gui.cpp" />
+    <ClCompile Include="Source\Gui\GuiManager.cpp" />
     <ClCompile Include="Source\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">pch.h</PrecompiledHeaderFile>
@@ -260,6 +261,7 @@
     <ClInclude Include="Source\GameObject\GameObject.h" />
     <ClInclude Include="Source\Gui\Diagnostics.h" />
     <ClInclude Include="Source\Gui\Gui.h" />
+    <ClInclude Include="Source\Gui\GuiManager.h" />
     <ClInclude Include="Source\Physics\Collision.h" />
     <ClInclude Include="Source\Physics\Physics.h" />
     <ClInclude Include="Source\Physics\Pobject.h" />

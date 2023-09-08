@@ -2,6 +2,8 @@
 #include <stdio.h>
 
 namespace Radiant {
+	
+	
 
 	class GuiTemplate {
 	private:

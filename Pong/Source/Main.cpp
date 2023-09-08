@@ -1,4 +1,5 @@
 #include "Pong.h"
+#include "Scenes/MainMenu.h"
 #include "Scenes/Arena.h"
 
 using namespace Radiant;
@@ -8,10 +9,11 @@ int main(void)
     Application pongApp;
     pongApp.Start("Pong");
 
+    UniqueID mainMenu = pongApp.AddScene(new MainMenu);
     UniqueID arena = pongApp.AddScene(new Arena);
-    pongApp.SetScene(arena);
+    pongApp.SetScene(mainMenu);
 
-   // Renderer::AttachGui(new DiagnosticsGUI);
+    //Renderer::AttachGui(new DiagnosticsGUI);
 
     /* Loop until the user closes the window */
     while (pongApp.IsRunning())

@@ -12,3 +12,4 @@
 #include "Polygon/Rect.h"
 #include "Polygon/Circle.h"
 #include "Utils/Utils.h"
+#include "Gui/GuiManager.h"

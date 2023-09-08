@@ -14,3 +14,5 @@
 
 #define WORLD_WIDTH 1920.0
 #define WORLD_HEIGHT 1080.0
+
+#define PONG_FONT 1
