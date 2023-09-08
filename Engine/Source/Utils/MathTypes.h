@@ -72,4 +72,11 @@ namespace Radiant {
 		Vec4f(float nA = 0.0f, float nB = 0.0f, float nC = 0.0f, float nD = 0.0f)
 			: x1(nA), x2(nB), x3(nC), x4(nD) {}
 	};
+
+	struct Vec2i {
+		int x, y;
+		
+		Vec2i(int nX=0, int nY=0) 
+			: x(nX), y(nY) {}
+	};
 }

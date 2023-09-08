@@ -143,8 +143,8 @@ namespace Radiant {
 		/*
 			Creates a new GLFW window with the provided specifications.
 		*/
-		static void CreateWindow(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight) {
-			m_instance->CreateWindowImpl(windowName, windowWidth, windowHeight);
+		static Vec2i CreateWindow(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight) {
+			return m_instance->CreateWindowImpl(windowName, windowWidth, windowHeight);
 		}
 
 		// *****************************************************
@@ -167,6 +167,12 @@ namespace Radiant {
 			Gets the current window instance's height
 		*/
 		static unsigned int GetWindowHeight() { return m_instance->m_window_height; }
+
+		/*
+			Update renderer internals if encountered a window resize event. Returns
+			the aspect ratio.
+		*/
+		static Vec2i OnWindowResize() { return m_instance->OnWindowResizeImpl(); }
 
 		/*
 			Gets the 2D camera coordinates based in the bottom left corner.
@@ -277,9 +283,11 @@ namespace Radiant {
 		friend class Input;
 
 	private:
-		void CreateWindowImpl(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight);
+		Vec2i CreateWindowImpl(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight);
 
 		void SetBackgroundColorImpl(const Vec4f& colorBits);
+
+		Vec2i OnWindowResizeImpl();
 
 		void OnBeginFrameImpl();
 		void OnUpdateImpl(const float deltaTime);

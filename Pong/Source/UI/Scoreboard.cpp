@@ -17,13 +17,18 @@ Scoreboard::Scoreboard(Ball& ballReference)
 void Scoreboard::OnUpdate(const float deltaTime)
 {
 	m_ball.GetScore(player1_score, player2_score);
+
+	if (Radiant::Input::CheckWindowResize()) {
+		m_window_width = Radiant::Renderer::GetWindowWidth();
+		m_window_height = Radiant::Renderer::GetWindowHeight();
+	}
 }
 
 void Scoreboard::OnRender()
 {
 	// First render config
 	ImGui::SetNextWindowSize(ImVec2(m_gui_width, m_gui_height), ImGuiCond_Appearing);
-	ImGui::SetNextWindowPos(ImVec2(m_window_width/2 - m_gui_width/2, 40), ImGuiCond_Appearing);
+	ImGui::SetNextWindowPos(ImVec2(m_window_width/2 - m_gui_width/2, 40));
 
 	ImGui::PushFont(scoreboardFont);
 

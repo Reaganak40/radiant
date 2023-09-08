@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Renderer.h"
 #include "ErrorHandling.h"
+#include "Utils/Utils.h"
 
 namespace Radiant {
 
@@ -74,8 +75,10 @@ namespace Radiant {
         }
     }
 
-    void Renderer::CreateWindowImpl(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight)
+    Vec2i Renderer::CreateWindowImpl(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight)
     {
+        Vec2i aspect_ratio = Utils::GetRatio(windowWidth, windowHeight);
+
         m_window_name = windowName;
         m_window_width = windowWidth;
         m_window_height = windowHeight;
@@ -125,8 +128,14 @@ namespace Radiant {
         AddDefaultShader();
 
         // Setup Camera (model view project matrix)
-        m_proj = glm::ortho(0.0f, (float)m_window_width, 0.0f, (float)m_window_height, -1.0f, 1.0f);
         m_screen_origin = Vec3f(0.0f, 0.0f, 0.0f);
+
+        if (aspect_ratio.x == 16 && aspect_ratio.y == 9) {
+            m_proj = glm::ortho(0.0f, (float)1920, 0.0f, (float)1080, -1.0f, 1.0f);
+        }
+        else {
+            m_proj = glm::ortho(0.0f, (float)m_window_width, 0.0f, (float)m_window_height, -1.0f, 1.0f);
+        }
 
         SetShader(m_shaders[0]->GetID());
         glm::mat4 mvp = m_proj * m_view * m_model;
@@ -138,11 +147,18 @@ namespace Radiant {
         // Set to 60 FPS
         glfwSwapInterval(1);
 
+        return aspect_ratio;
     }
 
     void Renderer::SetBackgroundColorImpl(const Vec4f& colorBits)
     {
         glClearColor(colorBits.x1, colorBits.x2, colorBits.x3, colorBits.x4);
+    }
+
+    Vec2i Renderer::OnWindowResizeImpl()
+    {
+        glfwGetWindowSize(m_window, (int*)&m_window_width, (int*)&m_window_height);
+        return Utils::GetRatio(m_window_width, m_window_height);
     }
 
     void Renderer::OnBeginFrameImpl()
@@ -228,6 +244,7 @@ namespace Radiant {
                 }
             }
         }
+
 
     }
 

@@ -43,6 +43,10 @@ namespace Radiant
 	{
 		m_timestep.Update();
 
+		if (Input::CheckWindowResize()) {
+			Renderer::OnWindowResize();
+		}
+
 		Renderer::Clear();
 		Renderer::OnBeginFrame();
 	}

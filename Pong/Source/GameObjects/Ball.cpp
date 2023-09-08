@@ -21,7 +21,7 @@ void Ball::OnRegister()
 {
 	using namespace Radiant;
 	
-	m_model_ID = Physics::CreateObject(std::make_shared<Rect>(spawnPos, BALL_RADIUS/2, BALL_RADIUS/2));
+	m_model_ID = Physics::CreateObject(std::make_shared<Rect>(spawnPos, BALL_RADIUS * 2, BALL_RADIUS*2));
 
 	
 	Physics::SetFriction(m_model_ID, 0);
@@ -50,7 +50,7 @@ void Ball::OnFinalUpdate()
 
 	auto ballX = Physics::GetPolygon(m_model_ID).GetOrigin().x;
 
-	if (ballX < -100 || ballX > Renderer::GetWindowWidth() + 100) {
+	if (ballX < -100 || ballX > WORLD_WIDTH + 100) {
 
 		if (ballX < -100) {
 			m_score[1]++;
@@ -91,7 +91,7 @@ void Ball::StartMovingBall()
 
 	int direction = Utils::RandInt(0, 1) == 0 ? -1 : 1;
 	Physics::SetVelocity(m_model_ID, Vec2d(
-		 direction * 450.0,
+		 direction * BALL_START_SPEED,
 		Utils::RandInt(0, 1) == 0 ? Utils::RandomFloat(100, 450) : -Utils::RandomFloat(100, 450)
 	));
 	Physics::SetAccelerationX(m_model_ID, direction * 40);

@@ -16,6 +16,26 @@ namespace Radiant {
 
             return d;
         }
+        Vec2i GetRatio(unsigned int x, unsigned int y)
+        {
+            int gcd = GCD(x, y);
+            return Vec2i(x / gcd, y / gcd);
+
+        }
+
+        int GCD(unsigned int x, unsigned int y)
+        {
+            if (x == 0) {
+                return y;
+            }
+            else if (y == 0) {
+                return x;
+            }
+
+            if (y > x) { Swap(x, y); }
+
+            return GCD(y, x % y);
+        }
         void SetRandomSeed()
         {
             srand((unsigned int)time(NULL));
@@ -72,6 +92,12 @@ namespace Radiant {
         void Swap(double& A, double& B)
         {
             double temp = A;
+            A = B;
+            B = temp;
+        }
+        void Swap(unsigned int& A, unsigned int& B)
+        {
+            int temp = A;
             A = B;
             B = temp;
         }

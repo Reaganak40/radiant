@@ -15,6 +15,16 @@ namespace Radiant {
         double ApplyEpsilon(double d);
 
         /*
+            Returns the integer ratio of x and y.
+        */
+        Vec2i GetRatio(unsigned int x, unsigned int y);
+
+        /*
+            Returns the greatest common divisor between x and y.
+        */
+        int GCD(unsigned int x, unsigned int y);
+
+        /*
             Sets the seed for random calls.
         */
         void SetRandomSeed();
@@ -53,6 +63,7 @@ namespace Radiant {
             Swaps the contents of the two values.
         */
         void Swap(double& A, double& B);
+        void Swap(unsigned int& A, unsigned int& B);
 
         /*
             Returns the vertex in the list that is closest to the provided point.
