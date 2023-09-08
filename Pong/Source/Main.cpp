@@ -1,5 +1,7 @@
 #include "Pong.h"
 #include "GameObjects/Padel.h"
+#include "GameObjects/Ball.h"
+#include "GameObjects/Wall.h"
 
 using namespace Radiant;
 
@@ -8,18 +10,31 @@ int main(void)
     Application pongApp;
     pongApp.Start("Pong");
 
-    Padel* RedPlayer;
-    pongApp.AddGameObject(RedPlayer = new Padel(100 + (PADEL_WIDTH / 2), 600.0));
-    RedPlayer->SetSpriteColor(WHITE);
+    Renderer::SetBackgroundColor(POWERSHELL_BLUE);
 
-    Padel* BluePlayer;
-    pongApp.AddGameObject(BluePlayer = new Padel(500, 300));
-    BluePlayer->SetSpriteColor(BLUE);
-    BluePlayer->FillSprite(false);
-    BluePlayer->SetDownControl({});
-    BluePlayer->SetUpControl({});
-    BluePlayer->SetLeftControl({});
-    BluePlayer->SetRightControl({});
+    Padel* redPlayer;
+    pongApp.AddGameObject(redPlayer = new Padel(30 + (PADEL_WIDTH / 2), pongApp.WindowHeight() / 2));
+    redPlayer->SetRightControl({});
+    redPlayer->SetLeftControl({});
+
+    Padel* bluePlayer;
+    pongApp.AddGameObject(bluePlayer = new Padel(pongApp.WindowWidth() - (PADEL_WIDTH / 2) - 30, pongApp.WindowHeight() / 2));
+    bluePlayer->SetSpriteColor(BLUE);
+    bluePlayer->SetUpControl(std::vector<InputState>{UP_KEY_DOWN, UP_KEY_PRESS});
+    bluePlayer->SetDownControl(std::vector<InputState>{DOWN_KEY_DOWN, DOWN_KEY_PRESS});
+    bluePlayer->SetRightControl({});
+    bluePlayer->SetLeftControl({});
+
+    Ball* ball;
+    pongApp.AddGameObject(ball = new Ball(pongApp.WindowWidth() * 0.85, pongApp.WindowHeight() / 2));
+
+    Wall* top;
+    pongApp.AddGameObject(top = new Wall(pongApp.WindowWidth() / 2, pongApp.WindowHeight()));
+    top->SetWallVisibility(true);
+
+    Wall* bottom;
+    pongApp.AddGameObject(bottom = new Wall(pongApp.WindowWidth() / 2, 0));
+    bottom->SetWallVisibility(true);
 
     Renderer::AttachGui(new DiagnosticsGUI);
 

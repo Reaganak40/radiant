@@ -174,6 +174,11 @@ namespace Radiant {
 		static Vec2d GetCameraCoordinates2D() { return Vec2d(m_instance->m_screen_origin.x, m_instance->m_screen_origin.y); }
 
 		/*
+			Sets the background color used on clear.
+		*/
+		static void SetBackgroundColor(const Color& color) { m_instance->SetBackgroundColorImpl(color.GetColor()); }
+
+		/*
 			Clears the screen with the defined background color.
 		*/
 		static void Clear() { glClear(GL_COLOR_BUFFER_BIT); }
@@ -273,6 +278,8 @@ namespace Radiant {
 
 	private:
 		void CreateWindowImpl(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight);
+
+		void SetBackgroundColorImpl(const Vec4f& colorBits);
 
 		void OnBeginFrameImpl();
 		void OnUpdateImpl(const float deltaTime);

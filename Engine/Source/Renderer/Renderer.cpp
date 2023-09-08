@@ -140,6 +140,11 @@ namespace Radiant {
 
     }
 
+    void Renderer::SetBackgroundColorImpl(const Vec4f& colorBits)
+    {
+        glClearColor(colorBits.x1, colorBits.x2, colorBits.x3, colorBits.x4);
+    }
+
     void Renderer::OnBeginFrameImpl()
     {
         if (m_GUIs.size() > 0) {

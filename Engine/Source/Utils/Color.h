@@ -9,6 +9,7 @@ namespace Radiant {
 		ORANGE,
 		BLACK,
 		WHITE,
+		POWERSHELL_BLUE,
 	};
 
 	class Color {

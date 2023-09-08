@@ -41,17 +41,27 @@ namespace Radiant {
     void Physics::OnUpdateImpl(const float deltaTime)
     {
         for (auto& [id1, object1] : m_objects) {
+
             object1.translation.UpdateVelocity(deltaTime);
 
-            for (auto& [id2, object2] : m_objects) {
-                if (id1 == id2) {
-                    continue;
-                } 
+            bool collisionDetected = false;
+            
+            if (!object1.HasProperties(ppRigid)) {
 
-                Collision::SweptAABB(object1, object2, deltaTime);
+                for (auto& [id2, object2] : m_objects) {
+                    if (id1 == id2) {
+                        continue;
+                    }
+
+                    if (Collision::SweptAABB(object1, object2, deltaTime)) {
+                        collisionDetected = true;
+                    }
+                }
             }
 
-            object1.translation.Translate(*object1.m_polygon, deltaTime);
+            if (!collisionDetected || !object1.HasProperties(ppBouncy)) {
+                object1.translation.Translate(*object1.m_polygon, deltaTime);
+            }
         }
     }
 
@@ -60,6 +70,33 @@ namespace Radiant {
         for (auto& [id, object] : m_objects) {
             object.translation.OnEndFrame();
         }
+    }
+
+    void Physics::SetObjectPropertiesImpl(const UniqueID objectID, const unsigned int nProperties)
+    {
+        if (m_objects.find(objectID) == m_objects.end()) {
+            return;
+        }
+
+        m_objects.at(objectID).SetProperties(nProperties);
+    }
+
+    void Physics::RemoveObjectPropertiesImpl(const UniqueID objectID, const unsigned int rProperties)
+    {
+        if (m_objects.find(objectID) == m_objects.end()) {
+            return;
+        }
+
+        m_objects.at(objectID).RemoveProperties(rProperties);
+    }
+
+    bool Physics::QueryObjectPropertiesImpl(const UniqueID objectID, const unsigned int propertyQuery)
+    {
+        if (m_objects.find(objectID) == m_objects.end()) {
+            return false;
+        }
+
+        return m_objects.at(objectID).HasProperties(propertyQuery);
     }
 
     UniqueID Physics::CreateObjectImpl(std::shared_ptr<Polygon> polygon)
@@ -96,6 +133,15 @@ namespace Radiant {
         m_objects.at(UUID).translation.m_acceleration.y = nY;
     }
 
+    void Physics::SetVelocityImpl(UniqueID objectID, Vec2d& nVelocity)
+    {
+        if (m_objects.find(objectID) == m_objects.end()) {
+            return;
+        }
+
+        m_objects.at(objectID).translation.SetVelocity(nVelocity);
+    }
+
     void Physics::SetMaximumVelocityImpl(UniqueID UUID, const Vec2d& nMaxVelocity)
     {
         if (m_objects.find(UUID) == m_objects.end()) {
@@ -104,4 +150,22 @@ namespace Radiant {
 
         m_objects.at(UUID).translation.SetMaxVelocity(nMaxVelocity);
     }
+
+    void Physics::SetFrictionImpl(const UniqueID objectID, const double friction)
+    {
+        if (m_objects.find(objectID) == m_objects.end()) {
+            return;
+        }
+
+        m_objects.at(objectID).translation.SetFriction(friction);
+    }
+
+    void Physics::SetPositionImpl(const UniqueID objectID, const Vec2d& nPosition) {
+        if (m_objects.find(objectID) == m_objects.end()) {
+            return;
+        }
+
+        m_objects.at(objectID).m_polygon->SetPosition(nPosition);
+    }
+
 }

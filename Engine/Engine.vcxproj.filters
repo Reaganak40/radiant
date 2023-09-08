@@ -129,6 +129,9 @@
     <ClCompile Include="Source\Renderer\RenderCache.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Utils\Timestep.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vendor\GLAD\glad.h">

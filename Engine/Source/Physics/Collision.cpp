@@ -174,11 +174,11 @@ bool Radiant::Collision::SweptAABB(Pobject& source, const Pobject& suspect, cons
 	Vec2d sp = suspect.m_polygon->GetVertices()[3];
 	Vec2d ep = suspect.m_polygon->GetVertices()[1];
 
-	sp.x -= source.m_polygon->GetWidth() / 2;
-	sp.y += source.m_polygon->GetHeight() / 2;
+	sp.x = ceil(sp.x - source.m_polygon->GetWidth() / 2);
+	sp.y = ceil(sp.y + source.m_polygon->GetHeight() / 2);
 
-	ep.x += source.m_polygon->GetWidth() / 2;
-	ep.y -= source.m_polygon->GetHeight() / 2;
+	ep.x = ceil(ep.x + source.m_polygon->GetWidth() / 2);
+	ep.y = ceil(ep.y - source.m_polygon->GetHeight() / 2);
 
 	Vec2d start = source.m_polygon->GetOrigin();
 	Vec2d contactPoint;
@@ -186,7 +186,27 @@ bool Radiant::Collision::SweptAABB(Pobject& source, const Pobject& suspect, cons
 	float contactTime = 1.0f;
 
 	if (RayVsRect(start, ray, sp, ep, contactPoint, contactNormal, contactTime)) {
-		source.translation.m_current_velocity += contactNormal * Vabs(source.translation.m_current_velocity) * (1 - contactTime);
+
+		if (source.HasProperties(ppBouncy)) {
+			
+			source.translation.Translate(*source.m_polygon, (deltaTime * contactTime));
+
+			if (abs(contactNormal.x) > 0) {
+				source.translation.m_current_velocity.x *= -1.0;
+				source.translation.m_acceleration.x *= -1.0;
+
+			} 
+			if (abs(contactNormal.y) > 0) {
+				source.translation.m_current_velocity.y *= -1.0;
+				source.translation.m_acceleration.y *= -1.0;
+			}
+
+			source.translation.Translate(*source.m_polygon, deltaTime * (1-contactTime));
+
+		}
+		else {
+			source.translation.m_current_velocity += contactNormal * Vabs(source.translation.m_current_velocity) * (1 - contactTime);
+		}
 		return true;
 	}
 
@@ -215,21 +235,40 @@ bool Radiant::Collision::RayVsRect(const Vec2d& start, const Vec2d& ray, const V
 	if (tNear.x > tFar.x) { Utils::Swap(tNear.x, tFar.x); }
 	if (tNear.y > tFar.y) { Utils::Swap(tNear.y, tFar.y); }
 
-
 	// Check for intersection
 	if (tNear.x > tFar.y || tNear.y > tFar.x) { return false; }
+
+	if (tNear.x == -std::numeric_limits<double>::infinity() &&
+		tFar.x == std::numeric_limits<double>::infinity()) {
+
+		if (((start + ray).x < rectTopLeft.x) || ((start + ray).x > rectBottomRight.x)) {
+			return false;
+		}
+	}
+
+	if (tNear.y == -std::numeric_limits<double>::infinity() &&
+		tFar.y == std::numeric_limits<double>::infinity()) {
+
+		if (((start + ray).y > rectTopLeft.y) || ((start + ray).y < rectBottomRight.y)) {
+			return false;
+		}
+	}
 
 
 	double tHitNear = Utils::Max(tNear.x, tNear.y);
 	double tHitFar = Utils::Min(tFar.x, tFar.y);
 
 	// Collision not in direction of ray
-	if (tHitNear < 0 || tHitNear > 1) {
+	if (tHitNear < 0.0 || tHitNear > 1.0) {
+		return false;
+	}
+
+	if ((tNear.x < 0.0 && tNear.y < 0.0)) {
 		return false;
 	}
 
 	contactPoint = start + (tHitNear * ray);
-	contactTime = tHitNear;
+	contactTime = (float)tHitNear;
 
 	if (tNear.x > tNear.y) {
 		if (ray.x < 0) {

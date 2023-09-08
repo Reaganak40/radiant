@@ -112,6 +112,23 @@ namespace Radiant {
         Z_KEY_DOWN,
         Z_KEY_UP,
 
+        RIGHT_KEY_PRESS,
+        RIGHT_KEY_DOWN,
+        RIGHT_KEY_UP,
+
+        LEFT_KEY_PRESS,
+        LEFT_KEY_DOWN,
+        LEFT_KEY_UP,
+
+        DOWN_KEY_PRESS,
+        DOWN_KEY_DOWN,
+        DOWN_KEY_UP,
+
+        UP_KEY_PRESS,
+        UP_KEY_DOWN,
+        UP_KEY_UP,
+
+
         NAIS // Not an input state
     };
 

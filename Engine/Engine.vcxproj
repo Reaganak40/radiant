@@ -192,6 +192,7 @@
     <ClCompile Include="Source\Utils\BitSet.cpp" />
     <ClCompile Include="Source\Utils\Input.cpp" />
     <ClCompile Include="Source\Utils\MathTypes.cpp" />
+    <ClCompile Include="Source\Utils\Timestep.cpp" />
     <ClCompile Include="Source\Utils\UniqueID.cpp" />
     <ClCompile Include="Source\Utils\Color.cpp" />
     <ClCompile Include="Source\Utils\Utils.cpp" />

@@ -50,9 +50,10 @@ namespace Radiant {
         if (key >= GLFW_KEY_A && key <= GLFW_KEY_Z) {
             flag = (key - GLFW_KEY_A) * 3;
         }
-        else {
-            return;
+        else if (key >= GLFW_KEY_RIGHT && key <= GLFW_KEY_UP) {
+            flag = RIGHT_KEY_PRESS + (key - GLFW_KEY_RIGHT) * 3;
         }
+
 
         switch (action) {
         case GLFW_PRESS:

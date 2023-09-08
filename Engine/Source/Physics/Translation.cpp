@@ -23,7 +23,7 @@ namespace Radiant {
 	}
 
 	void Translation::SetFriction(double frictionMagnitude) {
-		m_friction = 1 - fmin(frictionMagnitude, 1);
+		m_friction = Utils::ApplyEpsilon(1 - fmin(frictionMagnitude, 1));
 	}
 
 	void Translation::SetVelocity(const Vec2d nVelocity) {
@@ -48,14 +48,16 @@ namespace Radiant {
 			m_current_velocity.y = 0;
 		}
 
-		if (abs(m_current_velocity.x) > m_max_velocity.x) {
-			m_current_velocity.x = m_current_velocity.x < 0 ? -m_max_velocity.x : m_max_velocity.x;
-			m_acceleration.x = 0;
-		}
+		if (m_has_max_velocity) {
+			if (abs(m_current_velocity.x) > m_max_velocity.x) {
+				m_current_velocity.x = m_current_velocity.x < 0 ? -m_max_velocity.x : m_max_velocity.x;
+				m_acceleration.x = 0;
+			}
 
-		if (abs(m_current_velocity.y) > m_max_velocity.y) {
-			m_current_velocity.y = m_current_velocity.y < 0 ? -m_max_velocity.y : m_max_velocity.y;
-			m_acceleration.y = 0;
+			if (abs(m_current_velocity.y) > m_max_velocity.y) {
+				m_current_velocity.y = m_current_velocity.y < 0 ? -m_max_velocity.y : m_max_velocity.y;
+				m_acceleration.y = 0;
+			}
 		}
 	}
 

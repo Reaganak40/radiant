@@ -21,12 +21,24 @@
     <ClCompile Include="Source\GameObjects\Padel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\GameObjects\Ball.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GameObjects\Wall.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Pong.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\GameObjects\Padel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameObjects\Ball.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameObjects\Wall.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
