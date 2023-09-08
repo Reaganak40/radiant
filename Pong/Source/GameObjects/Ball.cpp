@@ -9,6 +9,8 @@ Ball::Ball(double xPos, double yPos)
 	m_sprite_color = GREEN;
 	acceleration = 500;
 
+	m_score[0] = 0;
+	m_score[1] = 0;
 }
 
 Ball::~Ball()
@@ -45,8 +47,17 @@ void Ball::OnProcessInput(const float deltaTIme)
 void Ball::OnFinalUpdate()
 {
 	using namespace Radiant;
-	if (Physics::GetPolygon(m_model_ID).GetOrigin().x < -100
-		|| Physics::GetPolygon(m_model_ID).GetOrigin().x > Renderer::GetWindowWidth() + 100) {
+
+	auto ballX = Physics::GetPolygon(m_model_ID).GetOrigin().x;
+
+	if (ballX < -100 || ballX > Renderer::GetWindowWidth() + 100) {
+
+		if (ballX < -100) {
+			m_score[1]++;
+		}
+		else {
+			m_score[0]++;
+		}
 
 		SetUpBall();
 		m_timer.Start();
@@ -85,4 +96,10 @@ void Ball::StartMovingBall()
 	));
 	Physics::SetAccelerationX(m_model_ID, direction * 40);
 
+}
+
+void Ball::GetScore(unsigned int& player1, unsigned int& player2)
+{
+	player1 = m_score[0];
+	player2 = m_score[1];
 }

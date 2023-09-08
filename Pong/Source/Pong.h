@@ -10,4 +10,4 @@
 
 #define WALL_LAYER 0
 #define WALL_WIDTH 1500
-#define WALL_HEIGHT 30
+#define WALL_HEIGHT 7

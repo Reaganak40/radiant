@@ -6,7 +6,7 @@ Padel::Padel(double xPos, double yPos)
 	using namespace Radiant;
 
 	spawnPos = Vec2d(xPos, yPos);
-	m_sprite_color = RED;
+	m_sprite_color = WHITE;
 	acceleration = 1050.0;
 
 	SetLeftControl(std::vector<InputState>{A_KEY_PRESS, A_KEY_DOWN});

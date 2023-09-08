@@ -10,6 +10,8 @@ namespace Radiant {
 
 		int m_window_width;
 		int m_window_height;
+
+		ImFont* m_font;
 	public:
 		DiagnosticsGUI();
 

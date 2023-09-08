@@ -3,6 +3,8 @@
 #include "GameObjects/Ball.h"
 #include "GameObjects/Wall.h"
 
+#include "UI/Scoreboard.h"
+
 using namespace Radiant;
 
 int main(void)
@@ -10,32 +12,32 @@ int main(void)
     Application pongApp;
     pongApp.Start("Pong");
 
-    Renderer::SetBackgroundColor(POWERSHELL_BLUE);
+    Renderer::SetBackgroundColor(BLACK);
 
-    Padel* redPlayer;
-    pongApp.AddGameObject(redPlayer = new Padel(30 + (PADEL_WIDTH / 2), pongApp.WindowHeight() / 2));
-    redPlayer->SetRightControl({});
-    redPlayer->SetLeftControl({});
+    Padel* player1;
+    pongApp.AddGameObject(player1 = new Padel(30 + (PADEL_WIDTH / 2), pongApp.WindowHeight() / 2));
+    player1->SetRightControl({});
+    player1->SetLeftControl({});
 
-    Padel* bluePlayer;
-    pongApp.AddGameObject(bluePlayer = new Padel(pongApp.WindowWidth() - (PADEL_WIDTH / 2) - 30, pongApp.WindowHeight() / 2));
-    bluePlayer->SetSpriteColor(BLUE);
-    bluePlayer->SetUpControl(std::vector<InputState>{UP_KEY_DOWN, UP_KEY_PRESS});
-    bluePlayer->SetDownControl(std::vector<InputState>{DOWN_KEY_DOWN, DOWN_KEY_PRESS});
-    bluePlayer->SetRightControl({});
-    bluePlayer->SetLeftControl({});
+    Padel* player2;
+    pongApp.AddGameObject(player2 = new Padel(pongApp.WindowWidth() - (PADEL_WIDTH / 2) - 30, pongApp.WindowHeight() / 2));
+    player2->SetUpControl(std::vector<InputState>{UP_KEY_DOWN, UP_KEY_PRESS});
+    player2->SetDownControl(std::vector<InputState>{DOWN_KEY_DOWN, DOWN_KEY_PRESS});
+    player2->SetRightControl({});
+    player2->SetLeftControl({});
 
     Ball* ball;
     pongApp.AddGameObject(ball = new Ball(pongApp.WindowWidth() * 0.85, pongApp.WindowHeight() / 2));
 
     Wall* top;
-    pongApp.AddGameObject(top = new Wall(pongApp.WindowWidth() / 2, pongApp.WindowHeight()));
+    pongApp.AddGameObject(top = new Wall(pongApp.WindowWidth() / 2, pongApp.WindowHeight() - (WALL_HEIGHT/2)));
     top->SetWallVisibility(true);
 
     Wall* bottom;
-    pongApp.AddGameObject(bottom = new Wall(pongApp.WindowWidth() / 2, 0));
+    pongApp.AddGameObject(bottom = new Wall(pongApp.WindowWidth() / 2, WALL_HEIGHT / 2));
     bottom->SetWallVisibility(true);
 
+    Renderer::AttachGui(new Scoreboard(*ball));
     Renderer::AttachGui(new DiagnosticsGUI);
 
     /* Loop until the user closes the window */

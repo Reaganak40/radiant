@@ -203,6 +203,10 @@ namespace Radiant {
             gui->OnRender();
         }
 
+        if (m_GUIs.size() > 0) {
+            GuiTemplate::RenderImGui();
+        }
+
         /* Swap front and back buffers */
         glfwSwapBuffers(m_window);
     }

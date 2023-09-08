@@ -27,6 +27,9 @@
     <ClCompile Include="Source\GameObjects\Wall.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\Scoreboard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Pong.h">
@@ -41,5 +44,11 @@
     <ClInclude Include="Source\GameObjects\Wall.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\UI\Scoreboard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Source\UI\Fonts\ErosRegular-DOXn3.ttf" />
   </ItemGroup>
 </Project>

@@ -8,8 +8,8 @@ namespace Radiant {
 	public:
 		virtual void OnUpdate(const float deltaTime) {}
 		virtual void OnRender() { printf("Warning: Using GuiTemplate::OnRender()!\n"); }
+		static void RenderImGui();
 	protected:
-		void RenderImGui();
 	};
 
 }
