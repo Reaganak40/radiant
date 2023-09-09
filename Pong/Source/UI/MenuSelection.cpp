@@ -48,6 +48,11 @@ void MenuSelection::OnRender()
 		m_choice = PlayAgianstComputer;
 	}
 
+	ImGui::NewLine();
+	if (AddSelection(mouseCoords, "Quit Game")) {
+		m_choice = ExitGame;
+	}
+
 	ImGui::End();
 
 

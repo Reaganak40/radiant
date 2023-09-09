@@ -230,4 +230,17 @@ namespace Radiant {
 
         object->m_polygon->SetPosition(nPosition);
     }
+
+    Vec2d Physics::GetVelocityImpl(const UniqueID realmID, const UniqueID objectID) {
+        if (m_realms.find(realmID) == m_realms.end()) {
+            return Vec2d::Zero();
+        }
+
+        Pobject* object = m_realms.at(realmID)->GetPhysicsObject(objectID);
+        if (object == nullptr) {
+            return Vec2d::Zero();
+        }
+
+        return object->translation.GetVelocity();
+    }
 }

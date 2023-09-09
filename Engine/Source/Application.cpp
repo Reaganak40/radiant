@@ -38,7 +38,7 @@ namespace Radiant
 
 	bool Application::IsRunning()
 	{
-		return !Renderer::ShouldWindowClose();
+		return !(Renderer::ShouldWindowClose() || SceneManager::NoSceneSelected());
 	}
 
 	void Application::BeginFrame()

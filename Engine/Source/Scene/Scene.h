@@ -44,6 +44,16 @@ namespace Radiant {
 		*/
 		void ChangeScene(const std::string& nScene);
 
+		/*
+			Gets a pointer to a different scene.
+		*/
+		Scene* GetOtherScene(const std::string& nScene);
+
+		/*
+			Unbinds the scene, notifying the host application that it is time to exit.
+		*/
+		void BeginExit();
+
 	public:
 		Scene();
 		~Scene();

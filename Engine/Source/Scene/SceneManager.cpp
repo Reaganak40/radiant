@@ -51,6 +51,20 @@ namespace Radiant {
 		m_instance->m_currentSceneName = sceneName;
 	}
 
+	bool SceneManager::NoSceneSelected()
+	{
+		return m_instance->m_currentSceneName == "";
+	}
+
+	Scene* SceneManager::GetAnyScene(const std::string& sceneName)
+	{
+		if (m_instance->m_scenes.find(sceneName) == m_instance->m_scenes.end()) {
+			return nullptr;
+		}
+
+		return m_instance->m_scenes.at(sceneName);
+	}
+
 	Scene* SceneManager::GetCurrentSceneImpl()
 	{
 		if (m_current_scene != m_scenes[m_currentSceneName]) {
@@ -63,5 +77,4 @@ namespace Radiant {
 
 		return m_current_scene;
 	}
-
 }

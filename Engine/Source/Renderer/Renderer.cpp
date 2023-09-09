@@ -154,6 +154,9 @@ namespace Radiant {
     Vec2i Renderer::OnWindowResizeImpl()
     {
         glfwGetWindowSize(m_window, (int*)&m_window_width, (int*)&m_window_height);
+        if (m_window_width == 0 || m_window_height == 0) {
+            return Vec2i(0, 0);
+        }
         return Utils::GetRatio(m_window_width, m_window_height);
     }
 

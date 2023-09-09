@@ -5,6 +5,7 @@ enum MenuOption {
 	NoOptionSelected = 0,
 	PlayAgainstHuman,
 	PlayAgianstComputer,
+	ExitGame
 };
 class MenuSelection : public Radiant::GuiTemplate {
 private:

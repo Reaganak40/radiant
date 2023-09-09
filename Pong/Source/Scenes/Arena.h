@@ -3,6 +3,7 @@
 class Arena : public Radiant::Scene {
 private:
 	bool previously_bounded;
+	bool computerActive;
 public:
 	Arena();
 	~Arena();
@@ -13,4 +14,5 @@ public:
 
 	void OnRender() override final;
 
+	void SetComputerActive(bool active);
 };

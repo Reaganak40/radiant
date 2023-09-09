@@ -7,7 +7,7 @@
 #include "UI/ReturnMenu.h"
 
 Arena::Arena()
-    : previously_bounded(false)
+    : previously_bounded(false), computerActive(false)
 {
 }
 
@@ -41,11 +41,12 @@ void Arena::OnRegister()
     player2->SetRightControl({});
     player2->SetLeftControl({});
 
-
     Ball* ball;
     m_game_objects.push_back(ball = new Ball(WORLD_WIDTH * 0.85, WORLD_HEIGHT / 2));
     ball->RegisterToRealm(m_realmID);
     ball->RegisterToScene(GetID());
+
+    player2->AddBallReference(ball);
 
 
     Wall* top;
@@ -74,6 +75,15 @@ void Arena::OnBind()
             object->OnBind();
         }
         previously_bounded = true;
+    }
+
+    ((Padel*)m_game_objects[1])->SetComputerControl(computerActive);
+    if (computerActive) {
+        ((Padel*)m_game_objects[0])->SetUpControl(std::vector<InputState>{UP_KEY_DOWN, UP_KEY_PRESS, W_KEY_PRESS, W_KEY_DOWN});
+        ((Padel*)m_game_objects[0])->SetDownControl(std::vector<InputState>{DOWN_KEY_DOWN, DOWN_KEY_PRESS, S_KEY_PRESS, S_KEY_DOWN});
+    } else {
+        ((Padel*)m_game_objects[0])->SetUpControl(std::vector<InputState>{W_KEY_PRESS, W_KEY_DOWN});
+        ((Padel*)m_game_objects[0])->SetDownControl(std::vector<InputState>{S_KEY_PRESS, S_KEY_DOWN});
     }
 
     for (auto& gui : m_GUIs) {
@@ -112,4 +122,9 @@ void Arena::OnRender()
     if (((ReturnMenu*)m_GUIs[1])->RequestedMenu()) {
         ChangeScene("MainMenu");
     }
+}
+
+void Arena::SetComputerActive(bool active)
+{
+    computerActive = active;
 }

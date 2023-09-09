@@ -23,6 +23,14 @@ namespace Radiant {
 		SceneManager::SetScene(nScene);
 	}
 
+	Scene* Scene::GetOtherScene(const std::string& nScene) {
+		return SceneManager::GetAnyScene(nScene);
+	}
+
+	void Scene::BeginExit() {
+		SceneManager::UnselectScene();
+	}
+
 	void Scene::RunProcessInputQueue(const float deltaTime)
 	{
 		for (auto& object : m_game_objects) {

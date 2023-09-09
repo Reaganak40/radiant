@@ -34,7 +34,29 @@ namespace Radiant {
 		*/
 		static Scene* GetCurrentScene() { return m_instance->GetCurrentSceneImpl(); }
 
+		/*
+			Returns true if no scene is selected. Will grab the current scene
+			and check if it is nullptr, but does not run OnRelease or
+			OnBind() on the newly selected scene if this is false.
+		*/
+		static bool NoSceneSelected();
+
+		friend class Scene;
 	private:
+
+		/*
+			Returns a scene even if it is not active. Used by other
+			scenes for communication.
+		*/
+		static Scene* GetAnyScene(const std::string& sceneName);
+
+		/*
+			Unselects the scene, effectively setting the scene pointer
+			for current scene to nullptr. This should be used if the
+			intention is to close the game.
+		*/
+		static void UnselectScene() { m_instance->m_currentSceneName = ""; }
+
 		Scene* GetCurrentSceneImpl();
 	};
 }

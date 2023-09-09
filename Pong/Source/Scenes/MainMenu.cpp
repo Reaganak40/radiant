@@ -1,6 +1,8 @@
 #include "MainMenu.h"
 #include "UI/Title.h"
 #include "UI/MenuSelection.h"
+#include "Arena.h"
+
 MainMenu::MainMenu()
 {
 
@@ -39,8 +41,20 @@ void MainMenu::OnRender()
 {
 	RunRenderQueue();
 
-	if (((MenuSelection*)m_GUIs[1])->GetSelection() == PlayAgainstHuman) {
+	switch (((MenuSelection*)m_GUIs[1])->GetSelection()) {
+	case PlayAgainstHuman:
 		ChangeScene("Arena");
+		((Arena*)GetOtherScene("Arena"))->SetComputerActive(false);
+		break;
+	case PlayAgianstComputer:
+		ChangeScene("Arena");
+		((Arena*)GetOtherScene("Arena"))->SetComputerActive(true);
+		break;
+	case ExitGame:
+		BeginExit();
+		break;
+	default:
+		break;
 	}
 }
 

@@ -23,6 +23,7 @@ public:
 	void Reset();
 
 	friend class Scoreboard;
+	friend class Padel;
 private:
 	void SetUpBall();
 	void StartMovingBall();

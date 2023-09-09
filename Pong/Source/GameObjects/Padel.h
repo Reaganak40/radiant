@@ -1,5 +1,6 @@
 #pragma once
 #include "Pong.h"
+#include "Ball.h"
 
 class Padel : public Radiant::GameObject {
 private:
@@ -12,6 +13,10 @@ private:
 	std::vector<Radiant::InputState> right_cond;
 	std::vector<Radiant::InputState> up_cond;
 	std::vector<Radiant::InputState> down_cond;
+
+	bool m_AI;
+	Ball* m_ball;
+
 public:
 	Padel(double xPos, double yPos);
 	~Padel();
@@ -34,4 +39,9 @@ public:
 
 	Radiant::Vec2d GetPosition();
 
+	void SetComputerControl(bool isComputer);
+	void AddBallReference(Ball* ball);
+	
+private:
+	void OnAIUpdate(const float deltaTime);
 };

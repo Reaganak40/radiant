@@ -125,7 +125,12 @@ namespace Radiant {
 			Manually sets the current position of an object, effectively teleporting it.
 		*/
 		static void SetPosition(const UniqueID realmID, const UniqueID objectID, const Vec2d& nPosition) { m_instance->SetPositionImpl(realmID, objectID, nPosition); }
-	private:
+	
+		/*
+			Gets the current velocity of the queried object.
+		*/
+		static Vec2d GetVelocity(const UniqueID realmID, const UniqueID objectID) { return m_instance->GetVelocityImpl(realmID, objectID); }
+private:
 
 		void OnUpdateImpl(const float deltaTime);
 		void OnEndFrameImpl();
@@ -142,16 +147,15 @@ namespace Radiant {
 		bool QueryObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, const unsigned int propertyQuery);
 
 		UniqueID CreateObjectImpl(const UniqueID realmID, std::shared_ptr<Polygon> polygon);
+		
 		void SetAccelerationImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nAcceleration);
 		void SetAccelerationXImpl(const UniqueID realmID, const UniqueID objectID, const double nX);
 		void SetAccelerationYImpl(const UniqueID realmID, const UniqueID objectID, const double nY);
-
 		void SetVelocityImpl(const UniqueID realmID, const UniqueID objectID, Vec2d& nVelocity);
-		
 		void SetMaximumVelocityImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nMaxVelocity);
-
 		void SetFrictionImpl(const UniqueID realmID, const UniqueID objectID, const double friction);
-
 		void SetPositionImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nPosition);
+
+		Vec2d GetVelocityImpl(const UniqueID realmID, const UniqueID objectID);
 	};
 }
