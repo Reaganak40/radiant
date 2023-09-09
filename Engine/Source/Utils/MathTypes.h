@@ -8,6 +8,9 @@ namespace Radiant {
 		Vec2d(double nX = 0, double nY = 0)
 			: x(nX), y(nY) {}
 
+		Vec2d(ImVec2 imVector)
+			: x(imVector.x), y(imVector.y) {}
+
 		Vec2d operator+=(const Vec2d& vector) {
 			x += vector.x;
 			y += vector.y;

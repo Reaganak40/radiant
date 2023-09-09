@@ -140,6 +140,8 @@
     <ClCompile Include="Source\Pong.cpp" />
     <ClCompile Include="Source\Scenes\Arena.cpp" />
     <ClCompile Include="Source\Scenes\MainMenu.cpp" />
+    <ClCompile Include="Source\UI\MenuSelection.cpp" />
+    <ClCompile Include="Source\UI\ReturnMenu.cpp" />
     <ClCompile Include="Source\UI\Scoreboard.cpp" />
     <ClCompile Include="Source\UI\Title.cpp" />
   </ItemGroup>
@@ -150,6 +152,8 @@
     <ClInclude Include="Source\Pong.h" />
     <ClInclude Include="Source\Scenes\Arena.h" />
     <ClInclude Include="Source\Scenes\MainMenu.h" />
+    <ClInclude Include="Source\UI\MenuSelection.h" />
+    <ClInclude Include="Source\UI\ReturnMenu.h" />
     <ClInclude Include="Source\UI\Scoreboard.h" />
     <ClInclude Include="Source\UI\Title.h" />
   </ItemGroup>

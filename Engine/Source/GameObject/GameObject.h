@@ -45,6 +45,12 @@ namespace Radiant {
 		virtual void OnBind() {}
 
 		/*
+			To implement function when the scene this object belongs to is
+			being released.
+		*/
+		virtual void OnRelease() {}
+
+		/*
 			To implement function when object needs to perform update procedures.
 		*/
 		virtual void OnProcessInput(const float deltaTIme) {}

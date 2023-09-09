@@ -8,7 +8,7 @@ Title::Title()
 	m_window_config = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground;
 
 	Radiant::GuiManager::LoadFont(PONG_FONT, "Source/UI/Fonts/ErosRegular-DOXn3.ttf");
-	m_title_font = Radiant::GuiManager::GetFont(PONG_FONT, 102);
+	m_title_font = Radiant::GuiManager::GetFont(PONG_FONT, 120);
 }
 
 Title::~Title()

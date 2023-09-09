@@ -103,3 +103,12 @@ void Ball::GetScore(unsigned int& player1, unsigned int& player2)
 	player1 = m_score[0];
 	player2 = m_score[1];
 }
+
+void Ball::Reset()
+{
+	m_score[0] = 0;
+	m_score[1] = 0;
+
+	SetUpBall();
+	m_timer.Start();
+}

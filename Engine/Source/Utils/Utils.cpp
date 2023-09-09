@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "Utils.h"
 
+#include <filesystem>
+
 namespace Radiant {
 
 
@@ -120,6 +122,11 @@ namespace Radiant {
         double GetDistance(const Vec2d& pointA, const Vec2d& pointB)
         {
             return sqrt(pow(pointB.x - pointA.x, 2) + pow(pointB.y - pointA.y, 2));
+        }
+
+        bool PathExists(const std::string& filepath)
+        {
+            return std::filesystem::exists(filepath);
         }
     }
 }

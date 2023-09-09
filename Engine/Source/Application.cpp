@@ -5,6 +5,7 @@
 #include "Utils/Utils.h"
 #include "Physics/Physics.h"
 #include "Gui/GuiManager.h"
+#include "Scene/SceneManager.h"
 
 namespace Radiant
 {
@@ -16,10 +17,8 @@ namespace Radiant
 
 	Application::~Application()
 	{
-		for (auto& [id, scene] : m_scenes) {
-			delete scene;
-		}
 
+		SceneManager::Destroy();
 		GuiManager::Destroy();
 		Physics::Destroy();
 		Input::Destroy();
@@ -34,6 +33,7 @@ namespace Radiant
 		Input::Initialize();
 		Physics::Initialize();
 		GuiManager::Initialize();
+		SceneManager::Initialize();
 	}
 
 	bool Application::IsRunning()
@@ -43,18 +43,28 @@ namespace Radiant
 
 	void Application::BeginFrame()
 	{
+		// Get the new deltaTime for this frame.
 		m_timestep.Update();
 
+		// Get the currently bounded scene for next game loop procedures.
+		m_current_scene = SceneManager::GetCurrentScene();
+
+		// Update renderer if the window size has changed.
 		if (Input::CheckWindowResize()) {
 			Renderer::OnWindowResize();
 		}
 
+		// Clear the Screen
 		Renderer::Clear();
+
+		// Run renderer's begin frame procedures.
 		Renderer::OnBeginFrame();
+
 	}
 
 	void Application::ProcessInput()
 	{
+		// All game objects in the bounded scene run their OnProcessInput()
 		if (m_current_scene != nullptr) {
 			m_current_scene->OnProcessInput(m_timestep.deltaTime);
 		}
@@ -62,24 +72,29 @@ namespace Radiant
 
 	void Application::UpdateWorld()
 	{
+		// Updates all active physical objects.
 		Physics::OnUpdate(m_timestep.deltaTime);
 	}
 
 	void Application::FinalUpdate()
 	{
+		// Runs the procedures for the final update of the currently bounded scene.
 		if (m_current_scene != nullptr) {
 			m_current_scene->OnFinalUpdate();
 		}
 
+		// Renderer does its update procedure.
 		Renderer::OnUpdate(m_timestep.deltaTime);
 	}
 
 	void Application::Render()
-	{		
+	{
+		// Creates the render command queue for the currently bounded scene.
 		if (m_current_scene != nullptr) {
 			m_current_scene->OnRender();
 		}
 
+		// RUn the render queue and display the new frame.
 		Renderer::Render();
 	}
 
@@ -97,25 +112,14 @@ namespace Radiant
 		return Renderer::GetWindowHeight();
 	}
 
-	const UniqueID Application::AddScene(Scene* nScene)
+	const UniqueID Application::AddScene(const std::string& sceneName, Scene* nScene)
 	{
-		nScene->OnRegister();
-		m_scenes[nScene->GetID()] = nScene;
-
+		SceneManager::RegisterScene(sceneName, nScene);
 		return nScene->GetID();
 	}
 
-	void Application::SetScene(UniqueID sceneUUID)
+	void Application::SetScene(const std::string& sceneName)
 	{
-		if (m_scenes.find(sceneUUID) == m_scenes.end()) {
-			return;
-		}
-
-		if (m_current_scene != nullptr) {
-			m_current_scene->OnRelease();
-		}
-
-		m_current_scene = m_scenes.at(sceneUUID);
-		m_current_scene->OnBind();
+		SceneManager::SetScene(sceneName);
 	}
 }

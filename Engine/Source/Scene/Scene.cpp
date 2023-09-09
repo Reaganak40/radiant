@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "Scene.h"
+#include "SceneManager.h"
 
 namespace Radiant {
-	
 	Scene::Scene()
 		: m_ID(GetUniqueID())
 	{
@@ -12,6 +12,15 @@ namespace Radiant {
 		for (auto& object : m_game_objects) {
 			delete object;
 		}
+
+		for (auto& gui: m_GUIs) {
+			delete gui;
+		}
+	}
+
+	void Scene::ChangeScene(const std::string& nScene)
+	{
+		SceneManager::SetScene(nScene);
 	}
 
 	void Scene::RunProcessInputQueue(const float deltaTime)

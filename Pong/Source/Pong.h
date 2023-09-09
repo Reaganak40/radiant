@@ -2,7 +2,7 @@
 
 #define PADEL_LAYER 0
 #define PADEL_WIDTH 25.0
-#define PADEL_HEIGHT 250.0
+#define PADEL_HEIGHT 230.0
 
 #define BALL_LAYER 1
 #define BALL_RADIUS 12

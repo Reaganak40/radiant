@@ -38,6 +38,12 @@ namespace Radiant {
 		*/
 		void RunRenderQueue();
 
+		/*
+			Changes the scene dynamically to a known scene. This change is delayed
+			until the start of the next game loop.
+		*/
+		void ChangeScene(const std::string& nScene);
+
 	public:
 		Scene();
 		~Scene();
@@ -46,8 +52,8 @@ namespace Radiant {
 
 		/*
 			Function called prior to the host application registering
-			the scene with the game world. This is where game objects
-			should be created and configured.
+			the scene with the SceneManager for the first time. This is where
+			permament game objects should be created.
 		*/
 		virtual void OnRegister() {}
 

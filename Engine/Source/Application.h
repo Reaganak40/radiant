@@ -8,8 +8,6 @@ namespace Radiant {
 	class Application {
 	private:
 		Timestep m_timestep;
-
-		std::unordered_map<UniqueID, Scene*> m_scenes;
 		Scene* m_current_scene;
 
 	public:
@@ -78,14 +76,14 @@ namespace Radiant {
 			Registers a scene to the application called its OnRegister()
 			and adding it to its list of scenes.
 		*/
-		const UniqueID AddScene(Scene* nScene);
+		const UniqueID AddScene(const std::string& sceneName, Scene* nScene);
 
 		/*
 			Manually sets the scene in the application to the one that
 			owns this uniqueID. This will call the Scene's OnBind() before
 			it gets set and the current scene's OnRelease.
 		*/
-		void SetScene(UniqueID sceneUUID);
+		void SetScene(const std::string& sceneName);
 
 	};
 }

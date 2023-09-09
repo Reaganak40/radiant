@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "GuiManager.h"
+#include "Utils/Utils.h"
 
 namespace Radiant {
 	
@@ -44,6 +45,11 @@ namespace Radiant {
 		if (m_fonts.find(magicWord) != m_fonts.end()) {
 			return;
 		}
+
+		if (!Utils::PathExists(filepath) && magicWord != GUI_DEFAULT_FONT) {
+			printf("Warning: [%s] does not exist.\n", filepath.c_str());
+			return;
+		}
 		m_fonts[magicWord] = FontCache();
 		m_fonts.at(magicWord).filepath = filepath;
 	}
@@ -60,7 +66,9 @@ namespace Radiant {
 
 		if (m_fonts.at(magicWord).font_ptrs.find(fontSize) == m_fonts.at(magicWord).font_ptrs.end()) {
 			ImGuiIO& io = ImGui::GetIO();
-			m_fonts.at(magicWord).font_ptrs[fontSize] = io.Fonts->AddFontFromFileTTF(m_fonts.at(magicWord).filepath.c_str(), fontSize);
+			ImFont* font = io.Fonts->AddFontFromFileTTF(m_fonts.at(magicWord).filepath.c_str(), fontSize);
+
+			m_fonts.at(magicWord).font_ptrs[fontSize] = font;
 		}
 
 		return m_fonts.at(magicWord).font_ptrs.at(fontSize);

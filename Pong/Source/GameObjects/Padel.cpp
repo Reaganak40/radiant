@@ -7,7 +7,7 @@ Padel::Padel(double xPos, double yPos)
 
 	spawnPos = Vec2d(xPos, yPos);
 	m_sprite_color = WHITE;
-	acceleration = 1050.0;
+	acceleration = 2000.0;
 
 	SetLeftControl(std::vector<InputState>{A_KEY_PRESS, A_KEY_DOWN});
 	SetRightControl(std::vector<InputState>{D_KEY_PRESS, D_KEY_DOWN});
@@ -26,6 +26,12 @@ void Padel::OnBind()
 
 	Physics::SetMaximumVelocity(GetRealmID(), m_model_ID, Vec2d(700, 700));
 	Physics::SetObjectProperties(GetRealmID(), m_model_ID, ppBouncy);
+}
+
+void Padel::OnRelease()
+{
+	using namespace Radiant;
+	Physics::SetPosition(GetRealmID(), m_model_ID, spawnPos);
 }
 
 void Padel::OnProcessInput(const float deltaTIme)

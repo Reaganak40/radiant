@@ -20,6 +20,8 @@ public:
 	void OnFinalUpdate() override final;
 	void OnRender() override final;
 
+	void Reset();
+
 	friend class Scoreboard;
 private:
 	void SetUpBall();

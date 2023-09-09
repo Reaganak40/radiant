@@ -43,10 +43,6 @@ namespace Radiant {
 
         delete m_vertex_array;
 
-        for (const auto& gui : m_GUIs) {
-            delete gui;
-        }
-
         glfwTerminate();
     }
 
@@ -441,6 +437,16 @@ namespace Radiant {
     void Renderer::AddLayer()
     {
         m_layers.push_back(glLayer());
+    }
+
+    void Renderer::DetachGuiImpl(const GuiTemplate* gui)
+    {
+        for (auto it = m_GUIs.begin(); it != m_GUIs.end(); ++it) {
+            if (*it == gui) {
+                m_GUIs.erase(it);
+                return;
+            }
+        }
     }
 
     void Renderer::AddToRenderUnit(const Mesh& mesh, const glRenderUnitType type)

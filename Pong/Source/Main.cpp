@@ -9,11 +9,12 @@ int main(void)
     Application pongApp;
     pongApp.Start("Pong");
 
-    UniqueID mainMenu = pongApp.AddScene(new MainMenu);
-    UniqueID arena = pongApp.AddScene(new Arena);
-    pongApp.SetScene(mainMenu);
+    // Define scenes
+    pongApp.AddScene("MainMenu", new MainMenu);
+    pongApp.AddScene("Arena", new Arena);
 
-    //Renderer::AttachGui(new DiagnosticsGUI);
+    // Set the initial scene.
+    pongApp.SetScene("MainMenu");
 
     /* Loop until the user closes the window */
     while (pongApp.IsRunning())

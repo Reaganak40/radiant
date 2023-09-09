@@ -192,6 +192,7 @@
     <ClCompile Include="Source\Renderer\VertexArray.cpp" />
     <ClCompile Include="Source\Renderer\VertexBuffer.cpp" />
     <ClCompile Include="Source\Scene\Scene.cpp" />
+    <ClCompile Include="Source\Scene\SceneManager.cpp" />
     <ClCompile Include="Source\Utils\BitSet.cpp" />
     <ClCompile Include="Source\Utils\Input.cpp" />
     <ClCompile Include="Source\Utils\MathTypes.cpp" />
@@ -272,6 +273,7 @@
     <ClInclude Include="Source\Renderer\GeoMode.h" />
     <ClInclude Include="Source\Renderer\RenderCache.h" />
     <ClInclude Include="Source\Scene\Scene.h" />
+    <ClInclude Include="Source\Scene\SceneManager.h" />
     <ClInclude Include="Source\Utils\BitSet.h" />
     <ClInclude Include="Source\Utils\Color.h" />
     <ClInclude Include="Source\Utils\Input.h" />

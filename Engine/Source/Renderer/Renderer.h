@@ -205,7 +205,7 @@ namespace Radiant {
 		static void Render() { m_instance->RenderImpl(); }
 
 		/*
-			Runs the end of frame procedures for the renderer.
+			Polls render events and flushes the command queue and buffers.
 		*/
 		static void OnEndFrame() { m_instance->OnEndFrameImpl(); }
 
@@ -272,8 +272,15 @@ namespace Radiant {
 
 		/*
 			Attaches a Gui instance, which will be drawn at the end of the draw command queue.
+			The Renderer is not responsible for freeing the GUI instance. It should be detached
+			and freed by its owner.
 		*/
 		static void AttachGui(GuiTemplate* gui) { m_instance->m_GUIs.push_back(gui); }
+
+		/*
+			Removes a GUI that is currently being rendered each frame.
+		*/
+		static void DetachGui(const GuiTemplate* gui) { m_instance->DetachGuiImpl(gui); }
 
 		/*
 			Removes a polygon from renderer mesh cache.
@@ -313,6 +320,8 @@ namespace Radiant {
 
 		void AddDefaultShader();
 		void AddLayer();
+
+		void DetachGuiImpl(const GuiTemplate* gui);
 
 		void AddToRenderUnit(const Mesh& mesh, const glRenderUnitType type);
 
