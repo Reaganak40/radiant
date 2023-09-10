@@ -16,8 +16,10 @@ namespace Radiant {
 
 		/*
 			Starts a new Radiant application, launching the window instance.
+			Aspect ratio is 16:9 by default.
+			Window is resizable by default.
 		*/
-		void Start(std::string appName, unsigned int windowWidth = 1280, unsigned int windowHeight = 720);
+		void Start(std::string appName, unsigned int windowWidth = 1280, unsigned int windowHeight = 720, bool resizable=true);
 
 		/*
 			Returns true if the application is running and the window is launched.

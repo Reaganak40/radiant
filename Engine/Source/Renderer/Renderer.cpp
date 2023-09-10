@@ -71,7 +71,7 @@ namespace Radiant {
         }
     }
 
-    Vec2i Renderer::CreateWindowImpl(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight)
+    Vec2i Renderer::CreateWindowImpl(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight, bool resizable)
     {
         Vec2i aspect_ratio = Utils::GetRatio(windowWidth, windowHeight);
 
@@ -100,6 +100,8 @@ namespace Radiant {
         // glad populates global constants after loading to indicate,
         // if a certain extension/version is available.
         printf("OpenGL %d.%d\n", GLVersion.major, GLVersion.minor);
+
+        glfwSetWindowAttrib(m_window, GLFW_RESIZABLE, resizable);
 
         // For opengl error handling
         EnableErrorCallback();

@@ -25,11 +25,11 @@ namespace Radiant
 		Renderer::Destroy();
 	}
 
-	void Application::Start(std::string appName, unsigned int windowWidth, unsigned int windowHeight)
+	void Application::Start(std::string appName, unsigned int windowWidth, unsigned int windowHeight, bool resizable)
 	{
 		Utils::SetRandomSeed();
 
-		Renderer::CreateWindow(appName, windowWidth, windowHeight);
+		Renderer::CreateWindow(appName, windowWidth, windowHeight, resizable);
 		Input::Initialize();
 		Physics::Initialize();
 		GuiManager::Initialize();

@@ -11,6 +11,9 @@ namespace Radiant {
 		Vec2d(ImVec2 imVector)
 			: x(imVector.x), y(imVector.y) {}
 
+		Vec2d(std::pair<double, double> dpair)
+			: x(dpair.first), y(dpair.second) {}
+
 		Vec2d operator+=(const Vec2d& vector) {
 			x += vector.x;
 			y += vector.y;

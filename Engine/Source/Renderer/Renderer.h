@@ -143,8 +143,8 @@ namespace Radiant {
 		/*
 			Creates a new GLFW window with the provided specifications.
 		*/
-		static Vec2i CreateWindow(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight) {
-			return m_instance->CreateWindowImpl(windowName, windowWidth, windowHeight);
+		static Vec2i CreateWindow(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight, bool resizable) {
+			return m_instance->CreateWindowImpl(windowName, windowWidth, windowHeight, resizable);
 		}
 
 		// *****************************************************
@@ -290,7 +290,7 @@ namespace Radiant {
 		friend class Input;
 
 	private:
-		Vec2i CreateWindowImpl(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight);
+		Vec2i CreateWindowImpl(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight, bool resizable);
 
 		void SetBackgroundColorImpl(const Vec4f& colorBits);
 
