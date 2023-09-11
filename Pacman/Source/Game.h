@@ -1,6 +1,10 @@
 #include "Radiant.h"
 
-#define PACMAN_SPRITE_WIDTH 30
+#define SCREEN_WIDTH 600
+#define SCREEN_HEIGHT 760
 
-#define SCREEN_WIDTH 960
-#define SCREEN_HEIGHT 720
+#define PACMAN_SPRITE_WIDTH 30
+#define PACMAN_SPEED 300
+#define PACMAN_SPAWN_X 300
+#define PACMAN_SPAWN_Y 198
+

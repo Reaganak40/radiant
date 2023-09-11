@@ -35,7 +35,7 @@ namespace rdt {
 			for (TextureSlot i = 1; i < MAX_TEXTURES; i++) {
 				if (m_instance->m_texture_slots[i] == NO_TEXTURE) {
 					texture->Bind(i);
-					m_instance->m_texture_slots[i] = texture->GetID();
+					m_instance->m_texture_slots[i] = i;
 					slots_changed = true;
 					break;
 				}
@@ -91,6 +91,7 @@ namespace rdt {
 	Texture* TextureManager::GetTextureImpl(const std::string& name)
 	{
 		if (m_textures.find(name) == m_textures.end()) {
+			printf("Warning: Could not find texture [%s]\n", name.c_str());
 			return nullptr;
 		}
 

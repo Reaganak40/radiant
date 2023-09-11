@@ -1,5 +1,6 @@
 #include "Game.h"
 
+#define PACMAN_LAYER 1
 class Pacman : public rdt::GameObject {
 private:
 	rdt::Vec2d spawnPos;

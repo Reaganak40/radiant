@@ -49,7 +49,7 @@ namespace rdt {
 			return;
 		}
 
-		stbi_set_flip_vertically_on_load(1);
+		//stbi_set_flip_vertically_on_load(1);
 
 		m_imageBuffer = stbi_load(textureFilePath.c_str(),
 			&m_image_width,

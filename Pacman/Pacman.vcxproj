@@ -133,12 +133,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\GameObjects\Map.cpp" />
     <ClCompile Include="Source\GameObjects\Pacman.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Scenes\Level.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Game.h" />
+    <ClInclude Include="Source\GameObjects\Map.h" />
     <ClInclude Include="Source\GameObjects\Pacman.h" />
     <ClInclude Include="Source\Scenes\Level.h" />
   </ItemGroup>
@@ -148,6 +150,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Resources\Textures\map.png" />
     <Image Include="Resources\Textures\pacman.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -28,7 +28,7 @@ void Pacman::OnBind()
 	Physics::SetFriction(GetRealmID(), m_model_ID, 0);
 
 	// start by moving right
-	Physics::SetVelocity(GetRealmID(), m_model_ID, { 300, 0 });
+	Physics::SetVelocity(GetRealmID(), m_model_ID, { 0, 0 });
 	Physics::SetRotation(GetRealmID(), m_model_ID, Utils::Radians_Right);
 }
 
@@ -40,23 +40,23 @@ void Pacman::OnProcessInput(const float deltaTIme)
 {
 
 	if (Input::CheckKeyboardState(right_cond)) {
-		Physics::SetVelocity(GetRealmID(), m_model_ID, { 300, 0 });
+		Physics::SetVelocity(GetRealmID(), m_model_ID, { PACMAN_SPEED, 0 });
 		Physics::SetRotation(GetRealmID(), m_model_ID, Utils::Radians_Right);
 	}
 
 	else if (Input::CheckKeyboardState(left_cond)) {
-		Physics::SetVelocity(GetRealmID(), m_model_ID, { -300, 0 });
+		Physics::SetVelocity(GetRealmID(), m_model_ID, { -PACMAN_SPEED, 0 });
 		Physics::SetRotation(GetRealmID(), m_model_ID, Utils::Radians_Left);
 	}
 
 	else if (Input::CheckKeyboardState(up_cond)) {
-		Physics::SetVelocity(GetRealmID(), m_model_ID, { 0, 300 });
+		Physics::SetVelocity(GetRealmID(), m_model_ID, { 0, PACMAN_SPEED });
 		Physics::SetRotation(GetRealmID(), m_model_ID, Utils::Radians_Up);
 
 	}
 
 	else if (Input::CheckKeyboardState(down_cond)) {
-		Physics::SetVelocity(GetRealmID(), m_model_ID, { 0, -300 });
+		Physics::SetVelocity(GetRealmID(), m_model_ID, { 0, -PACMAN_SPEED });
 		Physics::SetRotation(GetRealmID(), m_model_ID, Utils::Radians_Down);
 	}
 }
@@ -76,7 +76,7 @@ void Pacman::OnRender()
 {
 	using namespace rdt;
 
-	Renderer::Begin(0);
+	Renderer::Begin(PACMAN_LAYER);
 	Renderer::SetPolygonTexture("pacman");
 	Renderer::AddPolygon(Physics::GetPolygon(GetRealmID(), m_model_ID));
 	Renderer::End();

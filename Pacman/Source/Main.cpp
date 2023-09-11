@@ -7,7 +7,7 @@ using namespace rdt;
 int main(void)
 {
     Application pacmanApp;
-    pacmanApp.Start("Pacman", 960, 720, false);
+    pacmanApp.Start("Pacman", SCREEN_WIDTH, SCREEN_HEIGHT, false);
 
     pacmanApp.AddScene("Level", new Level);
     pacmanApp.SetScene("Level");
