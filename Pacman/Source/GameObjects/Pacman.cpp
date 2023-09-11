@@ -19,8 +19,10 @@ Pacman::~Pacman()
 
 void Pacman::OnBind()
 {
-	m_model_ID = Physics::CreateObject(GetRealmID(), std::make_shared<Rect>(spawnPos, PACMAN_SPRITE_WIDTH, PACMAN_SPRITE_WIDTH));
+	std::shared_ptr<Rect> sprite;
+	m_model_ID = Physics::CreateObject(GetRealmID(), sprite = std::make_shared<Rect>(spawnPos, PACMAN_SPRITE_WIDTH, PACMAN_SPRITE_WIDTH));
 
+	sprite->ApplyRotationOffset(M_PI);
 	Physics::SetAcceleration(GetRealmID(), m_model_ID, Vec2d::Zero());
 	Physics::SetMaximumVelocity(GetRealmID(), m_model_ID, Vec2d(700, 700));
 	Physics::SetObjectProperties(GetRealmID(), m_model_ID, ppBouncy);
@@ -36,18 +38,23 @@ void Pacman::OnProcessInput(const float deltaTIme)
 
 	if (Input::CheckKeyboardState(right_cond)) {
 		Physics::SetVelocity(GetRealmID(), m_model_ID, { 300, 0 });
+		Physics::SetRotation(GetRealmID(), m_model_ID, Utils::Radians_Right);
 	}
 
 	else if (Input::CheckKeyboardState(left_cond)) {
 		Physics::SetVelocity(GetRealmID(), m_model_ID, { -300, 0 });
+		Physics::SetRotation(GetRealmID(), m_model_ID, Utils::Radians_Left);
 	}
 
 	else if (Input::CheckKeyboardState(up_cond)) {
 		Physics::SetVelocity(GetRealmID(), m_model_ID, { 0, 300 });
+		Physics::SetRotation(GetRealmID(), m_model_ID, Utils::Radians_Up);
+
 	}
 
 	else if (Input::CheckKeyboardState(down_cond)) {
 		Physics::SetVelocity(GetRealmID(), m_model_ID, { 0, -300 });
+		Physics::SetRotation(GetRealmID(), m_model_ID, Utils::Radians_Down);
 	}
 }
 

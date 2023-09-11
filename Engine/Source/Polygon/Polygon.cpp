@@ -4,6 +4,10 @@
 #include "Utils/Utils.h"
 
 namespace rdt {
+    Polygon::Polygon()
+        : m_UUID(GetUniqueID()), m_width(0), m_height(0), m_properties(0), m_rotation(0)
+    {
+    }
     Polygon::~Polygon()
     {
         FreeUniqueID(m_UUID);
@@ -75,5 +79,22 @@ namespace rdt {
         for (unsigned int i = 0; i < m_vertices.size(); i++) {
             m_vertices[i] = m_origin + offsets[i];
         }
+    }
+
+    void Polygon::ApplyRotationOffset(const double oRadians)
+    {
+        SetRotation(oRadians);
+        m_rotation = 0;
+    }
+
+    void Polygon::SetRotation(const double nRadians)
+    {
+        double dr = nRadians - m_rotation;
+
+        for (auto& vertex : m_vertices) {
+            Utils::RotatePoint(m_origin, vertex, dr);
+        }
+
+        m_rotation = nRadians;
     }
 }

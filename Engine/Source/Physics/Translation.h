@@ -6,7 +6,6 @@ namespace rdt {
 	class Translation {
 	private:
 		Vec2d m_current_velocity;
-
 		bool m_has_max_velocity;
 		Vec2d m_max_velocity;
 
@@ -38,7 +37,7 @@ namespace rdt {
 			Gets the current velocity vector.
 		*/
 		Vec2d GetVelocity();
-		
+
 		/*
 			Updates the velocity vector according to dt and acceleration.
 		*/

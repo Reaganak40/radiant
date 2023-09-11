@@ -25,6 +25,8 @@ void Level::OnRegister()
 	Pacman* pacman;
 	m_game_objects.push_back(pacman = new Pacman(100, 100));
 	pacman->RegisterToRealm(m_realms[0]);
+
+	m_GUIs.push_back(new DiagnosticsGUI);
 }
 
 void Level::OnBind()
@@ -36,6 +38,10 @@ void Level::OnBind()
 			object->OnBind();
 		}
 		previously_bounded = true;
+	}
+
+	for (auto& gui : m_GUIs) {
+		Renderer::AttachGui(gui);
 	}
 
 	for (auto& realm : m_realms) {

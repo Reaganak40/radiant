@@ -218,7 +218,8 @@ namespace rdt {
         object->translation.SetFriction(friction);
     }
 
-    void Physics::SetPositionImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nPosition) {
+    void Physics::SetPositionImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nPosition)
+    {
         if (m_realms.find(realmID) == m_realms.end()) {
             return;
         }
@@ -231,7 +232,22 @@ namespace rdt {
         object->m_polygon->SetPosition(nPosition);
     }
 
-    Vec2d Physics::GetVelocityImpl(const UniqueID realmID, const UniqueID objectID) {
+    void Physics::SetRotationImpl(const UniqueID realmID, const UniqueID objectID, const double nRadians)
+    {
+        if (m_realms.find(realmID) == m_realms.end()) {
+            return;
+        }
+
+        Pobject* object = m_realms.at(realmID)->GetPhysicsObject(objectID);
+        if (object == nullptr) {
+            return;
+        }
+
+        object->m_polygon->SetRotation(nRadians);
+    }
+
+    Vec2d Physics::GetVelocityImpl(const UniqueID realmID, const UniqueID objectID)
+    {
         if (m_realms.find(realmID) == m_realms.end()) {
             return Vec2d::Zero();
         }

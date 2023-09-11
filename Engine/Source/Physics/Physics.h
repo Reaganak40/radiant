@@ -125,7 +125,12 @@ namespace rdt {
 			Manually sets the current position of an object, effectively teleporting it.
 		*/
 		static void SetPosition(const UniqueID realmID, const UniqueID objectID, const Vec2d& nPosition) { m_instance->SetPositionImpl(realmID, objectID, nPosition); }
-	
+		
+		/*
+			Manually sets the current rotation of an object.
+		*/
+		static void SetRotation(const UniqueID realmID, const UniqueID objectID, const double nRadians) { m_instance->SetRotationImpl(realmID, objectID, nRadians); }
+
 		/*
 			Gets the current velocity of the queried object.
 		*/
@@ -155,6 +160,7 @@ private:
 		void SetMaximumVelocityImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nMaxVelocity);
 		void SetFrictionImpl(const UniqueID realmID, const UniqueID objectID, const double friction);
 		void SetPositionImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nPosition);
+		void SetRotationImpl(const UniqueID realmID, const UniqueID objectID, const double nRadians);
 
 		Vec2d GetVelocityImpl(const UniqueID realmID, const UniqueID objectID);
 	};

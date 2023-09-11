@@ -9,6 +9,11 @@ namespace rdt {
 
     namespace Utils
     {
+        static double Radians_Up = M_PI / 2;
+        static double Radians_Left = M_PI;
+        static double Radians_Down = M_PI * 3 / 2;
+        static double Radians_Right = 0;
+
         /*
             Rounds the double to resolve inprecision in float math.
         */
@@ -79,5 +84,15 @@ namespace rdt {
             Returns true if the filepath exists.
         */
         bool PathExists(const std::string& filepath);
+
+        /*
+            Returns in radians the theta between these two points.
+        */
+        double GetRotation(const Vec2d& origin, const Vec2d& point);
+
+        /*
+            Rotates 'point' by dr about the origin.
+        */
+        void RotatePoint(const Vec2d& origin, Vec2d& point, const double dr);
     }
 }

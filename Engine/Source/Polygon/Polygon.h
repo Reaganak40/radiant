@@ -13,6 +13,7 @@ namespace rdt {
 	class Polygon {
 	private:
 		UniqueID m_UUID;
+		double m_rotation;
 	protected:
 		unsigned int m_properties;
 		std::vector<Vec2d> m_vertices;
@@ -24,7 +25,7 @@ namespace rdt {
 
 		void AddProperties(unsigned int nProperties);
 	public:
-		Polygon() : m_UUID(GetUniqueID()), m_width(0), m_height(0), m_properties(0) {}
+		Polygon();
 		~Polygon();
 
 		/*
@@ -76,6 +77,20 @@ namespace rdt {
 			Sets the size of the polygon.
 		*/
 		virtual void SetSize(const Vec2d& nSize) { printf("Warning: Using abstract class SetSize()!"); }
+
+
+		/*
+			Sets the initial rotation of the object to a different degree in radians
+			other than 0. This way, the axes may be aligned in arbitrary cases.
+
+			This should be done before SetRotation() is first used.
+		*/
+		void ApplyRotationOffset(const double oRadians);
+
+		/*
+			Rotates the object to the specified angle in radians.
+		*/
+		void SetRotation(const double nRadians);
 
 		friend class Translation;
 		friend class Renderer;

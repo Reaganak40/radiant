@@ -128,5 +128,16 @@ namespace rdt {
         {
             return std::filesystem::exists(filepath);
         }
+        double GetRotation(const Vec2d& origin, const Vec2d& point)
+        {
+            return std::atan2(point.y - origin.y, point.x - origin.x);
+        }
+        void RotatePoint(const Vec2d& origin, Vec2d& point, const double dr)
+        {
+            double magnitude = GetDistance(origin, point);
+            double theta = GetRotation(origin, point) + dr;
+            point.x = origin.x + (magnitude * std::cos(theta));
+            point.y = origin.y + (magnitude * std::sin(theta));
+        }
     }
 }
