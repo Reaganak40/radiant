@@ -4,7 +4,7 @@ Wall::Wall(double xPos, double yPos)
 {
 	m_is_visible = false;
 
-	spawnPos = Radiant::Vec2d(xPos, yPos);
+	spawnPos = rdt::Vec2d(xPos, yPos);
 }
 
 Wall::~Wall()
@@ -13,7 +13,7 @@ Wall::~Wall()
 
 void Wall::OnBind()
 {
-	using namespace Radiant;
+	using namespace rdt;
 	m_model_ID = Physics::CreateObject(GetRealmID(), std::make_shared<Rect>(spawnPos, WALL_WIDTH, WALL_HEIGHT));
 
 	Physics::SetObjectProperties(GetRealmID(), m_model_ID, ppRigid);
@@ -29,7 +29,7 @@ void Wall::OnFinalUpdate()
 
 void Wall::OnRender()
 {
-	using namespace Radiant;
+	using namespace rdt;
 	if (m_is_visible) {
 		Renderer::Begin(WALL_LAYER);
 		Renderer::SetPolygonColor(WHITE);

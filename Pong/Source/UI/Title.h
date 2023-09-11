@@ -1,7 +1,7 @@
 #pragma once
 #include "Pong.h"
 
-class Title : public Radiant::GuiTemplate {
+class Title : public rdt::GuiTemplate {
 private:
 	const float m_gui_width;
 	const float m_gui_height;

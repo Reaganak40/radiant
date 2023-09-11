@@ -7,7 +7,7 @@ enum MenuOption {
 	PlayAgianstComputer,
 	ExitGame
 };
-class MenuSelection : public Radiant::GuiTemplate {
+class MenuSelection : public rdt::GuiTemplate {
 private:
 	const float m_gui_width;
 	const float m_gui_height;
@@ -31,5 +31,5 @@ public:
 	MenuOption GetSelection() { return m_choice; }
 	void ResetSelection() { m_choice = NoOptionSelected; }
 private:
-	bool AddSelection(const Radiant::Vec2d& mouseCoords, const std::string& text);
+	bool AddSelection(const rdt::Vec2d& mouseCoords, const std::string& text);
 };

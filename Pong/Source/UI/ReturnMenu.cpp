@@ -3,11 +3,11 @@
 ReturnMenu::ReturnMenu()
 	: m_gui_width(130), m_gui_height(25), m_return_requested(false)
 {
-	m_window_width = Radiant::Renderer::GetWindowWidth();
-	m_window_height = Radiant::Renderer::GetWindowHeight();
+	m_window_width = rdt::Renderer::GetWindowWidth();
+	m_window_height = rdt::Renderer::GetWindowHeight();
 	m_window_config = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 
-	m_return_font = Radiant::GuiManager::GetFont(GUI_DEFAULT_FONT, GUI_DEFAULT_FONT_SIZE);
+	m_return_font = rdt::GuiManager::GetFont(GUI_DEFAULT_FONT, GUI_DEFAULT_FONT_SIZE);
 }
 
 ReturnMenu::~ReturnMenu()

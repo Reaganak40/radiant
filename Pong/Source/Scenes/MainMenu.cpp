@@ -21,15 +21,15 @@ void MainMenu::OnRegister()
 void MainMenu::OnBind()
 {
 
-	Radiant::Renderer::SetBackgroundColor(Radiant::BLACK);
+	rdt::Renderer::SetBackgroundColor(rdt::BLACK);
 	for (auto& gui : m_GUIs) {
-		Radiant::Renderer::AttachGui(gui);
+		rdt::Renderer::AttachGui(gui);
 	}
 }
 
 void MainMenu::OnRelease()
 {
-	using namespace Radiant;
+	using namespace rdt;
 	for (auto& gui : m_GUIs) {
 		Renderer::DetachGui(gui);
 	}

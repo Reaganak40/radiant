@@ -5,7 +5,7 @@
 #include "Utils/Input.h"
 #include "Renderer/Renderer.h"
 
-namespace Radiant {
+namespace rdt {
 
     Physics* Physics::m_instance = nullptr;
 

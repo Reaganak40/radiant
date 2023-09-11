@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "MathTypes.h"
 
-namespace Radiant {
+namespace rdt {
     
     bool operator==(const Vec2d& vector1, const Vec2d& vector2)
     {
@@ -89,6 +89,11 @@ namespace Radiant {
     double Vec2d::Dot(const Vec2d& A, const Vec2d& B)
     {
         return (A.x * B.x) + (A.y * B.y);
+    }
+
+    Vec2i Vec2i::Zero()
+    {
+        return Vec2i(0, 0);
     }
 
 }

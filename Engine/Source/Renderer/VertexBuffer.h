@@ -2,7 +2,7 @@
 #include "pch.h"
 #include "Mesh.h"
 
-namespace Radiant {
+namespace rdt {
 
 	typedef unsigned int VBO_ID;
 #define DEFAULT_VERTEX_BUFFER_LIMIT 64

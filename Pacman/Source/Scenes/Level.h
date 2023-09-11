@@ -1,8 +1,9 @@
 #include "Game.h"
 
-class Level : public Radiant::Scene {
+class Level : public rdt::Scene {
 private:
 	bool previously_bounded;
+	bool loaded_textures;
 public:
 	Level();
 	~Level();

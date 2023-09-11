@@ -2,7 +2,7 @@
 #include "Polygon/Polygon.h"
 #include "Physics/Translation.h"
 
-namespace Radiant {
+namespace rdt {
 
 	enum PhysicalProperties {
 		ppRigid = 1,

@@ -7,7 +7,7 @@
 #include "Gui/GuiManager.h"
 #include "Scene/SceneManager.h"
 
-namespace Radiant
+namespace rdt
 {
 	Application::Application()
 		: m_current_scene(nullptr)
@@ -22,6 +22,7 @@ namespace Radiant
 		GuiManager::Destroy();
 		Physics::Destroy();
 		Input::Destroy();
+		TextureManager::Destroy();
 		Renderer::Destroy();
 	}
 
@@ -30,6 +31,7 @@ namespace Radiant
 		Utils::SetRandomSeed();
 
 		Renderer::CreateWindow(appName, windowWidth, windowHeight, resizable);
+		TextureManager::Initialize();
 		Input::Initialize();
 		Physics::Initialize();
 		GuiManager::Initialize();

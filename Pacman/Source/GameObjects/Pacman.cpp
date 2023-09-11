@@ -1,6 +1,6 @@
 #include "Pacman.h"
 
-using namespace Radiant;
+using namespace rdt;
 Pacman::Pacman(double xPos, double yPos)
 {
 
@@ -57,10 +57,10 @@ void Pacman::OnFinalUpdate()
 
 void Pacman::OnRender()
 {
-	using namespace Radiant;
+	using namespace rdt;
 
 	Renderer::Begin(0);
-	Renderer::SetPolygonColor(BLUE);
+	Renderer::SetPolygonTexture("pacman");
 	Renderer::AddPolygon(Physics::GetPolygon(GetRealmID(), m_model_ID));
 	Renderer::End();
 }

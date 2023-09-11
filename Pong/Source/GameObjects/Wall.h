@@ -1,8 +1,8 @@
 #include "Pong.h"
 
-class Wall : public Radiant::GameObject {
+class Wall : public rdt::GameObject {
 private:
-	Radiant::Vec2d spawnPos;
+	rdt::Vec2d spawnPos;
 	bool m_is_visible;
 
 public:

@@ -4,7 +4,7 @@
 #include "BitSet.h"
 
 
-namespace Radiant {
+namespace rdt {
 
     enum InputState {
 

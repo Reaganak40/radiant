@@ -1,6 +1,6 @@
 #include "Pong.h"
 
-class ReturnMenu : public Radiant::GuiTemplate {
+class ReturnMenu : public rdt::GuiTemplate {
 private:
 	const float m_gui_width;
 	const float m_gui_height;

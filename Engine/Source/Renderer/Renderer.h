@@ -7,7 +7,7 @@
 #include "Polygon/Line.h"
 #include "Mesh.h"
 #include "Utils/Color.h"
-#include "RenderCache.h"
+#include "Texture/TextureManager.h"
 
 // For Opengl rendering
 #include "VertexArray.h"
@@ -16,8 +16,9 @@
 #include "Shader.h"
 #include "GeoMode.h"
 #include "Gui/Gui.h"
+#include "RenderCache.h"
 
-namespace Radiant {
+namespace rdt {
 
 	enum RenderCond {
 		NoConditions  = 0,
@@ -66,6 +67,9 @@ namespace Radiant {
 		std::queue<DrawCommand> m_command_queue;
 
 		Color m_polygon_color;
+		Texture* m_polygon_texture;
+		Vec2i m_polygon_texture_coords;
+
 		Color m_line_color;
 
 		// *****************************************************
@@ -184,6 +188,7 @@ namespace Radiant {
 		*/
 		static void SetBackgroundColor(const Color& color) { m_instance->SetBackgroundColorImpl(color.GetColor()); }
 
+
 		/*
 			Clears the screen with the defined background color.
 		*/
@@ -271,6 +276,15 @@ namespace Radiant {
 		static void SetPolygonColor(ColorType color) { m_instance->SetPolygonColorImpl(color); }
 
 		/*
+			Sets the textureID for the next polygon. This ID should correspond with
+			an already loaded texture in the TextureManager. If the texture has a
+			defined atlas, provide the tile coordinate index.
+
+			This currently only works for Rects.
+		*/
+		static void SetPolygonTexture(const std::string& texName, unsigned int atlasX = 0, unsigned int atlasY = 0) { m_instance->SetPolygonTextureImpl(texName, atlasX, atlasY); }
+
+		/*
 			Attaches a Gui instance, which will be drawn at the end of the draw command queue.
 			The Renderer is not responsible for freeing the GUI instance. It should be detached
 			and freed by its owner.
@@ -310,6 +324,7 @@ namespace Radiant {
 		void AddLineImpl(const Line& line);
 		void SetRenderCondImpl(const unsigned int rendCond);
 		void SetPolygonColorImpl(const Color& color);
+		void SetPolygonTextureImpl(const std::string& texName, unsigned int atlasX, unsigned int atlasY);
 		void SetLineColorImpl(const Color& color);
 
 

@@ -2,7 +2,7 @@
 #include "GuiManager.h"
 #include "Utils/Utils.h"
 
-namespace Radiant {
+namespace rdt {
 	
 	GuiManager* GuiManager::m_instance = nullptr;
 

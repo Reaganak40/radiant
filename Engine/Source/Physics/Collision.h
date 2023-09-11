@@ -5,7 +5,7 @@
 
 #include "Pobject.h"
 
-namespace Radiant {
+namespace rdt {
 	class Collision {
 	private:
 	public:

@@ -3,7 +3,7 @@
 #include "Renderer/Renderer.h"
 #include "Utils/Utils.h"
 
-namespace Radiant {
+namespace rdt {
     Polygon::~Polygon()
     {
         FreeUniqueID(m_UUID);

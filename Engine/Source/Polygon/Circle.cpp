@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Circle.h"
 
-namespace Radiant {
+namespace rdt {
 	
 	Circle::Circle(Vec2d spawnLocation, double radius)
 		: m_radius(radius)

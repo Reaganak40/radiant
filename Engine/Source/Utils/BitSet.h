@@ -2,7 +2,7 @@
 #include "pch.h"
 #include <cstdint>
 
-namespace Radiant {
+namespace rdt {
 
 	class BitSet {
 	private:

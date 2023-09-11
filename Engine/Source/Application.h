@@ -4,7 +4,7 @@
 #include "GameObject/GameObject.h"
 #include "Scene/Scene.h"
 
-namespace Radiant {
+namespace rdt {
 	class Application {
 	private:
 		Timestep m_timestep;
@@ -15,7 +15,7 @@ namespace Radiant {
 		~Application();
 
 		/*
-			Starts a new Radiant application, launching the window instance.
+			Starts a new rdt application, launching the window instance.
 			Aspect ratio is 16:9 by default.
 			Window is resizable by default.
 		*/

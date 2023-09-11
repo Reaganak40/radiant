@@ -3,7 +3,7 @@
 #include "Utils/MathTypes.h"
 #include "Utils/UniqueID.h"
 
-namespace Radiant {
+namespace rdt {
 
 	enum PolygonProperies {
 		IsRect = 1,

@@ -1,8 +1,8 @@
 #pragma once
-#include "Texture.h"
+#include "Texture/Texture.h"
 #include "pch.h"
 
-namespace Radiant {
+namespace rdt {
 
 	typedef unsigned int ShaderID;
 	typedef unsigned int UniformID;

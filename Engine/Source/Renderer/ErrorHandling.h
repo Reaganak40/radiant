@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 
-namespace Radiant {
+namespace rdt {
 
 #define ASSERT(x) if (!(x)) __debugbreak();
 

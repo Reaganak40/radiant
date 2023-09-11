@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Color.h"
 
-namespace Radiant {
+namespace rdt {
 	Color::Color()
 		: m_color(Vec4f(0.0f, 0.0f, 0.0f, 1.0f))
 	{

@@ -2,7 +2,7 @@
 #include "Diagnostics.h"
 #include "Renderer/Renderer.h"
 
-namespace Radiant {
+namespace rdt {
 	DiagnosticsGUI::DiagnosticsGUI()
 		: m_gui_width(295.0f), m_gui_height(85.0f)
 	{

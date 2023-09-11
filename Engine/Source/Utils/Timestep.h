@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 
-namespace Radiant {
+namespace rdt {
 	class Timestep {
 	private:
 		float _lastTimeFrame;

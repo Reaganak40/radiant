@@ -1,14 +1,14 @@
 #include "Title.h"
 
 Title::Title()
-	: m_gui_width(Radiant::Renderer::GetWindowWidth() * 0.75f), m_gui_height(Radiant::Renderer::GetWindowHeight() * 0.30f)
+	: m_gui_width(rdt::Renderer::GetWindowWidth() * 0.75f), m_gui_height(rdt::Renderer::GetWindowHeight() * 0.30f)
 {
-	m_window_width = Radiant::Renderer::GetWindowWidth();
-	m_window_height = Radiant::Renderer::GetWindowHeight();
+	m_window_width = rdt::Renderer::GetWindowWidth();
+	m_window_height = rdt::Renderer::GetWindowHeight();
 	m_window_config = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground;
 
-	Radiant::GuiManager::LoadFont(PONG_FONT, "Source/UI/Fonts/ErosRegular-DOXn3.ttf");
-	m_title_font = Radiant::GuiManager::GetFont(PONG_FONT, 120);
+	rdt::GuiManager::LoadFont(PONG_FONT, "Source/UI/Fonts/ErosRegular-DOXn3.ttf");
+	m_title_font = rdt::GuiManager::GetFont(PONG_FONT, 120);
 }
 
 Title::~Title()
@@ -17,9 +17,9 @@ Title::~Title()
 
 void Title::OnUpdate(const float deltaTime)
 {
-	if (Radiant::Input::CheckWindowResize()) {
-		m_window_width = Radiant::Renderer::GetWindowWidth();
-		m_window_height = Radiant::Renderer::GetWindowHeight();
+	if (rdt::Input::CheckWindowResize()) {
+		m_window_width = rdt::Renderer::GetWindowWidth();
+		m_window_height = rdt::Renderer::GetWindowHeight();
 	}
 }
 

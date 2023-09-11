@@ -3,7 +3,7 @@
 #include "GameObject/GameObject.h"
 #include "Gui/Gui.h"
 
-namespace Radiant {
+namespace rdt {
 	
 	/*
 		Scenes own game objects and GUIs that can be used by the application under

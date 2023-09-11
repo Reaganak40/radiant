@@ -1,7 +1,7 @@
 #pragma once
 #include "Polygon.h"
 
-namespace Radiant {
+namespace rdt {
 
 	class Triangle : public Polygon {
 	private:

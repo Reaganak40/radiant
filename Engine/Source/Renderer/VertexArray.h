@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Radiant {
+namespace rdt {
 
 	typedef unsigned int VAO_ID;
 

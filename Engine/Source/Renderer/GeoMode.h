@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 
-namespace Radiant {
+namespace rdt {
 	enum GeoMode {
 		FillMode = 1,
 		OutlineMode = 2

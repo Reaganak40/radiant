@@ -4,7 +4,7 @@
 #include "Utils/UniqueID.h"
 #include "Realm.h"
 
-namespace Radiant {
+namespace rdt {
 	class Physics {
 	private:
 		Physics();

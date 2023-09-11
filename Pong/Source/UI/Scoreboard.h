@@ -1,7 +1,7 @@
 #include "Pong.h"
 #include "GameObjects/Ball.h"
 
-class Scoreboard : public Radiant::GuiTemplate {
+class Scoreboard : public rdt::GuiTemplate {
 private:
 	const float m_gui_width;
 	const float m_gui_height;

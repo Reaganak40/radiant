@@ -2,7 +2,7 @@
 #include "Realm.h"
 #include "Collision.h"
 
-namespace Radiant {
+namespace rdt {
 
 	Realm::Realm()
         : m_ID(GetUniqueID())

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Timestep.h"
 
-namespace Radiant {
+namespace rdt {
 
 	Timer::Timer(float secondInterval)
 		: m_maxTime(secondInterval), m_is_running(false)

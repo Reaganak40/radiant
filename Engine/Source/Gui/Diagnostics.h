@@ -1,7 +1,7 @@
 #pragma once
 #include "Gui.h"
 
-namespace Radiant {
+namespace rdt {
 
 	class DiagnosticsGUI : public GuiTemplate {
 	private:

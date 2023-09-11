@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Radiant {
+namespace rdt {
 
 	struct Vec2d {
 		double x, y;
@@ -84,5 +84,19 @@ namespace Radiant {
 		
 		Vec2i(int nX=0, int nY=0) 
 			: x(nX), y(nY) {}
+
+		/*
+			Returns a zero vector.
+		*/
+		static Vec2i Zero();
+	};
+
+	struct Vec2f {
+		float x, y;
+
+		Vec2f(float nX = 0, float nY = 0)
+			: x(nX), y(nY) {}
+
+		
 	};
 }

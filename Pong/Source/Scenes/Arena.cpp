@@ -17,7 +17,7 @@ Arena::~Arena()
 
 void Arena::OnRegister()
 {
-    using namespace Radiant;
+    using namespace rdt;
 
     if (m_realms.size() == 0) {
         m_realms.push_back(Physics::CreateRealm());
@@ -67,7 +67,7 @@ void Arena::OnRegister()
 
 void Arena::OnBind()
 {
-    using namespace Radiant;
+    using namespace rdt;
     Renderer::SetBackgroundColor(BLACK);
 
     if (!previously_bounded) {
@@ -97,7 +97,7 @@ void Arena::OnBind()
 
 void Arena::OnRelease()
 {
-    using namespace Radiant;
+    using namespace rdt;
 
     for (auto& object : m_game_objects) {
         object->OnRelease();

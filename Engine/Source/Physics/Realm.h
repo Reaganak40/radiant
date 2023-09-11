@@ -4,7 +4,7 @@
 #include "Utils/UniqueID.h"
 #include "Pobject.h"
 
-namespace Radiant {
+namespace rdt {
 
 	class Realm {
 	private:

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Triangle.h"
 
-namespace Radiant {
+namespace rdt {
 	Triangle::Triangle(Vec2d spawnLocation, double width, double height)
 	{
 		m_origin = spawnLocation;

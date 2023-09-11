@@ -3,7 +3,7 @@
 #include <fstream>
 #include <string>
 
-namespace Radiant {
+namespace rdt {
 
     Shader::Shader()
         : m_ID(0)
@@ -27,35 +27,46 @@ namespace Radiant {
     void Shader::LoadDefaultShader()
     {
         std::string vertexShader =
-            "#version 450 core                     \n"
+            "#version 450 core\n"
+            "\n"
             "layout(location = 0) in vec4 position;\n"
-            "layout (location = 1) in vec4 color;  \n"
-            "                                      \n"
-            "smooth out vec4 vColor;               \n"
-            "                                      \n"
-            "uniform mat4 uMVP;                    \n"
-            "                                      \n"
-            "void main() {                         \n"
-            "    gl_Position = uMVP * position;    \n"
-            "                                      \n"
-            "    vColor = color;                   \n"
-            "    //vTexCoords = texCoords;         \n"
-            "                                      \n"
-            "    //vTexIndex = texIndex;           \n"
-            "};                                    \n";
-
+            "layout(location = 1) in vec4 color;\n"
+            "layout(location = 2) in vec2 texCoords;\n"
+            "layout(location = 3) in uint texIndex;\n"
+            "\n"
+            "smooth out vec4 vColor;\n"
+            "out vec2 vTexCoords;\n"
+            "out uint vTexIndex;\n"
+            "\n"
+            "uniform mat4 uMVP;\n"
+            "\n"
+            "void main() {\n"
+            "    gl_Position = uMVP * position;\n"
+            "    vColor = color;\n"
+            "    vTexCoords = texCoords;\n"
+            "    vTexIndex = texIndex;\n"
+            "};\n";
 
         std::string fragmentShader =
-            "#version 450 core                   \n"
-            "                                    \n"
-            "smooth in vec4 vColor;              \n"
-            "                                    \n"
+            "#version 450 core\n"
+            "\n"
+            "smooth in vec4 vColor;\n"
+            "in vec2 vTexCoords;\n"
+            "flat in uint vTexIndex;\n"
+            "\n"
             "layout(location = 0) out vec4 color;\n"
-            "                                    \n"
-            "                                    \n"
-            "void main() {                       \n"
-            "    color = vColor;                 \n"
-            "}                                   \n";
+            "\n"
+            "uniform vec4 uColor;\n"
+            "uniform sampler2D uTextures[30];\n"
+            "\n"
+            "void main() {\n"
+            "    if (vTexIndex > 0) {\n"
+            "        color = texture(uTextures[vTexIndex], vTexCoords);\n"
+            "    }\n"
+            "    else {\n"
+            "        color = vColor;\n"
+            "    }\n"
+            "}\n";
 
         CreateShader(vertexShader, fragmentShader);
     }

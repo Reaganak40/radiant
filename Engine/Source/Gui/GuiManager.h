@@ -1,5 +1,5 @@
 
-namespace Radiant {
+namespace rdt {
 
 #define GUI_DEFAULT_FONT 0
 #define GUI_DEFAULT_FONT_SIZE 12

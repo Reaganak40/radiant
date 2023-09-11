@@ -5,7 +5,7 @@
 #include "Renderer/Renderer.h"
 #include "Utils/Input.h"
 
-bool Radiant::Collision::CheckCollisionSAT(const Polygon& A, const Polygon& B)
+bool rdt::Collision::CheckCollisionSAT(const Polygon& A, const Polygon& B)
 {
 	/*
 		Step 1: Get the normal of each edge.
@@ -59,7 +59,7 @@ bool Radiant::Collision::CheckCollisionSAT(const Polygon& A, const Polygon& B)
     return true;
 }
 
-bool Radiant::Collision::CheckCollisionSAT(const Circle& A, const Polygon& B)
+bool rdt::Collision::CheckCollisionSAT(const Circle& A, const Polygon& B)
 {
 	/*
 		Step 1: Get the normal of each edge for the polygon B.
@@ -97,7 +97,7 @@ bool Radiant::Collision::CheckCollisionSAT(const Circle& A, const Polygon& B)
 	return true;
 }
 
-bool Radiant::Collision::CheckCollisionAABB(const Rect& A, const Rect& B)
+bool rdt::Collision::CheckCollisionAABB(const Rect& A, const Rect& B)
 {
 	const std::vector<Vec2d>& A_vertices = A.GetVertices();
 	const std::vector<Vec2d>& B_vertices = B.GetVertices();
@@ -106,7 +106,7 @@ bool Radiant::Collision::CheckCollisionAABB(const Rect& A, const Rect& B)
 		(A_vertices[2].y < B_vertices[1].y || B_vertices[2].y < A_vertices[1].y));
 }
 
-bool Radiant::Collision::StaticCollisionDiags(Polygon& dynamicPoly, Polygon& staticPoly)
+bool rdt::Collision::StaticCollisionDiags(Polygon& dynamicPoly, Polygon& staticPoly)
 {
 	Polygon* poly1;
 	Polygon* poly2;
@@ -154,7 +154,7 @@ bool Radiant::Collision::StaticCollisionDiags(Polygon& dynamicPoly, Polygon& sta
 	return displaced;
 }
 
-bool Radiant::Collision::SweptAABB(Pobject& source, const Pobject& suspect, const float deltaTime)
+bool rdt::Collision::SweptAABB(Pobject& source, const Pobject& suspect, const float deltaTime)
 {
 	/*
 		Rect:
@@ -213,13 +213,13 @@ bool Radiant::Collision::SweptAABB(Pobject& source, const Pobject& suspect, cons
 	return false;
 }
 
-bool Radiant::Collision::PointVsRect(const Vec2d& point, Rect& rect)
+bool rdt::Collision::PointVsRect(const Vec2d& point, Rect& rect)
 {
 	const std::vector<Vec2d>& vertices = rect.GetVertices();
 	return (point.x >= vertices[0].x && point.x <= vertices[1].x && point.y >= vertices[1].y && point.y <= vertices[2].y);
 }
 
-bool Radiant::Collision::RayVsRect(const Vec2d& start, const Vec2d& ray, const Vec2d& rectTopLeft, const Vec2d& rectBottomRight,
+bool rdt::Collision::RayVsRect(const Vec2d& start, const Vec2d& ray, const Vec2d& rectTopLeft, const Vec2d& rectBottomRight,
 	Vec2d& contactPoint, Vec2d& contactNormal, float& contactTime)
 {
 	Vec2d tNear = (rectTopLeft - start) / ray;
@@ -292,7 +292,7 @@ bool Radiant::Collision::RayVsRect(const Vec2d& start, const Vec2d& ray, const V
 	return true;
 }
 
-void Radiant::Collision::GetProjections(const std::vector<Vec2d>& vertices, const Vec2d& axis, double& outMin, double& outMax)
+void rdt::Collision::GetProjections(const std::vector<Vec2d>& vertices, const Vec2d& axis, double& outMin, double& outMax)
 {
 	outMin = std::numeric_limits<float>::max();
 	outMax = std::numeric_limits<float>::min();
@@ -306,7 +306,7 @@ void Radiant::Collision::GetProjections(const std::vector<Vec2d>& vertices, cons
 	}
 }
 
-void Radiant::Collision::GetProjections(const Vec2d& origin, const double radius, const Vec2d& axis, double& outMin, double& outMax)
+void rdt::Collision::GetProjections(const Vec2d& origin, const double radius, const Vec2d& axis, double& outMin, double& outMax)
 {
 	Vec2d direction = axis.Normalize();
 	Vec2d directionAndRadius = direction * radius;

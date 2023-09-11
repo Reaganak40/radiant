@@ -1,7 +1,7 @@
 #pragma once
 #include "Utils/UniqueID.h"
 
-namespace Radiant {
+namespace rdt {
 	class GameObject {
 	private:
 		UniqueID m_ID;

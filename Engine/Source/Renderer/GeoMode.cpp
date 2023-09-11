@@ -2,7 +2,7 @@
 #include "GeoMode.h"
 #include "ErrorHandling.h"
 
-namespace Radiant {
+namespace rdt {
 
     void ActivateGeoMode(GeoMode mode)
     {

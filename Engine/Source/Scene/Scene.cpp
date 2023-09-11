@@ -2,7 +2,7 @@
 #include "Scene.h"
 #include "SceneManager.h"
 
-namespace Radiant {
+namespace rdt {
 	Scene::Scene()
 		: m_ID(GetUniqueID())
 	{

@@ -3,7 +3,7 @@
 
 #include <filesystem>
 
-namespace Radiant {
+namespace rdt {
 
 
     namespace Utils {

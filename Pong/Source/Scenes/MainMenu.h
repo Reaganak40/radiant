@@ -1,6 +1,6 @@
 #include "Pong.h"
 
-class MainMenu : public Radiant::Scene {
+class MainMenu : public rdt::Scene {
 private:
 public:
 	MainMenu();

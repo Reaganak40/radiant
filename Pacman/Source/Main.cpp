@@ -2,7 +2,7 @@
 
 #include "Scenes/Level.h"
 
-using namespace Radiant;
+using namespace rdt;
 
 int main(void)
 {
@@ -10,7 +10,6 @@ int main(void)
     pacmanApp.Start("Pacman", 960, 720, false);
 
     pacmanApp.AddScene("Level", new Level);
-
     pacmanApp.SetScene("Level");
 
     /* Loop until the user closes the window */

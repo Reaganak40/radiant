@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Gui.h"
 
-namespace Radiant {
+namespace rdt {
 
 	void GuiTemplate::RenderImGui()
 	{

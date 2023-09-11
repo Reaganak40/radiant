@@ -3,7 +3,7 @@
 Padel::Padel(double xPos, double yPos)
 	: m_fill_sprite(true), m_AI(false), m_ball(nullptr)
 {
-	using namespace Radiant;
+	using namespace rdt;
 
 	spawnPos = Vec2d(xPos, yPos);
 	m_sprite_color = WHITE;
@@ -21,7 +21,7 @@ Padel::~Padel()
 
 void Padel::OnBind()
 {
-	using namespace Radiant;
+	using namespace rdt;
 	m_model_ID = Physics::CreateObject(GetRealmID(), std::make_shared<Rect>(spawnPos, PADEL_WIDTH, PADEL_HEIGHT));
 
 	Physics::SetMaximumVelocity(GetRealmID(), m_model_ID, Vec2d(700, 700));
@@ -30,14 +30,14 @@ void Padel::OnBind()
 
 void Padel::OnRelease()
 {
-	using namespace Radiant;
+	using namespace rdt;
 	Physics::SetPosition(GetRealmID(), m_model_ID, spawnPos);
 	Physics::SetVelocity(GetRealmID(), m_model_ID, Vec2d::Zero());
 }
 
 void Padel::OnProcessInput(const float deltaTime)
 {
-	using namespace Radiant;
+	using namespace rdt;
 
 	Physics::SetAcceleration(GetRealmID(), m_model_ID, Vec2d::Zero());
 	
@@ -69,7 +69,7 @@ void Padel::OnFinalUpdate()
 
 void Padel::OnRender()
 {
-	using namespace Radiant;
+	using namespace rdt;
 	
 	Renderer::Begin(0);
 	if (!m_fill_sprite) {
@@ -80,7 +80,7 @@ void Padel::OnRender()
 	Renderer::End();
 }
 
-void Padel::SetSpriteColor(Radiant::Color nColor)
+void Padel::SetSpriteColor(rdt::Color nColor)
 {
 	m_sprite_color = nColor;
 }
@@ -100,31 +100,31 @@ void Padel::FillSprite(bool fill)
 	m_fill_sprite = fill;
 }
 
-void Padel::SetLeftControl(const std::vector <Radiant::InputState>& conditions)
+void Padel::SetLeftControl(const std::vector <rdt::InputState>& conditions)
 {
 	left_cond = conditions;
 }
 
-void Padel::SetRightControl(const std::vector <Radiant::InputState>& conditions)
+void Padel::SetRightControl(const std::vector <rdt::InputState>& conditions)
 {
 	right_cond = conditions;
 
 }
 
-void Padel::SetUpControl(const std::vector <Radiant::InputState>& conditions)
+void Padel::SetUpControl(const std::vector <rdt::InputState>& conditions)
 {
 	up_cond = conditions;
 
 }
 
-void Padel::SetDownControl(const std::vector <Radiant::InputState>& conditions)
+void Padel::SetDownControl(const std::vector <rdt::InputState>& conditions)
 {
 	down_cond = conditions;
 }
 
-Radiant::Vec2d Padel::GetPosition()
+rdt::Vec2d Padel::GetPosition()
 {
-	return Radiant::Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
+	return rdt::Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
 }
 
 void Padel::SetComputerControl(bool isComputer)
@@ -132,11 +132,11 @@ void Padel::SetComputerControl(bool isComputer)
 	m_AI = isComputer;
 
 	if (m_AI) {
-		m_sprite_color = Radiant::RED;
+		m_sprite_color = rdt::RED;
 		acceleration = AI_ACCELERATION;
 	}
 	else {
-		m_sprite_color = Radiant::WHITE;
+		m_sprite_color = rdt::WHITE;
 		acceleration = PLAYER_ACCELERATION;
 	}
 }
@@ -152,7 +152,7 @@ void Padel::OnAIUpdate(const float deltaTime)
 		return;
 	}
 
-	using namespace Radiant;
+	using namespace rdt;
 
 
 	if (Physics::GetVelocity(GetRealmID(), m_ball->m_model_ID).x < 0) {

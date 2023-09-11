@@ -1,10 +1,10 @@
 #include "Level.h"
 #include "GameObjects/Pacman.h"
 
-using namespace Radiant;
+using namespace rdt;
 
 Level::Level()
-	: previously_bounded(false)
+	: previously_bounded(false), loaded_textures(false)
 {
 }
 
@@ -18,6 +18,10 @@ void Level::OnRegister()
 		m_realms.push_back(Physics::CreateRealm());
 	}
 
+	if (!loaded_textures) {
+		TextureManager::LoadTextureFromPNG("pacman", "Resources/Textures/pacman.png");
+	}
+
 	Pacman* pacman;
 	m_game_objects.push_back(pacman = new Pacman(100, 100));
 	pacman->RegisterToRealm(m_realms[0]);
@@ -25,7 +29,7 @@ void Level::OnRegister()
 
 void Level::OnBind()
 {
-	Renderer::SetBackgroundColor(BLACK);
+	Renderer::SetBackgroundColor(Color(0.1f, 0.1f, 0.1f, 1.0f));
 
 	if (!previously_bounded) {
 		for (auto& object : m_game_objects) {

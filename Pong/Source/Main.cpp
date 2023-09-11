@@ -2,7 +2,7 @@
 #include "Scenes/MainMenu.h"
 #include "Scenes/Arena.h"
 
-using namespace Radiant;
+using namespace rdt;
 
 int main(void)
 {

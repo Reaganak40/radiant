@@ -1,6 +1,6 @@
 #include "Pong.h"
 
-class Arena : public Radiant::Scene {
+class Arena : public rdt::Scene {
 private:
 	bool previously_bounded;
 	bool computerActive;

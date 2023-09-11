@@ -1,13 +1,13 @@
 #include "Game.h"
 
-class Pacman : public Radiant::GameObject {
+class Pacman : public rdt::GameObject {
 private:
-	Radiant::Vec2d spawnPos;
+	rdt::Vec2d spawnPos;
 
-	std::vector<Radiant::InputState> left_cond;
-	std::vector<Radiant::InputState> right_cond;
-	std::vector<Radiant::InputState> up_cond;
-	std::vector<Radiant::InputState> down_cond;
+	std::vector<rdt::InputState> left_cond;
+	std::vector<rdt::InputState> right_cond;
+	std::vector<rdt::InputState> up_cond;
+	std::vector<rdt::InputState> down_cond;
 public:
 	Pacman(double xPos, double yPos);
 	~Pacman();

@@ -2,7 +2,7 @@
 #include "ErrorHandling.h"
 #include <sstream>
 
-namespace Radiant {
+namespace rdt {
 
 	void glClearError() {
 		int count = 0;

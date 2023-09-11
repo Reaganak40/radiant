@@ -1,7 +1,7 @@
 #pragma once
 #include "MathTypes.h"
 
-namespace Radiant {
+namespace rdt {
 	enum ColorType {
 		BLUE,
 		RED,

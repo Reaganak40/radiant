@@ -3,13 +3,13 @@
 Scoreboard::Scoreboard(Ball& ballReference)
 	: m_gui_width(250.0f), m_gui_height(90.0f), m_ball(ballReference)
 {
-	m_window_width = Radiant::Renderer::GetWindowWidth();
-	m_window_height = Radiant::Renderer::GetWindowHeight();
+	m_window_width = rdt::Renderer::GetWindowWidth();
+	m_window_height = rdt::Renderer::GetWindowHeight();
 
 	m_window_config = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground;
 
-	Radiant::GuiManager::LoadFont(PONG_FONT, "Source/UI/Fonts/ErosRegular-DOXn3.ttf");
-	scoreboardFont = Radiant::GuiManager::GetFont(PONG_FONT, 48);
+	rdt::GuiManager::LoadFont(PONG_FONT, "Source/UI/Fonts/ErosRegular-DOXn3.ttf");
+	scoreboardFont = rdt::GuiManager::GetFont(PONG_FONT, 48);
 	
 	m_ball.GetScore(player1_score, player2_score);
 }
@@ -18,9 +18,9 @@ void Scoreboard::OnUpdate(const float deltaTime)
 {
 	m_ball.GetScore(player1_score, player2_score);
 
-	if (Radiant::Input::CheckWindowResize()) {
-		m_window_width = Radiant::Renderer::GetWindowWidth();
-		m_window_height = Radiant::Renderer::GetWindowHeight();
+	if (rdt::Input::CheckWindowResize()) {
+		m_window_width = rdt::Renderer::GetWindowWidth();
+		m_window_height = rdt::Renderer::GetWindowHeight();
 	}
 }
 

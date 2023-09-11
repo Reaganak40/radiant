@@ -3,7 +3,7 @@
 #include "ErrorHandling.h"
 #include "Utils/Utils.h"
 
-namespace Radiant {
+namespace rdt {
 
     Renderer* Renderer::m_instance = nullptr;
 
@@ -180,20 +180,44 @@ namespace Radiant {
 
     void Renderer::RenderImpl()
     {
+        bool update_slots = false;
+
+        /*
+            Step 1: Run the command queue, filling the buffers and further defining 
+            vertices and textures.
+        */
         while (!m_command_queue.empty()) {
             DrawCommand command = m_command_queue.front();
-            const Mesh& mesh = m_render_cache.GetMesh(command.meshIdentifier);
+            Mesh& mesh = m_render_cache.GetMesh(command.meshIdentifier);
 
             if (mesh.vertices.size() == 2) {
                 AddToRenderUnit(mesh, LineUnit);
             }
             else {
+
+                /* If mesh is a rect and a texture is provided, set the vertex texture coords. */
+                if (mesh.vertices.size() == 4 && mesh.texture != nullptr) {
+                    if (TextureManager::ApplyTextureAtlas(mesh.texture, mesh.texAtlasCoords, mesh.vertices)) {
+                        update_slots = true;
+                    }
+                }
                 AddToRenderUnit(mesh, DrawCommand::HasRendCond(command.renderCond, DrawOutline) ? OutlineUnit : FillUnit);
             }
 
             m_command_queue.pop();
         }
+        
+        /*
+            Step 2: If new textures are being used, update the texture slot map of the default texture.
+        */
+        if (update_slots) {
+            SetShader(m_shaders[0]->GetID());
+            m_shaders[0]->SetUniform<std::array<TextureID, MAX_TEXTURES>>("uTextures", TextureManager::GetTextureSlots());
+        }
 
+        /*
+            Step 3: Draw layer by layer. Each layer will have different types of draw calls (e.g drawing lines or polygons).
+        */
         for (const auto& layer : m_layers) {
             for (const auto& type : renderUnitOrder) {
                 for (auto& unit : layer.renderUnits[type]) {
@@ -216,10 +240,16 @@ namespace Radiant {
             }
         }
 
+        /*
+            Step 4: Run the GUI render queue.
+        */
         for (const auto& gui : m_GUIs) {
             gui->OnRender();
         }
 
+        /*
+            Step 5: Render all the GUI objects.
+        */
         if (m_GUIs.size() > 0) {
             GuiTemplate::RenderImGui();
         }
@@ -315,6 +345,7 @@ namespace Radiant {
     void Renderer::EndImpl()
     {
         m_current_render_cond = 0;
+        m_polygon_texture = NO_TEXTURE;
     }
 
     void Renderer::AddPolygonImpl(const Polygon& polygon)
@@ -326,23 +357,30 @@ namespace Radiant {
         }
 
         int index = 0;
+
+        
         for (const auto& vertex : polygon.GetVertices()) {
             if (pMesh.vertices.size() == index) {
 
                 pMesh.vertices.push_back(
                     Vertex(
-                        Vec3f((float)vertex.x, (float)vertex.y), m_polygon_color.GetColor()
+                        Vec3f((float)vertex.x, (float)vertex.y), m_polygon_color.GetColor(),
+                        {0, 0}, NO_TEXTURE
                     )
                 );
             }
             else {
                 pMesh.vertices[index].position = Vec3f((float)vertex.x, (float)vertex.y);
                 pMesh.vertices[index].color = m_polygon_color.GetColor();
+                pMesh.vertices[index].texCoords = { 0, 0 };
+                pMesh.vertices[index].texIndex = NO_TEXTURE;
             }
             index++;
         }
 
         pMesh.layer = m_current_layer;
+        pMesh.texture = m_polygon_texture;
+        pMesh.texAtlasCoords = m_polygon_texture_coords;
 
         m_command_queue.push(DrawCommand(polygon.GetUUID(), m_current_render_cond));
     }
@@ -361,21 +399,25 @@ namespace Radiant {
 
                 pMesh.vertices.push_back(
                     Vertex(
-                        Vec3f((float)vertex.x, (float)vertex.y), m_line_color.GetColor()
+                        Vec3f((float)vertex.x, (float)vertex.y), m_line_color.GetColor(),
+                        { 0, 0 }, NO_TEXTURE
                     )
                 );
             }
             else {
                 pMesh.vertices[index].position = Vec3f((float)vertex.x, (float)vertex.y);
                 pMesh.vertices[index].color = m_line_color.GetColor();
+                pMesh.vertices[index].texCoords = { 0, 0 };
+                pMesh.vertices[index].texIndex = NO_TEXTURE;
             }
             index++;
         }
 
         pMesh.layer = m_current_layer;
+        pMesh.texture = nullptr;
+        pMesh.texAtlasCoords = Vec2i::Zero();
 
         m_command_queue.push(DrawCommand(line.GetUUID(), m_current_render_cond));
-
     }
 
     void Renderer::SetRenderCondImpl(const unsigned int rendCond)
@@ -387,6 +429,13 @@ namespace Radiant {
     void Renderer::SetPolygonColorImpl(const Color& color)
     {
         m_polygon_color = color;
+    }
+
+    void Renderer::SetPolygonTextureImpl(const std::string& texName, unsigned int atlasX, unsigned int atlasY)
+    {
+        m_polygon_texture = TextureManager::GetTexture(texName);
+        m_polygon_texture_coords.x = atlasX;
+        m_polygon_texture_coords.y = atlasY;
     }
 
     void Renderer::SetLineColorImpl(const Color& color)

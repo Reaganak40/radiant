@@ -1,7 +1,7 @@
 #pragma once
 #include <stdio.h>
 
-namespace Radiant {
+namespace rdt {
 	
 	
 

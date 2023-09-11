@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "SceneManager.h"
 
-namespace Radiant {
+namespace rdt {
 	SceneManager* SceneManager::m_instance = nullptr;
 
 	SceneManager::SceneManager()

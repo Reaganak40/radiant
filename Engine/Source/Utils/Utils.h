@@ -3,7 +3,7 @@
 #include "pch.h"
 #include "MathTypes.h"
 
-namespace Radiant {
+namespace rdt {
 
 #define FLOAT_EPSILON 0.0001
 

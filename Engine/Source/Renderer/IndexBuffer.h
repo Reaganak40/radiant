@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 
-namespace Radiant {
+namespace rdt {
 
 	typedef unsigned int IBO_ID;
 

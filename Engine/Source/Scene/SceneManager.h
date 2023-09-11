@@ -1,7 +1,7 @@
 #pragma once
 #include "Scene.h"
 
-namespace Radiant {
+namespace rdt {
 
 	class SceneManager {
 	private:

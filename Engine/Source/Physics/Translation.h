@@ -1,7 +1,7 @@
 #pragma once
 #include "Utils/MathTypes.h"
 #include "Polygon/Polygon.h"
-namespace Radiant {
+namespace rdt {
 
 	class Translation {
 	private:

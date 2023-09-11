@@ -3,7 +3,7 @@
 Ball::Ball(double xPos, double yPos)
 	: m_timer(1.5)
 {
-	using namespace Radiant;
+	using namespace rdt;
 
 	spawnPos = Vec2d(xPos, yPos);
 	m_sprite_color = GREEN;
@@ -19,7 +19,7 @@ Ball::~Ball()
 
 void Ball::OnBind()
 {
-	using namespace Radiant;
+	using namespace rdt;
 	
 	m_model_ID = Physics::CreateObject(GetRealmID(), std::make_shared<Rect>(spawnPos, BALL_RADIUS * 2, BALL_RADIUS * 2));
 
@@ -33,7 +33,7 @@ void Ball::OnBind()
 
 void Ball::OnProcessInput(const float deltaTIme)
 {
-	using namespace Radiant;
+	using namespace rdt;
 
 	if (m_timer.IsRunning()) {
 		
@@ -46,7 +46,7 @@ void Ball::OnProcessInput(const float deltaTIme)
 
 void Ball::OnFinalUpdate()
 {
-	using namespace Radiant;
+	using namespace rdt;
 
 	auto ballX = Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin().x;
 
@@ -67,7 +67,7 @@ void Ball::OnFinalUpdate()
 
 void Ball::OnRender()
 {
-	using namespace Radiant;
+	using namespace rdt;
 
 	Renderer::Begin(BALL_LAYER);
 	Renderer::SetPolygonColor(m_sprite_color);
@@ -78,7 +78,7 @@ void Ball::OnRender()
 
 void Ball::SetUpBall()
 {
-	using namespace Radiant;
+	using namespace rdt;
 
 	Physics::SetPosition(GetRealmID(), m_model_ID, Vec2d(WORLD_WIDTH / 2, WORLD_HEIGHT / 2));
 	Physics::SetVelocity(GetRealmID(), m_model_ID, Vec2d::Zero());
@@ -87,7 +87,7 @@ void Ball::SetUpBall()
 
 void Ball::StartMovingBall()
 {
-	using namespace Radiant;
+	using namespace rdt;
 
 	int direction = Utils::RandInt(0, 1) == 0 ? -1 : 1;
 	Physics::SetVelocity(GetRealmID(), m_model_ID, Vec2d(

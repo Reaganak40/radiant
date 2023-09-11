@@ -188,11 +188,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Source\Renderer\Shader.cpp" />
-    <ClCompile Include="Source\Renderer\Texture.cpp" />
     <ClCompile Include="Source\Renderer\VertexArray.cpp" />
     <ClCompile Include="Source\Renderer\VertexBuffer.cpp" />
     <ClCompile Include="Source\Scene\Scene.cpp" />
     <ClCompile Include="Source\Scene\SceneManager.cpp" />
+    <ClCompile Include="Source\Renderer\Texture\Texture.cpp" />
+    <ClCompile Include="Source\Renderer\Texture\TextureManager.cpp" />
     <ClCompile Include="Source\Utils\BitSet.cpp" />
     <ClCompile Include="Source\Utils\Input.cpp" />
     <ClCompile Include="Source\Utils\MathTypes.cpp" />
@@ -274,6 +275,8 @@
     <ClInclude Include="Source\Renderer\RenderCache.h" />
     <ClInclude Include="Source\Scene\Scene.h" />
     <ClInclude Include="Source\Scene\SceneManager.h" />
+    <ClInclude Include="Source\Renderer\Texture\Texture.h" />
+    <ClInclude Include="Source\Renderer\Texture\TextureManager.h" />
     <ClInclude Include="Source\Utils\BitSet.h" />
     <ClInclude Include="Source\Utils\Color.h" />
     <ClInclude Include="Source\Utils\Input.h" />
@@ -288,7 +291,6 @@
     <ClInclude Include="Source\Renderer\Mesh.h" />
     <ClInclude Include="Source\Renderer\Renderer.h" />
     <ClInclude Include="Source\Renderer\Shader.h" />
-    <ClInclude Include="Source\Renderer\Texture.h" />
     <ClInclude Include="Source\Renderer\VertexArray.h" />
     <ClInclude Include="Source\Renderer\VertexBuffer.h" />
     <ClInclude Include="Source\Utils\Timestep.h" />

@@ -2,7 +2,7 @@
 #include "Input.h"
 #include "Renderer/Renderer.h"
 
-namespace Radiant {
+namespace rdt {
     Input* Input::m_singleton = nullptr;
 
     Input::Input()

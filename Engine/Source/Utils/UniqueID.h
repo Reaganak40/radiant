@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Radiant {
+namespace rdt {
 #define NO_UUID 0
 
 	typedef unsigned int UniqueID;

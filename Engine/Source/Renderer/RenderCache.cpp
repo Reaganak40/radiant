@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "RenderCache.h"
 
-namespace Radiant {
+namespace rdt {
 	RenderCache::RenderCache()
 		: m_rect_index(0), m_line_index(0)
 	{

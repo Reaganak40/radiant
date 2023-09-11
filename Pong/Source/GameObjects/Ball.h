@@ -1,14 +1,14 @@
 #pragma once
 #include "Pong.h"
 
-class Ball : public Radiant::GameObject {
+class Ball : public rdt::GameObject {
 private:
-	Radiant::Vec2d spawnPos;
-	Radiant::Color m_sprite_color;
+	rdt::Vec2d spawnPos;
+	rdt::Color m_sprite_color;
 	double acceleration;
 	bool m_fill_sprite;
 
-	Radiant::Timer m_timer;
+	rdt::Timer m_timer;
 
 	unsigned int m_score[2];
 public:

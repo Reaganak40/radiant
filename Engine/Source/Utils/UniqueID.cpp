@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "UniqueID.h"
 
-namespace Radiant {
+namespace rdt {
 
     std::vector<UniqueID> UUID_Handler::freeIDs = {};
 

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "BitSet.h"
 
-namespace Radiant {
+namespace rdt {
 	BitSet::BitSet(unsigned int max_flags)
 	{
 		m_bit_field = std::vector<uint32_t>((max_flags / 32) + 1, 0);

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Rect.h"
 
-namespace Radiant {
+namespace rdt {
 	
 	Rect::Rect(Vec2d spawnLocation, double width, double height)
 	{

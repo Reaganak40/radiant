@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Line.h"
 
-namespace Radiant {
+namespace rdt {
 	
 	Line::Line(const Vec2d& start, const Vec2d& end)
 	{
