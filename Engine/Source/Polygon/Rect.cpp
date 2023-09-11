@@ -24,19 +24,6 @@ namespace rdt {
 		m_indices.push_back(0);
 	}
 
-	void Rect::SetPosition(const Vec2d& nPosition)
-	{
-		if (m_origin == nPosition) {
-			return;
-		}
-
-		m_origin = nPosition;
-		m_vertices[0] = Vec2d(m_origin.x - (m_width / 2), m_origin.y - (m_height / 2));
-		m_vertices[1] = Vec2d(m_origin.x + (m_width / 2), m_origin.y - (m_height / 2));
-		m_vertices[2] = Vec2d(m_origin.x + (m_width / 2), m_origin.y + (m_height / 2));
-		m_vertices[3] = Vec2d(m_origin.x - (m_width / 2), m_origin.y + (m_height / 2));
-	}
-
 	void Rect::SetSize(const Vec2d& nSize)
 	{
 		if (nSize.x == m_width && nSize.y == m_height) {

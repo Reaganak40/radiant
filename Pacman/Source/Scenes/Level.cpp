@@ -54,6 +54,10 @@ void Level::OnRelease()
 	for (auto& realm : m_realms) {
 		Physics::DeactivateRealm(realm);
 	}
+
+	for (auto& gui : m_GUIs) {
+		Renderer::DetachGui(gui);
+	}
 }
 
 void Level::OnRender()

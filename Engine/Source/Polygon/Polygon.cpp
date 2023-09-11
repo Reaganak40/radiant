@@ -71,7 +71,7 @@ namespace rdt {
         offsets.reserve(m_vertices.size());
 
         for (const auto& vertex : m_vertices) {
-            offsets.push_back(Utils::GetDistance(m_origin, vertex));
+            offsets.push_back(Utils::GetManhattanDistance(m_origin, vertex));
         }
 
         m_origin = nPosition;

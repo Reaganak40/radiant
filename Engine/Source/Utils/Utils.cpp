@@ -9,11 +9,21 @@ namespace rdt {
     namespace Utils {
         double ApplyEpsilon(double d)
         {
-            if (abs(d) - abs(int(d)) < FLOAT_EPSILON) {
-                return (int)d;
+            if (d > 0) {
+                if (abs(d) - abs(floor(d)) < FLOAT_EPSILON) {
+                    return floor(d);
+                }
+                else if ((abs(ceil(d)) - abs(d)) < FLOAT_EPSILON) {
+                    return ceil(d);
+                }
             }
-            else if ((abs(ceil(d)) - abs(d)) < FLOAT_EPSILON) {
-                return ceil(d);
+            else if (d < 0) {
+                if (abs(d) - abs(ceil(d)) < FLOAT_EPSILON) {
+                    return ceil(d);
+                }
+                else if ((abs(floor(d)) - abs(d)) < FLOAT_EPSILON) {
+                    return floor(d);
+                }
             }
 
             return d;
@@ -122,6 +132,11 @@ namespace rdt {
         double GetDistance(const Vec2d& pointA, const Vec2d& pointB)
         {
             return sqrt(pow(pointB.x - pointA.x, 2) + pow(pointB.y - pointA.y, 2));
+        }
+
+        Vec2d GetManhattanDistance(const Vec2d& pointA, const Vec2d& pointB)
+        {
+            return pointB - pointA;
         }
 
         bool PathExists(const std::string& filepath)

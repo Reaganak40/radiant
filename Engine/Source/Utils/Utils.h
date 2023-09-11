@@ -81,6 +81,11 @@ namespace rdt {
         double GetDistance(const Vec2d& pointA, const Vec2d& pointB);
 
         /*
+            Returns the manhattan distance between two points.
+        */
+        Vec2d GetManhattanDistance(const Vec2d& pointA, const Vec2d& pointB);
+
+        /*
             Returns true if the filepath exists.
         */
         bool PathExists(const std::string& filepath);
