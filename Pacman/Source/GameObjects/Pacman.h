@@ -25,6 +25,11 @@ private:
 	rdt::Vec2i m_lastMapCoords;
 
 	Map* m_map;
+	int current_frame;
+	int df;
+
+	rdt::Timer m_timer;
+
 public:
 	Pacman(double xPos, double yPos);
 	~Pacman();

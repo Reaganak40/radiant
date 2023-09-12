@@ -45,19 +45,25 @@ namespace rdt {
 
 		if (texture->has_texture_atlas) {
 
-			rectVertices[0].texCoords.x = (atlasCoords.x * texture->m_tileWidth) / texture->m_image_width;
-			rectVertices[0].texCoords.y = ((atlasCoords.y + 1) * texture->m_tileHeight) / texture->m_image_height;
+			float leftX  = ((atlasCoords.x * (texture->m_tileWidth + texture->m_tile_gap)) + (texture->m_tile_gap / 2)) / texture->m_image_width;
+			float rightX = (((atlasCoords.x + 1) * (texture->m_tileWidth + texture->m_tile_gap)) + (texture->m_tile_gap / 2)) / texture->m_image_width;
 
-			rectVertices[1].texCoords.x = ((atlasCoords.x + 1) * texture->m_tileWidth) / texture->m_image_width;
-			rectVertices[1].texCoords.y = ((atlasCoords.y + 1) * texture->m_tileHeight) / texture->m_image_height;
+			float topY    = ((atlasCoords.y * (texture->m_tileHeight + texture->m_tile_gap)) + (texture->m_tile_gap / 2)) / texture->m_image_height;
+			float bottomY = (((atlasCoords.y + 1) * (texture->m_tileHeight + texture->m_tile_gap)) + (texture->m_tile_gap / 2)) / texture->m_image_height;
+
+			rectVertices[0].texCoords.x = leftX;
+			rectVertices[0].texCoords.y = bottomY;
+
+			rectVertices[1].texCoords.x = rightX;
+			rectVertices[1].texCoords.y = bottomY;
 
 
-			rectVertices[2].texCoords.x = ((atlasCoords.x + 1) * texture->m_tileWidth) / texture->m_image_width;
-			rectVertices[2].texCoords.y = (atlasCoords.y * texture->m_tileHeight) / texture->m_image_height;
+			rectVertices[2].texCoords.x = rightX;
+			rectVertices[2].texCoords.y = topY;
 
 
-			rectVertices[3].texCoords.x = (atlasCoords.x * texture->m_tileWidth) / texture->m_image_width;
-			rectVertices[3].texCoords.y = (atlasCoords.y * texture->m_tileHeight) / texture->m_image_height;
+			rectVertices[3].texCoords.x = leftX;
+			rectVertices[3].texCoords.y = topY;
 
 		}
 		else {

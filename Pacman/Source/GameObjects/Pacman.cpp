@@ -2,6 +2,7 @@
 
 using namespace rdt;
 Pacman::Pacman(double xPos, double yPos)
+	: m_timer(Timer(0.07))
 {
 	for (int i = 0; i < 4; i++) {
 		m_lastMove[i] = false;
@@ -17,6 +18,9 @@ Pacman::Pacman(double xPos, double yPos)
 	down_cond = std::vector<InputState>{ S_KEY_PRESS, S_KEY_DOWN };
 
 	m_map = nullptr;
+	current_frame = 1;
+	df = 1;
+
 }
 
 Pacman::~Pacman()
@@ -28,11 +32,11 @@ void Pacman::OnBind()
 	std::shared_ptr<Rect> sprite;
 	m_model_ID = Physics::CreateObject(GetRealmID(), sprite = std::make_shared<Rect>(spawnPos, PACMAN_SPRITE_WIDTH, PACMAN_SPRITE_WIDTH));
 
-	sprite->ApplyRotationOffset(M_PI);
 	Physics::SetObjectProperties(GetRealmID(), m_model_ID, ppRigid);
 	Physics::SetAcceleration(GetRealmID(), m_model_ID, Vec2d::Zero());
 	Physics::SetFriction(GetRealmID(), m_model_ID, 0);
 
+	m_timer.Start();
 	Respawn();
 }
 
@@ -137,6 +141,25 @@ void Pacman::OnProcessInput(const float deltaTIme)
 	}
 
 	Physics::SetVelocity(GetRealmID(), m_model_ID, nVelocity);
+
+	if (m_timer.IsRunning()) {
+		if (m_timer.Update(deltaTIme)) {
+			current_frame += df;
+
+			if (current_frame == 0) {
+				df = 1;
+			}
+			else if (current_frame == 2) {
+				df = -1;
+			}
+
+			m_timer.Start();
+		}
+	}
+
+	if (nVelocity == Vec2d::Zero()) {
+		current_frame = 1;
+	}
 }
 
 void Pacman::OnFinalUpdate()
@@ -179,7 +202,7 @@ void Pacman::OnRender()
 	using namespace rdt;
 
 	Renderer::Begin(PACMAN_LAYER);
-	Renderer::SetPolygonTexture("pacman");
+	Renderer::SetPolygonTexture("pacman", current_frame, 0);
 	Renderer::AddPolygon(Physics::GetPolygon(GetRealmID(), m_model_ID));
 	Renderer::End();
 }

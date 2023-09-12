@@ -23,7 +23,9 @@ void Level::OnRegister()
 	}
 
 	if (!loaded_textures) {
-		TextureManager::LoadTextureFromPNG("pacman", "Resources/Textures/pacman.png");
+		Texture& pacmanTex = TextureManager::LoadTextureFromPNG("pacman", "Resources/Textures/pacman.png");
+		pacmanTex.DefineTextureAtlas(51, 51, 1, 12, 16);
+
 		TextureManager::LoadTextureFromPNG("map", "Resources/Textures/map.png");
 	}
 

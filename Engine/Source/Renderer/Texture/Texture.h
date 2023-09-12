@@ -25,7 +25,7 @@ namespace rdt {
 		float m_tileHeight;
 		unsigned int m_numRows;
 		unsigned int m_numCols;
-
+		unsigned int m_tile_gap;
 
 
 	public:
@@ -37,7 +37,7 @@ namespace rdt {
 		/*
 			Adds a texture atlas to the texture, which can be used for reference tile maps.
 		*/
-		void DefineTextureAtlas(unsigned int tileWidth, unsigned int tileHeight, unsigned int numRows, unsigned int numCols);
+		void DefineTextureAtlas(unsigned int tileWidth, unsigned int tileHeight, unsigned int numRows, unsigned int numCols, unsigned int tileGap);
 
 		friend class TextureManager;
 

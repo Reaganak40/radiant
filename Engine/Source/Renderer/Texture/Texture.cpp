@@ -29,13 +29,14 @@ namespace rdt {
 		glDeleteTextures(1, &m_textureID);
 	}
 
-	void Texture::DefineTextureAtlas(unsigned int tileWidth, unsigned int tileHeight, unsigned int numRows, unsigned int numCols)
+	void Texture::DefineTextureAtlas(unsigned int tileWidth, unsigned int tileHeight, unsigned int numRows, unsigned int numCols, unsigned int tileGap)
 	{
 		has_texture_atlas = true;
 		m_tileWidth = (float)tileWidth;
 		m_tileHeight = (float)tileHeight;
 		m_numRows = numRows;
 		m_numCols = numCols;
+		m_tile_gap = tileGap;
 	}
 
 	void Texture::LoadTexture(const std::string& textureFilePath)
