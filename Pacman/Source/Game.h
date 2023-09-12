@@ -6,5 +6,17 @@
 #define PACMAN_SPRITE_WIDTH 30
 #define PACMAN_SPEED 300
 #define PACMAN_SPAWN_X 300
-#define PACMAN_SPAWN_Y 198
+#define PACMAN_SPAWN_Y 195
 
+// the pixel width of a tile
+#define TILE_WIDTH 21.5
+
+// width of tile map
+#define NUM_TILES_X 26
+
+// height of tile map
+#define NUM_TILES_Y 29
+
+// the pixel offset from y = 0.
+#define TILE_OFFSET_Y 45
+#define TILE_OFFSET_X 32

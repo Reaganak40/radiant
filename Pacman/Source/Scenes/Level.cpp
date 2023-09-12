@@ -1,6 +1,7 @@
 #include "Level.h"
 #include "GameObjects/Pacman.h"
 #include "GameObjects/Map.h"
+#include "GameObjects/PacDot.h"
 
 using namespace rdt;
 
@@ -31,8 +32,31 @@ void Level::OnRegister()
 	Map* map;
 	m_game_objects.push_back(map = new Map);
 	map->RegisterToRealm(m_realms[0]);
+	pacman->AddMapPtr(map);
 
-	//m_GUIs.push_back(new DiagnosticsGUI);
+	for (int row = 0; row < NUM_TILES_Y; row++) {
+		for (int col = 0; col < NUM_TILES_X; col++) {
+
+			if (row == 22 && (col == 13 || col == 12)) {
+				continue;
+			}
+
+			if (row > 7 && row < 19) {
+				if (col != 5 && col != 20) {
+					continue;
+				}
+			}
+
+			if (map->IsInMap(row, col)) {
+				Vec2d spawnPos = map->GetWorldCoordinates({ col, row });
+				PacDot* dot;
+				m_game_objects.push_back(dot = new PacDot(spawnPos.x, spawnPos.y));
+				dot->RegisterToRealm(m_realms[0]);
+			}
+		}
+	}
+
+	m_GUIs.push_back(new DiagnosticsGUI);
 }
 
 void Level::OnBind()
