@@ -6,6 +6,10 @@
 class PacDot : public rdt::GameObject {
 private:
 	rdt::Vec2d spawnPos;
+	rdt::Color m_color;
+
+	bool m_eaten;
+
 public:
 	PacDot(double xPos, double yPos);
 	~PacDot();
@@ -15,4 +19,9 @@ public:
 	void OnProcessInput(const float deltaTIme) override final;
 	void OnFinalUpdate() override final;
 	void OnRender() override final;
+
+	void SetColor(rdt::Color nColor);
+
+	void Eat();
+	void Reset();
 };

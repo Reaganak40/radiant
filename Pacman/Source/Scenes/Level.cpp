@@ -1,13 +1,15 @@
 #include "Level.h"
 #include "GameObjects/Pacman.h"
 #include "GameObjects/Map.h"
-#include "GameObjects/PacDot.h"
 
 using namespace rdt;
 
 Level::Level()
 	: previously_bounded(false), loaded_textures(false)
 {
+	for (int i = 0; i < NUM_TILES_Y; i++) {
+		m_dotMap[i].fill(nullptr);
+	}
 }
 
 Level::~Level()
@@ -37,12 +39,12 @@ void Level::OnRegister()
 	for (int row = 0; row < NUM_TILES_Y; row++) {
 		for (int col = 0; col < NUM_TILES_X; col++) {
 
-			if (row == 22 && (col == 13 || col == 12)) {
+			if (row == 22 && (col == 15 || col == 16)) {
 				continue;
 			}
 
 			if (row > 7 && row < 19) {
-				if (col != 5 && col != 20) {
+				if (col != 8 && col != 23) {
 					continue;
 				}
 			}
@@ -52,6 +54,8 @@ void Level::OnRegister()
 				PacDot* dot;
 				m_game_objects.push_back(dot = new PacDot(spawnPos.x, spawnPos.y));
 				dot->RegisterToRealm(m_realms[0]);
+
+				m_dotMap[row][col] = dot;
 			}
 		}
 	}
@@ -92,5 +96,11 @@ void Level::OnRelease()
 
 void Level::OnRender()
 {
+	Vec2i pacmanCoords = ((Pacman*)m_game_objects[0])->GetMapCoordinates();
+	PacDot* dot = m_dotMap[pacmanCoords.y][pacmanCoords.x];
+	if (dot != nullptr) {
+		dot->Eat();
+	}
+
 	RunRenderQueue();
 }

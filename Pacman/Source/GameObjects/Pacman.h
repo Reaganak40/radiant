@@ -39,6 +39,8 @@ public:
 
 	void Respawn();
 
+	rdt::Vec2i GetMapCoordinates();
+
 private:
 	void UpdateBorderCheck(const rdt::Vec2i& mapCoords);
 };

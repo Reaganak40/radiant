@@ -45,6 +45,7 @@ void Pacman::OnProcessInput(const float deltaTIme)
 	const Vec2d location = Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
 	Vec2i mapCoords = m_map->GetMapCoordinates(location);
 	Vec2d nVelocity = Physics::GetVelocity(GetRealmID(), m_model_ID);
+	Vec2d centeredCoords = m_map->GetWorldCoordinates(mapCoords);
 
 	UpdateBorderCheck(mapCoords);
 
@@ -66,22 +67,22 @@ void Pacman::OnProcessInput(const float deltaTIme)
 	}
 
 	if (nVelocity.x < 0) {
-		if (m_onBorder[LEFT] && m_map->GetWorldCoordinates(mapCoords).x >= location.x) {
+		if (m_onBorder[LEFT] && centeredCoords.x >= location.x) {
 			nVelocity.x = 0;
 		}
 	} else if (nVelocity.x > 0) {
-		if (m_onBorder[RIGHT] && m_map->GetWorldCoordinates(mapCoords).x <= location.x) {
+		if (m_onBorder[RIGHT] && centeredCoords.x <= location.x) {
 			nVelocity.x = 0;
 		}
 	}
 
 
 	if (nVelocity.y < 0) {
-		if (m_onBorder[DOWN] && m_map->GetWorldCoordinates(mapCoords).y >= location.y) {
+		if (m_onBorder[DOWN] && centeredCoords.y >= location.y) {
 			nVelocity.y = 0;
 		}
 	} else if (nVelocity.y > 0) {
-		if (m_onBorder[UP] && m_map->GetWorldCoordinates(mapCoords).y <= location.y) {
+		if (m_onBorder[UP] && centeredCoords.y <= location.y) {
 			nVelocity.y = 0;
 		}
 	}
@@ -89,11 +90,28 @@ void Pacman::OnProcessInput(const float deltaTIme)
 	if (nVelocity.x != 0 && nVelocity.y != 0) {
 
 		if (m_lastMove[UP] || m_lastMove[DOWN]) {
-			nVelocity.y = 0;
+			if (abs(location.y - centeredCoords.y) < (TILE_WIDTH / 3)) {
+				nVelocity.y = 0;
+			}
+			else {
+				nVelocity.x = 0;
+			}
 		}
 		else {
-			nVelocity.x = 0;
+			if (abs(location.x - centeredCoords.x) < (TILE_WIDTH / 3)) {
+				nVelocity.x = 0;
+			}
+			else {
+				nVelocity.y = 0;
+			}
 		}
+	}
+
+	if (nVelocity.y != 0 && (m_lastMove[LEFT] || m_lastMove[RIGHT])) {
+		Physics::SetPosition(GetRealmID(), m_model_ID, { centeredCoords.x,location.y });
+	}
+	else if (nVelocity.x != 0 && (m_lastMove[UP] || m_lastMove[DOWN])) {
+		Physics::SetPosition(GetRealmID(), m_model_ID, { location.x, centeredCoords.y });
 	}
 
 	for (int i = 0; i < 4; i++) {
@@ -178,6 +196,12 @@ void Pacman::Respawn()
 	Physics::SetPosition(GetRealmID(), m_model_ID, { PACMAN_SPAWN_X, m_map->GetWorldCoordinates({12, 22}).y});
 	Physics::SetVelocity(GetRealmID(), m_model_ID, { 0, 0 });
 	Physics::SetRotation(GetRealmID(), m_model_ID, Utils::Radians_Right);
+}
+
+rdt::Vec2i Pacman::GetMapCoordinates()
+{
+	const Vec2d location = Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
+	return m_map->GetMapCoordinates(location);
 }
 
 void Pacman::UpdateBorderCheck(const rdt::Vec2i& mapCoords)
