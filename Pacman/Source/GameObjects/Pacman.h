@@ -1,14 +1,6 @@
+#pragma once
 #include "Game.h"
 #include "Map.h"
-
-
-enum PacmanMove {
-	UP = 0,
-	DOWN,
-	LEFT,
-	RIGHT,
-	NOMOVE
-};
 
 class Pacman : public rdt::GameObject {
 private:
