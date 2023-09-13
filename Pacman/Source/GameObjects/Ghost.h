@@ -27,6 +27,9 @@ private:
 
 	rdt::Timer m_home_timer;
 	bool m_is_home;
+
+	bool m_is_vulnerable;
+
 public:
 	Ghost(GhostName nName);
 	~Ghost();
@@ -38,6 +41,8 @@ public:
 	void OnRender() override final;
 
 	void AddMapPtr(Map* nMap);
+
+	void SetVulnerable(bool state);
 
 private:
 	void SelectNewTarget();

@@ -64,6 +64,9 @@
     <Image Include="Resources\Textures\ghost.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="Resources\Textures\powerDot.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Resources\TileMap.txt" />

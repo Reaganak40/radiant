@@ -1,9 +1,12 @@
 #include "PacDot.h"
 
 PacDot::PacDot(double xPos, double yPos)
+	: m_blinking_timer(0.35)
 {
 	spawnPos = { xPos, yPos };
 	m_color = rdt::WHITE;
+	m_power_dot = false;
+	m_show = true;
 }
 
 PacDot::~PacDot()
@@ -14,7 +17,12 @@ void PacDot::OnBind()
 {
 	using namespace rdt;
 
-	m_model_ID = Physics::CreateObject(GetRealmID(), std::make_shared<Rect>(spawnPos, PAC_DOT_WIDTH, PAC_DOT_WIDTH));
+	int extra_size = 0;
+	if (m_power_dot) {
+		extra_size = 10;
+		m_blinking_timer.Start();
+	}
+	m_model_ID = Physics::CreateObject(GetRealmID(), std::make_shared<Rect>(spawnPos, PAC_DOT_WIDTH + extra_size, PAC_DOT_WIDTH + extra_size));
 
 	Physics::SetObjectProperties(GetRealmID(), m_model_ID, ppRigid);
 	Physics::SetMaximumVelocity(GetRealmID(), m_model_ID, Vec2d::Zero());
@@ -29,7 +37,13 @@ void PacDot::OnRelease()
 
 void PacDot::OnProcessInput(const float deltaTIme)
 {
-	m_color = rdt::WHITE;
+	if (m_blinking_timer.IsRunning()) {
+		
+		if (m_blinking_timer.Update(deltaTIme)) {
+			m_show = !m_show;
+			m_blinking_timer.Start();
+		}
+	}
 }
 
 void PacDot::OnFinalUpdate()
@@ -40,9 +54,17 @@ void PacDot::OnRender()
 {
 	using namespace rdt;
 
-	if (!m_eaten) {
+	if (!m_eaten && m_show) {
+
 		Renderer::Begin(PAC_DOT_LAYER);
-		Renderer::SetPolygonColor(m_color);
+		
+		if (m_power_dot) {
+			Renderer::SetPolygonTexture("powerdot");
+		}
+		else {
+			Renderer::SetPolygonColor(m_color);
+		}
+
 		Renderer::AddPolygon(Physics::GetPolygon(GetRealmID(), m_model_ID));
 		Renderer::End();
 	}
@@ -53,6 +75,11 @@ void PacDot::SetColor(rdt::Color nColor)
 	m_color = nColor;
 }
 
+bool PacDot::IsEaten()
+{
+	return m_eaten;
+}
+
 void PacDot::Eat()
 {
 	m_eaten = true;
@@ -61,4 +88,14 @@ void PacDot::Eat()
 void PacDot::Reset()
 {
 	m_eaten = false;
+}
+
+void PacDot::MakePowerDot()
+{
+	m_power_dot = true;
+}
+
+bool PacDot::IsPowerDot()
+{
+	return m_power_dot;
 }

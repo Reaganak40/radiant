@@ -60,5 +60,10 @@ namespace rdt {
 			Sets the internal interval limit.
 		*/
 		void SetInterval(float nSecondInterval);
+
+		/*
+			Get in seconds the time left on the timer.
+		*/
+		float GetTimeLeft();
 	};
 }

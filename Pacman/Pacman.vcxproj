@@ -157,6 +157,7 @@
     <Image Include="Resources\Textures\ghost.png" />
     <Image Include="Resources\Textures\map.png" />
     <Image Include="Resources\Textures\pacman.png" />
+    <Image Include="Resources\Textures\powerDot.png" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Resources\TileMap.txt" />

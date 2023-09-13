@@ -15,7 +15,7 @@ namespace rdt {
 	void Timer::Start()
 	{
 		m_timeLeft = m_maxTime;
-		m_is_running = true;
+		m_is_running = m_timeLeft > 0;
 	}
 
 	bool Timer::Update(float deltaTime)
@@ -45,6 +45,10 @@ namespace rdt {
 
 	void Timer::SetInterval(float nSecondInterval) {
 		m_maxTime = nSecondInterval;
+	}
+
+	float Timer::GetTimeLeft() {
+		return m_timeLeft;
 	}
 
 }

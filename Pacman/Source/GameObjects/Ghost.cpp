@@ -9,6 +9,7 @@ Ghost::Ghost(GhostName nName)
 	spawnPos = Vec2d::Zero();
 	m_map = nullptr;
 	m_target_coords = { 15, 10 };
+	m_is_vulnerable = false;
 
 	switch (nName) {
 	case BLINKY:
@@ -287,6 +288,39 @@ void Ghost::AddMapPtr(Map* nMap)
 	m_map = nMap;
 }
 
+void Ghost::SetVulnerable(bool state)
+{
+	m_is_vulnerable = state;
+
+	if (m_is_vulnerable) {
+
+		m_frame_col = 8;
+		m_frame_row = 0;
+		df = 1;
+	}
+	else {
+		switch (m_name) {
+		case BLINKY:
+			m_frame_row = 0;
+			break;
+		case PINKY:
+			m_frame_row = 1;
+			break;
+		case INKY:
+			m_frame_row = 2;
+			break;
+		case CLYDE:
+			m_frame_row = 3;
+			break;
+		default:
+			m_frame_row = 0;
+			break;
+		}
+
+		Look(m_direction);
+	}
+}
+
 void Ghost::SelectNewTarget()
 {
 	bool options[4];
@@ -381,6 +415,10 @@ void Ghost::SelectNewTarget()
 
 void Ghost::Look(PacmanMoveDirection direction)
 {
+	if (m_is_vulnerable) {
+		return;
+	}
+
 	switch (direction) {
 	case LEFT:
 		m_frame_col = 2;
@@ -395,6 +433,9 @@ void Ghost::Look(PacmanMoveDirection direction)
 		m_frame_col = 6;
 		break;
 	}
-	df = 1;
+
+	if (df < 0) {
+		m_frame_col++;
+	}
 }
 

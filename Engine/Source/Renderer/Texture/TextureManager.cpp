@@ -45,11 +45,11 @@ namespace rdt {
 
 		if (texture->has_texture_atlas) {
 
-			float leftX  = ((atlasCoords.x * (texture->m_tileWidth + texture->m_tile_gap)) + (texture->m_tile_gap / 2)) / texture->m_image_width;
-			float rightX = (((atlasCoords.x + 1) * (texture->m_tileWidth + texture->m_tile_gap)) + (texture->m_tile_gap / 2)) / texture->m_image_width;
+			float leftX  = ((atlasCoords.x * (texture->m_tileWidth + texture->m_tile_gap + 1)) + (texture->m_tile_gap / 2)) / texture->m_image_width;
+			float rightX = (((atlasCoords.x + 1) * (texture->m_tileWidth + texture->m_tile_gap + 1)) + (texture->m_tile_gap / 2)) / texture->m_image_width;
 
-			float topY    = ((atlasCoords.y * (texture->m_tileHeight + texture->m_tile_gap)) + (texture->m_tile_gap / 2)) / texture->m_image_height;
-			float bottomY = (((atlasCoords.y + 1) * (texture->m_tileHeight + texture->m_tile_gap)) + (texture->m_tile_gap / 2)) / texture->m_image_height;
+			float topY    = ((atlasCoords.y * (texture->m_tileHeight + texture->m_tile_gap + 1)) + (texture->m_tile_gap / 2)) / texture->m_image_height;
+			float bottomY = (((atlasCoords.y + 1) * (texture->m_tileHeight + texture->m_tile_gap + 1)) + (texture->m_tile_gap / 2)) / texture->m_image_height;
 
 			rectVertices[0].texCoords.x = leftX;
 			rectVertices[0].texCoords.y = bottomY;

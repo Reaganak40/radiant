@@ -8,6 +8,9 @@ private:
 	rdt::Color m_color;
 
 	bool m_eaten;
+	bool m_power_dot;
+	bool m_show;
+	rdt::Timer m_blinking_timer;
 
 public:
 	PacDot(double xPos, double yPos);
@@ -21,6 +24,9 @@ public:
 
 	void SetColor(rdt::Color nColor);
 
+	bool IsEaten();
 	void Eat();
 	void Reset();
+	void MakePowerDot();
+	bool IsPowerDot();
 };
