@@ -4,13 +4,20 @@
 #define SCREEN_WIDTH 600
 #define SCREEN_HEIGHT 760
 
-#define PACMAN_SPRITE_WIDTH 28
+#define PACMAN_SPRITE_WIDTH 35
 #define PACMAN_SPEED 260
 #define PACMAN_SPAWN_X 300
 #define PACMAN_SPAWN_Y 195
 
-#define GHOST_SPRITE_WIDTH 28
+#define GHOST_SPRITE_WIDTH 38
 #define GHOST_SPEED 190
+#define GHOST_HOME_Y 388.89
+#define MAX_HOME_Y_RANGE 15
+
+#define BLINKY_HOME_X 301
+#define PINKY_HOME_X 301
+#define INKY_HOME_X 258
+#define CLYDE_HOME_X 344
 
 // the pixel width of a tile
 #define TILE_WIDTH 21.5

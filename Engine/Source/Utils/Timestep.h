@@ -32,7 +32,7 @@ namespace rdt {
 		bool m_is_running;
 
 	public:
-		Timer(float secondInterval);
+		Timer(float secondInterval = 1.0);
 		~Timer();
 
 		/*
@@ -55,5 +55,10 @@ namespace rdt {
 			Returns true if the timer was started
 		*/
 		bool IsRunning();
+
+		/*
+			Sets the internal interval limit.
+		*/
+		void SetInterval(float nSecondInterval);
 	};
 }

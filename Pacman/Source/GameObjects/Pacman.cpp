@@ -166,9 +166,9 @@ void Pacman::OnFinalUpdate()
 {
 	const Vec2d location = Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
 
-	if (location.x < 0 - PACMAN_SPRITE_WIDTH) {
+	if (location.x < 0 - (PACMAN_SPRITE_WIDTH/2)) {
 		Physics::SetPosition(GetRealmID(), m_model_ID, { SCREEN_WIDTH, location.y });
-	} else if (location.x > SCREEN_WIDTH + PACMAN_SPRITE_WIDTH) {
+	} else if (location.x > SCREEN_WIDTH + (PACMAN_SPRITE_WIDTH/2)) {
 		Physics::SetPosition(GetRealmID(), m_model_ID, { 0, location.y });
 	}
 	else {

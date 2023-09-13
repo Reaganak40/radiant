@@ -26,7 +26,12 @@ namespace rdt {
 
 		m_timeLeft -= deltaTime;
 
-		return m_timeLeft < 0;
+		if (m_timeLeft <= 0) {
+			m_timeLeft = 0;
+			m_is_running = false;
+			return true;
+		}
+		return false;
 	}
 	void Timer::End()
 	{
@@ -37,4 +42,9 @@ namespace rdt {
 	{
 		return m_is_running;
 	}
+
+	void Timer::SetInterval(float nSecondInterval) {
+		m_maxTime = nSecondInterval;
+	}
+
 }

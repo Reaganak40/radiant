@@ -16,11 +16,17 @@ private:
 	rdt::Vec2d spawnPos;
 	double m_speed;
 
+	rdt::Timer m_frame_timer;
+	int df;
 	int m_frame_row;
 	int m_frame_col;
+
 	Map* m_map;
 	rdt::Vec2i m_target_coords;
 	PacmanMoveDirection m_direction;
+
+	rdt::Timer m_home_timer;
+	bool m_is_home;
 public:
 	Ghost(GhostName nName);
 	~Ghost();
@@ -35,4 +41,5 @@ public:
 
 private:
 	void SelectNewTarget();
+	void Look(PacmanMoveDirection direction);
 };

@@ -3,35 +3,34 @@
 using namespace rdt;
 
 Ghost::Ghost(GhostName nName)
+	: m_frame_timer(0.35)
 {
 	m_name = nName;
 	spawnPos = Vec2d::Zero();
 	m_map = nullptr;
+	m_target_coords = { 15, 10 };
 
 	switch (nName) {
 	case BLINKY:
 		m_frame_row = 0;
-		m_target_coords = { 13, 4 };
 		m_direction = PacmanMoveDirection::LEFT;
-		m_speed = GHOST_SPEED + 50;
+		m_home_timer.SetInterval(0.5);
 		break;
 	case PINKY:
-		m_target_coords = { 16, 4 };
 		m_frame_row = 1;
-		m_direction = PacmanMoveDirection::LEFT;
-		m_speed = GHOST_SPEED;
+		m_direction = PacmanMoveDirection::DOWN;
+		m_home_timer.SetInterval(Utils::RandomFloat(1.0, 3.0));
+
 		break;
 	case INKY:
-		m_target_coords = { 19, 4 };
 		m_frame_row = 2;
-		m_direction = PacmanMoveDirection::RIGHT;
-		m_speed = GHOST_SPEED;
+		m_direction = PacmanMoveDirection::UP;
+		m_home_timer.SetInterval(Utils::RandomFloat(5.0, 8.0));
 		break;
 	case CLYDE:
-		m_target_coords = { 22, 4 };
 		m_frame_row = 3;
-		m_direction = PacmanMoveDirection::RIGHT;
-		m_speed = GHOST_SPEED;
+		m_direction = PacmanMoveDirection::UP;
+		m_home_timer.SetInterval(Utils::RandomFloat(8.0, 15.0));
 		break;
 	default:
 		m_frame_row = 0;
@@ -39,8 +38,20 @@ Ghost::Ghost(GhostName nName)
 		m_speed = 0;
 		break;
 	}
-	m_frame_col = 0;
 
+	if (m_name == BLINKY) {
+		m_is_home = false;
+		m_speed = GHOST_SPEED + 50;
+	}
+	else {
+		m_is_home = true;
+		m_speed = GHOST_SPEED;
+	}
+
+	m_frame_col = 0;
+	df = 1;
+
+	Look(m_direction);
 }
 
 Ghost::~Ghost()
@@ -50,43 +61,128 @@ Ghost::~Ghost()
 void Ghost::OnBind()
 {
 	spawnPos = m_map->GetWorldCoordinates(m_target_coords);
+	
+	switch (m_name) {
+	case BLINKY:
+		m_target_coords.x -= 1;
+		spawnPos.x = BLINKY_HOME_X;
+		break;
+	case PINKY:
+		spawnPos.x = PINKY_HOME_X;
+		spawnPos.y = GHOST_HOME_Y;
+		break;
+	case INKY:
+		spawnPos.x = INKY_HOME_X;
+		spawnPos.y = GHOST_HOME_Y;
+		break;
+	case CLYDE:
+		spawnPos.y = GHOST_HOME_Y;
+		spawnPos.x = CLYDE_HOME_X;
+		break;
+	default:
+		break;
+	}
+	
 	m_model_ID = Physics::CreateObject(GetRealmID(), std::make_shared<Rect>(spawnPos, GHOST_SPRITE_WIDTH, GHOST_SPRITE_WIDTH));
 
 	Physics::SetObjectProperties(GetRealmID(), m_model_ID, ppRigid);
 	Physics::SetAcceleration(GetRealmID(), m_model_ID, Vec2d::Zero());
 	Physics::SetFriction(GetRealmID(), m_model_ID, 0);
+
+	if (m_name == BLINKY) {
+		Physics::SetVelocity(GetRealmID(), m_model_ID, {-m_speed, 0});
+	}
+
+	if (m_is_home) {
+		m_home_timer.Start();
+	}
+
+	m_frame_timer.Start();
 }
 
 void Ghost::OnRelease()
 {
 }
 
-void Ghost::OnProcessInput(const float deltaTIme)
+void Ghost::OnProcessInput(const float deltaTime)
 {
+	
 	const Vec2d location = Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
 	const Vec2d target = m_map->GetWorldCoordinates(m_target_coords);
-	Vec2d nVelocity = Vec2d::Zero();
 
-	if (location == target) {
+	if (!m_is_home && location == target) {
+		Vec2d nVelocity = Vec2d::Zero();
 		SelectNewTarget();
+
+		switch (m_direction) {
+		case LEFT:
+			nVelocity.x = -m_speed;
+			break;
+		case RIGHT:
+			nVelocity.x = m_speed;
+			break;
+		case UP:
+			nVelocity.y = m_speed;
+			break;
+		case DOWN:
+			nVelocity.y = -m_speed;
+			break;
+		}
+		Look(m_direction);
+
+		Physics::SetVelocity(GetRealmID(), m_model_ID, nVelocity);
+	
+	} else if (m_is_home) {
+		Vec2d nVelocity = Vec2d::Zero();
+
+		if (m_home_timer.IsRunning() && !m_home_timer.Update(deltaTime)) {
+
+			if (m_direction == UP) {
+				nVelocity.y = m_speed * 0.50;
+			}
+			else if (m_direction == DOWN) {
+				nVelocity.y = -m_speed * 0.50;
+			}
+
+		}
+		else {
+			// time to leave base
+
+			if (location.x > BLINKY_HOME_X) {
+				nVelocity.x = -m_speed * 0.50;
+				m_direction = PacmanMoveDirection::LEFT;
+				Look(m_direction);
+			}
+			else if (location.x < BLINKY_HOME_X) {
+				nVelocity.x = m_speed * 0.50;
+				m_direction = PacmanMoveDirection::RIGHT;
+				Look(m_direction);
+			}
+			else {
+				if (m_direction != UP) {
+					m_direction = PacmanMoveDirection::UP;
+					Look(m_direction);
+				}
+				nVelocity.y = m_speed * 0.25;
+			}
+		}
+		Physics::SetVelocity(GetRealmID(), m_model_ID, nVelocity);
+		
 	}
 
-	switch (m_direction) {
-	case LEFT:
-		nVelocity.x = -m_speed;
-		break;
-	case RIGHT:
-		nVelocity.x = m_speed;
-		break;
-	case UP:
-		nVelocity.y = m_speed;
-		break;
-	case DOWN:
-		nVelocity.y = -m_speed;
-		break;
-	}
+	if (m_frame_timer.IsRunning()) {
+		if (m_frame_timer.Update(deltaTime)) {
+			m_frame_col += df;
+			if (df < 0) {
+				df = 1;
+			}
+			else {
+				df = -1;
+			}
 
-	Physics::SetVelocity(GetRealmID(), m_model_ID, nVelocity);
+			m_frame_timer.Start();
+		}
+	}
 }
 
 void Ghost::OnFinalUpdate()
@@ -94,6 +190,65 @@ void Ghost::OnFinalUpdate()
 	const Vec2d location = Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
 	const Vec2d worldCoords = m_map->GetWorldCoordinates(m_target_coords);
 	double error = TILE_WIDTH / 4;
+	
+	if (m_is_home) {
+
+		if (m_direction == UP) {
+
+			if (m_home_timer.IsRunning()) {
+				if (location.y > (GHOST_HOME_Y + MAX_HOME_Y_RANGE)) {
+					Physics::SetPosition(GetRealmID(), m_model_ID, { location.x, GHOST_HOME_Y + MAX_HOME_Y_RANGE });
+					m_direction = DOWN;
+					Look(m_direction);
+				}
+			}
+			else {
+				if (location.y > (worldCoords.y - error)) {
+
+					/* Ghost is completely out of home base. */
+					Physics::SetPosition(GetRealmID(), m_model_ID, {location.x, worldCoords.y});
+
+					int direction = Utils::RandInt(0, 1);
+					if (direction == 0) {
+						m_direction = LEFT;
+						m_target_coords.x -= 1;
+						Physics::SetVelocity(GetRealmID(), m_model_ID, { -m_speed, 0 });
+					}
+					else {
+						m_direction = RIGHT;
+						m_target_coords.x += 1;
+						Physics::SetVelocity(GetRealmID(), m_model_ID, { m_speed, 0 });
+					}
+
+					m_is_home = false;
+				}
+			}
+		}
+		else if (m_direction == DOWN) {
+			if (location.y < (GHOST_HOME_Y - MAX_HOME_Y_RANGE)) {
+				Physics::SetPosition(GetRealmID(), m_model_ID, { location.x, GHOST_HOME_Y - MAX_HOME_Y_RANGE});
+				m_direction = UP;
+				Look(m_direction);
+			}
+		}
+		else if (m_direction == LEFT) {
+			if (location.x < BLINKY_HOME_X) {
+				Physics::SetPosition(GetRealmID(), m_model_ID, { BLINKY_HOME_X, location.y });
+				m_direction = UP;
+				Look(m_direction);
+			}
+		}
+		else if (m_direction == RIGHT) {
+			if (location.x > BLINKY_HOME_X) {
+				Physics::SetPosition(GetRealmID(), m_model_ID, { BLINKY_HOME_X, location.y });
+				m_direction = UP;
+				Look(m_direction);
+			}
+		}
+
+		return;
+	}
+
 
 	switch (m_direction) {
 	case LEFT:
@@ -222,5 +377,24 @@ void Ghost::SelectNewTarget()
 			}
 		}
 	}
+}
+
+void Ghost::Look(PacmanMoveDirection direction)
+{
+	switch (direction) {
+	case LEFT:
+		m_frame_col = 2;
+		break;
+	case RIGHT:
+		m_frame_col = 0;
+		break;
+	case UP:
+		m_frame_col = 4;
+		break;
+	case DOWN:
+		m_frame_col = 6;
+		break;
+	}
+	df = 1;
 }
 
