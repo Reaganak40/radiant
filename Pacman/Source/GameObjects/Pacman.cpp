@@ -125,19 +125,19 @@ void Pacman::OnProcessInput(const float deltaTIme)
 
 	if (nVelocity.x > 0) {
 		m_lastMove[RIGHT] = true;
-		Physics::SetRotation(GetRealmID(), m_model_ID, Utils::Radians_Right);
+		m_frame_row = 0;
 
 	} else if (nVelocity.x < 0) {
 		m_lastMove[LEFT] = true;
-		Physics::SetRotation(GetRealmID(), m_model_ID, Utils::Radians_Left);
+		m_frame_row = 1;
 	}
 	else if (nVelocity.y < 0) {
 		m_lastMove[DOWN] = true;
-		Physics::SetRotation(GetRealmID(), m_model_ID, Utils::Radians_Down);
+		m_frame_row = 3;
 	}
 	else if (nVelocity.y > 0) {
 		m_lastMove[UP] = true;
-		Physics::SetRotation(GetRealmID(), m_model_ID, Utils::Radians_Up);
+		m_frame_row = 2;
 	}
 
 	Physics::SetVelocity(GetRealmID(), m_model_ID, nVelocity);
@@ -153,12 +153,14 @@ void Pacman::OnProcessInput(const float deltaTIme)
 				df = -1;
 			}
 
+			m_frame_col = current_frame;
 			m_timer.Start();
 		}
 	}
 
 	if (nVelocity == Vec2d::Zero()) {
 		current_frame = 1;
+		m_frame_col = 1;
 	}
 }
 
@@ -202,7 +204,14 @@ void Pacman::OnRender()
 	using namespace rdt;
 
 	Renderer::Begin(PACMAN_LAYER);
-	Renderer::SetPolygonTexture("pacman", current_frame, 0);
+
+	if (current_frame == 2) {
+		Renderer::SetPolygonTexture("pacman", 2, 0);
+	}
+	else {
+		Renderer::SetPolygonTexture("pacman", m_frame_col, m_frame_row);
+	}
+
 	Renderer::AddPolygon(Physics::GetPolygon(GetRealmID(), m_model_ID));
 	Renderer::End();
 }
@@ -218,13 +227,18 @@ void Pacman::Respawn()
 
 	Physics::SetPosition(GetRealmID(), m_model_ID, { PACMAN_SPAWN_X, m_map->GetWorldCoordinates({12, 22}).y});
 	Physics::SetVelocity(GetRealmID(), m_model_ID, { 0, 0 });
-	Physics::SetRotation(GetRealmID(), m_model_ID, Utils::Radians_Right);
+	m_frame_col = 0;
 }
 
 rdt::Vec2i Pacman::GetMapCoordinates()
 {
 	const Vec2d location = Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
 	return m_map->GetMapCoordinates(location);
+}
+
+rdt::Vec2d Pacman::GetWorldCoordinates()
+{
+	return Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
 }
 
 void Pacman::UpdateBorderCheck(const rdt::Vec2i& mapCoords)

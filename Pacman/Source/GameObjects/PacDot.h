@@ -29,4 +29,6 @@ public:
 	void Reset();
 	void MakePowerDot();
 	bool IsPowerDot();
+
+	bool ShouldEat(const rdt::Vec2d& position);
 };

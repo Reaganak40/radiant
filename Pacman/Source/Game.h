@@ -30,7 +30,7 @@
 
 // the pixel offset from y = 0.
 #define TILE_OFFSET_Y 45
-#define TILE_OFFSET_X -30
+#define TILE_OFFSET_X -32
 
 #define MAP_LAYER 0
 #define PAC_DOT_LAYER 1

@@ -18,6 +18,8 @@ private:
 	Map* m_map;
 	int current_frame;
 	int df;
+	int m_frame_row;
+	int m_frame_col;
 
 	rdt::Timer m_timer;
 
@@ -36,6 +38,7 @@ public:
 	void Respawn();
 
 	rdt::Vec2i GetMapCoordinates();
+	rdt::Vec2d GetWorldCoordinates();
 
 private:
 	void UpdateBorderCheck(const rdt::Vec2i& mapCoords);

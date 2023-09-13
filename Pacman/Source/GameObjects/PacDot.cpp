@@ -1,5 +1,7 @@
 #include "PacDot.h"
 
+using namespace rdt;
+
 PacDot::PacDot(double xPos, double yPos)
 	: m_blinking_timer(0.35)
 {
@@ -15,8 +17,6 @@ PacDot::~PacDot()
 
 void PacDot::OnBind()
 {
-	using namespace rdt;
-
 	int extra_size = 0;
 	if (m_power_dot) {
 		extra_size = 10;
@@ -98,4 +98,15 @@ void PacDot::MakePowerDot()
 bool PacDot::IsPowerDot()
 {
 	return m_power_dot;
+}
+
+bool PacDot::ShouldEat(const rdt::Vec2d& suspect_position)
+{
+	const Vec2d location = Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
+	double error = TILE_WIDTH / 3;
+
+	if (abs(suspect_position.x - location.x) < error && abs(suspect_position.y - location.y) < error) {
+		return true;
+	}
+	return false;
 }

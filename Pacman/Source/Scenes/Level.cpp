@@ -6,7 +6,7 @@
 using namespace rdt;
 
 Level::Level()
-	: previously_bounded(false), loaded_textures(false), m_power_timer(10.0)
+	: previously_bounded(false), loaded_textures(false), m_power_timer(10.0), ghosts_blinking(false)
 {
 	for (int i = 0; i < NUM_TILES_Y; i++) {
 		m_dotMap[i].fill(nullptr);
@@ -25,7 +25,7 @@ void Level::OnRegister()
 
 	if (!loaded_textures) {
 		Texture& pacmanTex = TextureManager::LoadTextureFromPNG("pacman", "Resources/Textures/pacman.png");
-		pacmanTex.DefineTextureAtlas(51, 51, 1, 12, 16);
+		pacmanTex.DefineTextureAtlas(51, 51, 4, 3, 16);
 
 		TextureManager::LoadTextureFromPNG("map", "Resources/Textures/map.png");
 
@@ -147,7 +147,7 @@ void Level::OnRender()
 {
 	Vec2i pacmanCoords = ((Pacman*)m_game_objects[0])->GetMapCoordinates();
 	PacDot* dot = m_dotMap[pacmanCoords.y][pacmanCoords.x];
-	if (dot != nullptr && !dot->IsEaten()) {
+	if (dot != nullptr && !dot->IsEaten() && dot->ShouldEat(((Pacman*)m_game_objects[0])->GetWorldCoordinates())) {
 		dot->Eat();
 
 		if (dot->IsPowerDot()) {

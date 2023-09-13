@@ -203,7 +203,7 @@ void Ghost::OnFinalUpdate()
 {
 	const Vec2d location = Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
 	const Vec2d worldCoords = m_map->GetWorldCoordinates(m_target_coords);
-	double error = TILE_WIDTH / 4;
+	double error = TILE_WIDTH / 5;
 	
 	if (m_is_home) {
 

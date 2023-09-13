@@ -4,7 +4,7 @@
 namespace rdt {
 
 	Timer::Timer(float secondInterval)
-		: m_maxTime(secondInterval), m_is_running(false)
+		: m_maxTime(secondInterval), m_is_running(false), m_timeLeft(0)
 	{
 	}
 
