@@ -133,6 +133,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\GameObjects\Ghost.cpp" />
     <ClCompile Include="Source\GameObjects\Map.cpp" />
     <ClCompile Include="Source\GameObjects\PacDot.cpp" />
     <ClCompile Include="Source\GameObjects\Pacman.cpp" />
@@ -141,6 +142,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Game.h" />
+    <ClInclude Include="Source\GameObjects\Ghost.h" />
     <ClInclude Include="Source\GameObjects\Map.h" />
     <ClInclude Include="Source\GameObjects\PacDot.h" />
     <ClInclude Include="Source\GameObjects\Pacman.h" />
@@ -152,6 +154,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Resources\Textures\ghost.png" />
     <Image Include="Resources\Textures\map.png" />
     <Image Include="Resources\Textures\pacman.png" />
   </ItemGroup>

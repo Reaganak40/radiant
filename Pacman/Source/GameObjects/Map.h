@@ -3,7 +3,6 @@
 
 #define MAP_WIDTH 600
 #define MAP_HEIGHT 664
-#define MAP_LAYER 0
 
 class Map : public rdt::GameObject {
 private:

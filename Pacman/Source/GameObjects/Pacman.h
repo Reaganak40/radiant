@@ -1,7 +1,6 @@
 #include "Game.h"
 #include "Map.h"
 
-#define PACMAN_LAYER 2
 
 enum PacmanMove {
 	UP = 0,

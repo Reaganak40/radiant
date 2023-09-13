@@ -12,10 +12,10 @@ Pacman::Pacman(double xPos, double yPos)
 	spawnPos.x = xPos;
 	spawnPos.y = yPos;
 
-	left_cond = std::vector<InputState>{ A_KEY_PRESS, A_KEY_DOWN };
-	right_cond = std::vector<InputState>{ D_KEY_PRESS, D_KEY_DOWN };
-	up_cond = std::vector<InputState>{ W_KEY_PRESS, W_KEY_DOWN };
-	down_cond = std::vector<InputState>{ S_KEY_PRESS, S_KEY_DOWN };
+	left_cond = std::vector<InputState>{ A_KEY_PRESS, A_KEY_DOWN, LEFT_KEY_DOWN, LEFT_KEY_PRESS };
+	right_cond = std::vector<InputState>{ D_KEY_PRESS, D_KEY_DOWN, RIGHT_KEY_DOWN, RIGHT_KEY_PRESS };
+	up_cond = std::vector<InputState>{ W_KEY_PRESS, W_KEY_DOWN, UP_KEY_DOWN, UP_KEY_PRESS };
+	down_cond = std::vector<InputState>{ S_KEY_PRESS, S_KEY_DOWN, DOWN_KEY_DOWN, DOWN_KEY_PRESS };
 
 	m_map = nullptr;
 	current_frame = 1;

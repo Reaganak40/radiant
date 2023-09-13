@@ -8,6 +8,8 @@
 #define PACMAN_SPAWN_X 300
 #define PACMAN_SPAWN_Y 195
 
+#define GHOST_SPEITE_WIDTH 28
+
 // the pixel width of a tile
 #define TILE_WIDTH 21.5
 
@@ -20,3 +22,8 @@
 // the pixel offset from y = 0.
 #define TILE_OFFSET_Y 45
 #define TILE_OFFSET_X -30
+
+#define MAP_LAYER 0
+#define PAC_DOT_LAYER 1
+#define PACMAN_LAYER 2
+#define GHOST_LAYER 3

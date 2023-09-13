@@ -1,6 +1,7 @@
 #include "Level.h"
 #include "GameObjects/Pacman.h"
 #include "GameObjects/Map.h"
+#include "GameObjects/Ghost.h"
 
 using namespace rdt;
 
@@ -27,6 +28,9 @@ void Level::OnRegister()
 		pacmanTex.DefineTextureAtlas(51, 51, 1, 12, 16);
 
 		TextureManager::LoadTextureFromPNG("map", "Resources/Textures/map.png");
+
+		Texture& ghostTex = TextureManager::LoadTextureFromPNG("ghost", "Resources/Textures/ghost.png");
+		ghostTex.DefineTextureAtlas(111, 111, 4, 12, 16);
 	}
 
 	Pacman* pacman;
@@ -38,6 +42,7 @@ void Level::OnRegister()
 	map->RegisterToRealm(m_realms[0]);
 	pacman->AddMapPtr(map);
 
+	/* Adds dots to the map. */
 	for (int row = 0; row < NUM_TILES_Y; row++) {
 		for (int col = 0; col < NUM_TILES_X; col++) {
 
@@ -61,6 +66,26 @@ void Level::OnRegister()
 			}
 		}
 	}
+
+	Ghost* blinky;
+	m_game_objects.push_back(blinky = new Ghost(BLINKY));
+	blinky->RegisterToRealm(m_realms[0]);
+	blinky->AddMapPtr(map);
+
+	Ghost* inky;
+	m_game_objects.push_back(inky = new Ghost(INKY));
+	inky->RegisterToRealm(m_realms[0]);
+	inky->AddMapPtr(map);
+
+	Ghost* pinky;
+	m_game_objects.push_back(pinky = new Ghost(PINKY));
+	pinky->RegisterToRealm(m_realms[0]);
+	pinky->AddMapPtr(map);
+
+	Ghost* clyde;
+	m_game_objects.push_back(clyde = new Ghost(CLYDE));
+	clyde->RegisterToRealm(m_realms[0]);
+	clyde->AddMapPtr(map);
 
 	m_GUIs.push_back(new DiagnosticsGUI);
 }

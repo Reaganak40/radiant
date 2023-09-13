@@ -1,17 +1,26 @@
+#pragma once
+
 #include "Game.h"
+#include "Map.h"
 
-#define PAC_DOT_WIDTH 5
+enum GhostName {
+	BLINKY,
+	INKY,
+	PINKY,
+	CLYDE
+};
 
-class PacDot : public rdt::GameObject {
+class Ghost : public rdt::GameObject {
 private:
+	GhostName m_name;
 	rdt::Vec2d spawnPos;
-	rdt::Color m_color;
 
-	bool m_eaten;
-
+	int m_frame_row;
+	int m_frame_col;
+	Map* m_map;
 public:
-	PacDot(double xPos, double yPos);
-	~PacDot();
+	Ghost(GhostName nName);
+	~Ghost();
 
 	void OnBind() override final;
 	void OnRelease() override final;
@@ -19,8 +28,6 @@ public:
 	void OnFinalUpdate() override final;
 	void OnRender() override final;
 
-	void SetColor(rdt::Color nColor);
+	void AddMapPtr(Map* nMap);
 
-	void Eat();
-	void Reset();
 };

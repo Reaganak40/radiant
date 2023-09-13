@@ -30,6 +30,9 @@
     <ClCompile Include="Source\GameObjects\PacDot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\GameObjects\Ghost.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Game.h">
@@ -47,12 +50,18 @@
     <ClInclude Include="Source\GameObjects\PacDot.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GameObjects\Ghost.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Textures\pacman.png">
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="Resources\Textures\map.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\Textures\ghost.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
