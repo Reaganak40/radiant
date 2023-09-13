@@ -29,6 +29,8 @@ private:
 	bool m_is_home;
 
 	bool m_is_vulnerable;
+	bool m_is_blinking;
+	rdt::Timer m_blink_timer;
 
 public:
 	Ghost(GhostName nName);
@@ -43,6 +45,7 @@ public:
 	void AddMapPtr(Map* nMap);
 
 	void SetVulnerable(bool state);
+	void SetIsBlinking(bool blink);
 
 private:
 	void SelectNewTarget();

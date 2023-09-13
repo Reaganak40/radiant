@@ -6,6 +6,7 @@ class Level : public rdt::Scene {
 private:
 	bool previously_bounded;
 	bool loaded_textures;
+	bool ghosts_blinking;
 
 	rdt::Timer m_power_timer;
 
@@ -23,4 +24,5 @@ public:
 private:
 	void ActivatePowerMode();
 	void DeactivatePowerMode();
+	void StartBlinking();
 };

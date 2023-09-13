@@ -122,6 +122,11 @@ void Level::OnProcessInput(const float deltaTime)
 		if (m_power_timer.Update(deltaTime)) {
 			DeactivatePowerMode();
 		}
+		else if (m_power_timer.GetTimeLeft() <= 5) {
+			if (!ghosts_blinking) {
+				StartBlinking();
+			}
+		}
 	}
 
 	RunProcessInputQueue(deltaTime);
@@ -164,6 +169,7 @@ void Level::ActivatePowerMode()
 			((Ghost*)m_game_objects.at(i))->SetVulnerable(true);
 		}
 	}
+	ghosts_blinking = false;
 }
 
 void Level::DeactivatePowerMode()
@@ -172,4 +178,15 @@ void Level::DeactivatePowerMode()
 	for (int i = 2; i <= 5; i++) {
 		((Ghost*)m_game_objects.at(i))->SetVulnerable(false);
 	}
+
+	ghosts_blinking = false;
+}
+
+void Level::StartBlinking()
+{
+	// ghosts start at index 2
+	for (int i = 2; i <= 5; i++) {
+		((Ghost*)m_game_objects.at(i))->SetIsBlinking(true);
+	}
+	ghosts_blinking = true;
 }

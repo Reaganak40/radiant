@@ -3,7 +3,7 @@
 using namespace rdt;
 
 Ghost::Ghost(GhostName nName)
-	: m_frame_timer(0.35)
+	: m_frame_timer(0.35), m_blink_timer(0.20)
 {
 	m_name = nName;
 	spawnPos = Vec2d::Zero();
@@ -150,12 +150,12 @@ void Ghost::OnProcessInput(const float deltaTime)
 			// time to leave base
 
 			if (location.x > BLINKY_HOME_X) {
-				nVelocity.x = -m_speed * 0.50;
+				nVelocity.x = -GHOST_SPEED * 0.50;
 				m_direction = PacmanMoveDirection::LEFT;
 				Look(m_direction);
 			}
 			else if (location.x < BLINKY_HOME_X) {
-				nVelocity.x = m_speed * 0.50;
+				nVelocity.x = GHOST_SPEED * 0.50;
 				m_direction = PacmanMoveDirection::RIGHT;
 				Look(m_direction);
 			}
@@ -164,7 +164,7 @@ void Ghost::OnProcessInput(const float deltaTime)
 					m_direction = PacmanMoveDirection::UP;
 					Look(m_direction);
 				}
-				nVelocity.y = m_speed * 0.25;
+				nVelocity.y = GHOST_SPEED * 0.45;
 			}
 		}
 		Physics::SetVelocity(GetRealmID(), m_model_ID, nVelocity);
@@ -182,6 +182,19 @@ void Ghost::OnProcessInput(const float deltaTime)
 			}
 
 			m_frame_timer.Start();
+		}
+	}
+
+	if (m_blink_timer.IsRunning()) {
+		if (m_blink_timer.Update(deltaTime)) {
+			if (m_frame_col < 10) {
+				m_frame_col += 2;
+			}
+			else {
+				m_frame_col -= 2;
+			}
+
+			m_blink_timer.Start();
 		}
 	}
 }
@@ -290,15 +303,21 @@ void Ghost::AddMapPtr(Map* nMap)
 
 void Ghost::SetVulnerable(bool state)
 {
-	m_is_vulnerable = state;
 
-	if (m_is_vulnerable) {
+	if (state) {
 
 		m_frame_col = 8;
 		m_frame_row = 0;
 		df = 1;
+		SetIsBlinking(false);
+
+		if (m_is_vulnerable != state) {
+			m_speed *= 0.40;
+		}
 	}
 	else {
+		SetIsBlinking(false);
+
 		switch (m_name) {
 		case BLINKY:
 			m_frame_row = 0;
@@ -318,6 +337,25 @@ void Ghost::SetVulnerable(bool state)
 		}
 
 		Look(m_direction);
+
+		m_speed = GHOST_SPEED;
+		if (m_name == BLINKY) {
+			m_speed += 50;
+		}
+	}
+
+	m_is_vulnerable = state;
+}
+
+void Ghost::SetIsBlinking(bool blink)
+{
+	m_is_blinking = blink;
+
+	if (m_is_blinking) {
+		m_blink_timer.Start();
+	}
+	else {
+		m_blink_timer.End();
 	}
 }
 
