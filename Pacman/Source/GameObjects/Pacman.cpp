@@ -18,8 +18,8 @@ Pacman::Pacman(double xPos, double yPos)
 	down_cond = std::vector<InputState>{ S_KEY_PRESS, S_KEY_DOWN, DOWN_KEY_DOWN, DOWN_KEY_PRESS };
 
 	m_map = nullptr;
-	current_frame = 1;
-	df = 1;
+	current_frame = 2;
+	df = -1;
 
 }
 
@@ -32,7 +32,8 @@ void Pacman::OnBind()
 	std::shared_ptr<Rect> sprite;
 	m_model_ID = Physics::CreateObject(GetRealmID(), sprite = std::make_shared<Rect>(spawnPos, PACMAN_SPRITE_WIDTH, PACMAN_SPRITE_WIDTH));
 
-	Physics::SetObjectProperties(GetRealmID(), m_model_ID, ppRigid);
+	Physics::SetObjectProperties(GetRealmID(), m_model_ID, DontResolve);
+	Physics::AddPTag(GetRealmID(), m_model_ID, "pacman");
 	Physics::SetAcceleration(GetRealmID(), m_model_ID, Vec2d::Zero());
 	Physics::SetFriction(GetRealmID(), m_model_ID, 0);
 
@@ -46,9 +47,17 @@ void Pacman::OnRelease()
 
 void Pacman::OnProcessInput(const float deltaTIme)
 {
+	Vec2d nVelocity = Physics::GetVelocity(GetRealmID(), m_model_ID);
+	if (m_paused) {
+		return;
+	}
+	else if (m_spawned) {
+		nVelocity.x = PACMAN_SPEED;
+		m_spawned = false;
+	}
+
 	const Vec2d location = Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
 	Vec2i mapCoords = m_map->GetMapCoordinates(location);
-	Vec2d nVelocity = Physics::GetVelocity(GetRealmID(), m_model_ID);
 	Vec2d centeredCoords = m_map->GetWorldCoordinates(mapCoords);
 
 	UpdateBorderCheck(mapCoords);
@@ -166,6 +175,10 @@ void Pacman::OnProcessInput(const float deltaTIme)
 
 void Pacman::OnFinalUpdate()
 {
+	if (m_paused) {
+		return;
+	}
+
 	const Vec2d location = Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
 
 	if (location.x < 0 - (PACMAN_SPRITE_WIDTH/2)) {
@@ -228,6 +241,7 @@ void Pacman::Respawn()
 	Physics::SetPosition(GetRealmID(), m_model_ID, { PACMAN_SPAWN_X, m_map->GetWorldCoordinates({12, 22}).y});
 	Physics::SetVelocity(GetRealmID(), m_model_ID, { 0, 0 });
 	m_frame_col = 0;
+	m_spawned = true;
 }
 
 rdt::Vec2i Pacman::GetMapCoordinates()
@@ -239,6 +253,11 @@ rdt::Vec2i Pacman::GetMapCoordinates()
 rdt::Vec2d Pacman::GetWorldCoordinates()
 {
 	return Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
+}
+
+void Pacman::SetPause(bool pause)
+{
+	m_paused = pause;
 }
 
 void Pacman::UpdateBorderCheck(const rdt::Vec2i& mapCoords)

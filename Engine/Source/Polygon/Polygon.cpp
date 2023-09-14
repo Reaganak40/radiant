@@ -49,6 +49,11 @@ namespace rdt {
         return m_height;
     }
 
+    double Polygon::GetRotation() const
+    {
+        return m_rotation;
+    }
+
     const UniqueID Polygon::GetUUID() const
     {
         return m_UUID;

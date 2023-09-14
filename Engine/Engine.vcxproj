@@ -169,6 +169,7 @@
     <ClCompile Include="Source\Physics\Collision.cpp" />
     <ClCompile Include="Source\Physics\Physics.cpp" />
     <ClCompile Include="Source\Physics\Pobject.cpp" />
+    <ClCompile Include="Source\Physics\Ptag.cpp" />
     <ClCompile Include="Source\Physics\Realm.cpp" />
     <ClCompile Include="Source\Physics\Translation.cpp" />
     <ClCompile Include="Source\Polygon\Circle.cpp" />
@@ -267,6 +268,7 @@
     <ClInclude Include="Source\Physics\Collision.h" />
     <ClInclude Include="Source\Physics\Physics.h" />
     <ClInclude Include="Source\Physics\Pobject.h" />
+    <ClInclude Include="Source\Physics\Ptag.h" />
     <ClInclude Include="Source\Physics\Realm.h" />
     <ClInclude Include="Source\Physics\Translation.h" />
     <ClInclude Include="Source\Polygon\Circle.h" />

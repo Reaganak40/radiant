@@ -12,6 +12,13 @@ namespace rdt {
 		Collision() {}
 		~Collision() {}
 
+
+		/*
+			Takes two physics objects and chooses the best collision test for the two, returns
+			true if there was a collision.
+		*/
+		static bool CheckCollision(Pobject& source, const Pobject& suspect, const float deltaTime);
+
 		/*
 			Test for collision betwen two polygons using seperated axis theorem.
 		*/
@@ -25,7 +32,7 @@ namespace rdt {
 		/*
 			Tests for collisions of two rects on the same axis using AABB theorem.
 		*/
-		static bool CheckCollisionAABB(const Rect& A, const Rect& B);
+		static bool CheckCollisionAABB(const Polygon& A, const Polygon& B);
 
 		/*
 			Resolves static collisions, and returns true if there was collision resolution.

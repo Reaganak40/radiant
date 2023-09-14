@@ -23,6 +23,9 @@ private:
 
 	rdt::Timer m_timer;
 
+	bool m_paused;
+	bool m_spawned;
+
 public:
 	Pacman(double xPos, double yPos);
 	~Pacman();
@@ -39,6 +42,7 @@ public:
 
 	rdt::Vec2i GetMapCoordinates();
 	rdt::Vec2d GetWorldCoordinates();
+	void SetPause(bool pause);
 
 private:
 	void UpdateBorderCheck(const rdt::Vec2i& mapCoords);

@@ -5,6 +5,24 @@
 #include "Renderer/Renderer.h"
 #include "Utils/Input.h"
 
+bool rdt::Collision::CheckCollision(Pobject& source, const Pobject& suspect, const float deltaTime)
+{
+	
+	if (source.m_polygon->CheckProperties(IsRect) && suspect.m_polygon->CheckProperties(IsRect)) {
+
+		if (source.m_polygon->GetRotation() == 0 && suspect.m_polygon->GetRotation() == 0) {
+			
+			if (source.HasProperties(DontResolve)) {
+				return CheckCollisionAABB(*source.m_polygon, *suspect.m_polygon);
+			}
+
+			return SweptAABB(source, suspect, deltaTime);
+		}
+	}
+
+	return false;
+}
+
 bool rdt::Collision::CheckCollisionSAT(const Polygon& A, const Polygon& B)
 {
 	/*
@@ -97,7 +115,7 @@ bool rdt::Collision::CheckCollisionSAT(const Circle& A, const Polygon& B)
 	return true;
 }
 
-bool rdt::Collision::CheckCollisionAABB(const Rect& A, const Rect& B)
+bool rdt::Collision::CheckCollisionAABB(const Polygon& A, const Polygon& B)
 {
 	const std::vector<Vec2d>& A_vertices = A.GetVertices();
 	const std::vector<Vec2d>& B_vertices = B.GetVertices();

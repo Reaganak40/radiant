@@ -2,6 +2,7 @@
 
 #include "Game.h"
 #include "Map.h"
+#include "Pacman.h"
 
 enum GhostName {
 	BLINKY,
@@ -32,6 +33,10 @@ private:
 	bool m_is_blinking;
 	rdt::Timer m_blink_timer;
 
+	bool m_paused;
+
+	Pacman* m_pacman_ptr;
+
 public:
 	Ghost(GhostName nName);
 	~Ghost();
@@ -46,8 +51,14 @@ public:
 
 	void SetVulnerable(bool state);
 	void SetIsBlinking(bool blink);
+	void SetPause(bool pause);
+
+	void SetPacmanPtr(Pacman* pacman);
 
 private:
 	void SelectNewTarget();
 	void Look(PacmanMoveDirection direction);
+
+	void ResolveCollisions();
+	void FinalUpdatePosition();
 };

@@ -90,6 +90,15 @@ namespace rdt {
 		*/
 		static const Polygon& GetPolygon(const UniqueID realmID, const UniqueID objectID) { return m_instance->GetPolygonImpl(realmID, objectID); }
 
+		
+		/*
+			Adds a tag to the physics object, which will be used to interact with other objects.
+		*/
+		static void AddPTag(const UniqueID realmID, const UniqueID objectID, const std::string& tagName) { m_instance->AddPTagImpl(tagName, realmID, objectID); }
+		
+
+		static bool IsCollided(const UniqueID realmID, const UniqueID object1, const UniqueID object2) { return m_instance->IsCollidedImpl(realmID, object1, object2); }
+
 		/*
 			Sets the friction magnitude of the specified object. [0 to 1], where 0 is
 			no friction, and 1 is maximum friction.
@@ -153,6 +162,8 @@ private:
 
 		UniqueID CreateObjectImpl(const UniqueID realmID, std::shared_ptr<Polygon> polygon);
 		
+		bool IsCollidedImpl(const UniqueID realmID, const UniqueID object1, const UniqueID object2);
+		void AddPTagImpl(const std::string& tagName, const UniqueID realmID, const UniqueID objectID);
 		void SetAccelerationImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nAcceleration);
 		void SetAccelerationXImpl(const UniqueID realmID, const UniqueID objectID, const double nX);
 		void SetAccelerationYImpl(const UniqueID realmID, const UniqueID objectID, const double nY);

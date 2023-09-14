@@ -1,12 +1,14 @@
 #pragma once
 #include "Polygon/Polygon.h"
-#include "Physics/Translation.h"
+#include "Translation.h"
+#include "Ptag.h"
 
 namespace rdt {
 
 	enum PhysicalProperties {
-		ppRigid = 1,
-		ppBouncy = 2
+		NoCollision = 1,
+		ppBouncy = 2,
+		DontResolve = 4,
 	};
 	class Pobject {
 	private:
@@ -14,6 +16,8 @@ namespace rdt {
 		Translation translation;
 		unsigned int m_properties;
 
+		std::set<Ptag> m_tags;
+		std::set<UniqueID> m_collided_objects;
 	public:
 		
 		Pobject(std::shared_ptr<Polygon> m_polygon = std::shared_ptr<Polygon>());
@@ -24,6 +28,15 @@ namespace rdt {
 		void SetProperties(const unsigned int nProperties);
 		void RemoveProperties(const unsigned int rProperties);
 		bool HasProperties(const unsigned int propertyQuery);
+
+		void AddTag(Ptag ntag);
+
+		bool ShareTags(const Pobject& oObject);
+
+		void ResetCollisions();
+		void AddCollision(const UniqueID objectID);
+		bool IsCollidedWith(const UniqueID objectID);
+		bool CollisionDetected();
 
 		friend class Realm;
 		friend class Physics;

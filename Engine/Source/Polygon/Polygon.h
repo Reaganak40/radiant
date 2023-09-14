@@ -59,6 +59,11 @@ namespace rdt {
 		double GetHeight() const;
 
 		/*
+			Gets the rotation of this polygon in radians.
+		*/
+		double GetRotation() const;
+
+		/*
 			Returns the unique identifier for this polygon.
 		*/
 		const UniqueID GetUUID() const;

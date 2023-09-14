@@ -39,6 +39,11 @@ namespace rdt {
 		const UniqueID GetRealmID() { return m_realmID; }
 
 		/*
+			Gets the ID to identify the physics object in the realm.
+		*/
+		const UniqueID GetModelID() { return m_model_ID; }
+
+		/*
 			To implement function when the scene this object belongs to is
 			being binded.
 		*/

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Physics.h"
+#include "Ptag.h"
 #include "Collision.h"
 
 #include "Utils/Input.h"
@@ -132,6 +133,43 @@ namespace rdt {
             return 0;
         }
         return m_realms.at(realmID)->CreatePhysicsObject(polygon);
+    }
+
+    bool Physics::IsCollidedImpl(const UniqueID realmID, const UniqueID object1, const UniqueID object2)
+    {
+        if (m_realms.find(realmID) == m_realms.end()) {
+            return false;
+        }
+
+        Pobject* object1_ptr = m_realms.at(realmID)->GetPhysicsObject(object1);
+        if (object1_ptr == nullptr) {
+            return false;
+        }
+
+        if (m_realms.at(realmID)->GetPhysicsObject(object2) == nullptr) {
+            return false;
+        }
+
+        return object1_ptr->IsCollidedWith(object2);
+    }
+
+    void Physics::AddPTagImpl(const std::string& tagName, const UniqueID realmID, const UniqueID objectID)
+    {
+        if (m_realms.find(realmID) == m_realms.end()) {
+            return;
+        }
+
+        Pobject* object = m_realms.at(realmID)->GetPhysicsObject(objectID);
+        if (object == nullptr) {
+            return;
+        }
+
+        Ptag ntag;
+        if ((ntag = PtagManager::GetTag(tagName)) == 0) {
+            ntag = PtagManager::CreateTag(tagName);
+        }
+
+        object->AddTag(ntag);
     }
 
     void Physics::SetAccelerationImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nAcceleration)

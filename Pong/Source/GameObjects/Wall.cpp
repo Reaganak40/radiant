@@ -16,7 +16,7 @@ void Wall::OnBind()
 	using namespace rdt;
 	m_model_ID = Physics::CreateObject(GetRealmID(), std::make_shared<Rect>(spawnPos, WALL_WIDTH, WALL_HEIGHT));
 
-	Physics::SetObjectProperties(GetRealmID(), m_model_ID, ppRigid);
+	Physics::SetObjectProperties(GetRealmID(), m_model_ID, NoCollision);
 }
 
 void Wall::OnProcessInput(const float deltaTIme)

@@ -6,6 +6,7 @@
 #include "Physics/Physics.h"
 #include "Gui/GuiManager.h"
 #include "Scene/SceneManager.h"
+#include "Physics/Ptag.h"
 
 namespace rdt
 {
@@ -21,6 +22,7 @@ namespace rdt
 		SceneManager::Destroy();
 		GuiManager::Destroy();
 		Physics::Destroy();
+		PtagManager::Destroy();
 		Input::Destroy();
 		TextureManager::Destroy();
 		Renderer::Destroy();
@@ -33,6 +35,7 @@ namespace rdt
 		Renderer::CreateWindow(appName, windowWidth, windowHeight, resizable);
 		TextureManager::Initialize();
 		Input::Initialize();
+		PtagManager::Initialize();
 		Physics::Initialize();
 		GuiManager::Initialize();
 		SceneManager::Initialize();

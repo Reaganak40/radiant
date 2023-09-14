@@ -4,38 +4,47 @@
 
 namespace rdt {
 
-	Realm::Realm()
+    Realm::Realm()
         : m_ID(GetUniqueID())
-	{
-	}
+    {
+    }
 
-	Realm::~Realm()
-	{
+    Realm::~Realm()
+    {
         FreeUniqueID(m_ID);
-	}
+    }
 
-	void Realm::OnUpdate(const float deltaTime)
-	{
+    void Realm::OnUpdate(const float deltaTime)
+    {
+        for (auto& [id, object] : m_objects) {
+            if (!object.HasProperties(NoCollision)) {
+                object.ResetCollisions();
+            }
+        }
+
         for (auto& [id1, object1] : m_objects) {
 
             object1.translation.UpdateVelocity(deltaTime);
 
             bool collisionDetected = false;
 
-            if (!object1.HasProperties(ppRigid)) {
+            if (!object1.HasProperties(NoCollision)) {
 
                 for (auto& [id2, object2] : m_objects) {
-                    if (id1 == id2) {
+                    if (id1 == id2 || !object1.ShareTags(object2)) {
                         continue;
                     }
 
-                    if (Collision::SweptAABB(object1, object2, deltaTime)) {
+                    if (Collision::CheckCollision(object1, object2, deltaTime)) {
                         collisionDetected = true;
+                        object1.AddCollision(id2);
+                        object2.AddCollision(id1);
                     }
                 }
             }
 
-            if (!collisionDetected || !object1.HasProperties(ppBouncy)) {
+
+            if (object1.HasProperties(NoCollision) || !collisionDetected || !object1.HasProperties(ppBouncy)) {
                 object1.translation.Translate(*object1.m_polygon, deltaTime);
             }
         }

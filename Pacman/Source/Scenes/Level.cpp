@@ -6,7 +6,8 @@
 using namespace rdt;
 
 Level::Level()
-	: previously_bounded(false), loaded_textures(false), m_power_timer(10.0), ghosts_blinking(false)
+	: previously_bounded(false), loaded_textures(false), m_power_timer(10.0), ghosts_blinking(false),
+	m_spawn_timer(2.5)
 {
 	for (int i = 0; i < NUM_TILES_Y; i++) {
 		m_dotMap[i].fill(nullptr);
@@ -20,6 +21,7 @@ Level::~Level()
 void Level::OnRegister()
 {
 	if (m_realms.size() == 0) {
+		m_realms.push_back(Physics::CreateRealm());
 		m_realms.push_back(Physics::CreateRealm());
 	}
 
@@ -48,21 +50,27 @@ void Level::OnRegister()
 	m_game_objects.push_back(blinky = new Ghost(BLINKY));
 	blinky->RegisterToRealm(m_realms[0]);
 	blinky->AddMapPtr(map);
+	blinky->SetPacmanPtr(pacman);
 
 	Ghost* inky;
 	m_game_objects.push_back(inky = new Ghost(INKY));
 	inky->RegisterToRealm(m_realms[0]);
 	inky->AddMapPtr(map);
+	inky->SetPacmanPtr(pacman);
+
 
 	Ghost* pinky;
 	m_game_objects.push_back(pinky = new Ghost(PINKY));
 	pinky->RegisterToRealm(m_realms[0]);
 	pinky->AddMapPtr(map);
+	pinky->SetPacmanPtr(pacman);
+
 
 	Ghost* clyde;
 	m_game_objects.push_back(clyde = new Ghost(CLYDE));
 	clyde->RegisterToRealm(m_realms[0]);
 	clyde->AddMapPtr(map);
+	clyde->SetPacmanPtr(pacman);
 
 	/* Adds dots to the map. */
 	for (int row = 0; row < NUM_TILES_Y; row++) {
@@ -82,7 +90,7 @@ void Level::OnRegister()
 				Vec2d spawnPos = map->GetWorldCoordinates({ col, row });
 				PacDot* dot;
 				m_game_objects.push_back(dot = new PacDot(spawnPos.x, spawnPos.y));
-				dot->RegisterToRealm(m_realms[0]);
+				dot->RegisterToRealm(m_realms[1]);
 
 				if ((row == 22 || row == 2) && (col == 28 || col == 3)) {
 					dot->MakePowerDot();
@@ -111,9 +119,10 @@ void Level::OnBind()
 		Renderer::AttachGui(gui);
 	}
 
-	for (auto& realm : m_realms) {
-		Physics::ActivateRealm(realm);
-	}
+	Physics::ActivateRealm(m_realms[0]);
+
+	PauseGame();
+	m_spawn_timer.Start();
 }
 
 void Level::OnProcessInput(const float deltaTime)
@@ -126,6 +135,12 @@ void Level::OnProcessInput(const float deltaTime)
 			if (!ghosts_blinking) {
 				StartBlinking();
 			}
+		}
+	}
+
+	if (m_spawn_timer.IsRunning()) {
+		if (m_spawn_timer.Update(deltaTime)) {
+			ResumeGame();
 		}
 	}
 
@@ -189,4 +204,22 @@ void Level::StartBlinking()
 		((Ghost*)m_game_objects.at(i))->SetIsBlinking(true);
 	}
 	ghosts_blinking = true;
+}
+
+void Level::PauseGame()
+{
+	// ghosts start at index 2
+	for (int i = 2; i <= 5; i++) {
+		((Ghost*)m_game_objects.at(i))->SetPause(true);
+	}
+	((Pacman*)m_game_objects[0])->SetPause(true);
+}
+
+void Level::ResumeGame()
+{
+	// ghosts start at index 2
+	for (int i = 2; i <= 5; i++) {
+		((Ghost*)m_game_objects.at(i))->SetPause(false);
+	}
+	((Pacman*)m_game_objects[0])->SetPause(false);
 }
