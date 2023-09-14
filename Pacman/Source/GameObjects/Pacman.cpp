@@ -2,13 +2,8 @@
 
 using namespace rdt;
 Pacman::Pacman(double xPos, double yPos)
-	: m_timer(Timer(0.07))
+	: m_texture_timer(Timer(0.07))
 {
-	for (int i = 0; i < 4; i++) {
-		m_lastMove[i] = false;
-		m_onBorder[i] = false;
-	}
-
 	spawnPos.x = xPos;
 	spawnPos.y = yPos;
 
@@ -20,7 +15,6 @@ Pacman::Pacman(double xPos, double yPos)
 	m_map = nullptr;
 	current_frame = 2;
 	df = -1;
-
 }
 
 Pacman::~Pacman()
@@ -37,7 +31,7 @@ void Pacman::OnBind()
 	Physics::SetAcceleration(GetRealmID(), m_model_ID, Vec2d::Zero());
 	Physics::SetFriction(GetRealmID(), m_model_ID, 0);
 
-	m_timer.Start();
+	m_texture_timer.Start();
 	Respawn();
 }
 
@@ -45,132 +39,14 @@ void Pacman::OnRelease()
 {
 }
 
-void Pacman::OnProcessInput(const float deltaTIme)
+void Pacman::OnProcessInput(const float deltaTime)
 {
-	Vec2d nVelocity = Physics::GetVelocity(GetRealmID(), m_model_ID);
 	if (m_paused) {
 		return;
 	}
-	else if (m_spawned) {
-		nVelocity.x = PACMAN_SPEED;
-		m_spawned = false;
-	}
-
-	const Vec2d location = Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
-	Vec2i mapCoords = m_map->GetMapCoordinates(location);
-	Vec2d centeredCoords = m_map->GetWorldCoordinates(mapCoords);
-
-	UpdateBorderCheck(mapCoords);
-
-	m_lastMapCoords = mapCoords;
-
-	if (Input::CheckKeyboardState(right_cond)) {
-		nVelocity.x = PACMAN_SPEED;
-	}
-
-	else if (Input::CheckKeyboardState(left_cond)) {
-		nVelocity.x = -PACMAN_SPEED;
-	}
-
-	if (Input::CheckKeyboardState(up_cond)) {
-		nVelocity.y = PACMAN_SPEED;
-	}
-	else if (Input::CheckKeyboardState(down_cond)) {
-		nVelocity.y = -PACMAN_SPEED;
-	}
-
-	if (nVelocity.x < 0) {
-		if (m_onBorder[LEFT] && centeredCoords.x >= location.x) {
-			nVelocity.x = 0;
-		}
-	} else if (nVelocity.x > 0) {
-		if (m_onBorder[RIGHT] && centeredCoords.x <= location.x) {
-			nVelocity.x = 0;
-		}
-	}
-
-
-	if (nVelocity.y < 0) {
-		if (m_onBorder[DOWN] && centeredCoords.y >= location.y) {
-			nVelocity.y = 0;
-		}
-	} else if (nVelocity.y > 0) {
-		if (m_onBorder[UP] && centeredCoords.y <= location.y) {
-			nVelocity.y = 0;
-		}
-	}
-
-	if (nVelocity.x != 0 && nVelocity.y != 0) {
-
-		if (m_lastMove[UP] || m_lastMove[DOWN]) {
-			if (abs(location.y - centeredCoords.y) < (TILE_WIDTH / 3)) {
-				nVelocity.y = 0;
-			}
-			else {
-				nVelocity.x = 0;
-			}
-		}
-		else {
-			if (abs(location.x - centeredCoords.x) < (TILE_WIDTH / 3)) {
-				nVelocity.x = 0;
-			}
-			else {
-				nVelocity.y = 0;
-			}
-		}
-	}
-
-	if (nVelocity.y != 0 && (m_lastMove[LEFT] || m_lastMove[RIGHT])) {
-		Physics::SetPosition(GetRealmID(), m_model_ID, { centeredCoords.x,location.y });
-	}
-	else if (nVelocity.x != 0 && (m_lastMove[UP] || m_lastMove[DOWN])) {
-		Physics::SetPosition(GetRealmID(), m_model_ID, { location.x, centeredCoords.y });
-	}
-
-	for (int i = 0; i < 4; i++) {
-		m_lastMove[i] = false;
-	}
-
-
-	if (nVelocity.x > 0) {
-		m_lastMove[RIGHT] = true;
-		m_frame_row = 0;
-
-	} else if (nVelocity.x < 0) {
-		m_lastMove[LEFT] = true;
-		m_frame_row = 1;
-	}
-	else if (nVelocity.y < 0) {
-		m_lastMove[DOWN] = true;
-		m_frame_row = 3;
-	}
-	else if (nVelocity.y > 0) {
-		m_lastMove[UP] = true;
-		m_frame_row = 2;
-	}
-
-	Physics::SetVelocity(GetRealmID(), m_model_ID, nVelocity);
-
-	if (m_timer.IsRunning()) {
-		if (m_timer.Update(deltaTIme)) {
-			current_frame += df;
-
-			if (current_frame == 0) {
-				df = 1;
-			}
-			else if (current_frame == 2) {
-				df = -1;
-			}
-
-			m_frame_col = current_frame;
-			m_timer.Start();
-		}
-	}
-
-	if (nVelocity == Vec2d::Zero()) {
-		current_frame = 1;
-		m_frame_col = 1;
-	}
+	
+	UpdateVelocityAndDirection();
+	UpdateTextureFrame(deltaTime);
 }
 
 void Pacman::OnFinalUpdate()
@@ -179,37 +55,7 @@ void Pacman::OnFinalUpdate()
 		return;
 	}
 
-	const Vec2d location = Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
-
-	if (location.x < 0 - (PACMAN_SPRITE_WIDTH/2)) {
-		Physics::SetPosition(GetRealmID(), m_model_ID, { SCREEN_WIDTH, location.y });
-	} else if (location.x > SCREEN_WIDTH + (PACMAN_SPRITE_WIDTH/2)) {
-		Physics::SetPosition(GetRealmID(), m_model_ID, { 0, location.y });
-	}
-	else {
-		Vec2i mapCoords = m_map->GetMapCoordinates(location);
-		Vec2d centered_coords = m_map->GetWorldCoordinates(m_lastMapCoords);
-
-		if (m_lastMove[UP] && m_onBorder[UP]) {
-			if (mapCoords.y < m_lastMapCoords.y || centered_coords.y < location.y) {
-				Physics::SetPosition(GetRealmID(), m_model_ID, { location.x, centered_coords.y});
-			}
-		} else if (m_lastMove[DOWN] && m_onBorder[DOWN]) {
-			if (mapCoords.y > m_lastMapCoords.y || centered_coords.y > location.y) {
-				Physics::SetPosition(GetRealmID(), m_model_ID, { location.x, centered_coords.y });
-			}
-		}
-
-		if (m_lastMove[LEFT] && m_onBorder[LEFT]) {
-			if (mapCoords.x < m_lastMapCoords.x || centered_coords.x > location.x) {
-				Physics::SetPosition(GetRealmID(), m_model_ID, { centered_coords.x, location.y });
-			}
-		} else if (m_lastMove[RIGHT] && m_onBorder[RIGHT]) {
-			if (mapCoords.y < m_lastMapCoords.y || centered_coords.x < location.x) {
-				Physics::SetPosition(GetRealmID(), m_model_ID, { centered_coords.x, location.y });
-			}
-		}
-	}
+	ReAlignToMap();
 }
 
 void Pacman::OnRender()
@@ -260,11 +106,251 @@ void Pacman::SetPause(bool pause)
 	m_paused = pause;
 }
 
-void Pacman::UpdateBorderCheck(const rdt::Vec2i& mapCoords)
+void Pacman::UpdateVelocityAndDirection()
 {
-	m_onBorder[UP] = !m_map->IsInMap(mapCoords.y - 1, mapCoords.x);
-	m_onBorder[DOWN] = !m_map->IsInMap(mapCoords.y + 1, mapCoords.x);
+	Vec2d nVelocity = Vec2d::Zero();
 
-	m_onBorder[LEFT] = !m_map->IsInMap(mapCoords.y, mapCoords.x - 1);
-	m_onBorder[RIGHT] = !m_map->IsInMap(mapCoords.y, mapCoords.x + 1);
+	if (m_spawned) {
+		m_direction = PacmanMoveDirection::RIGHT;
+		m_spawned = false;
+	}
+
+	const Vec2d location = Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
+	Vec2i mapCoords = m_map->GetMapCoordinates(location);
+	Vec2d centeredCoords = m_map->GetWorldCoordinates(mapCoords);
+	bool options[4] = { false };
+	bool keys[4] = { true, true, true, true };
+
+	/* Check legal moves */
+	/* Check can move right. */
+	if ((m_direction == RIGHT || m_direction == LEFT) && (location.x < centeredCoords.x || m_map->IsInMap(mapCoords.y, mapCoords.x + 1))) {
+		options[RIGHT] = true;
+	}
+	else if (location.y == centeredCoords.y && m_map->IsInMap(mapCoords.y, mapCoords.x + 1)) {
+		options[RIGHT] = true;
+	}
+
+	/* Check can move left. */
+	if ((m_direction == RIGHT || m_direction == LEFT) && (location.x > centeredCoords.x || m_map->IsInMap(mapCoords.y, mapCoords.x - 1))) {
+		options[LEFT] = true;
+	}
+	else if (location.y == centeredCoords.y && m_map->IsInMap(mapCoords.y, mapCoords.x - 1)) {
+		options[LEFT] = true;
+	}
+
+	/* Check can move up. */
+	if ((m_direction == UP || m_direction == DOWN) && (location.y < centeredCoords.y || m_map->IsInMap(mapCoords.y - 1, mapCoords.x))) {
+		options[UP] = true;
+	}
+	else if (location.x == centeredCoords.x && m_map->IsInMap(mapCoords.y - 1, mapCoords.x)) {
+		options[UP] = true;
+	}
+
+	/* Check can move down. */
+	if ((m_direction == UP || m_direction == DOWN) && (location.y > centeredCoords.y || m_map->IsInMap(mapCoords.y + 1, mapCoords.x))) {
+		options[DOWN] = true;
+	}
+	else if (location.x == centeredCoords.x && m_map->IsInMap(mapCoords.y + 1, mapCoords.x)) {
+		options[DOWN] = true;
+	}
+
+	/* Check if player wants to go left or right and the move is legal. */
+	if (Input::CheckKeyboardState(right_cond)) {
+		keys[LEFT] = false;
+	}
+	else if (Input::CheckKeyboardState(left_cond)) {
+		keys[RIGHT] = false;
+	}
+	else {
+		keys[LEFT] = false;
+		keys[RIGHT] = false;
+	}
+
+	/* Check if player wants to go up or down and the move is legal. */
+	if (Input::CheckKeyboardState(up_cond)) {
+		keys[DOWN] = false;
+	}
+	else if (Input::CheckKeyboardState(down_cond)) {
+		keys[UP] = false;
+	}
+	else {
+		keys[UP] = false;
+		keys[DOWN] = false;
+	}
+
+	/* If the player has multiple keys down and both options are legal directions. */
+	bool resolved = false;
+	if ((keys[LEFT] || keys[RIGHT]) && (keys[UP] || keys[DOWN])) {
+
+		if (m_direction == LEFT || m_direction == DOWN) {
+			if (options[UP] && keys[UP]) {
+				m_direction = PacmanMoveDirection::UP;
+				resolved = true;
+			}
+			else if (options[DOWN] && keys[DOWN]) {
+				m_direction = PacmanMoveDirection::DOWN;
+				resolved = true;
+			}
+		}
+		else {
+			if (options[LEFT] && keys[LEFT]) {
+				m_direction = PacmanMoveDirection::LEFT;
+				resolved = true;
+			}
+			else if(options[RIGHT] && keys[RIGHT]){
+				m_direction = PacmanMoveDirection::RIGHT;
+				resolved = true;
+			}
+		}
+	}
+	/* The user has keyDown with one or no legal directions(s). */
+	else if (keys[LEFT] || keys[RIGHT] || keys[UP] || keys[DOWN]) {
+		
+		for (int i = 0; i < 4; i++) {
+			if (keys[i] && options[i]) {
+				switch (i) {
+				case UP:
+					m_direction = PacmanMoveDirection::UP;
+					break;
+				case DOWN:
+					m_direction = PacmanMoveDirection::DOWN;
+					break;
+				case LEFT:
+					m_direction = PacmanMoveDirection::LEFT;
+					break;
+				case RIGHT:
+					m_direction = PacmanMoveDirection::RIGHT;
+					break;
+				}
+				resolved = true;
+				break;
+			}
+		}
+	}
+
+	/* If the direction is still not resolved, use the existing direction unless hit a wall. */
+	if (!resolved) {
+		if (!options[m_direction]) {
+			m_direction = PacmanMoveDirection::NOMOVE;
+		}
+	}
+
+	switch (m_direction) {
+	case UP:
+		if (location.y >= centeredCoords.y) {
+			m_target_coords = { mapCoords.x, mapCoords.y - 1 };
+		}
+		nVelocity.y = PACMAN_SPEED;
+		break;
+	case DOWN:
+		if (location.y <= centeredCoords.y) {
+			m_target_coords = { mapCoords.x, mapCoords.y + 1 };
+		}
+		nVelocity.y = -PACMAN_SPEED;
+		break;
+	case LEFT:
+		if (location.x <= centeredCoords.x) {
+			m_target_coords = { mapCoords.x - 1, mapCoords.y };
+		}
+		nVelocity.x = -PACMAN_SPEED;
+		break;
+	case RIGHT:
+		if (location.x >= centeredCoords.x) {
+			m_target_coords = { mapCoords.x + 1, mapCoords.y };
+		}
+		nVelocity.x = PACMAN_SPEED;
+		break;
+	default:
+		break;
+	}
+
+	Physics::SetVelocity(GetRealmID(), m_model_ID, nVelocity);
 }
+
+void Pacman::UpdateTextureFrame(const float deltaTime)
+{
+	if (m_texture_timer.IsRunning()) {
+		if (m_texture_timer.Update(deltaTime)) {
+			current_frame += df;
+
+			if (current_frame == 0) {
+				df = 1;
+			}
+			else if (current_frame == 2) {
+				df = -1;
+			}
+
+			m_frame_col = current_frame;
+			m_texture_timer.Start();
+		}
+	}
+
+	if (m_direction == NOMOVE) {
+		current_frame = 1;
+		m_frame_col = 1;
+	}
+	else {
+		switch (m_direction) {
+		case UP:
+			m_frame_row = 2;
+			break;
+		case DOWN:
+			m_frame_row = 3;
+			break;
+		case LEFT:
+			m_frame_row = 1;
+			break;
+		case RIGHT:
+			m_frame_row = 0;
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+void Pacman::ReAlignToMap()
+{
+	const Vec2d location = Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
+	const Vec2d centeredCoords = m_map->GetWorldCoordinates(m_target_coords);
+
+	/* Player is off screen left or right and needs to teleport to other side of map*/
+	if (m_map->GetLeftTeleport() == m_target_coords && (location.x < centeredCoords.x)) {
+		m_target_coords = m_map->GetRightTeleport();
+		Physics::SetPosition(GetRealmID(), m_model_ID, m_map->GetWorldCoordinates(m_target_coords));
+		m_target_coords.x -= 1;
+	}
+	else if (m_map->GetRightTeleport() == m_target_coords && (location.x > centeredCoords.x)) {
+		m_target_coords = m_map->GetLeftTeleport();
+		Physics::SetPosition(GetRealmID(), m_model_ID, m_map->GetWorldCoordinates(m_target_coords));
+		m_target_coords.x += 1;
+	}
+	else {
+
+		switch (m_direction) {
+		case UP:
+			if (location.y > centeredCoords.y) {
+				Physics::SetPosition(GetRealmID(), m_model_ID, centeredCoords);
+			}
+			break;
+		case DOWN:
+			if (location.y < centeredCoords.y) {
+				Physics::SetPosition(GetRealmID(), m_model_ID, centeredCoords);
+			}
+			break;
+		case LEFT:
+			if (location.x < centeredCoords.x) {
+				Physics::SetPosition(GetRealmID(), m_model_ID, centeredCoords);
+			}
+			break;
+		case RIGHT:
+			if (location.x > centeredCoords.x) {
+				Physics::SetPosition(GetRealmID(), m_model_ID, centeredCoords);
+			}
+			break;
+		default:
+			break;
+		}
+	}
+}
+

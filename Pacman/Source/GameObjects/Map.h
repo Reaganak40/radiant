@@ -6,7 +6,13 @@
 
 class Map : public rdt::GameObject {
 private:
-	std::vector<std::string> m_tilemap;
+
+	struct MapNode {
+		int row, col;
+		MapNode* pEdges[4];
+	};
+
+	std::array<std::array<MapNode*, NUM_TILES_X>, NUM_TILES_Y> m_graph;
 	double m_realHeight;
 public:
 	Map();
@@ -21,6 +27,9 @@ public:
 	bool IsInMap(int row, int col);
 	rdt::Vec2i GetMapCoordinates(const rdt::Vec2d& worldCoords);
 	rdt::Vec2d GetWorldCoordinates(const rdt::Vec2i& mapCoords);
+
+	rdt::Vec2i GetLeftTeleport();
+	rdt::Vec2i GetRightTeleport();
 
 private:
 	void CompileTileMap();

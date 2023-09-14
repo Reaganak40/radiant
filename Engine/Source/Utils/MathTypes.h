@@ -90,6 +90,8 @@ namespace rdt {
 		*/
 		static Vec2i Zero();
 	};
+	bool operator==(const Vec2i& vector1, const Vec2i& vector2);
+
 
 	struct Vec2f {
 		float x, y;

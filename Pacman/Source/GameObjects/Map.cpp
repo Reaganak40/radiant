@@ -9,6 +9,13 @@ Map::Map()
 
 Map::~Map()
 {
+	for (int row = 0; row < NUM_TILES_Y; row++) {
+		for (int col = 0; col < NUM_TILES_X; col++) {
+			if (m_graph[row][col] != nullptr) {
+				delete m_graph[row][col];
+			}
+		}
+	}
 }
 
 void Map::OnBind()
@@ -57,7 +64,7 @@ bool Map::IsInMap(int row, int col)
 	if (col < 0 || col >= NUM_TILES_X) {
 		return false;
 	}
-	return m_tilemap[row][col] == '#';
+	return m_graph[row][col] != nullptr;
 }
 
 rdt::Vec2i Map::GetMapCoordinates(const rdt::Vec2d& worldCoords)
@@ -72,9 +79,20 @@ rdt::Vec2d Map::GetWorldCoordinates(const rdt::Vec2i& mapCoords)
 	return rdt::Vec2d(mapCoords.x * TILE_WIDTH + TILE_OFFSET_X, m_realHeight+TILE_OFFSET_Y-(mapCoords.y * TILE_WIDTH));
 }
 
+rdt::Vec2i Map::GetLeftTeleport()
+{
+	return { 0, 13 };
+}
+
+rdt::Vec2i Map::GetRightTeleport()
+{
+	return { 31, 13 };
+}
+
 void Map::CompileTileMap()
 {
 	using namespace rdt;
+	std::vector<std::string> tilemap;
 
 	std::string res;
 	Utils::ReadTextFile("Resources/TileMap.txt", res);
@@ -85,6 +103,47 @@ void Map::CompileTileMap()
 		while (token.length() < NUM_TILES_X) {
 			token += " ";
 		}
-		m_tilemap.push_back(token);
+		tilemap.push_back(token);
 	}
+
+	for (int row = 0; row < NUM_TILES_Y; row++) {
+		for (int col = 0; col < NUM_TILES_X; col++) {
+			if (tilemap[row][col] != '#') {
+				m_graph[row][col] = nullptr;
+				continue;
+			 }
+
+			m_graph[row][col] = new MapNode;
+			m_graph[row][col]->row = row;
+			m_graph[row][col]->col = col;
+
+			if (row == 0) {
+				m_graph[row][col]->pEdges[UP] = nullptr;
+			}
+			else {
+				m_graph[row][col]->pEdges[UP] = m_graph[row - 1][col];
+
+				if (m_graph[row - 1][col] != nullptr) {
+					m_graph[row - 1][col]->pEdges[DOWN] = m_graph[row][col];
+				}
+			}
+
+			if (col == 0) {
+				m_graph[row][col]->pEdges[LEFT] = nullptr;
+			}
+			else {
+				m_graph[row][col]->pEdges[LEFT] = m_graph[row][col-1];
+
+				if (m_graph[row][col - 1] != nullptr) {
+					m_graph[row][col-1]->pEdges[RIGHT] = m_graph[row][col];
+				}
+			}
+
+			m_graph[row][col]->pEdges[RIGHT] = nullptr;
+			m_graph[row][col]->pEdges[DOWN] = nullptr;
+		}
+	}
+
+	m_graph[13][0]->pEdges[LEFT] = m_graph[13][31];
+	m_graph[13][31]->pEdges[RIGHT] = m_graph[13][0];
 }

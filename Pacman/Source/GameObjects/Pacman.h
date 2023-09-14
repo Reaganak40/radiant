@@ -11,9 +11,8 @@ private:
 	std::vector<rdt::InputState> up_cond;
 	std::vector<rdt::InputState> down_cond;
 
-	bool m_lastMove[4];
-	bool m_onBorder[4];
-	rdt::Vec2i m_lastMapCoords;
+	rdt::Vec2i m_target_coords;
+	PacmanMoveDirection m_direction;
 
 	Map* m_map;
 	int current_frame;
@@ -21,7 +20,7 @@ private:
 	int m_frame_row;
 	int m_frame_col;
 
-	rdt::Timer m_timer;
+	rdt::Timer m_texture_timer;
 
 	bool m_paused;
 	bool m_spawned;
@@ -32,7 +31,7 @@ public:
 
 	void OnBind() override final;
 	void OnRelease() override final;
-	void OnProcessInput(const float deltaTIme) override final;
+	void OnProcessInput(const float deltaTime) override final;
 	void OnFinalUpdate() override final;
 	void OnRender() override final;
 
@@ -45,5 +44,7 @@ public:
 	void SetPause(bool pause);
 
 private:
-	void UpdateBorderCheck(const rdt::Vec2i& mapCoords);
+	void UpdateVelocityAndDirection();
+	void UpdateTextureFrame(const float deltaTime);
+	void ReAlignToMap();
 };

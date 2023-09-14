@@ -96,4 +96,9 @@ namespace rdt {
         return Vec2i(0, 0);
     }
 
+    bool operator==(const Vec2i& vector1, const Vec2i& vector2)
+    {
+        return vector1.x == vector2.x && vector1.y == vector2.y;
+    }
+
 }
