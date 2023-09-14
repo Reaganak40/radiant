@@ -10,6 +10,7 @@ private:
 
 	rdt::Timer m_power_timer;
 	rdt::Timer m_spawn_timer;
+	rdt::Timer m_movement_timer;
 
 	std::array<std::array<PacDot*, NUM_TILES_X>, NUM_TILES_Y> m_dotMap;
 public:

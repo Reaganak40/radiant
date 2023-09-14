@@ -55,6 +55,8 @@ Ghost::Ghost(GhostName nName)
 	df = 1;
 
 	Look(m_direction);
+
+	m_movement_mode = FRIGHTENED;
 }
 
 Ghost::~Ghost()
@@ -238,8 +240,10 @@ void Ghost::SetVulnerable(bool state)
 		m_frame_col = 8;
 		m_frame_row = 0;
 		df = 1;
+
 		SetIsBlinking(false);
 
+		/* If ghost not currently vulnerable */
 		if (m_is_vulnerable != state) {
 			m_speed *= 0.40;
 		}
@@ -296,6 +300,11 @@ void Ghost::SetPause(bool pause)
 	m_paused = pause;
 }
 
+void Ghost::SetMovementMode(MovementMode mode)
+{
+	m_movement_mode = mode;
+}
+
 void Ghost::SetPacmanPtr(Pacman* pacman)
 {
 	m_pacman_ptr = pacman;
@@ -303,7 +312,6 @@ void Ghost::SetPacmanPtr(Pacman* pacman)
 
 void Ghost::SelectNewTarget()
 {
-	bool options[4];
 
 	/* Check if ghost is using tunnel to teleport. */
 	if (m_target_coords.x == 0) {
@@ -320,6 +328,23 @@ void Ghost::SelectNewTarget()
 		m_direction = PacmanMoveDirection::RIGHT;
 		return;
 	}
+
+	switch (m_movement_mode) {
+	case CHASE:
+		SelectNext();
+		break;
+	case SCATTER:
+		SelectNext();
+		break;
+	case FRIGHTENED:
+		SelectRandom();
+		break;
+	}
+}
+
+void Ghost::SelectRandom()
+{
+	bool options[4];
 
 	/* Check what legal directions exist. */
 	if (m_direction == DOWN) {
@@ -391,6 +416,237 @@ void Ghost::SelectNewTarget()
 			}
 		}
 	}
+}
+
+void Ghost::SelectNext()
+{
+	/* Select next direction in the queue. */
+	if (!m_direction_queue.empty()) {
+		PacmanMoveDirection nDirection = m_direction_queue.front();
+
+		switch (nDirection) {
+		case UP:
+			m_direction = PacmanMoveDirection::UP;
+			m_target_coords.y -= 1;
+			break;
+		case DOWN:
+			m_direction = PacmanMoveDirection::DOWN;
+			m_target_coords.y += 1;
+			break;
+		case LEFT:
+			m_direction = PacmanMoveDirection::LEFT;
+			m_target_coords.x -= 1;
+			break;
+		case RIGHT:
+			m_direction = PacmanMoveDirection::RIGHT;
+			m_target_coords.x += 1;
+			break;
+		default:
+			m_direction = PacmanMoveDirection::UP;
+			break;
+		}
+		m_direction_queue.pop();
+		return;
+	}
+
+	/* If nothing left in queue create new path. */
+	if (m_movement_mode == CHASE) {
+		CreateChasePath();
+	}
+	else if (m_movement_mode == SCATTER) {
+		CreateScatterPath();
+	}
+
+	SelectNewTarget();
+}
+
+void Ghost::CreateScatterPath()
+{
+	switch (m_name) {
+	case BLINKY:
+
+		if (m_target_coords == Vec2i(BLINKY_SCATTER_TARGET_X, BLINKY_SCATTER_TARGET_Y)) {
+			/* Blinky scatter loop. */
+			m_direction_queue.push(RIGHT);
+
+			m_direction_queue.push(DOWN);
+			m_direction_queue.push(DOWN);
+			m_direction_queue.push(DOWN);
+			m_direction_queue.push(DOWN);
+
+			m_direction_queue.push(LEFT);
+			m_direction_queue.push(LEFT);
+			m_direction_queue.push(LEFT);
+			m_direction_queue.push(LEFT);
+			m_direction_queue.push(LEFT);
+
+			m_direction_queue.push(UP);
+			m_direction_queue.push(UP);
+			m_direction_queue.push(UP);
+			m_direction_queue.push(UP);
+
+			m_direction_queue.push(RIGHT);
+			m_direction_queue.push(RIGHT);
+			m_direction_queue.push(RIGHT);
+		}
+		else {
+			CreateShortestPath({ BLINKY_SCATTER_TARGET_X, BLINKY_SCATTER_TARGET_Y });
+		}
+		break;
+	case PINKY:
+		if (m_target_coords == Vec2i(PINKY_SCATTER_TARGET_X, PINKY_SCATTER_TARGET_Y)) {
+			/* Pinky scatter loop. */
+			m_direction_queue.push(LEFT);
+
+			m_direction_queue.push(DOWN);
+			m_direction_queue.push(DOWN);
+			m_direction_queue.push(DOWN);
+			m_direction_queue.push(DOWN);
+
+			m_direction_queue.push(RIGHT);
+			m_direction_queue.push(RIGHT);
+			m_direction_queue.push(RIGHT);
+			m_direction_queue.push(RIGHT);
+			m_direction_queue.push(RIGHT);
+
+			m_direction_queue.push(UP);
+			m_direction_queue.push(UP);
+			m_direction_queue.push(UP);
+			m_direction_queue.push(UP);
+
+			m_direction_queue.push(LEFT);
+			m_direction_queue.push(LEFT);
+			m_direction_queue.push(LEFT);
+		}
+		else {
+			CreateShortestPath({ PINKY_SCATTER_TARGET_X, PINKY_SCATTER_TARGET_Y });
+		}
+		break;
+	case INKY:
+		if (m_target_coords == Vec2i(INKY_SCATTER_TARGET_X, INKY_SCATTER_TARGET_Y)) {
+			/* Inky scatter loop. */
+			m_direction_queue.push(RIGHT);
+
+			m_direction_queue.push(UP);
+			m_direction_queue.push(UP);
+			m_direction_queue.push(UP);
+			
+			m_direction_queue.push(LEFT);
+			m_direction_queue.push(LEFT);
+			m_direction_queue.push(LEFT);
+			m_direction_queue.push(LEFT);
+			m_direction_queue.push(LEFT);
+
+			m_direction_queue.push(UP);
+			m_direction_queue.push(UP);
+			m_direction_queue.push(UP);
+
+			m_direction_queue.push(LEFT);
+			m_direction_queue.push(LEFT);
+			m_direction_queue.push(LEFT);
+
+			m_direction_queue.push(DOWN);
+			m_direction_queue.push(DOWN);
+			m_direction_queue.push(DOWN);
+
+			m_direction_queue.push(LEFT);
+			m_direction_queue.push(LEFT);
+			m_direction_queue.push(LEFT);
+
+			m_direction_queue.push(DOWN);
+			m_direction_queue.push(DOWN);
+			m_direction_queue.push(DOWN);
+
+			m_direction_queue.push(RIGHT);
+			m_direction_queue.push(RIGHT);
+			m_direction_queue.push(RIGHT);
+			m_direction_queue.push(RIGHT);
+			m_direction_queue.push(RIGHT);
+			m_direction_queue.push(RIGHT);
+			m_direction_queue.push(RIGHT);
+			m_direction_queue.push(RIGHT);
+			m_direction_queue.push(RIGHT);
+			m_direction_queue.push(RIGHT);
+		}
+		else {
+			CreateShortestPath({ INKY_SCATTER_TARGET_X, INKY_SCATTER_TARGET_Y });
+		}
+		break;
+	case CLYDE:
+		if (m_target_coords == Vec2i(CLYDE_SCATTER_TARGET_X, CLYDE_SCATTER_TARGET_Y)) {
+			/* Clyde scatter loop. */
+			m_direction_queue.push(LEFT);
+
+			m_direction_queue.push(UP);
+			m_direction_queue.push(UP);
+			m_direction_queue.push(UP);
+
+			m_direction_queue.push(RIGHT);
+			m_direction_queue.push(RIGHT);
+			m_direction_queue.push(RIGHT);
+			m_direction_queue.push(RIGHT);
+			m_direction_queue.push(RIGHT);
+
+			m_direction_queue.push(UP);
+			m_direction_queue.push(UP);
+			m_direction_queue.push(UP);
+
+			m_direction_queue.push(RIGHT);
+			m_direction_queue.push(RIGHT);
+			m_direction_queue.push(RIGHT);
+
+			m_direction_queue.push(DOWN);
+			m_direction_queue.push(DOWN);
+			m_direction_queue.push(DOWN);
+
+			m_direction_queue.push(RIGHT);
+			m_direction_queue.push(RIGHT);
+			m_direction_queue.push(RIGHT);
+
+			m_direction_queue.push(DOWN);
+			m_direction_queue.push(DOWN);
+			m_direction_queue.push(DOWN);
+
+			m_direction_queue.push(LEFT);
+			m_direction_queue.push(LEFT);
+			m_direction_queue.push(LEFT);
+			m_direction_queue.push(LEFT);
+			m_direction_queue.push(LEFT);
+			m_direction_queue.push(LEFT);
+			m_direction_queue.push(LEFT);
+			m_direction_queue.push(LEFT);
+			m_direction_queue.push(LEFT);
+			m_direction_queue.push(LEFT);
+		}
+		else {
+			CreateShortestPath({ CLYDE_SCATTER_TARGET_X, CLYDE_SCATTER_TARGET_Y });
+		}
+		break;
+	}
+}
+
+void Ghost::CreateChasePath()
+{
+	switch (m_name) {
+	case BLINKY:
+		m_movement_mode = FRIGHTENED;
+		break;
+	case PINKY:
+		m_movement_mode = FRIGHTENED;
+		break;
+	case INKY:
+		m_movement_mode = FRIGHTENED;
+		break;
+	case CLYDE:
+		m_movement_mode = FRIGHTENED;
+		break;
+	}
+}
+
+void Ghost::CreateShortestPath(rdt::Vec2i target)
+{
+	/* Use Djikstra shortest path to create the direction queue. */
+	m_map->Djikstra(m_target_coords, target, m_direction_queue);
 }
 
 void Ghost::Look(PacmanMoveDirection direction)

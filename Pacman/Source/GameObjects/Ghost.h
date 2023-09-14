@@ -4,11 +4,28 @@
 #include "Map.h"
 #include "Pacman.h"
 
+#define BLINKY_SCATTER_TARGET_X 27
+#define BLINKY_SCATTER_TARGET_Y 0
+#define PINKY_SCATTER_TARGET_X 4
+#define PINKY_SCATTER_TARGET_Y 0
+#define INKY_SCATTER_TARGET_X 27
+#define INKY_SCATTER_TARGET_Y 28
+#define CLYDE_SCATTER_TARGET_X 4
+#define CLYDE_SCATTER_TARGET_Y 28
+
+
+
 enum GhostName {
 	BLINKY,
 	INKY,
 	PINKY,
 	CLYDE
+};
+
+enum MovementMode {
+	CHASE,
+	SCATTER,
+	FRIGHTENED
 };
 
 class Ghost : public rdt::GameObject {
@@ -25,6 +42,9 @@ private:
 	Map* m_map;
 	rdt::Vec2i m_target_coords;
 	PacmanMoveDirection m_direction;
+
+	MovementMode m_movement_mode;
+	std::queue<PacmanMoveDirection> m_direction_queue;
 
 	rdt::Timer m_home_timer;
 	bool m_is_home;
@@ -53,10 +73,19 @@ public:
 	void SetIsBlinking(bool blink);
 	void SetPause(bool pause);
 
+	void SetMovementMode(MovementMode mode);
+
 	void SetPacmanPtr(Pacman* pacman);
 
 private:
 	void SelectNewTarget();
+	void SelectRandom();
+	void SelectNext();
+
+	void CreateScatterPath();
+	void CreateChasePath();
+	void CreateShortestPath(rdt::Vec2i target);
+
 	void Look(PacmanMoveDirection direction);
 
 	void ResolveCollisions();

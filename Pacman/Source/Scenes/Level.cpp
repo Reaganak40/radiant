@@ -182,6 +182,7 @@ void Level::ActivatePowerMode()
 		// ghosts start at index 2
 		for (int i = 2; i <= 5; i++) {
 			((Ghost*)m_game_objects.at(i))->SetVulnerable(true);
+			((Ghost*)m_game_objects.at(i))->SetMovementMode(FRIGHTENED);
 		}
 	}
 	ghosts_blinking = false;
@@ -192,6 +193,7 @@ void Level::DeactivatePowerMode()
 	// ghosts start at index 2
 	for (int i = 2; i <= 5; i++) {
 		((Ghost*)m_game_objects.at(i))->SetVulnerable(false);
+		((Ghost*)m_game_objects.at(i))->SetMovementMode(SCATTER);
 	}
 
 	ghosts_blinking = false;
@@ -220,6 +222,7 @@ void Level::ResumeGame()
 	// ghosts start at index 2
 	for (int i = 2; i <= 5; i++) {
 		((Ghost*)m_game_objects.at(i))->SetPause(false);
+		((Ghost*)m_game_objects.at(i))->SetMovementMode(SCATTER);
 	}
 	((Pacman*)m_game_objects[0])->SetPause(false);
 }

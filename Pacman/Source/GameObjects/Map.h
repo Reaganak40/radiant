@@ -13,6 +13,7 @@ private:
 	};
 
 	std::array<std::array<MapNode*, NUM_TILES_X>, NUM_TILES_Y> m_graph;
+
 	double m_realHeight;
 public:
 	Map();
@@ -30,6 +31,8 @@ public:
 
 	rdt::Vec2i GetLeftTeleport();
 	rdt::Vec2i GetRightTeleport();
+
+	void Djikstra(const rdt::Vec2i& start, const rdt::Vec2i& end, std::queue<PacmanMoveDirection>& path);
 
 private:
 	void CompileTileMap();

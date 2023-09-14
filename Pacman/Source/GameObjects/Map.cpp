@@ -1,5 +1,6 @@
 #include "Map.h"
 #include <iostream>
+#include <queue>
 
 Map::Map()
 {
@@ -89,6 +90,119 @@ rdt::Vec2i Map::GetRightTeleport()
 	return { 31, 13 };
 }
 
+void Map::Djikstra(const rdt::Vec2i& start, const rdt::Vec2i& end, std::queue<PacmanMoveDirection>& path)
+{
+	/* Distance matrix to backtrack and find shortest path. */
+	std::array<std::array<int, NUM_TILES_X>, NUM_TILES_Y> distances;
+	std::array<std::array<PacmanMoveDirection, NUM_TILES_X>, NUM_TILES_Y> directions;
+	for (int row = 0; row < NUM_TILES_Y; row++) {
+		distances[row].fill(INT_MAX);
+		directions[row].fill(NOMOVE);
+	}
+
+	/*
+		Set Node <int, int, int> ==> <distance, row, col>
+	*/
+	std::set<std::tuple<int, int, int>> pq;
+
+	distances[start.y][start.x] = 0;
+	pq.insert({0, start.y, start.x});
+
+	while (pq.size()) {
+
+		/* Pop smallest element */
+		auto current = *pq.begin();
+		pq.erase(pq.begin());
+
+		int uDistance = std::get<0>(current);
+		int uRow = std::get<1>(current);
+		int uCol = std::get<2>(current);
+
+		/* Found target node. */
+		if (uRow == end.y && uCol == end.x) {
+			break;
+		}
+
+		/* Traverse all neighbors */
+		for(int i = 0; i < 4; i++) {
+			MapNode* edge = m_graph[uRow][uCol]->pEdges[i];
+			if (edge == nullptr) {
+				continue;
+			}
+
+			int vRow = edge->row;
+			int vCol = edge->col;
+			int vDistance = distances[vRow][vCol];
+			if (uDistance + 1 < vDistance) {
+
+				if (vDistance != INT_MAX) {
+					pq.erase(pq.find(std::make_tuple(vDistance, vRow, vCol)));
+				}
+
+				distances[vRow][vCol] = uDistance + 1;
+				pq.insert(std::make_tuple(distances[vRow][vCol], vRow, vCol));
+
+				switch (i) {
+				case UP:
+					directions[vRow][vCol] = DOWN;
+					break;
+				case DOWN:
+					directions[vRow][vCol] = UP;
+					break;
+				case LEFT:
+					directions[vRow][vCol] = RIGHT;
+					break;
+				case RIGHT:
+					directions[vRow][vCol] = LEFT;
+					break;
+				}
+			}
+		}
+	}
+
+	/* If the target node was never found. */
+	if (directions[end.y][end.x] == NOMOVE) {
+		return;
+	}
+
+	std::vector<PacmanMoveDirection> retrace;
+
+	int currRow = end.y;
+	int currCol = end.x;
+
+	while (currRow != start.y || currCol != start.x) {
+		MapNode* pNext = nullptr;
+		switch (directions[currRow][currCol]) {
+		case UP:
+			retrace.push_back(DOWN);
+			pNext = m_graph[currRow][currCol]->pEdges[UP];
+			break;
+		case DOWN:
+			retrace.push_back(UP);
+			pNext = m_graph[currRow][currCol]->pEdges[DOWN];
+			break;
+		case LEFT:
+			retrace.push_back(RIGHT);
+			pNext = m_graph[currRow][currCol]->pEdges[LEFT];
+			break;
+		case RIGHT:
+			retrace.push_back(LEFT);
+			pNext = m_graph[currRow][currCol]->pEdges[RIGHT];
+			break;
+		}
+
+		if (pNext != nullptr) {
+			currRow = pNext->row;
+			currCol = pNext->col;
+		}
+	}
+
+	while (!retrace.empty()) {
+		path.push(retrace.back());
+		retrace.pop_back();
+	}
+}
+
 void Map::CompileTileMap()
 {
 	using namespace rdt;
@@ -111,7 +225,7 @@ void Map::CompileTileMap()
 			if (tilemap[row][col] != '#') {
 				m_graph[row][col] = nullptr;
 				continue;
-			 }
+			}
 
 			m_graph[row][col] = new MapNode;
 			m_graph[row][col]->row = row;
