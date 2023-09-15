@@ -41,6 +41,8 @@ public:
 
 	rdt::Vec2i GetMapCoordinates();
 	rdt::Vec2d GetWorldCoordinates();
+	PacmanMoveDirection GetDirection();
+
 	void SetPause(bool pause);
 
 private:

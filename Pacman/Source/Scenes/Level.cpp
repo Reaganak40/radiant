@@ -57,6 +57,7 @@ void Level::OnRegister()
 	inky->RegisterToRealm(m_realms[0]);
 	inky->AddMapPtr(map);
 	inky->SetPacmanPtr(pacman);
+	inky->AddBlinkyPtr(blinky);
 
 
 	Ghost* pinky;

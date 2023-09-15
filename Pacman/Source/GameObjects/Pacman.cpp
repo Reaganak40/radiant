@@ -101,6 +101,11 @@ rdt::Vec2d Pacman::GetWorldCoordinates()
 	return Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
 }
 
+PacmanMoveDirection Pacman::GetDirection()
+{
+	return m_direction;
+}
+
 void Pacman::SetPause(bool pause)
 {
 	m_paused = pause;

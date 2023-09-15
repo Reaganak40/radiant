@@ -9,6 +9,7 @@ Ghost::Ghost(GhostName nName)
 	m_target_coords = { 15, 10 };
 	m_map = nullptr;
 	m_pacman_ptr = nullptr;
+	m_blinky_ptr = nullptr;
 	m_is_vulnerable = false;
 	m_paused = false;
 
@@ -44,7 +45,7 @@ Ghost::Ghost(GhostName nName)
 
 	if (m_name == BLINKY) {
 		m_is_home = false;
-		m_speed = GHOST_SPEED + 30;
+		m_speed = GHOST_SPEED;
 	}
 	else {
 		m_is_home = true;
@@ -234,6 +235,13 @@ void Ghost::OnRender()
 void Ghost::AddMapPtr(Map* nMap)
 {
 	m_map = nMap;
+}
+
+void Ghost::AddBlinkyPtr(Ghost* blinky)
+{
+	if (m_name == INKY) {
+		m_blinky_ptr = blinky;
+	}
 }
 
 void Ghost::SetVulnerable(bool state)
@@ -645,13 +653,118 @@ void Ghost::CreateChasePath()
 		CreateShortestPath(m_pacman_ptr->GetMapCoordinates());
 		break;
 	case PINKY:
-		CreateShortestPath(m_pacman_ptr->GetMapCoordinates());
+	{
+		Vec2i target = m_pacman_ptr->GetMapCoordinates();
+
+		switch (m_pacman_ptr->GetDirection()) {
+		case UP:
+			target.y -= 4;
+			if (target.y < 0) {
+				target.y += 8;
+			}
+			break;
+		case LEFT:
+			target.x -= 4;
+			if (target.x < 3) {
+				target.x += 8;
+			}
+			break;
+		case RIGHT:
+			target.x += 4;
+			if (target.x > 28) {
+				target.x -= 8;
+			}
+			break;
+		case DOWN:
+			target.y += 4;
+			if (target.y > 28) {
+				target.y -= 8;
+			}
+			break;
+		}
+
+		while (!m_map->IsInMap(target.y, target.x)) {
+			if (target.x < 28) {
+				target.x += 1;
+			}
+			else {
+				target.y += 1;
+			}
+		}
+
+		CreateShortestPath(target);
+	}
 		break;
 	case INKY:
-		CreateShortestPath(m_pacman_ptr->GetMapCoordinates());
+	{
+		Vec2i target = m_pacman_ptr->GetMapCoordinates();
+
+		switch (m_pacman_ptr->GetDirection()) {
+		case UP:
+			target.y -= 2;
+			if (target.y < 0) {
+				target.y += 4;
+			}
+			break;
+		case LEFT:
+			target.x -= 2;
+			if (target.x < 3) {
+				target.x += 4;
+			}
+			break;
+		case RIGHT:
+			target.x += 2;
+			if (target.x > 28) {
+				target.x -= 4;
+			}
+			break;
+		case DOWN:
+			target.y += 2;
+			if (target.y > 28) {
+				target.y -= 4;
+			}
+			break;
+		}
+		Vec2i blinkyPos = m_blinky_ptr->GetMapCoordinates();
+		target -= blinkyPos;
+		target *= 2;
+		target = blinkyPos + target;
+
+		while (!m_map->IsInMap(target.y, target.x)) {
+			if (target.x > 28) {
+				target.x--;
+			}
+			else if (target.x < 3) {
+				target.x++;
+			}
+			else if (target.y < 0) {
+				target.y++;
+			}
+			else if (target.y > 28) {
+				target.y--;
+			}
+			else if (target.x < 28) {
+				target.x += 1;
+			}
+			else {
+				target.y += 1;
+			}
+		}
+		CreateShortestPath(target);
+	}
 		break;
 	case CLYDE:
-		CreateShortestPath(m_pacman_ptr->GetMapCoordinates());
+	{
+		Vec2i target = m_pacman_ptr->GetMapCoordinates();
+		Vec2i currPos = GetMapCoordinates();
+
+		if (Vabs(target - currPos).Magnitude() > 8) {
+			CreateShortestPath(m_pacman_ptr->GetMapCoordinates());
+		}
+		else {
+			CreateShortestPath({ CLYDE_SCATTER_TARGET_X, CLYDE_SCATTER_TARGET_Y });
+		}
+	}
 		break;
 	}
 
@@ -661,11 +774,17 @@ void Ghost::CreateChasePath()
 void Ghost::CreateShortestPath(rdt::Vec2i target)
 {
 	/* Use Djikstra shortest path to create the direction queue. */
-	m_map->Djikstra(m_target_coords, target, m_direction_queue);
+	m_map->Djikstra(m_target_coords, target, m_direction_queue, m_direction);
 
 	if (m_direction_queue.empty()) {
 		m_movement_mode = FRIGHTENED;
 	}
+}
+
+rdt::Vec2i Ghost::GetMapCoordinates()
+{
+	const Vec2d location = Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
+	return m_map->GetMapCoordinates(location);
 }
 
 void Ghost::Look(PacmanMoveDirection direction)
@@ -707,7 +826,7 @@ void Ghost::FinalUpdatePosition()
 {
 	const Vec2d location = Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
 	const Vec2d worldCoords = m_map->GetWorldCoordinates(m_target_coords);
-	double error = TILE_WIDTH / 5;
+	double error = TILE_WIDTH / 6;
 
 	if (m_is_home) {
 

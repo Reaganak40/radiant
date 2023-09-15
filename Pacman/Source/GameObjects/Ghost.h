@@ -57,6 +57,7 @@ private:
 	bool m_paused;
 
 	Pacman* m_pacman_ptr;
+	Ghost* m_blinky_ptr;
 
 public:
 	Ghost(GhostName nName);
@@ -69,6 +70,7 @@ public:
 	void OnRender() override final;
 
 	void AddMapPtr(Map* nMap);
+	void AddBlinkyPtr(Ghost* blinky);
 
 	void SetVulnerable(bool state);
 	void SetIsBlinking(bool blink);
@@ -86,6 +88,9 @@ private:
 	void CreateScatterPath();
 	void CreateChasePath();
 	void CreateShortestPath(rdt::Vec2i target);
+
+	rdt::Vec2i GetMapCoordinates();
+
 
 	void Look(PacmanMoveDirection direction);
 

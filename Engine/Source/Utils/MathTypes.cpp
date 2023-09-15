@@ -67,6 +67,11 @@ namespace rdt {
         return Vec2d(abs(vector.x), abs(vector.y));
     }
 
+    Vec2i Vabs(Vec2i vector)
+    {
+        return Vec2i(abs(vector.x), abs(vector.y));
+    }
+
     double Vec2d::Magnitude() const
     {
         return sqrt((x * x) + (y * y));
@@ -96,9 +101,23 @@ namespace rdt {
         return Vec2i(0, 0);
     }
 
+    double Vec2i::Magnitude() const
+    {
+        return sqrt((x * x) + (y * y));
+    }
+
+
     bool operator==(const Vec2i& vector1, const Vec2i& vector2)
     {
         return vector1.x == vector2.x && vector1.y == vector2.y;
+    }
+
+    Vec2i operator+ (const Vec2i& vector1, const Vec2i& vector2) {
+        return Vec2i(vector1.x + vector2.x, vector1.y + vector2.y);
+    }
+
+    Vec2i operator- (const Vec2i& vector1, const Vec2i& vector2) {
+        return Vec2i(vector1.x - vector2.x, vector1.y - vector2.y);
     }
 
 }

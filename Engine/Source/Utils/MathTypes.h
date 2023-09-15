@@ -60,10 +60,7 @@ namespace rdt {
 	Vec2d operator/ (const Vec2d& vector, const double divider);
 	Vec2d operator/ (const Vec2d& vector1, const Vec2d& vector2);
 
-	/*
-		Returns an absolute vector with all positive values.
-	*/
-	Vec2d Vabs(Vec2d vector);
+	
 
 	struct Vec3f {
 		float x, y, z;
@@ -85,12 +82,37 @@ namespace rdt {
 		Vec2i(int nX=0, int nY=0) 
 			: x(nX), y(nY) {}
 
+		Vec2i operator+=(const Vec2i& vector) {
+			x += vector.x;
+			y += vector.y;
+			return (*this);
+		}
+
+		Vec2i operator-=(const Vec2i& vector) {
+			x -= vector.x;
+			y -= vector.y;
+			return (*this);
+		}
+
+		Vec2i operator*=(int factor) {
+			x *= factor;
+			y *= factor;
+			return (*this);
+		}
+
+		/*
+			Returns the magnitude of this vector.
+		*/
+		double Magnitude() const;
+
 		/*
 			Returns a zero vector.
 		*/
 		static Vec2i Zero();
 	};
 	bool operator==(const Vec2i& vector1, const Vec2i& vector2);
+	Vec2i operator+ (const Vec2i& vector1, const Vec2i& vector2);
+	Vec2i operator- (const Vec2i& vector1, const Vec2i& vector2);
 
 
 	struct Vec2f {
@@ -98,7 +120,17 @@ namespace rdt {
 
 		Vec2f(float nX = 0, float nY = 0)
 			: x(nX), y(nY) {}
-
 		
 	};
+
+
+	/*
+		Returns an absolute vector with all positive values.
+	*/
+	Vec2d Vabs(Vec2d vector);
+
+	/*
+		Returns an absolute vector with all positive values.
+	*/
+	Vec2i Vabs(Vec2i vector);
 }

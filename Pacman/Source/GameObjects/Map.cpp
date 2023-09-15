@@ -90,11 +90,29 @@ rdt::Vec2i Map::GetRightTeleport()
 	return { 31, 13 };
 }
 
-void Map::Djikstra(const rdt::Vec2i& start, const rdt::Vec2i& end, std::queue<PacmanMoveDirection>& path)
+void Map::Djikstra(const rdt::Vec2i& start, const rdt::Vec2i& end, std::queue<PacmanMoveDirection>& path, PacmanMoveDirection currDirection)
 {
 	if (start.x == end.x && start.y == end.y) {
 		return;
 	}
+
+	if (currDirection != NOMOVE) {
+		switch (currDirection) {
+		case UP:
+			currDirection = DOWN;
+			break;
+		case DOWN:
+			currDirection = UP;
+			break;
+		case LEFT:
+			currDirection = RIGHT;
+			break;
+		case RIGHT:
+			currDirection = LEFT;
+			break;
+		}
+	}
+
 	/* Distance matrix to backtrack and find shortest path. */
 	std::array<std::array<int, NUM_TILES_X>, NUM_TILES_Y> distances;
 	std::array<std::array<PacmanMoveDirection, NUM_TILES_X>, NUM_TILES_Y> directions;
@@ -128,6 +146,10 @@ void Map::Djikstra(const rdt::Vec2i& start, const rdt::Vec2i& end, std::queue<Pa
 
 		/* Traverse all neighbors */
 		for(int i = 0; i < 4; i++) {
+			if (i == currDirection && uRow == start.y && uCol == start.x) {
+				continue;
+			}
+
 			MapNode* edge = m_graph[uRow][uCol]->pEdges[i];
 			if (edge == nullptr) {
 				continue;

@@ -32,7 +32,7 @@ public:
 	rdt::Vec2i GetLeftTeleport();
 	rdt::Vec2i GetRightTeleport();
 
-	void Djikstra(const rdt::Vec2i& start, const rdt::Vec2i& end, std::queue<PacmanMoveDirection>& path);
+	void Djikstra(const rdt::Vec2i& start, const rdt::Vec2i& end, std::queue<PacmanMoveDirection>& path, PacmanMoveDirection currDirection = NOMOVE);
 
 private:
 	void CompileTileMap();
