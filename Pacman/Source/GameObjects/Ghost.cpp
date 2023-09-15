@@ -3,7 +3,7 @@
 using namespace rdt;
 
 Ghost::Ghost(GhostName nName)
-	: m_frame_timer(0.35), m_blink_timer(0.20)
+	: m_frame_timer(0.35), m_blink_timer(0.20), m_path_finding_timer(0.6)
 {
 	spawnPos = Vec2d::Zero();
 	m_target_coords = { 15, 10 };
@@ -44,7 +44,7 @@ Ghost::Ghost(GhostName nName)
 
 	if (m_name == BLINKY) {
 		m_is_home = false;
-		m_speed = GHOST_SPEED + 50;
+		m_speed = GHOST_SPEED + 30;
 	}
 	else {
 		m_is_home = true;
@@ -55,7 +55,7 @@ Ghost::Ghost(GhostName nName)
 	df = 1;
 
 	Look(m_direction);
-
+	
 	m_movement_mode = FRIGHTENED;
 }
 
@@ -207,6 +207,10 @@ void Ghost::OnProcessInput(const float deltaTime)
 			m_blink_timer.Start();
 		}
 	}
+
+	if (m_path_finding_timer.IsRunning()) {
+		m_path_finding_timer.Update(deltaTime);
+	}
 }
 
 void Ghost::OnFinalUpdate()
@@ -303,6 +307,11 @@ void Ghost::SetPause(bool pause)
 void Ghost::SetMovementMode(MovementMode mode)
 {
 	m_movement_mode = mode;
+
+	if (!m_direction_queue.empty()) {
+		std::queue<PacmanMoveDirection> empty;
+		std::swap(m_direction_queue, empty);
+	}
 }
 
 void Ghost::SetPacmanPtr(Pacman* pacman)
@@ -331,6 +340,10 @@ void Ghost::SelectNewTarget()
 
 	switch (m_movement_mode) {
 	case CHASE:
+		if (!m_path_finding_timer.IsRunning()) {
+			std::queue<PacmanMoveDirection> empty;
+			std::swap(m_direction_queue, empty);
+		}
 		SelectNext();
 		break;
 	case SCATTER:
@@ -629,24 +642,30 @@ void Ghost::CreateChasePath()
 {
 	switch (m_name) {
 	case BLINKY:
-		m_movement_mode = FRIGHTENED;
+		CreateShortestPath(m_pacman_ptr->GetMapCoordinates());
 		break;
 	case PINKY:
-		m_movement_mode = FRIGHTENED;
+		CreateShortestPath(m_pacman_ptr->GetMapCoordinates());
 		break;
 	case INKY:
-		m_movement_mode = FRIGHTENED;
+		CreateShortestPath(m_pacman_ptr->GetMapCoordinates());
 		break;
 	case CLYDE:
-		m_movement_mode = FRIGHTENED;
+		CreateShortestPath(m_pacman_ptr->GetMapCoordinates());
 		break;
 	}
+
+	m_path_finding_timer.Start();
 }
 
 void Ghost::CreateShortestPath(rdt::Vec2i target)
 {
 	/* Use Djikstra shortest path to create the direction queue. */
 	m_map->Djikstra(m_target_coords, target, m_direction_queue);
+
+	if (m_direction_queue.empty()) {
+		m_movement_mode = FRIGHTENED;
+	}
 }
 
 void Ghost::Look(PacmanMoveDirection direction)

@@ -11,6 +11,7 @@ private:
 	rdt::Timer m_power_timer;
 	rdt::Timer m_spawn_timer;
 	rdt::Timer m_movement_timer;
+	bool shouldChase;
 
 	std::array<std::array<PacDot*, NUM_TILES_X>, NUM_TILES_Y> m_dotMap;
 public:
@@ -29,4 +30,6 @@ private:
 	void StartBlinking();
 	void PauseGame();
 	void ResumeGame();
+
+	void SetChase();
 };

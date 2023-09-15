@@ -45,6 +45,7 @@ private:
 
 	MovementMode m_movement_mode;
 	std::queue<PacmanMoveDirection> m_direction_queue;
+	rdt::Timer m_path_finding_timer;
 
 	rdt::Timer m_home_timer;
 	bool m_is_home;

@@ -92,6 +92,9 @@ rdt::Vec2i Map::GetRightTeleport()
 
 void Map::Djikstra(const rdt::Vec2i& start, const rdt::Vec2i& end, std::queue<PacmanMoveDirection>& path)
 {
+	if (start.x == end.x && start.y == end.y) {
+		return;
+	}
 	/* Distance matrix to backtrack and find shortest path. */
 	std::array<std::array<int, NUM_TILES_X>, NUM_TILES_Y> distances;
 	std::array<std::array<PacmanMoveDirection, NUM_TILES_X>, NUM_TILES_Y> directions;
