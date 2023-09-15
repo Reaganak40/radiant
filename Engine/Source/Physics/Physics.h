@@ -141,6 +141,13 @@ namespace rdt {
 		static void SetRotation(const UniqueID realmID, const UniqueID objectID, const double nRadians) { m_instance->SetRotationImpl(realmID, objectID, nRadians); }
 
 		/*
+			Set the hitbox size of the physics object. This is by scale where 1x1 makes the hitbox
+			the same as the shape of the polygon, and less than that shrinks the hitbox.
+		*/
+		static void SetHitBoxSize(const UniqueID realmID, const UniqueID objectID, const Vec2d& nSize) {
+			m_instance->SetHitBoxSizeImpl(realmID, objectID, nSize);
+		}
+		/*
 			Gets the current velocity of the queried object.
 		*/
 		static Vec2d GetVelocity(const UniqueID realmID, const UniqueID objectID) { return m_instance->GetVelocityImpl(realmID, objectID); }
@@ -172,6 +179,7 @@ private:
 		void SetFrictionImpl(const UniqueID realmID, const UniqueID objectID, const double friction);
 		void SetPositionImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nPosition);
 		void SetRotationImpl(const UniqueID realmID, const UniqueID objectID, const double nRadians);
+		void SetHitBoxSizeImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nSize);
 
 		Vec2d GetVelocityImpl(const UniqueID realmID, const UniqueID objectID);
 	};

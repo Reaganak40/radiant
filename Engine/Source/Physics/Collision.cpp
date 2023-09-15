@@ -13,7 +13,7 @@ bool rdt::Collision::CheckCollision(Pobject& source, const Pobject& suspect, con
 		if (source.m_polygon->GetRotation() == 0 && suspect.m_polygon->GetRotation() == 0) {
 			
 			if (source.HasProperties(DontResolve)) {
-				return CheckCollisionAABB(*source.m_polygon, *suspect.m_polygon);
+				return CheckCollisionAABB(source, suspect);
 			}
 
 			return SweptAABB(source, suspect, deltaTime);
@@ -115,10 +115,13 @@ bool rdt::Collision::CheckCollisionSAT(const Circle& A, const Polygon& B)
 	return true;
 }
 
-bool rdt::Collision::CheckCollisionAABB(const Polygon& A, const Polygon& B)
+bool rdt::Collision::CheckCollisionAABB(const Pobject& A, const Pobject& B)
 {
-	const std::vector<Vec2d>& A_vertices = A.GetVertices();
-	const std::vector<Vec2d>& B_vertices = B.GetVertices();
+	std::vector<Vec2d> A_vertices;
+	std::vector<Vec2d> B_vertices;
+
+	A.GetHitBox(A_vertices);
+	B.GetHitBox(B_vertices);
 
 	return !((A_vertices[1].x < B_vertices[0].x || B_vertices[1].x < A_vertices[0].x) ||
 		(A_vertices[2].y < B_vertices[1].y || B_vertices[2].y < A_vertices[1].y));

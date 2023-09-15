@@ -97,6 +97,8 @@ namespace rdt {
 		*/
 		void SetRotation(const double nRadians);
 
+
+
 		friend class Translation;
 		friend class Renderer;
 	};

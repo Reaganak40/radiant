@@ -7,7 +7,7 @@ using namespace rdt;
 
 Level::Level()
 	: previously_bounded(false), loaded_textures(false), m_power_timer(10.0), ghosts_blinking(false),
-	m_spawn_timer(2.5), shouldChase(true)
+	m_spawn_timer(2.5)
 {
 	for (int i = 0; i < NUM_TILES_Y; i++) {
 		m_dotMap[i].fill(nullptr);
@@ -124,7 +124,6 @@ void Level::OnBind()
 
 	PauseGame();
 	m_spawn_timer.Start();
-	SetChase();
 }
 
 void Level::OnProcessInput(const float deltaTime)
@@ -143,12 +142,6 @@ void Level::OnProcessInput(const float deltaTime)
 	if (m_spawn_timer.IsRunning()) {
 		if (m_spawn_timer.Update(deltaTime)) {
 			ResumeGame();
-		}
-	}
-
-	if (m_movement_timer.IsRunning()) {
-		if (m_movement_timer.Update(deltaTime)) {
-			SetChase();
 		}
 	}
 
@@ -194,7 +187,6 @@ void Level::ActivatePowerMode()
 		}
 	}
 
-	m_movement_timer.End();
 	ghosts_blinking = false;
 }
 
@@ -206,8 +198,6 @@ void Level::DeactivatePowerMode()
 	}
 
 	ghosts_blinking = false;
-	shouldChase = true;
-	SetChase();
 }
 
 void Level::StartBlinking()
@@ -235,25 +225,4 @@ void Level::ResumeGame()
 		((Ghost*)m_game_objects.at(i))->SetPause(false);
 	}
 	((Pacman*)m_game_objects[0])->SetPause(false);
-}
-
-void Level::SetChase()
-{
-	if (shouldChase) {
-		// ghosts start at index 2
-		for (int i = 2; i <= 5; i++) {
-			((Ghost*)m_game_objects.at(i))->SetMovementMode(CHASE);
-		}
-		m_movement_timer.SetInterval(20);
-	}
-	else {
-		// ghosts start at index 2
-		for (int i = 2; i <= 5; i++) {
-			((Ghost*)m_game_objects.at(i))->SetMovementMode(SCATTER);
-		}
-		m_movement_timer.SetInterval(7);
-	}
-
-	shouldChase = !shouldChase;
-	m_movement_timer.Start();
 }

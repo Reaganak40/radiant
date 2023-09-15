@@ -284,6 +284,20 @@ namespace rdt {
         object->m_polygon->SetRotation(nRadians);
     }
 
+    void Physics::SetHitBoxSizeImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nSize)
+    {
+        if (m_realms.find(realmID) == m_realms.end()) {
+            return;
+        }
+
+        Pobject* object = m_realms.at(realmID)->GetPhysicsObject(objectID);
+        if (object == nullptr) {
+            return;
+        }
+
+        object->SetHitBoxSize(nSize);
+    }
+
     Vec2d Physics::GetVelocityImpl(const UniqueID realmID, const UniqueID objectID)
     {
         if (m_realms.find(realmID) == m_realms.end()) {

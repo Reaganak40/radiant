@@ -18,12 +18,16 @@ namespace rdt {
 
 		std::set<Ptag> m_tags;
 		std::set<UniqueID> m_collided_objects;
+		Vec2d m_hitbox_size;
 	public:
 		
 		Pobject(std::shared_ptr<Polygon> m_polygon = std::shared_ptr<Polygon>());
 		~Pobject();
 
-		const Polygon& GetPolygon() { return *m_polygon; }
+		const Polygon& GetPolygon() const { return *m_polygon; }
+		const Vec2d& GetHitBoxSize() const { return m_hitbox_size; }
+
+		void GetHitBox(std::vector<Vec2d>& vertices) const;
 
 		void SetProperties(const unsigned int nProperties);
 		void RemoveProperties(const unsigned int rProperties);
@@ -37,6 +41,9 @@ namespace rdt {
 		void AddCollision(const UniqueID objectID);
 		bool IsCollidedWith(const UniqueID objectID);
 		bool CollisionDetected();
+
+		void SetHitBoxSize(const Vec2d& nSize);
+
 
 		friend class Realm;
 		friend class Physics;

@@ -32,7 +32,7 @@ namespace rdt {
 		/*
 			Tests for collisions of two rects on the same axis using AABB theorem.
 		*/
-		static bool CheckCollisionAABB(const Polygon& A, const Polygon& B);
+		static bool CheckCollisionAABB(const Pobject& A, const Pobject& B);
 
 		/*
 			Resolves static collisions, and returns true if there was collision resolution.

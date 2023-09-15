@@ -57,7 +57,7 @@ Ghost::Ghost(GhostName nName)
 
 	Look(m_direction);
 	
-	m_movement_mode = FRIGHTENED;
+	SetMovementMode(CHASE);
 }
 
 Ghost::~Ghost()
@@ -93,6 +93,7 @@ void Ghost::OnBind()
 
 	Physics::SetObjectProperties(GetRealmID(), m_model_ID, DontResolve);
 	Physics::AddPTag(GetRealmID(), m_model_ID, "pacman");
+	Physics::SetHitBoxSize(GetRealmID(), m_model_ID, { 0.45, 0.45 });
 	Physics::SetAcceleration(GetRealmID(), m_model_ID, Vec2d::Zero());
 	Physics::SetFriction(GetRealmID(), m_model_ID, 0);
 
@@ -133,15 +134,24 @@ void Ghost::OnProcessInput(const float deltaTime)
 		case DOWN:
 			nVelocity.y = -m_speed;
 			break;
+		default:
+			break;
 		}
-		Look(m_direction);
+
+		if (m_direction != NOMOVE) {
+			Look(m_direction);
+		}
 
 		Physics::SetVelocity(GetRealmID(), m_model_ID, nVelocity);
 	
 	} else if (m_is_home) {
 		Vec2d nVelocity = Vec2d::Zero();
 
-		if (m_home_timer.IsRunning() && !m_home_timer.Update(deltaTime)) {
+		if (m_is_eaten) {
+			m_direction = DOWN;
+			nVelocity.y = -m_speed;
+		}
+		else if (m_home_timer.IsRunning() && !m_home_timer.Update(deltaTime)) {
 
 			if (m_direction == UP) {
 				nVelocity.y = m_speed * 0.50;
@@ -153,7 +163,6 @@ void Ghost::OnProcessInput(const float deltaTime)
 		}
 		else {
 			// time to leave base
-
 			if (location.x > BLINKY_HOME_X) {
 				nVelocity.x = -GHOST_SPEED * 0.50;
 				m_direction = PacmanMoveDirection::LEFT;
@@ -212,6 +221,10 @@ void Ghost::OnProcessInput(const float deltaTime)
 	if (m_path_finding_timer.IsRunning()) {
 		m_path_finding_timer.Update(deltaTime);
 	}
+
+	if (m_movement_timer.IsRunning()) {
+		m_movement_timer.Update(deltaTime);
+	}
 }
 
 void Ghost::OnFinalUpdate()
@@ -249,6 +262,10 @@ void Ghost::SetVulnerable(bool state)
 
 	if (state) {
 
+		if (m_is_home || m_is_eaten) {
+			return;
+		}
+
 		m_frame_col = 8;
 		m_frame_row = 0;
 		df = 1;
@@ -267,36 +284,19 @@ void Ghost::SetVulnerable(bool state)
 
 		SetIsBlinking(false);
 
-		switch (m_name) {
-		case BLINKY:
-			m_frame_row = 0;
-			break;
-		case PINKY:
-			m_frame_row = 1;
-			break;
-		case INKY:
-			m_frame_row = 2;
-			break;
-		case CLYDE:
-			m_frame_row = 3;
-			break;
-		default:
-			m_frame_row = 0;
-			break;
-		}
-
-		Look(m_direction);
+		ResetFrameRow();
 
 		m_speed = GHOST_SPEED;
-		if (m_name == BLINKY) {
-			m_speed += 50;
-		}
 	}
 
 }
 
 void Ghost::SetIsBlinking(bool blink)
 {
+	if (blink && !m_is_vulnerable) {
+		blink = false;
+	}
+
 	m_is_blinking = blink;
 
 	if (m_is_blinking) {
@@ -320,6 +320,18 @@ void Ghost::SetMovementMode(MovementMode mode)
 		std::queue<PacmanMoveDirection> empty;
 		std::swap(m_direction_queue, empty);
 	}
+
+	m_movement_timer.End();
+
+	if (m_movement_mode == CHASE) {
+		m_movement_timer.SetInterval(20);
+		m_movement_timer.Start();
+
+	}
+	else if (m_movement_mode == SCATTER) {
+		m_movement_timer.SetInterval(7);
+		m_movement_timer.Start();
+	}
 }
 
 void Ghost::SetPacmanPtr(Pacman* pacman)
@@ -329,6 +341,9 @@ void Ghost::SetPacmanPtr(Pacman* pacman)
 
 void Ghost::SelectNewTarget()
 {
+	if (m_is_home) {
+		return;
+	}
 
 	/* Check if ghost is using tunnel to teleport. */
 	if (m_target_coords.x == 0) {
@@ -346,6 +361,15 @@ void Ghost::SelectNewTarget()
 		return;
 	}
 
+	if (!m_movement_timer.IsRunning()) {
+		if (m_movement_mode == CHASE) {
+			SetMovementMode(SCATTER);
+		}
+		else if (m_movement_mode == SCATTER) {
+			SetMovementMode(CHASE);
+		}
+	}
+
 	switch (m_movement_mode) {
 	case CHASE:
 		if (!m_path_finding_timer.IsRunning()) {
@@ -355,6 +379,9 @@ void Ghost::SelectNewTarget()
 		SelectNext();
 		break;
 	case SCATTER:
+		SelectNext();
+		break;
+	case GOHOME:
 		SelectNext();
 		break;
 	case FRIGHTENED:
@@ -476,6 +503,9 @@ void Ghost::SelectNext()
 	}
 	else if (m_movement_mode == SCATTER) {
 		CreateScatterPath();
+	}
+	else if (m_movement_mode == GOHOME) {
+		CreateHomePath();
 	}
 
 	SelectNewTarget();
@@ -771,6 +801,17 @@ void Ghost::CreateChasePath()
 	m_path_finding_timer.Start();
 }
 
+void Ghost::CreateHomePath()
+{
+	if (GetMapCoordinates() == Vec2i(15, 10)) {
+		m_direction = NOMOVE;
+		m_is_home = true;
+	}
+	else {
+		CreateShortestPath({15, 10});
+	}
+}
+
 void Ghost::CreateShortestPath(rdt::Vec2i target)
 {
 	/* Use Djikstra shortest path to create the direction queue. */
@@ -795,20 +836,40 @@ void Ghost::Look(PacmanMoveDirection direction)
 
 	switch (direction) {
 	case LEFT:
-		m_frame_col = 2;
+		if (m_is_eaten) {
+			m_frame_col = 9;
+		}
+		else {
+			m_frame_col = 2;
+		}
 		break;
 	case RIGHT:
-		m_frame_col = 0;
+		if (m_is_eaten) {
+			m_frame_col = 8;
+		}
+		else {
+			m_frame_col = 0;
+		}
 		break;
 	case UP:
-		m_frame_col = 4;
+		if (m_is_eaten) {
+			m_frame_col = 10;
+		}
+		else {
+			m_frame_col = 4;
+		}
 		break;
 	case DOWN:
-		m_frame_col = 6;
+		if (m_is_eaten) {
+			m_frame_col = 11;
+		}
+		else {
+			m_frame_col = 6;
+		}
 		break;
 	}
 
-	if (df < 0) {
+	if (!m_is_eaten && df < 0) {
 		m_frame_col++;
 	}
 }
@@ -818,7 +879,26 @@ void Ghost::ResolveCollisions()
 	UniqueID pacmanModelID = m_pacman_ptr->GetModelID();
 
 	if (Physics::IsCollided(GetRealmID(), m_model_ID, pacmanModelID)) {
-
+		
+		switch (m_name) {
+		case BLINKY:
+			printf("blinky\n");
+			break;
+		case PINKY:
+			printf("pinky\n");
+			break;
+		case INKY:
+			printf("inky\n");
+			break;
+		case CLYDE:
+			printf("clyde\n");
+			break;
+		default:
+			break;
+		}
+		if (m_is_vulnerable) {
+			OnEaten();
+		}
 	}
 }
 
@@ -829,6 +909,16 @@ void Ghost::FinalUpdatePosition()
 	double error = TILE_WIDTH / 6;
 
 	if (m_is_home) {
+		
+		if (m_is_eaten) {
+			Physics::SetPosition(GetRealmID(), m_model_ID, { PINKY_HOME_X - 3, location.y });
+
+			if (location.y < GHOST_HOME_Y) {
+				OnRevived();
+			}
+
+			return;
+		}
 
 		if (m_direction == UP) {
 
@@ -909,5 +999,46 @@ void Ghost::FinalUpdatePosition()
 		}
 		break;
 	}
+}
+
+void Ghost::OnEaten()
+{
+	m_is_eaten = true;
+	SetVulnerable(false);
+	m_frame_row = 1;
+	m_frame_timer.End();
+	
+	SetMovementMode(GOHOME);
+	CreateShortestPath({ 15, 10 });
+}
+
+void Ghost::OnRevived()
+{
+	m_is_eaten = false;
+	ResetFrameRow();
+	SetMovementMode(CHASE);
+}
+
+void Ghost::ResetFrameRow()
+{
+	switch (m_name) {
+	case BLINKY:
+		m_frame_row = 0;
+		break;
+	case PINKY:
+		m_frame_row = 1;
+		break;
+	case INKY:
+		m_frame_row = 2;
+		break;
+	case CLYDE:
+		m_frame_row = 3;
+		break;
+	default:
+		m_frame_row = 0;
+		break;
+	}
+
+	Look(m_direction);
 }
 

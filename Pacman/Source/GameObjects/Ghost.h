@@ -25,7 +25,8 @@ enum GhostName {
 enum MovementMode {
 	CHASE,
 	SCATTER,
-	FRIGHTENED
+	FRIGHTENED,
+	GOHOME,
 };
 
 class Ghost : public rdt::GameObject {
@@ -46,12 +47,14 @@ private:
 	MovementMode m_movement_mode;
 	std::queue<PacmanMoveDirection> m_direction_queue;
 	rdt::Timer m_path_finding_timer;
+	rdt::Timer m_movement_timer;
 
 	rdt::Timer m_home_timer;
 	bool m_is_home;
 
 	bool m_is_vulnerable;
 	bool m_is_blinking;
+	bool m_is_eaten;
 	rdt::Timer m_blink_timer;
 
 	bool m_paused;
@@ -87,6 +90,7 @@ private:
 
 	void CreateScatterPath();
 	void CreateChasePath();
+	void CreateHomePath();
 	void CreateShortestPath(rdt::Vec2i target);
 
 	rdt::Vec2i GetMapCoordinates();
@@ -96,4 +100,8 @@ private:
 
 	void ResolveCollisions();
 	void FinalUpdatePosition();
+	void OnEaten();
+	void OnRevived();
+
+	void ResetFrameRow();
 };

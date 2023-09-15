@@ -28,6 +28,7 @@ void Pacman::OnBind()
 
 	Physics::SetObjectProperties(GetRealmID(), m_model_ID, DontResolve);
 	Physics::AddPTag(GetRealmID(), m_model_ID, "pacman");
+	Physics::SetHitBoxSize(GetRealmID(), m_model_ID, {0.35, 0.35});
 	Physics::SetAcceleration(GetRealmID(), m_model_ID, Vec2d::Zero());
 	Physics::SetFriction(GetRealmID(), m_model_ID, 0);
 
