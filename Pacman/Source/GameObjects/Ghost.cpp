@@ -239,10 +239,12 @@ void Ghost::OnFinalUpdate()
 
 void Ghost::OnRender()
 {
-	Renderer::Begin(GHOST_LAYER);
-	Renderer::SetPolygonTexture("ghost", m_frame_col, m_frame_row);
-	Renderer::AddPolygon(Physics::GetPolygon(GetRealmID(), m_model_ID));
-	Renderer::End();
+	if (!m_pacman_ptr->InRespawn()) {
+		Renderer::Begin(GHOST_LAYER);
+		Renderer::SetPolygonTexture("ghost", m_frame_col, m_frame_row);
+		Renderer::AddPolygon(Physics::GetPolygon(GetRealmID(), m_model_ID));
+		Renderer::End();
+	}
 }
 
 void Ghost::AddMapPtr(Map* nMap)
@@ -337,6 +339,64 @@ void Ghost::SetMovementMode(MovementMode mode)
 void Ghost::SetPacmanPtr(Pacman* pacman)
 {
 	m_pacman_ptr = pacman;
+}
+
+void Ghost::Respawn()
+{
+	Physics::SetPosition(GetRealmID(), m_model_ID, spawnPos);
+	Physics::SetVelocity(GetRealmID(), m_model_ID, Vec2d::Zero());
+
+	m_is_vulnerable = false;
+	m_is_blinking = false;
+	m_is_eaten = false;
+	m_target_coords = { 15, 10 };
+	m_speed = GHOST_SPEED;
+
+	switch (m_name) {
+	case BLINKY:
+		m_frame_row = 0;
+		m_direction = PacmanMoveDirection::LEFT;
+		m_home_timer.SetInterval(0.5);
+		break;
+	case PINKY:
+		m_frame_row = 1;
+		m_direction = PacmanMoveDirection::DOWN;
+		m_home_timer.SetInterval(Utils::RandomFloat(1.0, 3.0));
+
+		break;
+	case INKY:
+		m_frame_row = 2;
+		m_direction = PacmanMoveDirection::UP;
+		m_home_timer.SetInterval(Utils::RandomFloat(5.0, 8.0));
+		break;
+	case CLYDE:
+		m_frame_row = 3;
+		m_direction = PacmanMoveDirection::UP;
+		m_home_timer.SetInterval(Utils::RandomFloat(8.0, 15.0));
+		break;
+	default:
+		m_frame_row = 0;
+		m_direction = PacmanMoveDirection::RIGHT;
+		m_speed = 0;
+		break;
+	}
+
+	if (m_name == BLINKY) {
+		m_is_home = false;
+	}
+	else {
+		m_is_home = true;
+	}
+
+	m_frame_col = 0;
+	df = 1;
+
+	Look(m_direction);
+
+	SetMovementMode(CHASE);
+
+	m_frame_timer.Start();
+	m_home_timer.Start();
 }
 
 void Ghost::SelectNewTarget()
@@ -880,24 +940,11 @@ void Ghost::ResolveCollisions()
 
 	if (Physics::IsCollided(GetRealmID(), m_model_ID, pacmanModelID)) {
 		
-		switch (m_name) {
-		case BLINKY:
-			printf("blinky\n");
-			break;
-		case PINKY:
-			printf("pinky\n");
-			break;
-		case INKY:
-			printf("inky\n");
-			break;
-		case CLYDE:
-			printf("clyde\n");
-			break;
-		default:
-			break;
-		}
 		if (m_is_vulnerable) {
 			OnEaten();
+		}
+		else if (!m_is_eaten) {
+			m_pacman_ptr->SetHitFlag();
 		}
 	}
 }

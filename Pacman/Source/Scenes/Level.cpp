@@ -7,7 +7,7 @@ using namespace rdt;
 
 Level::Level()
 	: previously_bounded(false), loaded_textures(false), m_power_timer(10.0), ghosts_blinking(false),
-	m_spawn_timer(2.5)
+	m_spawn_timer(2.5), m_show_hit_timer(0.5), waiting_respawn(false)
 {
 	for (int i = 0; i < NUM_TILES_Y; i++) {
 		m_dotMap[i].fill(nullptr);
@@ -29,12 +29,17 @@ void Level::OnRegister()
 		Texture& pacmanTex = TextureManager::LoadTextureFromPNG("pacman", "Resources/Textures/pacman.png");
 		pacmanTex.DefineTextureAtlas(51, 51, 4, 3, 16);
 
+		Texture& deathTex = TextureManager::LoadTextureFromPNG("death", "Resources/Textures/death.png");
+		deathTex.DefineTextureAtlas(59, 57, 1, 10, 8);
+
 		TextureManager::LoadTextureFromPNG("map", "Resources/Textures/map.png");
 
 		Texture& ghostTex = TextureManager::LoadTextureFromPNG("ghost", "Resources/Textures/ghost.png");
 		ghostTex.DefineTextureAtlas(111, 111, 4, 12, 16);
 
 		TextureManager::LoadTextureFromPNG("powerdot", "Resources/Textures/powerDot.png");
+
+
 	}
 
 	Pacman* pacman;
@@ -128,6 +133,25 @@ void Level::OnBind()
 
 void Level::OnProcessInput(const float deltaTime)
 {
+
+	if (((Pacman*)m_game_objects[0])->IsHit()) {
+
+		if (m_show_hit_timer.IsRunning()) {
+			if (m_show_hit_timer.Update(deltaTime)) {
+				((Pacman*)m_game_objects[0])->BeginDeathAnimation();
+				((Pacman*)m_game_objects[0])->SetPause(false);
+				waiting_respawn = true;
+			}
+		}
+		else if (!((Pacman*)m_game_objects[0])->InDeathAnimation()) {
+			PauseGame();
+			m_show_hit_timer.Start();
+		}
+	}
+	else if (waiting_respawn) {
+		Respawn();
+	}
+
 	if (m_power_timer.IsRunning()) {
 		if (m_power_timer.Update(deltaTime)) {
 			DeactivatePowerMode();
@@ -216,6 +240,9 @@ void Level::PauseGame()
 		((Ghost*)m_game_objects.at(i))->SetPause(true);
 	}
 	((Pacman*)m_game_objects[0])->SetPause(true);
+
+	Physics::DeactivateRealm(m_realms[0]);
+
 }
 
 void Level::ResumeGame()
@@ -225,4 +252,21 @@ void Level::ResumeGame()
 		((Ghost*)m_game_objects.at(i))->SetPause(false);
 	}
 	((Pacman*)m_game_objects[0])->SetPause(false);
+
+	Physics::ActivateRealm(m_realms[0]);
+
+}
+
+void Level::Respawn()
+{
+	waiting_respawn = false;
+	((Pacman*)m_game_objects[0])->Respawn();
+	((Pacman*)m_game_objects[0])->SetPause(true);
+
+	for (int i = 2; i <= 5; i++) {
+		((Ghost*)m_game_objects.at(i))->Respawn();
+	}
+
+	m_spawn_timer.SetInterval(1.7);
+	m_spawn_timer.Start();
 }

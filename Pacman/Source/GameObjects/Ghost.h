@@ -82,7 +82,7 @@ public:
 	void SetMovementMode(MovementMode mode);
 
 	void SetPacmanPtr(Pacman* pacman);
-
+	void Respawn();
 private:
 	void SelectNewTarget();
 	void SelectRandom();

@@ -2,10 +2,12 @@
 
 using namespace rdt;
 Pacman::Pacman(double xPos, double yPos)
-	: m_texture_timer(Timer(0.07))
+	: m_texture_timer(Timer(0.07)), m_death_timer(0.09)
 {
 	spawnPos.x = xPos;
 	spawnPos.y = yPos;
+	m_is_hit = false;
+	m_dead_animation = false;
 
 	left_cond = std::vector<InputState>{ A_KEY_PRESS, A_KEY_DOWN, LEFT_KEY_DOWN, LEFT_KEY_PRESS };
 	right_cond = std::vector<InputState>{ D_KEY_PRESS, D_KEY_DOWN, RIGHT_KEY_DOWN, RIGHT_KEY_PRESS };
@@ -15,6 +17,7 @@ Pacman::Pacman(double xPos, double yPos)
 	m_map = nullptr;
 	current_frame = 2;
 	df = -1;
+	
 }
 
 Pacman::~Pacman()
@@ -32,7 +35,6 @@ void Pacman::OnBind()
 	Physics::SetAcceleration(GetRealmID(), m_model_ID, Vec2d::Zero());
 	Physics::SetFriction(GetRealmID(), m_model_ID, 0);
 
-	m_texture_timer.Start();
 	Respawn();
 }
 
@@ -63,13 +65,21 @@ void Pacman::OnRender()
 {
 	using namespace rdt;
 
+	if (m_frame_col == 10) {
+		return;
+	}
+
 	Renderer::Begin(PACMAN_LAYER);
 
-	if (current_frame == 2) {
+	if (m_is_hit) {
+		Renderer::SetPolygonTexture("death", m_frame_col, 0);
+	}
+	else if (current_frame == 2)  {
 		Renderer::SetPolygonTexture("pacman", 2, 0);
 	}
 	else {
 		Renderer::SetPolygonTexture("pacman", m_frame_col, m_frame_row);
+
 	}
 
 	Renderer::AddPolygon(Physics::GetPolygon(GetRealmID(), m_model_ID));
@@ -86,9 +96,14 @@ void Pacman::Respawn()
 	Vec2i mapCoords = m_map->GetMapCoordinates({PACMAN_SPAWN_X, PACMAN_SPAWN_Y});
 
 	Physics::SetPosition(GetRealmID(), m_model_ID, { PACMAN_SPAWN_X, m_map->GetWorldCoordinates({12, 22}).y});
-	Physics::SetVelocity(GetRealmID(), m_model_ID, { 0, 0 });
-	m_frame_col = 0;
+	m_frame_col = 1;
+	m_frame_row = 0;
+	current_frame = 2;
+	df = -1;
+	m_texture_timer.Start();
+
 	m_spawned = true;
+	m_in_respawn = false;
 }
 
 rdt::Vec2i Pacman::GetMapCoordinates()
@@ -112,9 +127,42 @@ void Pacman::SetPause(bool pause)
 	m_paused = pause;
 }
 
+void Pacman::SetHitFlag()
+{
+	m_is_hit = true;
+	m_frame_col = 0;
+	m_texture_timer.End();
+}
+
+void Pacman::BeginDeathAnimation()
+{
+	m_dead_animation = true;
+	m_in_respawn = true;
+	m_death_timer.Start();
+}
+
+bool Pacman::InDeathAnimation()
+{
+	return m_dead_animation;
+}
+
+bool Pacman::InRespawn()
+{
+	return m_in_respawn;
+}
+
+bool Pacman::IsHit()
+{
+	return m_is_hit;
+}
+
 void Pacman::UpdateVelocityAndDirection()
 {
 	Vec2d nVelocity = Vec2d::Zero();
+
+	if (m_dead_animation) {
+		return;
+	}
 
 	if (m_spawned) {
 		m_direction = PacmanMoveDirection::RIGHT;
@@ -289,6 +337,24 @@ void Pacman::UpdateTextureFrame(const float deltaTime)
 			m_frame_col = current_frame;
 			m_texture_timer.Start();
 		}
+	}
+	else if (m_death_timer.IsRunning()) {
+		if (m_death_timer.Update(deltaTime)) {
+			m_frame_col++;
+
+			if (m_frame_col == 10) {
+				m_dead_animation = false;
+				m_is_hit = false;
+			}
+			else {
+				m_death_timer.Start();
+			}
+
+		}
+	}
+
+	if (m_is_hit) {
+		return;
 	}
 
 	if (m_direction == NOMOVE) {

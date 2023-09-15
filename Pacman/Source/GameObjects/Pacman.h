@@ -24,6 +24,11 @@ private:
 
 	bool m_paused;
 	bool m_spawned;
+	bool m_is_hit;
+	bool m_in_respawn;
+
+	rdt::Timer m_death_timer;
+	bool m_dead_animation;
 
 public:
 	Pacman(double xPos, double yPos);
@@ -44,6 +49,12 @@ public:
 	PacmanMoveDirection GetDirection();
 
 	void SetPause(bool pause);
+	void SetHitFlag();
+
+	void BeginDeathAnimation();
+	bool InDeathAnimation();
+	bool InRespawn();
+	bool IsHit();
 
 private:
 	void UpdateVelocityAndDirection();

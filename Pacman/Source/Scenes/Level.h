@@ -7,9 +7,11 @@ private:
 	bool previously_bounded;
 	bool loaded_textures;
 	bool ghosts_blinking;
+	bool waiting_respawn;
 
 	rdt::Timer m_power_timer;
 	rdt::Timer m_spawn_timer;
+	rdt::Timer m_show_hit_timer;
 
 	std::array<std::array<PacDot*, NUM_TILES_X>, NUM_TILES_Y> m_dotMap;
 public:
@@ -28,4 +30,5 @@ private:
 	void StartBlinking();
 	void PauseGame();
 	void ResumeGame();
+	void Respawn();
 };
