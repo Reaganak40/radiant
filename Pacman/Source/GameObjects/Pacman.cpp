@@ -93,8 +93,6 @@ void Pacman::AddMapPtr(Map* map)
 
 void Pacman::Respawn()
 {
-	Vec2i mapCoords = m_map->GetMapCoordinates({PACMAN_SPAWN_X, PACMAN_SPAWN_Y});
-
 	Physics::SetPosition(GetRealmID(), m_model_ID, { PACMAN_SPAWN_X, m_map->GetWorldCoordinates({12, 22}).y});
 	m_frame_col = 1;
 	m_frame_row = 0;
@@ -164,14 +162,16 @@ void Pacman::UpdateVelocityAndDirection()
 		return;
 	}
 
-	if (m_spawned) {
-		m_direction = PacmanMoveDirection::RIGHT;
-		m_spawned = false;
-	}
-
 	const Vec2d location = Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
 	Vec2i mapCoords = m_map->GetMapCoordinates(location);
 	Vec2d centeredCoords = m_map->GetWorldCoordinates(mapCoords);
+
+	if (m_spawned) {
+		m_direction = PacmanMoveDirection::RIGHT;
+		m_target_coords = mapCoords;
+		m_spawned = false;
+	}
+
 	bool options[4] = { false };
 	bool keys[4] = { true, true, true, true };
 

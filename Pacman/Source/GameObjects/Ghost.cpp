@@ -262,9 +262,13 @@ void Ghost::AddBlinkyPtr(Ghost* blinky)
 void Ghost::SetVulnerable(bool state)
 {
 
+	if (m_is_home) {
+		return;
+	}
+
 	if (state) {
 
-		if (m_is_home || m_is_eaten) {
+		if (m_is_eaten) {
 			return;
 		}
 
@@ -276,7 +280,8 @@ void Ghost::SetVulnerable(bool state)
 
 		/* If ghost not currently vulnerable */
 		if (m_is_vulnerable != state) {
-			m_speed *= 0.40;
+			m_speed *= 0.50;
+			SetMovementMode(FRIGHTENED);
 		}
 		m_is_vulnerable = state;
 
@@ -295,6 +300,10 @@ void Ghost::SetVulnerable(bool state)
 
 void Ghost::SetIsBlinking(bool blink)
 {
+	if (blink && (m_is_home || m_is_eaten)) {
+		return;
+	}
+
 	if (blink && !m_is_vulnerable) {
 		blink = false;
 	}
@@ -405,22 +414,6 @@ void Ghost::SelectNewTarget()
 		return;
 	}
 
-	/* Check if ghost is using tunnel to teleport. */
-	if (m_target_coords.x == 0) {
-		m_target_coords.x = 31;
-		Physics::SetPosition(GetRealmID(), m_model_ID, m_map->GetWorldCoordinates(m_target_coords));
-		m_target_coords.x -= 1;
-		m_direction = PacmanMoveDirection::LEFT;
-		return;
-	}
-	else if (m_target_coords.x == 31) {
-		m_target_coords.x = 0;
-		Physics::SetPosition(GetRealmID(), m_model_ID, m_map->GetWorldCoordinates(m_target_coords));
-		m_target_coords.x += 1;
-		m_direction = PacmanMoveDirection::RIGHT;
-		return;
-	}
-
 	if (!m_movement_timer.IsRunning()) {
 		if (m_movement_mode == CHASE) {
 			SetMovementMode(SCATTER);
@@ -473,14 +466,24 @@ void Ghost::SelectRandom()
 		options[LEFT] = false;
 	}
 	else {
-		options[LEFT] = m_map->IsInMap(m_target_coords.y, m_target_coords.x - 1);
+		if (m_target_coords.y == 13 && m_target_coords.x == 0) {
+			options[LEFT] = true;
+		}
+		else {
+			options[LEFT] = m_map->IsInMap(m_target_coords.y, m_target_coords.x - 1);
+		}
 	}
 
 	if (m_direction == LEFT) {
 		options[RIGHT] = false;
 	}
 	else {
-		options[RIGHT] = m_map->IsInMap(m_target_coords.y, m_target_coords.x + 1);
+		if (m_target_coords.y == 13 && m_target_coords.x == 31) {
+			options[RIGHT] = true;
+		}
+		else {
+			options[RIGHT] = m_map->IsInMap(m_target_coords.y, m_target_coords.x + 1);
+		}
 	}
 
 
@@ -520,6 +523,13 @@ void Ghost::SelectRandom()
 					m_direction = PacmanMoveDirection::UP;
 					break;
 				}
+
+				if (m_target_coords.x < 0) {
+					m_target_coords.x = 31;
+				}
+				else if (m_target_coords.x > 31) {
+					m_target_coords.x = 0;
+				}
 				return;
 			}
 		}
@@ -553,6 +563,15 @@ void Ghost::SelectNext()
 			m_direction = PacmanMoveDirection::UP;
 			break;
 		}
+
+
+		if (m_target_coords.x < 0) {
+			m_target_coords.x = 31;
+		}
+		else if (m_target_coords.x > 31) {
+			m_target_coords.x = 0;
+		}
+
 		m_direction_queue.pop();
 		return;
 	}
@@ -1020,6 +1039,16 @@ void Ghost::FinalUpdatePosition()
 			}
 		}
 
+		return;
+	}
+
+	/* Check if ghost is using tunnel to teleport. */
+	if (location.x < m_map->GetWorldCoordinates({0, 13}).x) {
+		Physics::SetPosition(GetRealmID(), m_model_ID, m_map->GetWorldCoordinates({31, 13}));
+		return;
+	}
+	else if (location.x > m_map->GetWorldCoordinates({ 31, 13 }).x) {
+		Physics::SetPosition(GetRealmID(), m_model_ID, m_map->GetWorldCoordinates({ 0, 13 }));
 		return;
 	}
 
