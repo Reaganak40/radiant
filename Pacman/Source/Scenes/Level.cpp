@@ -2,16 +2,20 @@
 #include "GameObjects/Pacman.h"
 #include "GameObjects/Map.h"
 #include "GameObjects/Ghost.h"
+#include "GameObjects/UI.h"
 
 using namespace rdt;
 
 Level::Level()
 	: previously_bounded(false), loaded_textures(false), m_power_timer(10.0), ghosts_blinking(false),
-	m_spawn_timer(2.5), m_show_hit_timer(0.5), waiting_respawn(false)
+	m_spawn_timer(2.5), m_show_hit_timer(0.5), waiting_respawn(false), m_1up_timer(0.25)
 {
 	for (int i = 0; i < NUM_TILES_Y; i++) {
 		m_dotMap[i].fill(nullptr);
 	}
+
+	playerScore = 0;
+	highScore = 0;
 }
 
 Level::~Level()
@@ -21,6 +25,7 @@ Level::~Level()
 void Level::OnRegister()
 {
 	if (m_realms.size() == 0) {
+		m_realms.push_back(Physics::CreateRealm());
 		m_realms.push_back(Physics::CreateRealm());
 		m_realms.push_back(Physics::CreateRealm());
 	}
@@ -35,10 +40,12 @@ void Level::OnRegister()
 		TextureManager::LoadTextureFromPNG("map", "Resources/Textures/map.png");
 
 		Texture& ghostTex = TextureManager::LoadTextureFromPNG("ghost", "Resources/Textures/ghost.png");
-		ghostTex.DefineTextureAtlas(111, 111, 4, 12, 16);
+		ghostTex.DefineTextureAtlas(112, 112, 4, 12, 16);
 
 		TextureManager::LoadTextureFromPNG("powerdot", "Resources/Textures/powerDot.png");
 
+		Texture& fontTex = TextureManager::LoadTextureFromPNG("font", "Resources/Textures/font.png");
+		fontTex.DefineTextureAtlas(28, 28, 15, 3, 4);
 
 	}
 
@@ -78,6 +85,34 @@ void Level::OnRegister()
 	clyde->AddMapPtr(map);
 	clyde->SetPacmanPtr(pacman);
 
+	UI* highScore;
+	m_game_objects.push_back(highScore = new UI(10, {18, 18}));
+	highScore->RegisterToRealm(m_realms[2]);
+	highScore->SetOrigin({ SCREEN_WIDTH / 2 - 75, SCREEN_HEIGHT - 20 });
+	highScore->SetAlignment(TEXT_LEFT);
+	highScore->SetText("HIGH SCORE");
+
+	UI* _1up;
+	m_game_objects.push_back(_1up = new UI(3, { 18, 18 }));
+	_1up->RegisterToRealm(m_realms[2]);
+	_1up->SetOrigin({ 75, SCREEN_HEIGHT - 20 });
+	_1up->SetAlignment(TEXT_LEFT);
+	_1up->SetText("1UP");
+
+	UI* _1score;
+	m_game_objects.push_back(_1score = new UI(7, { 18, 18 }));
+	_1score->RegisterToRealm(m_realms[2]);
+	_1score->SetOrigin({ 25, SCREEN_HEIGHT - 45 });
+	_1score->SetAlignment(TEXT_RIGHT);
+	_1score->SetText("0");
+
+	UI* highScoreVal;
+	m_game_objects.push_back(highScoreVal = new UI(7, { 18, 18 }));
+	highScoreVal->RegisterToRealm(m_realms[2]);
+	highScoreVal->SetOrigin({ SCREEN_WIDTH / 2 - 55, SCREEN_HEIGHT - 45 });
+	highScoreVal->SetAlignment(TEXT_RIGHT);
+	highScoreVal->SetText("");
+
 	/* Adds dots to the map. */
 	for (int row = 0; row < NUM_TILES_Y; row++) {
 		for (int col = 0; col < NUM_TILES_X; col++) {
@@ -106,8 +141,9 @@ void Level::OnRegister()
 			}
 		}
 	}
+	m_1up_timer.Start();
 
-	m_GUIs.push_back(new DiagnosticsGUI);
+	//m_GUIs.push_back(new DiagnosticsGUI);
 }
 
 void Level::OnBind()
@@ -169,6 +205,14 @@ void Level::OnProcessInput(const float deltaTime)
 		}
 	}
 
+	if (m_1up_timer.IsRunning()) {
+		if (m_1up_timer.Update(deltaTime)) {
+			bool show = ((UI*)m_game_objects.at(_1UP_INDEX))->IsShowing();
+			((UI*)m_game_objects.at(_1UP_INDEX))->SetShow(!show);
+			m_1up_timer.Start();
+		}
+	}
+
 	RunProcessInputQueue(deltaTime);
 }
 
@@ -193,6 +237,8 @@ void Level::OnRender()
 		if (dot->IsPowerDot()) {
 			ActivatePowerMode();
 		}
+
+		UpdatePlayerScore(10);
 	}
 
 	RunRenderQueue();
@@ -268,4 +314,15 @@ void Level::Respawn()
 
 	m_spawn_timer.SetInterval(1.7);
 	m_spawn_timer.Start();
+}
+
+void Level::UpdatePlayerScore(int pointsToAdd)
+{
+	playerScore += pointsToAdd;
+	((UI*)m_game_objects.at(_1UP_SCORE_INDEX))->SetText(std::to_string(playerScore));
+
+	if (playerScore > highScore) {
+		highScore = playerScore;
+		((UI*)m_game_objects.at(HIGHSCORE_VAL_INDEX))->SetText(std::to_string(highScore));
+	}
 }

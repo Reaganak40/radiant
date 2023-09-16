@@ -33,6 +33,9 @@
     <ClCompile Include="Source\GameObjects\Ghost.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\GameObjects\UI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Game.h">
@@ -53,6 +56,9 @@
     <ClInclude Include="Source\GameObjects\Ghost.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GameObjects\UI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Textures\pacman.png">
@@ -65,6 +71,12 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="Resources\Textures\powerDot.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\Textures\death.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\Textures\font.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
