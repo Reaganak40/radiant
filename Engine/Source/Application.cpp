@@ -3,6 +3,7 @@
 #include "Renderer/Renderer.h"
 #include "Utils/Input.h"
 #include "Utils/Utils.h"
+#include "Messaging/MessageBus.h"
 #include "Physics/Physics.h"
 #include "Gui/GuiManager.h"
 #include "Scene/SceneManager.h"
@@ -23,6 +24,7 @@ namespace rdt
 		GuiManager::Destroy();
 		Physics::Destroy();
 		PtagManager::Destroy();
+		MessageBus::Destroy();
 		Input::Destroy();
 		TextureManager::Destroy();
 		Renderer::Destroy();
@@ -35,6 +37,7 @@ namespace rdt
 		Renderer::CreateWindow(appName, windowWidth, windowHeight, resizable);
 		TextureManager::Initialize();
 		Input::Initialize();
+		MessageBus::Initialize();
 		PtagManager::Initialize();
 		Physics::Initialize();
 		GuiManager::Initialize();
@@ -67,6 +70,11 @@ namespace rdt
 
 	}
 
+	void Application::PollMessages1()
+	{
+		MessageBus::SendMessages();
+	}
+
 	void Application::ProcessInput()
 	{
 		// All game objects in the bounded scene run their OnProcessInput()
@@ -79,6 +87,11 @@ namespace rdt
 	{
 		// Updates all active physical objects.
 		Physics::OnUpdate(m_timestep.deltaTime);
+	}
+
+	void Application::PollMessages2()
+	{
+		MessageBus::SendMessages();
 	}
 
 	void Application::FinalUpdate()

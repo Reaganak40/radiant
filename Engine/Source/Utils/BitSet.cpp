@@ -43,4 +43,12 @@ namespace rdt {
 		}
 	}
 
+	void BitSet::SetNewFlagMax(unsigned int nMax)
+	{
+		unsigned int count = (nMax / 32) + 1;
+		while (m_bit_field.size() < count) {
+			m_bit_field.push_back(0);
+		}
+	}
+
 }

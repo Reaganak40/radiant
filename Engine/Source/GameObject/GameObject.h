@@ -1,8 +1,10 @@
 #pragma once
 #include "Utils/UniqueID.h"
+#include "Messaging/MessageBus.h"
+#include "Utils/BitSet.h"
 
 namespace rdt {
-	class GameObject {
+	class GameObject : public Messenger {
 	private:
 		UniqueID m_ID;
 		UniqueID m_sceneID;
@@ -10,11 +12,15 @@ namespace rdt {
 
 	protected:
 		UniqueID m_model_ID;
+		BitSet m_gameState;
 
 	public:
-		GameObject() : m_ID(GetUniqueID()), m_sceneID(0), m_model_ID(0), m_realmID(0) {}
+		GameObject();
 		~GameObject() {}
 
+		/*
+			Gets the Unique ID for this game object.
+		*/
 		const UniqueID GetID() { return m_ID; }
 
 		/*
@@ -69,6 +75,11 @@ namespace rdt {
 			To implement function when object needs to perform rendering procedures.
 		*/
 		virtual void OnRender() {}
+
+		/*
+			To implement function when the object receives a message from the Message Bus.
+		*/
+		virtual void OnMessage(Message msg) override;
 
 	};
 }

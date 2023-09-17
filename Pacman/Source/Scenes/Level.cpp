@@ -32,7 +32,7 @@ void Level::OnRegister()
 
 	if (!loaded_textures) {
 		Texture& pacmanTex = TextureManager::LoadTextureFromPNG("pacman", "Resources/Textures/pacman.png");
-		pacmanTex.DefineTextureAtlas(51, 51, 4, 3, 16);
+		pacmanTex.DefineTextureAtlas(52, 52, 4, 3, 16);
 
 		Texture& deathTex = TextureManager::LoadTextureFromPNG("death", "Resources/Textures/death.png");
 		deathTex.DefineTextureAtlas(59, 57, 1, 10, 8);
@@ -312,7 +312,7 @@ void Level::Respawn()
 		((Ghost*)m_game_objects.at(i))->Respawn();
 	}
 
-	m_spawn_timer.SetInterval(1.7);
+	m_spawn_timer.SetInterval(1.7f);
 	m_spawn_timer.Start();
 }
 

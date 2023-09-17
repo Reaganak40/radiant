@@ -3,7 +3,7 @@
 using namespace rdt;
 
 Ghost::Ghost(GhostName nName)
-	: m_frame_timer(0.35), m_blink_timer(0.20), m_path_finding_timer(0.6)
+	: m_frame_timer(0.35f), m_blink_timer(0.20f), m_path_finding_timer(0.6f)
 {
 	spawnPos = Vec2d::Zero();
 	m_target_coords = { 15, 10 };

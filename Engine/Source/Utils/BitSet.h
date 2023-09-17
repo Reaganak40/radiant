@@ -36,6 +36,11 @@ namespace rdt {
 		*/
 		void Clear();
 
+		/*
+			Sets the number flags this bit field contains.
+		*/
+		void SetNewFlagMax(unsigned int nMax);
+
 	};
 
 }
