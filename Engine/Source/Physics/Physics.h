@@ -3,6 +3,7 @@
 #include "Pobject.h"
 #include "Utils/UniqueID.h"
 #include "Realm.h"
+#include "Messaging/MessageBus.h"
 
 namespace rdt {
 	class Physics {
@@ -62,7 +63,7 @@ namespace rdt {
 		/*
 			Adds an object to the physical world. Returns its UUID for future lookups. 
 		*/
-		static UniqueID CreateObject(const UniqueID realmID, std::shared_ptr<Polygon> polygon) { return m_instance->CreateObjectImpl(realmID, polygon); }
+		static UniqueID CreateObject(const UniqueID realmID, const MessageID messageID, std::shared_ptr<Polygon> polygon) { return m_instance->CreateObjectImpl(realmID, messageID, polygon); }
 
 		/*
 			Sets an existing objects properties in the physical world.
@@ -90,15 +91,11 @@ namespace rdt {
 		*/
 		static const Polygon& GetPolygon(const UniqueID realmID, const UniqueID objectID) { return m_instance->GetPolygonImpl(realmID, objectID); }
 
-		
 		/*
 			Adds a tag to the physics object, which will be used to interact with other objects.
 		*/
 		static void AddPTag(const UniqueID realmID, const UniqueID objectID, const std::string& tagName) { m_instance->AddPTagImpl(tagName, realmID, objectID); }
 		
-
-		static bool IsCollided(const UniqueID realmID, const UniqueID object1, const UniqueID object2) { return m_instance->IsCollidedImpl(realmID, object1, object2); }
-
 		/*
 			Sets the friction magnitude of the specified object. [0 to 1], where 0 is
 			no friction, and 1 is maximum friction.
@@ -167,9 +164,8 @@ private:
 		void RemoveObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, const unsigned int nProperties);
 		bool QueryObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, const unsigned int propertyQuery);
 
-		UniqueID CreateObjectImpl(const UniqueID realmID, std::shared_ptr<Polygon> polygon);
+		UniqueID CreateObjectImpl(const UniqueID realmID, const MessageID messageID, std::shared_ptr<Polygon> polygon);
 		
-		bool IsCollidedImpl(const UniqueID realmID, const UniqueID object1, const UniqueID object2);
 		void AddPTagImpl(const std::string& tagName, const UniqueID realmID, const UniqueID objectID);
 		void SetAccelerationImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nAcceleration);
 		void SetAccelerationXImpl(const UniqueID realmID, const UniqueID objectID, const double nX);

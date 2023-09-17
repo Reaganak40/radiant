@@ -71,6 +71,7 @@ public:
 	void OnProcessInput(const float deltaTIme) override final;
 	void OnFinalUpdate() override final;
 	void OnRender() override final;
+	void OnMessage(rdt::Message msg) override final;
 
 	void AddMapPtr(Map* nMap);
 	void AddBlinkyPtr(Ghost* blinky);
@@ -98,7 +99,7 @@ private:
 
 	void Look(PacmanMoveDirection direction);
 
-	void ResolveCollisions();
+	void ResolveCollision(rdt::CollisionData* data);
 	void FinalUpdatePosition();
 	void OnEaten();
 	void OnRevived();

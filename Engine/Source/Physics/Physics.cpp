@@ -127,30 +127,12 @@ namespace rdt {
         return object->HasProperties(propertyQuery);
     }
 
-    UniqueID Physics::CreateObjectImpl(const UniqueID realmID, std::shared_ptr<Polygon> polygon)
+    UniqueID Physics::CreateObjectImpl(const UniqueID realmID, const MessageID messageID, std::shared_ptr<Polygon> polygon)
     {
         if (m_realms.find(realmID) == m_realms.end()) {
             return 0;
         }
-        return m_realms.at(realmID)->CreatePhysicsObject(polygon);
-    }
-
-    bool Physics::IsCollidedImpl(const UniqueID realmID, const UniqueID object1, const UniqueID object2)
-    {
-        if (m_realms.find(realmID) == m_realms.end()) {
-            return false;
-        }
-
-        Pobject* object1_ptr = m_realms.at(realmID)->GetPhysicsObject(object1);
-        if (object1_ptr == nullptr) {
-            return false;
-        }
-
-        if (m_realms.at(realmID)->GetPhysicsObject(object2) == nullptr) {
-            return false;
-        }
-
-        return object1_ptr->IsCollidedWith(object2);
+        return m_realms.at(realmID)->CreatePhysicsObject(polygon, messageID);
     }
 
     void Physics::AddPTagImpl(const std::string& tagName, const UniqueID realmID, const UniqueID objectID)

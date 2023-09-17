@@ -1,8 +1,20 @@
 #pragma once
 #include "Message.h"
 #include "Messenger.h"
+#include "Utils/UniqueID.h"
 
 namespace rdt {
+	
+	enum DefaultMessage {
+		MT_Collision = 0xdead
+	};
+
+	struct CollisionData {
+		UniqueID source;
+
+		CollisionData(UniqueID nSource)
+			: source(nSource) {}
+	};
 
 	class MessageBus {
 	private:
@@ -61,6 +73,11 @@ namespace rdt {
 			Adds a new message to the Message Queue.
 		*/
 		static void AddToQueue(const std::string& from, const std::string& to, MessageType type, void* data);
+
+		/*
+			Adds a new message to the Message Queue.
+		*/
+		static void AddToQueue(const MessageID from, const MessageID to, MessageType type, void* data);
 
 	private:
 		static MessageID GetNextMessageID();

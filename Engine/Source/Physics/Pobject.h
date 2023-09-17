@@ -17,7 +17,6 @@ namespace rdt {
 		unsigned int m_properties;
 
 		std::set<Ptag> m_tags;
-		std::set<UniqueID> m_collided_objects;
 		Vec2d m_hitbox_size;
 	public:
 		
@@ -36,11 +35,6 @@ namespace rdt {
 		void AddTag(Ptag ntag);
 
 		bool ShareTags(const Pobject& oObject);
-
-		void ResetCollisions();
-		void AddCollision(const UniqueID objectID);
-		bool IsCollidedWith(const UniqueID objectID);
-		bool CollisionDetected();
 
 		void SetHitBoxSize(const Vec2d& nSize);
 

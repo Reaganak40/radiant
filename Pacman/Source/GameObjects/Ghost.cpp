@@ -19,22 +19,25 @@ Ghost::Ghost(GhostName nName)
 		m_frame_row = 0;
 		m_direction = PacmanMoveDirection::LEFT;
 		m_home_timer.SetInterval(0.5);
+		RegisterToMessageBus("blinky");
 		break;
 	case PINKY:
 		m_frame_row = 1;
 		m_direction = PacmanMoveDirection::DOWN;
 		m_home_timer.SetInterval(Utils::RandomFloat(1.0, 3.0));
-
+		RegisterToMessageBus("pinky");
 		break;
 	case INKY:
 		m_frame_row = 2;
 		m_direction = PacmanMoveDirection::UP;
 		m_home_timer.SetInterval(Utils::RandomFloat(5.0, 8.0));
+		RegisterToMessageBus("inky");
 		break;
 	case CLYDE:
 		m_frame_row = 3;
 		m_direction = PacmanMoveDirection::UP;
 		m_home_timer.SetInterval(Utils::RandomFloat(8.0, 15.0));
+		RegisterToMessageBus("clyde");
 		break;
 	default:
 		m_frame_row = 0;
@@ -89,7 +92,7 @@ void Ghost::OnBind()
 		break;
 	}
 	
-	m_model_ID = Physics::CreateObject(GetRealmID(), std::make_shared<Rect>(spawnPos, GHOST_SPRITE_WIDTH, GHOST_SPRITE_WIDTH));
+	AddObjectToWorld(std::make_shared<Rect>(spawnPos, GHOST_SPRITE_WIDTH, GHOST_SPRITE_WIDTH));
 
 	Physics::SetObjectProperties(GetRealmID(), m_model_ID, DontResolve);
 	Physics::AddPTag(GetRealmID(), m_model_ID, "pacman");
@@ -233,7 +236,6 @@ void Ghost::OnFinalUpdate()
 		return;
 	}
 
-	ResolveCollisions();
 	FinalUpdatePosition();
 }
 
@@ -244,6 +246,14 @@ void Ghost::OnRender()
 		Renderer::SetPolygonTexture("ghost", m_frame_col, m_frame_row);
 		Renderer::AddPolygon(Physics::GetPolygon(GetRealmID(), m_model_ID));
 		Renderer::End();
+	}
+}
+
+void Ghost::OnMessage(Message msg)
+{
+	switch (msg.type) {
+	case MT_Collision:
+		ResolveCollision((CollisionData*)msg.data);
 	}
 }
 
@@ -953,11 +963,11 @@ void Ghost::Look(PacmanMoveDirection direction)
 	}
 }
 
-void Ghost::ResolveCollisions()
+void Ghost::ResolveCollision(rdt::CollisionData* data)
 {
 	UniqueID pacmanModelID = m_pacman_ptr->GetModelID();
 
-	if (Physics::IsCollided(GetRealmID(), m_model_ID, pacmanModelID)) {
+	if (data->source == pacmanModelID) {
 		
 		if (m_is_vulnerable) {
 			OnEaten();

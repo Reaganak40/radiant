@@ -3,6 +3,7 @@
 #include "Polygon/Polygon.h"
 #include "Utils/UniqueID.h"
 #include "Pobject.h"
+#include "Messaging/MessageBus.h"
 
 namespace rdt {
 
@@ -10,6 +11,7 @@ namespace rdt {
 	private:
 		UniqueID m_ID;
 		std::unordered_map<UniqueID, Pobject> m_objects;
+		std::unordered_map<MessageID, UniqueID> m_object_mIDs;
 
 	public:
 		Realm();
@@ -19,7 +21,7 @@ namespace rdt {
 		void OnEndFrame();
 		const UniqueID GetUUID() { return m_ID; }
 
-		const UniqueID CreatePhysicsObject(std::shared_ptr<Polygon> polygon);
+		const UniqueID CreatePhysicsObject(std::shared_ptr<Polygon> polygon, const MessageID messageID);
 		Pobject* GetPhysicsObject(const UniqueID UUID);
 
 		friend class Physics;

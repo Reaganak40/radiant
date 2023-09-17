@@ -2,6 +2,7 @@
 #include "Utils/UniqueID.h"
 #include "Messaging/MessageBus.h"
 #include "Utils/BitSet.h"
+#include "Polygon/Polygon.h"
 
 namespace rdt {
 	class GameObject : public Messenger {
@@ -13,6 +14,12 @@ namespace rdt {
 	protected:
 		UniqueID m_model_ID;
 		BitSet m_gameState;
+
+		/*
+			Helper function for child game object classes to add a polygon
+			to the physical world.
+		*/
+		void AddObjectToWorld(std::shared_ptr<Polygon> polygon);
 
 	public:
 		GameObject();

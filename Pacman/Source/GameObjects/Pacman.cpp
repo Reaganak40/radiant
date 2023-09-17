@@ -18,6 +18,7 @@ Pacman::Pacman(double xPos, double yPos)
 	current_frame = 2;
 	df = -1;
 	
+	RegisterToMessageBus("pacman");
 }
 
 Pacman::~Pacman()
@@ -26,8 +27,7 @@ Pacman::~Pacman()
 
 void Pacman::OnBind()
 {
-	std::shared_ptr<Rect> sprite;
-	m_model_ID = Physics::CreateObject(GetRealmID(), sprite = std::make_shared<Rect>(spawnPos, PACMAN_SPRITE_WIDTH, PACMAN_SPRITE_WIDTH));
+	AddObjectToWorld(std::make_shared<Rect>(spawnPos, PACMAN_SPRITE_WIDTH, PACMAN_SPRITE_WIDTH));
 
 	Physics::SetObjectProperties(GetRealmID(), m_model_ID, DontResolve);
 	Physics::AddPTag(GetRealmID(), m_model_ID, "pacman");

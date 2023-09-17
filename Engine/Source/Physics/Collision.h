@@ -6,6 +6,7 @@
 #include "Pobject.h"
 
 namespace rdt {
+
 	class Collision {
 	private:
 	public:

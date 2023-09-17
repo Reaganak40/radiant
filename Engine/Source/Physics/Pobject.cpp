@@ -78,25 +78,6 @@ namespace rdt {
 		return false;
 	}
 
-	void Pobject::ResetCollisions()
-	{
-		m_collided_objects.clear();
-	}
-
-	void Pobject::AddCollision(const UniqueID objectID)
-	{
-		m_collided_objects.insert(objectID);
-	}
-
-	bool Pobject::IsCollidedWith(const UniqueID objectID)
-	{
-		return m_collided_objects.contains(objectID);
-	}
-
-	bool Pobject::CollisionDetected()
-	{
-		return m_collided_objects.size();
-	}
 	void Pobject::SetHitBoxSize(const Vec2d& nSize)
 	{
 		m_hitbox_size = nSize;

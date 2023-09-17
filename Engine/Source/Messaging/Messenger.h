@@ -12,7 +12,7 @@ namespace rdt {
 			This will set the MessageID to a unique identifer which can be used to send and receive
 			messages.
 		*/
-		void RegisterToMessageBus(std::string& alias);
+		void RegisterToMessageBus(const std::string& alias);
 
 	public:
 		Messenger();

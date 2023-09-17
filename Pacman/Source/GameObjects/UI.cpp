@@ -20,7 +20,8 @@ void UI::OnBind()
 
 	for (int i = 0; i < m_numTiles; i++) {
 		Vec2d spawnPos(m_origin.x + (i * m_tileSize.x), m_origin.y);
-		m_model_ID = Physics::CreateObject(GetRealmID(), std::make_shared<Rect>(spawnPos, m_tileSize.x, m_tileSize.y));
+
+		AddObjectToWorld(std::make_shared<Rect>(spawnPos, m_tileSize.x, m_tileSize.y));
 		Physics::SetObjectProperties(GetRealmID(), m_model_ID, NoCollision);
 		Physics::SetMaximumVelocity(GetRealmID(), m_model_ID, Vec2d::Zero());
 		Physics::SetAcceleration(GetRealmID(), m_model_ID, Vec2d::Zero());

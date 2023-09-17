@@ -24,7 +24,7 @@ void Map::OnBind()
 	using namespace rdt;
 
 	Vec2d spawnPos = Vec2d(SCREEN_WIDTH / 2, (SCREEN_HEIGHT / 2) - 10);
-	m_model_ID = Physics::CreateObject(GetRealmID(), std::make_shared<Rect>(spawnPos, MAP_WIDTH, MAP_HEIGHT));
+	m_model_ID = Physics::CreateObject(GetRealmID(), GetMessageID(), std::make_shared<Rect>(spawnPos, MAP_WIDTH, MAP_HEIGHT));
 	
 	Physics::SetObjectProperties(GetRealmID(), m_model_ID, NoCollision);
 	Physics::SetMaximumVelocity(GetRealmID(), m_model_ID, Vec2d::Zero());

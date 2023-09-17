@@ -85,6 +85,18 @@ namespace rdt {
 		AddToQueue(nMsg);
 	}
 
+	void MessageBus::AddToQueue(const MessageID from, const MessageID to, MessageType type, void* data)
+	{
+		Message nMsg;
+
+		nMsg.from = from;
+		nMsg.to = to;
+		nMsg.type = type;
+		nMsg.data = data;
+
+		AddToQueue(nMsg);
+	}
+
 	MessageID MessageBus::GetNextMessageID()
 	{
 		return ++idCounter;
@@ -94,7 +106,8 @@ namespace rdt {
 	{
 		while (!m_message_queue.empty()) {
 			auto& msg = m_message_queue.front();
-			m_objects[msg.from]->OnMessage(msg);
+			m_objects[msg.to]->OnMessage(msg);
+			msg.Destroy();
 			m_message_queue.pop();
 		}
 	}

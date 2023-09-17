@@ -22,7 +22,8 @@ void PacDot::OnBind()
 		extra_size = 10;
 		m_blinking_timer.Start();
 	}
-	m_model_ID = Physics::CreateObject(GetRealmID(), std::make_shared<Rect>(spawnPos, PAC_DOT_WIDTH + extra_size, PAC_DOT_WIDTH + extra_size));
+
+	AddObjectToWorld(std::make_shared<Rect>(spawnPos, PAC_DOT_WIDTH + extra_size, PAC_DOT_WIDTH + extra_size));
 	Physics::SetObjectProperties(GetRealmID(), m_model_ID, NoCollision);
 	Physics::SetMaximumVelocity(GetRealmID(), m_model_ID, Vec2d::Zero());
 	Physics::SetAcceleration(GetRealmID(), m_model_ID, Vec2d::Zero());

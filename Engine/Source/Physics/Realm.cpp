@@ -16,12 +16,6 @@ namespace rdt {
 
     void Realm::OnUpdate(const float deltaTime)
     {
-        for (auto& [id, object] : m_objects) {
-            if (!object.HasProperties(NoCollision)) {
-                object.ResetCollisions();
-            }
-        }
-
         for (auto& [id1, object1] : m_objects) {
 
             object1.translation.UpdateVelocity(deltaTime);
@@ -36,9 +30,8 @@ namespace rdt {
                     }
 
                     if (Collision::CheckCollision(object1, object2, deltaTime)) {
+                        MessageBus::AddToQueue(m_object_mIDs[id2], m_object_mIDs[id1], MT_Collision, new CollisionData(id2));
                         collisionDetected = true;
-                        object1.AddCollision(id2);
-                        object2.AddCollision(id1);
                     }
                 }
             }
@@ -55,10 +48,11 @@ namespace rdt {
             object.translation.OnEndFrame();
         }
     }
-    const UniqueID Realm::CreatePhysicsObject(std::shared_ptr<Polygon> polygon)
+    const UniqueID Realm::CreatePhysicsObject(std::shared_ptr<Polygon> polygon, const MessageID messageID)
     {
         UniqueID objectID = GetUniqueID();
         m_objects[objectID] = Pobject(polygon);
+        m_object_mIDs[objectID] = messageID;
         return objectID;
     }
 

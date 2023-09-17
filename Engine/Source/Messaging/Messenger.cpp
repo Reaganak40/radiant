@@ -12,8 +12,8 @@ namespace rdt {
 	{
 	}
 
-	void Messenger::RegisterToMessageBus(std::string& alias)
+	void Messenger::RegisterToMessageBus(const std::string& alias)
 	{
-		MessageBus::Register(alias, this);
+		m_messageID = MessageBus::Register(alias, this);
 	}
 }
