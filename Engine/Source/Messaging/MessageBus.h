@@ -1,20 +1,8 @@
 #pragma once
 #include "Message.h"
 #include "Messenger.h"
-#include "Utils/UniqueID.h"
 
 namespace rdt {
-	
-	enum DefaultMessage {
-		MT_Collision = 0xdead
-	};
-
-	struct CollisionData {
-		UniqueID source;
-
-		CollisionData(UniqueID nSource)
-			: source(nSource) {}
-	};
 
 	class MessageBus {
 	private:

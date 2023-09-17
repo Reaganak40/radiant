@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Realm.h"
 #include "Collision.h"
+#include "Messaging/MessageTypes.h"
 
 namespace rdt {
 

@@ -62,28 +62,22 @@ void Level::OnRegister()
 	m_game_objects.push_back(blinky = new Ghost(BLINKY));
 	blinky->RegisterToRealm(m_realms[0]);
 	blinky->AddMapPtr(map);
-	blinky->SetPacmanPtr(pacman);
 
 	Ghost* inky;
 	m_game_objects.push_back(inky = new Ghost(INKY));
 	inky->RegisterToRealm(m_realms[0]);
 	inky->AddMapPtr(map);
-	inky->SetPacmanPtr(pacman);
-	inky->AddBlinkyPtr(blinky);
-
 
 	Ghost* pinky;
 	m_game_objects.push_back(pinky = new Ghost(PINKY));
 	pinky->RegisterToRealm(m_realms[0]);
 	pinky->AddMapPtr(map);
-	pinky->SetPacmanPtr(pacman);
 
 
 	Ghost* clyde;
 	m_game_objects.push_back(clyde = new Ghost(CLYDE));
 	clyde->RegisterToRealm(m_realms[0]);
 	clyde->AddMapPtr(map);
-	clyde->SetPacmanPtr(pacman);
 
 	UI* highScore;
 	m_game_objects.push_back(highScore = new UI(10, {18, 18}));
@@ -143,7 +137,7 @@ void Level::OnRegister()
 	}
 	m_1up_timer.Start();
 
-	//m_GUIs.push_back(new DiagnosticsGUI);
+	m_GUIs.push_back(new DiagnosticsGUI);
 }
 
 void Level::OnBind()

@@ -62,6 +62,8 @@ private:
 	Pacman* m_pacman_ptr;
 	Ghost* m_blinky_ptr;
 
+	std::string m_nameStr;
+
 public:
 	Ghost(GhostName nName);
 	~Ghost();
@@ -74,7 +76,6 @@ public:
 	void OnMessage(rdt::Message msg) override final;
 
 	void AddMapPtr(Map* nMap);
-	void AddBlinkyPtr(Ghost* blinky);
 
 	void SetVulnerable(bool state);
 	void SetIsBlinking(bool blink);
@@ -82,9 +83,10 @@ public:
 
 	void SetMovementMode(MovementMode mode);
 
-	void SetPacmanPtr(Pacman* pacman);
 	void Respawn();
 private:
+	void AddGameObjectPtr(rdt::MessageID from, rdt::GameObjectPtrData* data);
+
 	void SelectNewTarget();
 	void SelectRandom();
 	void SelectNext();

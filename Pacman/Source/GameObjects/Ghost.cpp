@@ -1,4 +1,5 @@
 #include "Ghost.h"
+#include "Messages.h"
 
 using namespace rdt;
 
@@ -19,25 +20,25 @@ Ghost::Ghost(GhostName nName)
 		m_frame_row = 0;
 		m_direction = PacmanMoveDirection::LEFT;
 		m_home_timer.SetInterval(0.5);
-		RegisterToMessageBus("blinky");
+		m_nameStr = "blinky";
 		break;
 	case PINKY:
 		m_frame_row = 1;
 		m_direction = PacmanMoveDirection::DOWN;
 		m_home_timer.SetInterval(Utils::RandomFloat(1.0, 3.0));
-		RegisterToMessageBus("pinky");
+		m_nameStr = "pinky";
 		break;
 	case INKY:
 		m_frame_row = 2;
 		m_direction = PacmanMoveDirection::UP;
 		m_home_timer.SetInterval(Utils::RandomFloat(5.0, 8.0));
-		RegisterToMessageBus("inky");
+		m_nameStr = "inky";
 		break;
 	case CLYDE:
 		m_frame_row = 3;
 		m_direction = PacmanMoveDirection::UP;
 		m_home_timer.SetInterval(Utils::RandomFloat(8.0, 15.0));
-		RegisterToMessageBus("clyde");
+		m_nameStr = "clyde";
 		break;
 	default:
 		m_frame_row = 0;
@@ -45,6 +46,8 @@ Ghost::Ghost(GhostName nName)
 		m_speed = 0;
 		break;
 	}
+	RegisterToMessageBus(m_nameStr);
+
 
 	if (m_name == BLINKY) {
 		m_is_home = false;
@@ -105,6 +108,12 @@ void Ghost::OnBind()
 	}
 
 	m_frame_timer.Start();
+
+	MessageBus::AddToQueue(m_nameStr, "pacman", MT_RequestGameObjectPtr, nullptr);
+
+	if (m_name == INKY) {
+		MessageBus::AddToQueue(m_nameStr, "blinky", MT_RequestGameObjectPtr, nullptr);
+	}
 }
 
 void Ghost::OnRelease()
@@ -254,19 +263,19 @@ void Ghost::OnMessage(Message msg)
 	switch (msg.type) {
 	case MT_Collision:
 		ResolveCollision((CollisionData*)msg.data);
+		break;
+	case MT_SendGameObjectPtr:
+		AddGameObjectPtr(msg.from, (GameObjectPtrData*)msg.data);
+		break;
+	case MT_RequestGameObjectPtr:
+		SendMessage(msg.from, MT_SendGameObjectPtr, new GameObjectPtrData(this));
+		break;
 	}
 }
 
 void Ghost::AddMapPtr(Map* nMap)
 {
 	m_map = nMap;
-}
-
-void Ghost::AddBlinkyPtr(Ghost* blinky)
-{
-	if (m_name == INKY) {
-		m_blinky_ptr = blinky;
-	}
 }
 
 void Ghost::SetVulnerable(bool state)
@@ -355,11 +364,6 @@ void Ghost::SetMovementMode(MovementMode mode)
 	}
 }
 
-void Ghost::SetPacmanPtr(Pacman* pacman)
-{
-	m_pacman_ptr = pacman;
-}
-
 void Ghost::Respawn()
 {
 	Physics::SetPosition(GetRealmID(), m_model_ID, spawnPos);
@@ -416,6 +420,18 @@ void Ghost::Respawn()
 
 	m_frame_timer.Start();
 	m_home_timer.Start();
+}
+
+void Ghost::AddGameObjectPtr(MessageID from, GameObjectPtrData* data)
+{
+	std::string alias = MessageBus::GetAlias(from);
+	
+	if (alias == "pacman") {
+		m_pacman_ptr = (Pacman*)data->ptr;
+	}
+	else if (alias == "blinky") {
+		m_blinky_ptr = (Ghost*)data->ptr;
+	}
 }
 
 void Ghost::SelectNewTarget()
@@ -973,7 +989,7 @@ void Ghost::ResolveCollision(rdt::CollisionData* data)
 			OnEaten();
 		}
 		else if (!m_is_eaten) {
-			m_pacman_ptr->SetHitFlag();
+			SendMessage("pacman", PacmanHit, nullptr);
 		}
 	}
 }

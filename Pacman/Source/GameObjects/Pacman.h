@@ -39,6 +39,7 @@ public:
 	void OnProcessInput(const float deltaTime) override final;
 	void OnFinalUpdate() override final;
 	void OnRender() override final;
+	void OnMessage(rdt::Message msg) override final;
 
 	void AddMapPtr(Map* map);
 
@@ -49,7 +50,6 @@ public:
 	PacmanMoveDirection GetDirection();
 
 	void SetPause(bool pause);
-	void SetHitFlag();
 
 	void BeginDeathAnimation();
 	bool InDeathAnimation();
@@ -60,4 +60,6 @@ private:
 	void UpdateVelocityAndDirection();
 	void UpdateTextureFrame(const float deltaTime);
 	void ReAlignToMap();
+	void OnHit();
+
 };

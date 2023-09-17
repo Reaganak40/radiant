@@ -14,3 +14,6 @@
 #include "Utils/Utils.h"
 #include "Gui/GuiManager.h"
 
+#include "Messaging/MessageTypes.h"
+
+

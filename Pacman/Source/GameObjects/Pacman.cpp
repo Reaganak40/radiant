@@ -1,4 +1,5 @@
 #include "Pacman.h"
+#include "Messages.h"
 
 using namespace rdt;
 Pacman::Pacman(double xPos, double yPos)
@@ -86,6 +87,18 @@ void Pacman::OnRender()
 	Renderer::End();
 }
 
+void Pacman::OnMessage(rdt::Message msg)
+{
+	switch (msg.type) {
+	case MT_RequestGameObjectPtr:
+		SendMessage(msg.from, MT_SendGameObjectPtr, new GameObjectPtrData(this));
+		break;
+	case PacmanHit:
+		OnHit();
+		break;
+	}
+}
+
 void Pacman::AddMapPtr(Map* map)
 {
 	m_map = map;
@@ -123,13 +136,6 @@ PacmanMoveDirection Pacman::GetDirection()
 void Pacman::SetPause(bool pause)
 {
 	m_paused = pause;
-}
-
-void Pacman::SetHitFlag()
-{
-	m_is_hit = true;
-	m_frame_col = 0;
-	m_texture_timer.End();
 }
 
 void Pacman::BeginDeathAnimation()
@@ -424,5 +430,12 @@ void Pacman::ReAlignToMap()
 			break;
 		}
 	}
+}
+
+void Pacman::OnHit()
+{
+	m_is_hit = true;
+	m_frame_col = 0;
+	m_texture_timer.End();
 }
 

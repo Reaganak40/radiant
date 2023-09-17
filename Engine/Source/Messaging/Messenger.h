@@ -24,6 +24,16 @@ namespace rdt {
 		const MessageID GetMessageID() { return m_messageID; }
 
 		/*
+			Send a message through the message bus.
+		*/
+		void SendMessage(MessageID to, MessageType type, void* data);
+
+		/*
+			Send a message through the message bus.
+		*/
+		void SendMessage(const std::string& to, MessageType type, void* data);
+
+		/*
 			Called when a message is received through the message bus.
 		*/
 		virtual void OnMessage(Message msg) = 0;

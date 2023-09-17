@@ -142,6 +142,7 @@
     <ClCompile Include="Source\Scenes\Level.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Messages.h" />
     <ClInclude Include="Source\Game.h" />
     <ClInclude Include="Source\GameObjects\Ghost.h" />
     <ClInclude Include="Source\GameObjects\Map.h" />

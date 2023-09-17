@@ -1175,6 +1175,9 @@
     <ClInclude Include="Source\Messaging\Messenger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Messaging\MessageTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="Vendor\GLFW\lib-vc2022\glfw3.lib" />
