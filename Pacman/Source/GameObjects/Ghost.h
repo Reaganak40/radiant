@@ -32,37 +32,34 @@ enum MovementMode {
 class Ghost : public rdt::GameObject {
 private:
 	GhostName m_name;
+	std::string m_nameStr;
 	rdt::Vec2d spawnPos;
 	double m_speed;
 
+	Map* m_map_ptr;
+	Pacman* m_pacman_ptr;
+	Ghost* m_blinky_ptr;
+
 	rdt::Timer m_frame_timer;
+	rdt::Timer m_path_finding_timer;
+	rdt::Timer m_movement_timer;
+	rdt::Timer m_blink_timer;
+	
 	int df;
 	int m_frame_row;
 	int m_frame_col;
 
-	Map* m_map;
 	rdt::Vec2i m_target_coords;
 	PacmanMoveDirection m_direction;
-
 	MovementMode m_movement_mode;
 	std::queue<PacmanMoveDirection> m_direction_queue;
-	rdt::Timer m_path_finding_timer;
-	rdt::Timer m_movement_timer;
 
-	rdt::Timer m_home_timer;
 	bool m_is_home;
-
+	bool m_should_leave;
 	bool m_is_vulnerable;
 	bool m_is_blinking;
 	bool m_is_eaten;
-	rdt::Timer m_blink_timer;
-
 	bool m_paused;
-
-	Pacman* m_pacman_ptr;
-	Ghost* m_blinky_ptr;
-
-	std::string m_nameStr;
 
 public:
 	Ghost(GhostName nName);
@@ -74,8 +71,6 @@ public:
 	void OnFinalUpdate() override final;
 	void OnRender() override final;
 	void OnMessage(rdt::Message msg) override final;
-
-	void AddMapPtr(Map* nMap);
 
 	void SetVulnerable(bool state);
 	void SetIsBlinking(bool blink);

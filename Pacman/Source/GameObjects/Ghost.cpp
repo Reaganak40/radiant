@@ -1,5 +1,4 @@
 #include "Ghost.h"
-#include "Messages.h"
 
 using namespace rdt;
 
@@ -8,7 +7,9 @@ Ghost::Ghost(GhostName nName)
 {
 	spawnPos = Vec2d::Zero();
 	m_target_coords = { 15, 10 };
-	m_map = nullptr;
+	m_speed = GHOST_SPEED;
+
+	m_map_ptr = nullptr;
 	m_pacman_ptr = nullptr;
 	m_blinky_ptr = nullptr;
 	m_is_vulnerable = false;
@@ -19,25 +20,21 @@ Ghost::Ghost(GhostName nName)
 	case BLINKY:
 		m_frame_row = 0;
 		m_direction = PacmanMoveDirection::LEFT;
-		m_home_timer.SetInterval(0.5);
 		m_nameStr = "blinky";
 		break;
 	case PINKY:
 		m_frame_row = 1;
 		m_direction = PacmanMoveDirection::DOWN;
-		m_home_timer.SetInterval(Utils::RandomFloat(1.0, 3.0));
 		m_nameStr = "pinky";
 		break;
 	case INKY:
 		m_frame_row = 2;
 		m_direction = PacmanMoveDirection::UP;
-		m_home_timer.SetInterval(Utils::RandomFloat(5.0, 8.0));
 		m_nameStr = "inky";
 		break;
 	case CLYDE:
 		m_frame_row = 3;
 		m_direction = PacmanMoveDirection::UP;
-		m_home_timer.SetInterval(Utils::RandomFloat(8.0, 15.0));
 		m_nameStr = "clyde";
 		break;
 	default:
@@ -48,14 +45,17 @@ Ghost::Ghost(GhostName nName)
 	}
 	RegisterToMessageBus(m_nameStr);
 
-
 	if (m_name == BLINKY) {
 		m_is_home = false;
-		m_speed = GHOST_SPEED;
+		m_should_leave = true;
+	}
+	else if (m_name == PINKY) {
+		m_is_home = true;
+		m_should_leave = true;
 	}
 	else {
 		m_is_home = true;
-		m_speed = GHOST_SPEED;
+		m_should_leave = false;
 	}
 
 	m_frame_col = 0;
@@ -72,7 +72,8 @@ Ghost::~Ghost()
 
 void Ghost::OnBind()
 {
-	spawnPos = m_map->GetWorldCoordinates(m_target_coords);
+	SendDirectMessage("map", MT_RequestGameObjectPtr, nullptr);
+	spawnPos = m_map_ptr->GetWorldCoordinates(m_target_coords);
 	
 	switch (m_name) {
 	case BLINKY:
@@ -103,16 +104,12 @@ void Ghost::OnBind()
 	Physics::SetAcceleration(GetRealmID(), m_model_ID, Vec2d::Zero());
 	Physics::SetFriction(GetRealmID(), m_model_ID, 0);
 
-	if (m_is_home) {
-		m_home_timer.Start();
-	}
-
 	m_frame_timer.Start();
 
-	MessageBus::AddToQueue(m_nameStr, "pacman", MT_RequestGameObjectPtr, nullptr);
+	SendMessage("pacman", MT_RequestGameObjectPtr, nullptr);
 
 	if (m_name == INKY) {
-		MessageBus::AddToQueue(m_nameStr, "blinky", MT_RequestGameObjectPtr, nullptr);
+		SendMessage("blinky", MT_RequestGameObjectPtr, nullptr);
 	}
 }
 
@@ -127,7 +124,7 @@ void Ghost::OnProcessInput(const float deltaTime)
 	}
 
 	const Vec2d location = Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
-	const Vec2d target = m_map->GetWorldCoordinates(m_target_coords);
+	const Vec2d target = m_map_ptr->GetWorldCoordinates(m_target_coords);
 
 	if (!m_is_home && location == target) {
 		Vec2d nVelocity = Vec2d::Zero();
@@ -163,17 +160,8 @@ void Ghost::OnProcessInput(const float deltaTime)
 			m_direction = DOWN;
 			nVelocity.y = -m_speed;
 		}
-		else if (m_home_timer.IsRunning() && !m_home_timer.Update(deltaTime)) {
+		else if (m_should_leave) {
 
-			if (m_direction == UP) {
-				nVelocity.y = m_speed * 0.50;
-			}
-			else if (m_direction == DOWN) {
-				nVelocity.y = -m_speed * 0.50;
-			}
-
-		}
-		else {
 			// time to leave base
 			if (location.x > BLINKY_HOME_X) {
 				nVelocity.x = -GHOST_SPEED * 0.50;
@@ -191,6 +179,14 @@ void Ghost::OnProcessInput(const float deltaTime)
 					Look(m_direction);
 				}
 				nVelocity.y = GHOST_SPEED * 0.45;
+			}
+		}
+		else {
+			if (m_direction == UP) {
+				nVelocity.y = m_speed * 0.50;
+			}
+			else if (m_direction == DOWN) {
+				nVelocity.y = -m_speed * 0.50;
 			}
 		}
 		Physics::SetVelocity(GetRealmID(), m_model_ID, nVelocity);
@@ -270,17 +266,14 @@ void Ghost::OnMessage(Message msg)
 	case MT_RequestGameObjectPtr:
 		SendMessage(msg.from, MT_SendGameObjectPtr, new GameObjectPtrData(this));
 		break;
+	case PMT_LeaveHome:
+		m_should_leave = true;
+		break;
 	}
-}
-
-void Ghost::AddMapPtr(Map* nMap)
-{
-	m_map = nMap;
 }
 
 void Ghost::SetVulnerable(bool state)
 {
-
 	if (m_is_home) {
 		return;
 	}
@@ -379,23 +372,19 @@ void Ghost::Respawn()
 	case BLINKY:
 		m_frame_row = 0;
 		m_direction = PacmanMoveDirection::LEFT;
-		m_home_timer.SetInterval(0.5);
 		break;
 	case PINKY:
 		m_frame_row = 1;
 		m_direction = PacmanMoveDirection::DOWN;
-		m_home_timer.SetInterval(Utils::RandomFloat(1.0, 3.0));
 
 		break;
 	case INKY:
 		m_frame_row = 2;
 		m_direction = PacmanMoveDirection::UP;
-		m_home_timer.SetInterval(Utils::RandomFloat(5.0, 8.0));
 		break;
 	case CLYDE:
 		m_frame_row = 3;
 		m_direction = PacmanMoveDirection::UP;
-		m_home_timer.SetInterval(Utils::RandomFloat(8.0, 15.0));
 		break;
 	default:
 		m_frame_row = 0;
@@ -406,9 +395,15 @@ void Ghost::Respawn()
 
 	if (m_name == BLINKY) {
 		m_is_home = false;
+		m_should_leave = true;
+	}
+	else if (m_name == PINKY) {
+		m_is_home = true;
+		m_should_leave = true;
 	}
 	else {
 		m_is_home = true;
+		m_should_leave = false;
 	}
 
 	m_frame_col = 0;
@@ -419,7 +414,6 @@ void Ghost::Respawn()
 	SetMovementMode(CHASE);
 
 	m_frame_timer.Start();
-	m_home_timer.Start();
 }
 
 void Ghost::AddGameObjectPtr(MessageID from, GameObjectPtrData* data)
@@ -431,6 +425,9 @@ void Ghost::AddGameObjectPtr(MessageID from, GameObjectPtrData* data)
 	}
 	else if (alias == "blinky") {
 		m_blinky_ptr = (Ghost*)data->ptr;
+	}
+	else if (alias == "map") {
+		m_map_ptr = (Map*)data->ptr;
 	}
 }
 
@@ -478,14 +475,14 @@ void Ghost::SelectRandom()
 		options[UP] = false;
 	}
 	else {
-		options[UP] = m_map->IsInMap(m_target_coords.y - 1, m_target_coords.x);
+		options[UP] = m_map_ptr->IsInMap(m_target_coords.y - 1, m_target_coords.x);
 	}
 
 	if (m_direction == UP) {
 		options[DOWN] = false;
 	}
 	else {
-		options[DOWN] = m_map->IsInMap(m_target_coords.y + 1, m_target_coords.x);
+		options[DOWN] = m_map_ptr->IsInMap(m_target_coords.y + 1, m_target_coords.x);
 	}
 
 	if (m_direction == RIGHT) {
@@ -496,7 +493,7 @@ void Ghost::SelectRandom()
 			options[LEFT] = true;
 		}
 		else {
-			options[LEFT] = m_map->IsInMap(m_target_coords.y, m_target_coords.x - 1);
+			options[LEFT] = m_map_ptr->IsInMap(m_target_coords.y, m_target_coords.x - 1);
 		}
 	}
 
@@ -508,7 +505,7 @@ void Ghost::SelectRandom()
 			options[RIGHT] = true;
 		}
 		else {
-			options[RIGHT] = m_map->IsInMap(m_target_coords.y, m_target_coords.x + 1);
+			options[RIGHT] = m_map_ptr->IsInMap(m_target_coords.y, m_target_coords.x + 1);
 		}
 	}
 
@@ -818,7 +815,7 @@ void Ghost::CreateChasePath()
 			break;
 		}
 
-		while (!m_map->IsInMap(target.y, target.x)) {
+		while (!m_map_ptr->IsInMap(target.y, target.x)) {
 			if (target.x < 28) {
 				target.x += 1;
 			}
@@ -865,7 +862,7 @@ void Ghost::CreateChasePath()
 		target *= 2;
 		target = blinkyPos + target;
 
-		while (!m_map->IsInMap(target.y, target.x)) {
+		while (!m_map_ptr->IsInMap(target.y, target.x)) {
 			if (target.x > 28) {
 				target.x--;
 			}
@@ -920,7 +917,7 @@ void Ghost::CreateHomePath()
 void Ghost::CreateShortestPath(rdt::Vec2i target)
 {
 	/* Use Djikstra shortest path to create the direction queue. */
-	m_map->Djikstra(m_target_coords, target, m_direction_queue, m_direction);
+	m_map_ptr->Djikstra(m_target_coords, target, m_direction_queue, m_direction);
 
 	if (m_direction_queue.empty()) {
 		m_movement_mode = FRIGHTENED;
@@ -930,7 +927,7 @@ void Ghost::CreateShortestPath(rdt::Vec2i target)
 rdt::Vec2i Ghost::GetMapCoordinates()
 {
 	const Vec2d location = Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
-	return m_map->GetMapCoordinates(location);
+	return m_map_ptr->GetMapCoordinates(location);
 }
 
 void Ghost::Look(PacmanMoveDirection direction)
@@ -989,7 +986,7 @@ void Ghost::ResolveCollision(rdt::CollisionData* data)
 			OnEaten();
 		}
 		else if (!m_is_eaten) {
-			SendMessage("pacman", PacmanHit, nullptr);
+			SendMessage("pacman", PMT_PacmanHit, nullptr);
 		}
 	}
 }
@@ -997,7 +994,7 @@ void Ghost::ResolveCollision(rdt::CollisionData* data)
 void Ghost::FinalUpdatePosition()
 {
 	const Vec2d location = Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
-	const Vec2d worldCoords = m_map->GetWorldCoordinates(m_target_coords);
+	const Vec2d worldCoords = m_map_ptr->GetWorldCoordinates(m_target_coords);
 	double error = TILE_WIDTH / 6;
 
 	if (m_is_home) {
@@ -1014,7 +1011,7 @@ void Ghost::FinalUpdatePosition()
 
 		if (m_direction == UP) {
 
-			if (m_home_timer.IsRunning()) {
+			if (m_is_home && !m_should_leave) {
 				if (location.y > (GHOST_HOME_Y + MAX_HOME_Y_RANGE)) {
 					Physics::SetPosition(GetRealmID(), m_model_ID, { location.x, GHOST_HOME_Y + MAX_HOME_Y_RANGE });
 					m_direction = DOWN;
@@ -1069,12 +1066,12 @@ void Ghost::FinalUpdatePosition()
 	}
 
 	/* Check if ghost is using tunnel to teleport. */
-	if (location.x < m_map->GetWorldCoordinates({0, 13}).x) {
-		Physics::SetPosition(GetRealmID(), m_model_ID, m_map->GetWorldCoordinates({31, 13}));
+	if (location.x < m_map_ptr->GetWorldCoordinates({0, 13}).x) {
+		Physics::SetPosition(GetRealmID(), m_model_ID, m_map_ptr->GetWorldCoordinates({31, 13}));
 		return;
 	}
-	else if (location.x > m_map->GetWorldCoordinates({ 31, 13 }).x) {
-		Physics::SetPosition(GetRealmID(), m_model_ID, m_map->GetWorldCoordinates({ 0, 13 }));
+	else if (location.x > m_map_ptr->GetWorldCoordinates({ 31, 13 }).x) {
+		Physics::SetPosition(GetRealmID(), m_model_ID, m_map_ptr->GetWorldCoordinates({ 0, 13 }));
 		return;
 	}
 

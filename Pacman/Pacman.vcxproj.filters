@@ -59,9 +59,6 @@
     <ClInclude Include="Source\GameObjects\UI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Messages.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Textures\pacman.png">

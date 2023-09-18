@@ -67,6 +67,22 @@ namespace rdt {
 		*/
 		static void AddToQueue(const MessageID from, const MessageID to, MessageType type, void* data);
 
+		/*
+			Sends a message directly to the receiver, calling its OnMessage immediately.
+		*/
+		static void SendDirectMessage(Message& msg);
+		
+		/*
+			Sends a message directly to the receiver, calling its OnMessage immediately.
+		*/
+		static void SendDirectMessage(const std::string& from, const std::string& to, MessageType type, void* data);
+
+		/*
+			Sends a message directly to the receiver, calling its OnMessage immediately.
+		*/
+		static void SendDirectMessage(const MessageID from, const MessageID to, MessageType type, void* data);
+
+
 	private:
 		static MessageID GetNextMessageID();
 		void SendMessagesImpl();

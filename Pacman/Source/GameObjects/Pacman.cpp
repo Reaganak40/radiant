@@ -1,5 +1,4 @@
 #include "Pacman.h"
-#include "Messages.h"
 
 using namespace rdt;
 Pacman::Pacman(double xPos, double yPos)
@@ -28,6 +27,7 @@ Pacman::~Pacman()
 
 void Pacman::OnBind()
 {
+	SendDirectMessage("map", MT_RequestGameObjectPtr, nullptr);
 	AddObjectToWorld(std::make_shared<Rect>(spawnPos, PACMAN_SPRITE_WIDTH, PACMAN_SPRITE_WIDTH));
 
 	Physics::SetObjectProperties(GetRealmID(), m_model_ID, DontResolve);
@@ -93,15 +93,23 @@ void Pacman::OnMessage(rdt::Message msg)
 	case MT_RequestGameObjectPtr:
 		SendMessage(msg.from, MT_SendGameObjectPtr, new GameObjectPtrData(this));
 		break;
-	case PacmanHit:
+	case PMT_PacmanHit:
 		OnHit();
 		break;
-	}
-}
+	case MT_SendGameObjectPtr:
+		AddGameObjectPtr(msg.from, (GameObjectPtrData*)msg.data);
+		break;
+	case PMT_StartDeathAnimation:
+		BeginDeathAnimation();
+		break;
+	case PMT_PauseGame:
+		SetPause(true);
+		break;
+	case PMT_ResumeGame:
+		SetPause(false);
+		break;
 
-void Pacman::AddMapPtr(Map* map)
-{
-	m_map = map;
+	}
 }
 
 void Pacman::Respawn()
@@ -145,11 +153,6 @@ void Pacman::BeginDeathAnimation()
 	m_death_timer.Start();
 }
 
-bool Pacman::InDeathAnimation()
-{
-	return m_dead_animation;
-}
-
 bool Pacman::InRespawn()
 {
 	return m_in_respawn;
@@ -158,6 +161,13 @@ bool Pacman::InRespawn()
 bool Pacman::IsHit()
 {
 	return m_is_hit;
+}
+
+void Pacman::AddGameObjectPtr(rdt::MessageID from, rdt::GameObjectPtrData* data)
+{
+	if (MessageBus::GetAlias(from) == "map") {
+		m_map = (Map*)data->ptr;
+	}
 }
 
 void Pacman::UpdateVelocityAndDirection()
@@ -351,6 +361,7 @@ void Pacman::UpdateTextureFrame(const float deltaTime)
 			if (m_frame_col == 10) {
 				m_dead_animation = false;
 				m_is_hit = false;
+				SendMessage("level", PMT_EndDeathAnimation);
 			}
 			else {
 				m_death_timer.Start();
@@ -437,5 +448,6 @@ void Pacman::OnHit()
 	m_is_hit = true;
 	m_frame_col = 0;
 	m_texture_timer.End();
+	SendDirectMessage("level", PMT_PacmanHit);
 }
 

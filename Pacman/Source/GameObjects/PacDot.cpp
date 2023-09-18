@@ -3,7 +3,7 @@
 using namespace rdt;
 
 PacDot::PacDot(double xPos, double yPos)
-	: m_blinking_timer(0.35)
+	: m_blinking_timer(0.35f)
 {
 	spawnPos = { xPos, yPos };
 	m_color = rdt::WHITE;

@@ -8,7 +8,7 @@ using namespace rdt;
 
 Level::Level()
 	: previously_bounded(false), loaded_textures(false), m_power_timer(10.0), ghosts_blinking(false),
-	m_spawn_timer(2.5), m_show_hit_timer(0.5), waiting_respawn(false), m_1up_timer(0.25)
+	m_spawn_timer(2.5), m_show_hit_timer(0.5), m_1up_timer(0.25)
 {
 	for (int i = 0; i < NUM_TILES_Y; i++) {
 		m_dotMap[i].fill(nullptr);
@@ -16,6 +16,11 @@ Level::Level()
 
 	playerScore = 0;
 	highScore = 0;
+	levelDotCount = 0;
+	clyde_out = false;
+	inky_out = false;
+	m_pacman_death_state = PDS_NoDeath;
+	RegisterToMessageBus("level");
 }
 
 Level::~Level()
@@ -56,28 +61,23 @@ void Level::OnRegister()
 	Map* map;
 	m_game_objects.push_back(map = new Map);
 	map->RegisterToRealm(m_realms[0]);
-	pacman->AddMapPtr(map);
 
 	Ghost* blinky;
 	m_game_objects.push_back(blinky = new Ghost(BLINKY));
 	blinky->RegisterToRealm(m_realms[0]);
-	blinky->AddMapPtr(map);
 
 	Ghost* inky;
 	m_game_objects.push_back(inky = new Ghost(INKY));
 	inky->RegisterToRealm(m_realms[0]);
-	inky->AddMapPtr(map);
 
 	Ghost* pinky;
 	m_game_objects.push_back(pinky = new Ghost(PINKY));
 	pinky->RegisterToRealm(m_realms[0]);
-	pinky->AddMapPtr(map);
 
 
 	Ghost* clyde;
 	m_game_objects.push_back(clyde = new Ghost(CLYDE));
 	clyde->RegisterToRealm(m_realms[0]);
-	clyde->AddMapPtr(map);
 
 	UI* highScore;
 	m_game_objects.push_back(highScore = new UI(10, {18, 18}));
@@ -159,27 +159,25 @@ void Level::OnBind()
 
 	PauseGame();
 	m_spawn_timer.Start();
+	inky_out = false;
+	clyde_out = false;
 }
 
 void Level::OnProcessInput(const float deltaTime)
 {
 
-	if (((Pacman*)m_game_objects[0])->IsHit()) {
-
-		if (m_show_hit_timer.IsRunning()) {
-			if (m_show_hit_timer.Update(deltaTime)) {
-				((Pacman*)m_game_objects[0])->BeginDeathAnimation();
-				((Pacman*)m_game_objects[0])->SetPause(false);
-				waiting_respawn = true;
-			}
-		}
-		else if (!((Pacman*)m_game_objects[0])->InDeathAnimation()) {
-			PauseGame();
-			m_show_hit_timer.Start();
-		}
-	}
-	else if (waiting_respawn) {
+	switch (m_pacman_death_state) {
+	case PDS_NoDeath:
+		break;
+	case PDS_ShowHit:
+		PacmanDeathShowHitPhase(deltaTime);
+		break;
+	case PDS_DeathAnimation:
+		break;
+	case PDS_Repawn:
 		Respawn();
+		m_pacman_death_state = PDS_NoDeath;
+		break;
 	}
 
 	if (m_power_timer.IsRunning()) {
@@ -233,9 +231,32 @@ void Level::OnRender()
 		}
 
 		UpdatePlayerScore(10);
+		levelDotCount++;
+
+		if (levelDotCount >= 30 && !inky_out) {
+			SendMessage("inky", PMT_LeaveHome, nullptr);
+			inky_out = true;
+		}
+		else if (levelDotCount >= 60 && !clyde_out) {
+			SendMessage("clyde", PMT_LeaveHome, nullptr);
+			clyde_out = true;
+		}
+
 	}
 
 	RunRenderQueue();
+}
+
+void Level::OnMessage(rdt::Message msg)
+{
+	switch (msg.type) {
+	case PMT_PacmanHit:
+		m_pacman_death_state = PDS_ShowHit;
+		break;
+	case PMT_EndDeathAnimation:
+		m_pacman_death_state = PDS_Repawn;
+		break;
+	}
 }
 
 void Level::ActivatePowerMode()
@@ -298,7 +319,6 @@ void Level::ResumeGame()
 
 void Level::Respawn()
 {
-	waiting_respawn = false;
 	((Pacman*)m_game_objects[0])->Respawn();
 	((Pacman*)m_game_objects[0])->SetPause(true);
 
@@ -308,6 +328,8 @@ void Level::Respawn()
 
 	m_spawn_timer.SetInterval(1.7f);
 	m_spawn_timer.Start();
+	inky_out = false;
+	clyde_out = false;
 }
 
 void Level::UpdatePlayerScore(int pointsToAdd)
@@ -320,3 +342,19 @@ void Level::UpdatePlayerScore(int pointsToAdd)
 		((UI*)m_game_objects.at(HIGHSCORE_VAL_INDEX))->SetText(std::to_string(highScore));
 	}
 }
+
+void Level::PacmanDeathShowHitPhase(const float deltaTime)
+{
+	if (m_show_hit_timer.IsRunning()) {
+		if (m_show_hit_timer.Update(deltaTime)) {
+			SendDirectMessage("pacman", PMT_StartDeathAnimation);
+			m_pacman_death_state = PDS_DeathAnimation;
+		}
+	}
+	else {
+		m_show_hit_timer.Start();
+		PauseGame();
+		SendDirectMessage("pacman", PMT_ResumeGame);
+	}
+}
+

@@ -1,4 +1,5 @@
 #pragma once
+#include "Messaging/Messenger.h"
 #include "Utils/UniqueID.h"
 #include "GameObject/GameObject.h"
 #include "Gui/Gui.h"
@@ -11,7 +12,7 @@ namespace rdt {
 
 
 	*/
-	class Scene {
+	class Scene : public Messenger {
 	private:
 		UniqueID m_ID;
 
@@ -53,6 +54,11 @@ namespace rdt {
 			Unbinds the scene, notifying the host application that it is time to exit.
 		*/
 		void BeginExit();
+
+		/*
+			To implement function when the object receives a message from the Message Bus.
+		*/
+		void OnMessage(Message msg) override {}
 
 	public:
 		Scene();

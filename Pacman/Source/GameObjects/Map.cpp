@@ -2,10 +2,13 @@
 #include <iostream>
 #include <queue>
 
+using namespace rdt;
+
 Map::Map()
 {
 	CompileTileMap();
 	m_realHeight = TILE_WIDTH * NUM_TILES_Y;
+	RegisterToMessageBus("map");
 }
 
 Map::~Map()
@@ -54,6 +57,15 @@ void Map::OnRender()
 	Renderer::SetPolygonTexture("map");
 	Renderer::AddPolygon(Physics::GetPolygon(GetRealmID(), m_model_ID));
 	Renderer::End();
+}
+
+void Map::OnMessage(rdt::Message msg)
+{
+	switch (msg.type) {
+	case MT_RequestGameObjectPtr:
+		SendDirectMessage(msg.from, MT_SendGameObjectPtr, new GameObjectPtrData(this));
+		break;
+	}
 }
 
 bool Map::IsInMap(int row, int col)

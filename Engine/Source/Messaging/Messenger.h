@@ -26,12 +26,22 @@ namespace rdt {
 		/*
 			Send a message through the message bus.
 		*/
-		void SendMessage(MessageID to, MessageType type, void* data);
+		void SendMessage(MessageID to, MessageType type, void* data = nullptr);
+
+		/*
+			Send a message through the message bus, which will be resolved immediately.
+		*/
+		void SendDirectMessage(const std::string& to, MessageType type, void* data = nullptr);
+
+		/*
+			Send a message through the message bus, which will be resolved immediately.
+		*/
+		void SendDirectMessage(MessageID to, MessageType type, void* data = nullptr);
 
 		/*
 			Send a message through the message bus.
 		*/
-		void SendMessage(const std::string& to, MessageType type, void* data);
+		void SendMessage(const std::string& to, MessageType type, void* data = nullptr);
 
 		/*
 			Called when a message is received through the message bus.

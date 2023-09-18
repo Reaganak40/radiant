@@ -97,6 +97,44 @@ namespace rdt {
 		AddToQueue(nMsg);
 	}
 
+	void MessageBus::SendDirectMessage(Message& msg)
+	{
+		if (m_instance->m_objects.find(msg.from) == m_instance->m_objects.end()) {
+			return;
+		}
+
+		if (m_instance->m_objects.find(msg.to) == m_instance->m_objects.end()) {
+			return;
+		}
+
+		m_instance->m_objects[msg.to]->OnMessage(msg);
+		msg.Destroy();
+	}
+
+	void MessageBus::SendDirectMessage(const std::string& from, const std::string& to, MessageType type, void* data)
+	{
+		Message nMsg;
+
+		nMsg.from = GetMessageID(from);
+		nMsg.to = GetMessageID(to);
+		nMsg.type = type;
+		nMsg.data = data;
+
+		SendDirectMessage(nMsg);
+	}
+
+	void MessageBus::SendDirectMessage(const MessageID from, const MessageID to, MessageType type, void* data)
+	{
+		Message nMsg;
+
+		nMsg.from = from;
+		nMsg.to = to;
+		nMsg.type = type;
+		nMsg.data = data;
+
+		SendDirectMessage(nMsg);
+	}
+
 	MessageID MessageBus::GetNextMessageID()
 	{
 		return ++idCounter;

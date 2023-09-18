@@ -17,6 +17,16 @@ namespace rdt {
 		MessageBus::AddToQueue(m_messageID, to, type, data);
 	}
 
+	void Messenger::SendDirectMessage(const std::string& to, MessageType type, void* data)
+	{
+		MessageBus::SendDirectMessage(m_messageID, MessageBus::GetMessageID(to), type, data);
+	}
+
+	void Messenger::SendDirectMessage(MessageID to, MessageType type, void* data)
+	{
+		MessageBus::SendDirectMessage(m_messageID, to, type, data);
+	}
+
 	void Messenger::SendMessage(const std::string& to, MessageType type, void* data)
 	{
 		MessageBus::AddToQueue(m_messageID, MessageBus::GetMessageID(to), type, data);

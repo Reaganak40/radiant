@@ -16,7 +16,8 @@ private:
 	bool previously_bounded;
 	bool loaded_textures;
 	bool ghosts_blinking;
-	bool waiting_respawn;
+	bool inky_out;
+	bool clyde_out;
 
 	rdt::Timer m_power_timer;
 	rdt::Timer m_spawn_timer;
@@ -26,6 +27,9 @@ private:
 	std::array<std::array<PacDot*, NUM_TILES_X>, NUM_TILES_Y> m_dotMap;
 	int playerScore;
 	int highScore;
+	int levelDotCount;
+
+	PacmanDeathSequence m_pacman_death_state;
 
 public:
 	Level();
@@ -36,6 +40,7 @@ public:
 	void OnProcessInput(const float deltaTime) override final;
 	void OnRelease() override final;
 	void OnRender() override final;
+	void OnMessage(rdt::Message msg) override final;
 
 private:
 	void ActivatePowerMode();
@@ -45,4 +50,6 @@ private:
 	void ResumeGame();
 	void Respawn();
 	void UpdatePlayerScore(int pointsToAdd);
+
+	void PacmanDeathShowHitPhase(const float deltaTime);
 };

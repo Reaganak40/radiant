@@ -24,6 +24,7 @@ public:
 	void OnProcessInput(const float deltaTIme) override final;
 	void OnFinalUpdate() override final;
 	void OnRender() override final;
+	void OnMessage(rdt::Message msg) override final;
 
 	bool IsInMap(int row, int col);
 	rdt::Vec2i GetMapCoordinates(const rdt::Vec2d& worldCoords);

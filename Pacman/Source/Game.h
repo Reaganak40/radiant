@@ -44,3 +44,19 @@ enum PacmanMoveDirection {
 	RIGHT,
 	NOMOVE
 };
+
+enum PacmanDeathSequence {
+	PDS_ShowHit,
+	PDS_DeathAnimation,
+	PDS_Repawn,
+	PDS_NoDeath
+};
+
+enum PacmanMessageTypes {
+	PMT_PacmanHit,
+	PMT_LeaveHome,
+	PMT_StartDeathAnimation,
+	PMT_PauseGame,
+	PMT_ResumeGame,
+	PMT_EndDeathAnimation
+};
