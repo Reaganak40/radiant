@@ -3,6 +3,7 @@
 #include "Messaging/MessageBus.h"
 #include "Utils/BitSet.h"
 #include "Polygon/Polygon.h"
+#include "GameState.h"
 
 namespace rdt {
 	class GameObject : public Messenger {
@@ -13,7 +14,7 @@ namespace rdt {
 
 	protected:
 		UniqueID m_model_ID;
-		BitSet m_gameState;
+		GameState GState;
 
 		/*
 			Helper function for child game object classes to add a polygon

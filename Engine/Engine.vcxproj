@@ -156,6 +156,7 @@
   <ItemGroup>
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\GameObject\GameObject.cpp" />
+    <ClCompile Include="Source\GameObject\GameState.cpp" />
     <ClCompile Include="Source\Gui\Diagnostics.cpp" />
     <ClCompile Include="Source\Gui\Gui.cpp" />
     <ClCompile Include="Source\Gui\GuiManager.cpp" />
@@ -266,6 +267,7 @@
   <ItemGroup>
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\GameObject\GameObject.h" />
+    <ClInclude Include="Source\GameObject\GameState.h" />
     <ClInclude Include="Source\Gui\Diagnostics.h" />
     <ClInclude Include="Source\Gui\Gui.h" />
     <ClInclude Include="Source\Gui\GuiManager.h" />

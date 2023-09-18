@@ -58,5 +58,6 @@ enum PacmanMessageTypes {
 	PMT_StartDeathAnimation,
 	PMT_PauseGame,
 	PMT_ResumeGame,
-	PMT_EndDeathAnimation
+	PMT_EndDeathAnimation,
+	PMT_Respawn
 };

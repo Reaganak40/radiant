@@ -4,10 +4,9 @@ using namespace rdt;
 Pacman::Pacman(double xPos, double yPos)
 	: m_texture_timer(Timer(0.07)), m_death_timer(0.09)
 {
+	GState.SetStateCount(PGS_MaxState);
 	spawnPos.x = xPos;
 	spawnPos.y = yPos;
-	m_is_hit = false;
-	m_dead_animation = false;
 
 	left_cond = std::vector<InputState>{ A_KEY_PRESS, A_KEY_DOWN, LEFT_KEY_DOWN, LEFT_KEY_PRESS };
 	right_cond = std::vector<InputState>{ D_KEY_PRESS, D_KEY_DOWN, RIGHT_KEY_DOWN, RIGHT_KEY_PRESS };
@@ -45,7 +44,7 @@ void Pacman::OnRelease()
 
 void Pacman::OnProcessInput(const float deltaTime)
 {
-	if (m_paused) {
+	if (GState.CheckState(PGS_Paused)) {
 		return;
 	}
 	
@@ -55,7 +54,7 @@ void Pacman::OnProcessInput(const float deltaTime)
 
 void Pacman::OnFinalUpdate()
 {
-	if (m_paused) {
+	if (GState.CheckState(PGS_Paused)) {
 		return;
 	}
 
@@ -72,7 +71,7 @@ void Pacman::OnRender()
 
 	Renderer::Begin(PACMAN_LAYER);
 
-	if (m_is_hit) {
+	if (GState.CheckState(PGS_IsHit)) {
 		Renderer::SetPolygonTexture("death", m_frame_col, 0);
 	}
 	else if (current_frame == 2)  {
@@ -108,7 +107,9 @@ void Pacman::OnMessage(rdt::Message msg)
 	case PMT_ResumeGame:
 		SetPause(false);
 		break;
-
+	case PMT_Respawn:
+		Respawn();
+		break;
 	}
 }
 
@@ -121,8 +122,8 @@ void Pacman::Respawn()
 	df = -1;
 	m_texture_timer.Start();
 
-	m_spawned = true;
-	m_in_respawn = false;
+	GState.SetState(PGS_Spawned, true);
+	GState.SetState(PGS_InRespawn, false);
 }
 
 rdt::Vec2i Pacman::GetMapCoordinates()
@@ -143,24 +144,24 @@ PacmanMoveDirection Pacman::GetDirection()
 
 void Pacman::SetPause(bool pause)
 {
-	m_paused = pause;
+	GState.SetState(PGS_Paused, pause);
 }
 
 void Pacman::BeginDeathAnimation()
 {
-	m_dead_animation = true;
-	m_in_respawn = true;
+	GState.SetState(PGS_InDeathAnimation, true);
+	GState.SetState(PGS_InRespawn, true);
 	m_death_timer.Start();
 }
 
 bool Pacman::InRespawn()
 {
-	return m_in_respawn;
+	return GState.CheckState(PGS_InRespawn);
 }
 
 bool Pacman::IsHit()
 {
-	return m_is_hit;
+	return GState.CheckState(PGS_IsHit);
 }
 
 void Pacman::AddGameObjectPtr(rdt::MessageID from, rdt::GameObjectPtrData* data)
@@ -174,7 +175,7 @@ void Pacman::UpdateVelocityAndDirection()
 {
 	Vec2d nVelocity = Vec2d::Zero();
 
-	if (m_dead_animation) {
+	if (GState.CheckState(PGS_InDeathAnimation)) {
 		return;
 	}
 
@@ -182,10 +183,10 @@ void Pacman::UpdateVelocityAndDirection()
 	Vec2i mapCoords = m_map->GetMapCoordinates(location);
 	Vec2d centeredCoords = m_map->GetWorldCoordinates(mapCoords);
 
-	if (m_spawned) {
+	if (GState.CheckState(PGS_Spawned)) {
 		m_direction = PacmanMoveDirection::RIGHT;
 		m_target_coords = mapCoords;
-		m_spawned = false;
+		GState.SetState(PGS_Spawned, false);
 	}
 
 	bool options[4] = { false };
@@ -359,8 +360,8 @@ void Pacman::UpdateTextureFrame(const float deltaTime)
 			m_frame_col++;
 
 			if (m_frame_col == 10) {
-				m_dead_animation = false;
-				m_is_hit = false;
+				GState.SetState(PGS_InDeathAnimation, false);
+				GState.SetState(PGS_IsHit, false);
 				SendMessage("level", PMT_EndDeathAnimation);
 			}
 			else {
@@ -370,7 +371,7 @@ void Pacman::UpdateTextureFrame(const float deltaTime)
 		}
 	}
 
-	if (m_is_hit) {
+	if (GState.CheckState(PGS_IsHit)) {
 		return;
 	}
 
@@ -445,7 +446,7 @@ void Pacman::ReAlignToMap()
 
 void Pacman::OnHit()
 {
-	m_is_hit = true;
+	GState.SetState(PGS_IsHit, true);
 	m_frame_col = 0;
 	m_texture_timer.End();
 	SendDirectMessage("level", PMT_PacmanHit);

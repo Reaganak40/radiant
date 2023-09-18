@@ -295,36 +295,36 @@ void Level::StartBlinking()
 
 void Level::PauseGame()
 {
-	// ghosts start at index 2
-	for (int i = 2; i <= 5; i++) {
-		((Ghost*)m_game_objects.at(i))->SetPause(true);
-	}
-	((Pacman*)m_game_objects[0])->SetPause(true);
+	SendDirectMessage("blinky", PMT_PauseGame);
+	SendDirectMessage("inky",   PMT_PauseGame);
+	SendDirectMessage("pinky",  PMT_PauseGame);
+	SendDirectMessage("clyde",  PMT_PauseGame);
+	SendDirectMessage("pacman", PMT_PauseGame);
 
 	Physics::DeactivateRealm(m_realms[0]);
-
 }
 
 void Level::ResumeGame()
 {
-	// ghosts start at index 2
-	for (int i = 2; i <= 5; i++) {
-		((Ghost*)m_game_objects.at(i))->SetPause(false);
-	}
-	((Pacman*)m_game_objects[0])->SetPause(false);
+	SendDirectMessage("blinky", PMT_ResumeGame);
+	SendDirectMessage("inky",   PMT_ResumeGame);
+	SendDirectMessage("pinky",  PMT_ResumeGame);
+	SendDirectMessage("clyde",  PMT_ResumeGame);
+	SendDirectMessage("pacman", PMT_ResumeGame);
 
 	Physics::ActivateRealm(m_realms[0]);
-
 }
 
 void Level::Respawn()
 {
-	((Pacman*)m_game_objects[0])->Respawn();
-	((Pacman*)m_game_objects[0])->SetPause(true);
+	SendDirectMessage("pacman", PMT_Respawn);
+	SendDirectMessage("pacman", PMT_PauseGame);
 
-	for (int i = 2; i <= 5; i++) {
-		((Ghost*)m_game_objects.at(i))->Respawn();
-	}
+	SendDirectMessage("blinky", PMT_Respawn);
+	SendDirectMessage("inky",   PMT_Respawn);
+	SendDirectMessage("pinky",  PMT_Respawn);
+	SendDirectMessage("clyde",  PMT_Respawn);
+	SendDirectMessage("pacman", PMT_Respawn);
 
 	m_spawn_timer.SetInterval(1.7f);
 	m_spawn_timer.Start();

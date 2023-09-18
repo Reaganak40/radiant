@@ -29,6 +29,15 @@ enum MovementMode {
 	GOHOME,
 };
 
+enum GhostGameState {
+	GSS_Paused,
+	GSS_IsHome,
+	GSS_ShouldLeave,
+	GSS_IsVulnerable,
+	GSS_IsBlinking,
+	GSS_IsEaten,
+	GSS_MaxState,
+};
 class Ghost : public rdt::GameObject {
 private:
 	GhostName m_name;
@@ -54,13 +63,6 @@ private:
 	MovementMode m_movement_mode;
 	std::queue<PacmanMoveDirection> m_direction_queue;
 
-	bool m_is_home;
-	bool m_should_leave;
-	bool m_is_vulnerable;
-	bool m_is_blinking;
-	bool m_is_eaten;
-	bool m_paused;
-
 public:
 	Ghost(GhostName nName);
 	~Ghost();
@@ -74,14 +76,14 @@ public:
 
 	void SetVulnerable(bool state);
 	void SetIsBlinking(bool blink);
-	void SetPause(bool pause);
 
 	void SetMovementMode(MovementMode mode);
 
-	void Respawn();
 private:
+	void Respawn();
 	void AddGameObjectPtr(rdt::MessageID from, rdt::GameObjectPtrData* data);
 
+	void SetPause(bool pause);
 	void SelectNewTarget();
 	void SelectRandom();
 	void SelectNext();

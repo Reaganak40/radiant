@@ -3,7 +3,14 @@
 #include "Map.h"
 
 
-
+enum PacmanGameState {
+	PGS_Paused,
+	PGS_Spawned,
+	PGS_IsHit,
+	PGS_InRespawn,
+	PGS_InDeathAnimation,
+	PGS_MaxState
+};
 
 class Pacman : public rdt::GameObject {
 private:
@@ -27,12 +34,6 @@ private:
 	int m_frame_row;
 	int m_frame_col;
 
-	bool m_paused;
-	bool m_spawned;
-	bool m_is_hit;
-	bool m_in_respawn;
-	bool m_dead_animation;
-
 public:
 	Pacman(double xPos, double yPos);
 	~Pacman();
@@ -44,19 +45,19 @@ public:
 	void OnRender() override final;
 	void OnMessage(rdt::Message msg) override final;
 
-	void Respawn();
 
 	rdt::Vec2i GetMapCoordinates();
 	rdt::Vec2d GetWorldCoordinates();
 	PacmanMoveDirection GetDirection();
 
-	void SetPause(bool pause);
 
 	void BeginDeathAnimation();
 	bool InRespawn();
 	bool IsHit();
 
 private:
+	void Respawn();
+	void SetPause(bool pause);
 	void AddGameObjectPtr(rdt::MessageID from, rdt::GameObjectPtrData* data);
 	void UpdateVelocityAndDirection();
 	void UpdateTextureFrame(const float deltaTime);

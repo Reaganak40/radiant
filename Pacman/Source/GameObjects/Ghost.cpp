@@ -5,6 +5,7 @@ using namespace rdt;
 Ghost::Ghost(GhostName nName)
 	: m_frame_timer(0.35f), m_blink_timer(0.20f), m_path_finding_timer(0.6f)
 {
+	GState.SetStateCount(GSS_MaxState);
 	spawnPos = Vec2d::Zero();
 	m_target_coords = { 15, 10 };
 	m_speed = GHOST_SPEED;
@@ -12,8 +13,6 @@ Ghost::Ghost(GhostName nName)
 	m_map_ptr = nullptr;
 	m_pacman_ptr = nullptr;
 	m_blinky_ptr = nullptr;
-	m_is_vulnerable = false;
-	m_paused = false;
 
 	m_name = nName;
 	switch (nName) {
@@ -46,16 +45,16 @@ Ghost::Ghost(GhostName nName)
 	RegisterToMessageBus(m_nameStr);
 
 	if (m_name == BLINKY) {
-		m_is_home = false;
-		m_should_leave = true;
+		GState.SetState(GSS_IsHome, false);
+		GState.SetState(GSS_ShouldLeave, true);
 	}
 	else if (m_name == PINKY) {
-		m_is_home = true;
-		m_should_leave = true;
+		GState.SetState(GSS_IsHome, true);
+		GState.SetState(GSS_ShouldLeave, true);
 	}
 	else {
-		m_is_home = true;
-		m_should_leave = false;
+		GState.SetState(GSS_IsHome, true);
+		GState.SetState(GSS_ShouldLeave, false);
 	}
 
 	m_frame_col = 0;
@@ -119,14 +118,14 @@ void Ghost::OnRelease()
 
 void Ghost::OnProcessInput(const float deltaTime)
 {
-	if (m_paused) {
+	if (GState.CheckState(GSS_Paused)) {
 		return;
 	}
 
 	const Vec2d location = Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
 	const Vec2d target = m_map_ptr->GetWorldCoordinates(m_target_coords);
 
-	if (!m_is_home && location == target) {
+	if (!GState.CheckState(GSS_IsHome) && location == target) {
 		Vec2d nVelocity = Vec2d::Zero();
 		SelectNewTarget();
 
@@ -153,14 +152,14 @@ void Ghost::OnProcessInput(const float deltaTime)
 
 		Physics::SetVelocity(GetRealmID(), m_model_ID, nVelocity);
 	
-	} else if (m_is_home) {
+	} else if (GState.CheckState(GSS_IsHome)) {
 		Vec2d nVelocity = Vec2d::Zero();
 
-		if (m_is_eaten) {
+		if (GState.CheckState(GSS_IsEaten)) {
 			m_direction = DOWN;
 			nVelocity.y = -m_speed;
 		}
-		else if (m_should_leave) {
+		else if (GState.CheckState(GSS_ShouldLeave)) {
 
 			// time to leave base
 			if (location.x > BLINKY_HOME_X) {
@@ -237,7 +236,7 @@ void Ghost::OnProcessInput(const float deltaTime)
 
 void Ghost::OnFinalUpdate()
 {
-	if (m_paused) {
+	if (GState.CheckState(GSS_Paused)) {
 		return;
 	}
 
@@ -267,20 +266,29 @@ void Ghost::OnMessage(Message msg)
 		SendMessage(msg.from, MT_SendGameObjectPtr, new GameObjectPtrData(this));
 		break;
 	case PMT_LeaveHome:
-		m_should_leave = true;
+		GState.SetState(GSS_ShouldLeave, true);
+		break;
+	case PMT_PauseGame:
+		SetPause(true);
+		break;
+	case PMT_ResumeGame:
+		SetPause(false);
+		break;
+	case PMT_Respawn:
+		Respawn();
 		break;
 	}
 }
 
 void Ghost::SetVulnerable(bool state)
 {
-	if (m_is_home) {
+	if (GState.CheckState(GSS_IsHome)) {
 		return;
 	}
 
 	if (state) {
 
-		if (m_is_eaten) {
+		if (GState.CheckState(GSS_IsEaten)) {
 			return;
 		}
 
@@ -291,15 +299,15 @@ void Ghost::SetVulnerable(bool state)
 		SetIsBlinking(false);
 
 		/* If ghost not currently vulnerable */
-		if (m_is_vulnerable != state) {
+		if (GState.CheckState(GSS_IsVulnerable) != state) {
 			m_speed *= 0.50;
 			SetMovementMode(FRIGHTENED);
 		}
-		m_is_vulnerable = state;
-
+		GState.SetState(GSS_IsVulnerable, state);
 	}
 	else {
-		m_is_vulnerable = state;
+		GState.SetState(GSS_IsVulnerable, state);
+
 
 		SetIsBlinking(false);
 
@@ -312,17 +320,17 @@ void Ghost::SetVulnerable(bool state)
 
 void Ghost::SetIsBlinking(bool blink)
 {
-	if (blink && (m_is_home || m_is_eaten)) {
+	if (blink && (GState.CheckState(GSS_IsHome) || GState.CheckState(GSS_IsEaten))) {
 		return;
 	}
 
-	if (blink && !m_is_vulnerable) {
+	if (blink && !GState.CheckState(GSS_IsVulnerable)) {
 		blink = false;
 	}
 
-	m_is_blinking = blink;
+	GState.SetState(GSS_IsBlinking, blink);
 
-	if (m_is_blinking) {
+	if (blink) {
 		m_blink_timer.Start();
 	}
 	else {
@@ -332,7 +340,7 @@ void Ghost::SetIsBlinking(bool blink)
 
 void Ghost::SetPause(bool pause)
 {
-	m_paused = pause;
+	GState.SetState(PGS_Paused, pause);
 }
 
 void Ghost::SetMovementMode(MovementMode mode)
@@ -362,9 +370,10 @@ void Ghost::Respawn()
 	Physics::SetPosition(GetRealmID(), m_model_ID, spawnPos);
 	Physics::SetVelocity(GetRealmID(), m_model_ID, Vec2d::Zero());
 
-	m_is_vulnerable = false;
-	m_is_blinking = false;
-	m_is_eaten = false;
+	GState.SetState(GSS_IsVulnerable, false);
+	GState.SetState(GSS_IsBlinking, false);
+	GState.SetState(GSS_IsEaten, false);
+	
 	m_target_coords = { 15, 10 };
 	m_speed = GHOST_SPEED;
 
@@ -394,16 +403,16 @@ void Ghost::Respawn()
 	}
 
 	if (m_name == BLINKY) {
-		m_is_home = false;
-		m_should_leave = true;
+		GState.SetState(GSS_IsHome, false);
+		GState.SetState(GSS_ShouldLeave, true);
 	}
 	else if (m_name == PINKY) {
-		m_is_home = true;
-		m_should_leave = true;
+		GState.SetState(GSS_IsHome, true);
+		GState.SetState(GSS_ShouldLeave, true);
 	}
 	else {
-		m_is_home = true;
-		m_should_leave = false;
+		GState.SetState(GSS_IsHome, true);
+		GState.SetState(GSS_ShouldLeave, false);
 	}
 
 	m_frame_col = 0;
@@ -433,7 +442,7 @@ void Ghost::AddGameObjectPtr(MessageID from, GameObjectPtrData* data)
 
 void Ghost::SelectNewTarget()
 {
-	if (m_is_home) {
+	if (GState.CheckState(GSS_IsHome)) {
 		return;
 	}
 
@@ -907,7 +916,7 @@ void Ghost::CreateHomePath()
 {
 	if (GetMapCoordinates() == Vec2i(15, 10)) {
 		m_direction = NOMOVE;
-		m_is_home = true;
+		GState.SetState(GSS_IsHome, true);
 	}
 	else {
 		CreateShortestPath({15, 10});
@@ -932,13 +941,13 @@ rdt::Vec2i Ghost::GetMapCoordinates()
 
 void Ghost::Look(PacmanMoveDirection direction)
 {
-	if (m_is_vulnerable) {
+	if (GState.CheckState(GSS_IsVulnerable)) {
 		return;
 	}
 
 	switch (direction) {
 	case LEFT:
-		if (m_is_eaten) {
+		if (GState.CheckState(GSS_IsEaten)) {
 			m_frame_col = 9;
 		}
 		else {
@@ -946,7 +955,7 @@ void Ghost::Look(PacmanMoveDirection direction)
 		}
 		break;
 	case RIGHT:
-		if (m_is_eaten) {
+		if (GState.CheckState(GSS_IsEaten)) {
 			m_frame_col = 8;
 		}
 		else {
@@ -954,7 +963,7 @@ void Ghost::Look(PacmanMoveDirection direction)
 		}
 		break;
 	case UP:
-		if (m_is_eaten) {
+		if (GState.CheckState(GSS_IsEaten)) {
 			m_frame_col = 10;
 		}
 		else {
@@ -962,7 +971,7 @@ void Ghost::Look(PacmanMoveDirection direction)
 		}
 		break;
 	case DOWN:
-		if (m_is_eaten) {
+		if (GState.CheckState(GSS_IsEaten)) {
 			m_frame_col = 11;
 		}
 		else {
@@ -971,7 +980,7 @@ void Ghost::Look(PacmanMoveDirection direction)
 		break;
 	}
 
-	if (!m_is_eaten && df < 0) {
+	if (!GState.CheckState(GSS_IsEaten) && df < 0) {
 		m_frame_col++;
 	}
 }
@@ -982,10 +991,10 @@ void Ghost::ResolveCollision(rdt::CollisionData* data)
 
 	if (data->source == pacmanModelID) {
 		
-		if (m_is_vulnerable) {
+		if (GState.CheckState(GSS_IsVulnerable)) {
 			OnEaten();
 		}
-		else if (!m_is_eaten) {
+		else if (!GState.CheckState(GSS_IsEaten)) {
 			SendMessage("pacman", PMT_PacmanHit, nullptr);
 		}
 	}
@@ -997,9 +1006,9 @@ void Ghost::FinalUpdatePosition()
 	const Vec2d worldCoords = m_map_ptr->GetWorldCoordinates(m_target_coords);
 	double error = TILE_WIDTH / 6;
 
-	if (m_is_home) {
+	if (GState.CheckState(GSS_IsHome)) {
 		
-		if (m_is_eaten) {
+		if (GState.CheckState(GSS_IsEaten)) {
 			Physics::SetPosition(GetRealmID(), m_model_ID, { PINKY_HOME_X - 3, location.y });
 
 			if (location.y < GHOST_HOME_Y) {
@@ -1011,7 +1020,7 @@ void Ghost::FinalUpdatePosition()
 
 		if (m_direction == UP) {
 
-			if (m_is_home && !m_should_leave) {
+			if (GState.CheckState(GSS_IsHome) && !GState.CheckState(GSS_ShouldLeave)) {
 				if (location.y > (GHOST_HOME_Y + MAX_HOME_Y_RANGE)) {
 					Physics::SetPosition(GetRealmID(), m_model_ID, { location.x, GHOST_HOME_Y + MAX_HOME_Y_RANGE });
 					m_direction = DOWN;
@@ -1036,7 +1045,7 @@ void Ghost::FinalUpdatePosition()
 						Physics::SetVelocity(GetRealmID(), m_model_ID, { m_speed, 0 });
 					}
 
-					m_is_home = false;
+					GState.SetState(GSS_IsHome, false);
 				}
 			}
 		}
@@ -1102,7 +1111,7 @@ void Ghost::FinalUpdatePosition()
 
 void Ghost::OnEaten()
 {
-	m_is_eaten = true;
+	GState.SetState(GSS_IsEaten, true);
 	SetVulnerable(false);
 	m_frame_row = 1;
 	m_frame_timer.End();
@@ -1113,7 +1122,7 @@ void Ghost::OnEaten()
 
 void Ghost::OnRevived()
 {
-	m_is_eaten = false;
+	GState.SetState(GSS_IsEaten, false);
 	ResetFrameRow();
 	SetMovementMode(CHASE);
 }
