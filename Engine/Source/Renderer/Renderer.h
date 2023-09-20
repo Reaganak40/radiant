@@ -11,6 +11,7 @@
 
 // For Opengl rendering
 #include "VertexArray.h"
+#include "Layer.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
@@ -19,13 +20,6 @@
 #include "RenderCache.h"
 
 namespace rdt {
-
-	enum RenderCond {
-		NoConditions  = 0,
-		DrawOutline = 1, // fill by default
-		DrawLines = 2, // draw triangles by default
-	};
-
 
 	class Renderer {
 	private:
@@ -52,17 +46,15 @@ namespace rdt {
 		// *****************************************************
 		struct DrawCommand {
 			UniqueID meshIdentifier;
-			unsigned int renderCond;
+			RenderType renderType;
 
-			DrawCommand(UniqueID nMeshIdentifier, unsigned int nRenderCond)
-				: meshIdentifier(nMeshIdentifier), renderCond(nRenderCond) {}
 
-			static bool HasRendCond(unsigned int src, unsigned int condQuery);
-			static unsigned int AddRendCond(unsigned int src, const unsigned int cond);
+			DrawCommand(UniqueID nMeshIdentifier, RenderType nRenderType)
+				: meshIdentifier(nMeshIdentifier), renderType(nRenderType) {}
 		};
 
 		unsigned int m_current_layer;
-		unsigned int m_current_render_cond;
+		RenderType m_current_render_type;
 		RenderCache m_render_cache;
 		std::queue<DrawCommand> m_command_queue;
 
@@ -78,36 +70,11 @@ namespace rdt {
 		// 
 		// *****************************************************
 
-		// Opengl render unit contains all needed data for 1 draw call.
-		struct glRenderUnit {
-			VBO_ID vboID;
-			IBO_ID iboID;
-			ShaderID shaderID;
-
-			VertexBuffer* m_VBO;
-			IndexBuffer* m_IBO;
-		};
-
-		// Container for layers in a scene with their own unique specifications.
-
-		enum glRenderUnitType {
-			FillUnit = 0,
-			OutlineUnit,
-			LineUnit
-		};
-
-		const glRenderUnitType renderUnitOrder[3] = { FillUnit, OutlineUnit, LineUnit };
-		struct glLayer {
-			std::vector<glRenderUnit> renderUnits[3];
-
-			glLayer() {}
-		};
-
 		// Use only one VAO
 		VertexArray* m_vertex_array;
 
 		// Each layer contains render units (specified draw calls).
-		std::vector<glLayer> m_layers;
+		std::vector<Layer> m_layers;
 
 		// Keep shaders independent from render units.
 		std::vector<Shader*> m_shaders;
@@ -218,16 +185,16 @@ namespace rdt {
 			Utility function for quickly drawing a Rect to the screen.
 		*/
 		static void DrawRect(const Vec2d& origin, const Vec2d& size, const Color& color, 
-			unsigned int layer = 0, const unsigned int rendCond = NoConditions) {
-			m_instance->DrawRectImpl(origin, size, color, layer, rendCond);
+			unsigned int layer = 0) {
+			m_instance->DrawRectImpl(origin, size, color, layer);
 		}
 
 		/*
 			Utility function for quickly drawing a Line to the screen.
 		*/
 		static void DrawLine(const Vec2d& start, const Vec2d& end, const Color& color,
-			unsigned int layer = 0, const unsigned int rendCond = NoConditions) {
-			m_instance->DrawLineImpl(start, end, color, layer, rendCond);
+			unsigned int layer = 0) {
+			m_instance->DrawLineImpl(start, end, color, layer);
 		}
 
 		/*
@@ -243,7 +210,7 @@ namespace rdt {
 		/*
 			Sets the render condition for the current context.
 		*/
-		static void SetRenderCond(const unsigned int rendCond) { m_instance->SetRenderCondImpl(rendCond); }
+		static void SetRenderType(RenderType type) { m_instance->SetRenderTypeImpl(type); }
 
 		/*
 			Adds a polygon to the render queue to be drawn next frame.
@@ -315,14 +282,14 @@ namespace rdt {
 		void RenderImpl();
 		void OnEndFrameImpl();
 
-		void DrawRectImpl(const Vec2d& origin, const Vec2d& size, const Color& color, unsigned int layer, const unsigned int rendCond);
-		void DrawLineImpl(const Vec2d& start, const Vec2d& end, const Color& color, unsigned int layer, const unsigned int rendCond);
+		void DrawRectImpl(const Vec2d& origin, const Vec2d& size, const Color& color, unsigned int layer);
+		void DrawLineImpl(const Vec2d& start, const Vec2d& end, const Color& color, unsigned int layer);
 		
 		void BeginImpl(unsigned int layer);
 		void EndImpl();
 		void AddPolygonImpl(const Polygon& polygon);
 		void AddLineImpl(const Line& line);
-		void SetRenderCondImpl(const unsigned int rendCond);
+		void SetRenderTypeImpl(RenderType type);
 		void SetPolygonColorImpl(const Color& color);
 		void SetPolygonTextureImpl(const std::string& texName, unsigned int atlasX, unsigned int atlasY);
 		void SetLineColorImpl(const Color& color);
@@ -334,11 +301,8 @@ namespace rdt {
 		void SetMode(GeoMode mode);
 
 		void AddDefaultShader();
-		void AddLayer();
 
 		void DetachGuiImpl(const GuiTemplate* gui);
-
-		void AddToRenderUnit(const Mesh& mesh, const glRenderUnitType type);
 
 		void FlushPolygonImpl(const UniqueID UUID);
 	};

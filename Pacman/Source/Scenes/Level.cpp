@@ -7,9 +7,10 @@
 using namespace rdt;
 
 Level::Level()
-	: previously_bounded(false), loaded_textures(false), m_power_timer(10.0), ghosts_blinking(false),
-	m_spawn_timer(2.5), m_show_hit_timer(0.5), m_1up_timer(0.25)
+	: m_power_timer(10.0), m_spawn_timer(2.5), m_show_hit_timer(0.5), m_1up_timer(0.25)
 {
+	GState.SetStateCount(LSF_MaxFlags);
+
 	for (int i = 0; i < NUM_TILES_Y; i++) {
 		m_dotMap[i].fill(nullptr);
 	}
@@ -17,8 +18,7 @@ Level::Level()
 	playerScore = 0;
 	highScore = 0;
 	levelDotCount = 0;
-	clyde_out = false;
-	inky_out = false;
+	lifeCount = 3;
 	m_pacman_death_state = PDS_NoDeath;
 	RegisterToMessageBus("level");
 }
@@ -35,7 +35,7 @@ void Level::OnRegister()
 		m_realms.push_back(Physics::CreateRealm());
 	}
 
-	if (!loaded_textures) {
+	if (!GState.CheckState(LSF_LoadedTextures)) {
 		Texture& pacmanTex = TextureManager::LoadTextureFromPNG("pacman", "Resources/Textures/pacman.png");
 		pacmanTex.DefineTextureAtlas(52, 52, 4, 3, 16);
 
@@ -51,7 +51,6 @@ void Level::OnRegister()
 
 		Texture& fontTex = TextureManager::LoadTextureFromPNG("font", "Resources/Textures/font.png");
 		fontTex.DefineTextureAtlas(28, 28, 15, 3, 4);
-
 	}
 
 	Pacman* pacman;
@@ -80,32 +79,39 @@ void Level::OnRegister()
 	clyde->RegisterToRealm(m_realms[0]);
 
 	UI* highScore;
-	m_game_objects.push_back(highScore = new UI(10, {18, 18}));
+	m_game_objects.push_back(highScore = new UI(UI_Text, 10, {18, 18}));
 	highScore->RegisterToRealm(m_realms[2]);
 	highScore->SetOrigin({ SCREEN_WIDTH / 2 - 75, SCREEN_HEIGHT - 20 });
 	highScore->SetAlignment(TEXT_LEFT);
 	highScore->SetText("HIGH SCORE");
 
 	UI* _1up;
-	m_game_objects.push_back(_1up = new UI(3, { 18, 18 }));
+	m_game_objects.push_back(_1up = new UI(UI_Text, 3, { 18, 18 }));
 	_1up->RegisterToRealm(m_realms[2]);
 	_1up->SetOrigin({ 75, SCREEN_HEIGHT - 20 });
 	_1up->SetAlignment(TEXT_LEFT);
 	_1up->SetText("1UP");
 
 	UI* _1score;
-	m_game_objects.push_back(_1score = new UI(7, { 18, 18 }));
+	m_game_objects.push_back(_1score = new UI(UI_Text, 7, { 18, 18 }));
 	_1score->RegisterToRealm(m_realms[2]);
 	_1score->SetOrigin({ 25, SCREEN_HEIGHT - 45 });
 	_1score->SetAlignment(TEXT_RIGHT);
 	_1score->SetText("0");
 
 	UI* highScoreVal;
-	m_game_objects.push_back(highScoreVal = new UI(7, { 18, 18 }));
+	m_game_objects.push_back(highScoreVal = new UI(UI_Text, 7, { 18, 18 }));
 	highScoreVal->RegisterToRealm(m_realms[2]);
 	highScoreVal->SetOrigin({ SCREEN_WIDTH / 2 - 55, SCREEN_HEIGHT - 45 });
 	highScoreVal->SetAlignment(TEXT_RIGHT);
 	highScoreVal->SetText("");
+
+	UI* lifeDisplay;
+	m_game_objects.push_back(lifeDisplay = new UI(UI_Image, 5, { 30, 30 }));
+	lifeDisplay->RegisterToRealm(m_realms[2]);
+	lifeDisplay->SetOrigin({ 30, 20 });
+	lifeDisplay->SetAlignment(TEXT_LEFT);
+	lifeDisplay->SetText("LL");
 
 	/* Adds dots to the map. */
 	for (int row = 0; row < NUM_TILES_Y; row++) {
@@ -137,18 +143,18 @@ void Level::OnRegister()
 	}
 	m_1up_timer.Start();
 
-	m_GUIs.push_back(new DiagnosticsGUI);
+	//m_GUIs.push_back(new DiagnosticsGUI);
 }
 
 void Level::OnBind()
 {
 	Renderer::SetBackgroundColor(Color(0.0509f, 0.0509f, 0.0509f, 1.0f));
 
-	if (!previously_bounded) {
+	if (!GState.CheckState(LSF_PreviouslyBounded)) {
 		for (auto& object : m_game_objects) {
 			object->OnBind();
 		}
-		previously_bounded = true;
+		GState.SetState(LSF_PreviouslyBounded, true);
 	}
 
 	for (auto& gui : m_GUIs) {
@@ -159,8 +165,9 @@ void Level::OnBind()
 
 	PauseGame();
 	m_spawn_timer.Start();
-	inky_out = false;
-	clyde_out = false;
+
+	GState.SetState(LSF_InkyOut, false);
+	GState.SetState(LSF_ClydeOut, false);
 }
 
 void Level::OnProcessInput(const float deltaTime)
@@ -185,7 +192,7 @@ void Level::OnProcessInput(const float deltaTime)
 			DeactivatePowerMode();
 		}
 		else if (m_power_timer.GetTimeLeft() <= 5) {
-			if (!ghosts_blinking) {
+			if (!GState.CheckState(LSF_GhostsBlinking)) {
 				StartBlinking();
 			}
 		}
@@ -233,13 +240,13 @@ void Level::OnRender()
 		UpdatePlayerScore(10);
 		levelDotCount++;
 
-		if (levelDotCount >= 30 && !inky_out) {
+		if (levelDotCount >= 30 && !GState.CheckState(LSF_InkyOut)) {
 			SendMessage("inky", PMT_LeaveHome, nullptr);
-			inky_out = true;
+			GState.SetState(LSF_InkyOut, true);
 		}
-		else if (levelDotCount >= 60 && !clyde_out) {
+		else if (levelDotCount >= 60 && !GState.CheckState(LSF_ClydeOut)) {
 			SendMessage("clyde", PMT_LeaveHome, nullptr);
-			clyde_out = true;
+			GState.SetState(LSF_ClydeOut, true);
 		}
 
 	}
@@ -264,33 +271,33 @@ void Level::ActivatePowerMode()
 	m_power_timer.Start();
 
 	if (m_power_timer.IsRunning()) {
-
-		// ghosts start at index 2
-		for (int i = 2; i <= 5; i++) {
-			((Ghost*)m_game_objects.at(i))->SetVulnerable(true);
-		}
+		SendDirectMessage("blinky", PMT_MakeVulnerable);
+		SendDirectMessage("inky",   PMT_MakeVulnerable);
+		SendDirectMessage("pinky",  PMT_MakeVulnerable);
+		SendDirectMessage("clyde",  PMT_MakeVulnerable);
 	}
 
-	ghosts_blinking = false;
+	GState.SetState(LSF_GhostsBlinking, false);
 }
 
 void Level::DeactivatePowerMode()
 {
-	// ghosts start at index 2
-	for (int i = 2; i <= 5; i++) {
-		((Ghost*)m_game_objects.at(i))->SetVulnerable(false);
-	}
+	SendDirectMessage("blinky", PMT_StopVulnerability);
+	SendDirectMessage("inky",   PMT_StopVulnerability);
+	SendDirectMessage("pinky",  PMT_StopVulnerability);
+	SendDirectMessage("clyde",  PMT_StopVulnerability);
 
-	ghosts_blinking = false;
+	GState.SetState(LSF_GhostsBlinking, false);
 }
 
 void Level::StartBlinking()
 {
-	// ghosts start at index 2
-	for (int i = 2; i <= 5; i++) {
-		((Ghost*)m_game_objects.at(i))->SetIsBlinking(true);
-	}
-	ghosts_blinking = true;
+	SendDirectMessage("blinky", PMT_StartBlinking);
+	SendDirectMessage("inky",   PMT_StartBlinking);
+	SendDirectMessage("pinky",  PMT_StartBlinking);
+	SendDirectMessage("clyde",  PMT_StartBlinking);
+
+	GState.SetState(LSF_GhostsBlinking, true);
 }
 
 void Level::PauseGame()
@@ -328,8 +335,12 @@ void Level::Respawn()
 
 	m_spawn_timer.SetInterval(1.7f);
 	m_spawn_timer.Start();
-	inky_out = false;
-	clyde_out = false;
+
+	GState.SetState(LSF_InkyOut, false);
+	GState.SetState(LSF_ClydeOut, false);
+
+	lifeCount--;
+	UpdateLifeDisplay();
 }
 
 void Level::UpdatePlayerScore(int pointsToAdd)
@@ -341,6 +352,15 @@ void Level::UpdatePlayerScore(int pointsToAdd)
 		highScore = playerScore;
 		((UI*)m_game_objects.at(HIGHSCORE_VAL_INDEX))->SetText(std::to_string(highScore));
 	}
+}
+
+void Level::UpdateLifeDisplay()
+{
+	std::string txt;
+	for (int i = 1; i < lifeCount; i++) {
+		txt += "L";
+	}
+	((UI*)m_game_objects.at(LIFE_DISPLAY_INDEX))->SetText(txt);
 }
 
 void Level::PacmanDeathShowHitPhase(const float deltaTime)

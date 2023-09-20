@@ -133,6 +133,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\GameObjects\Apple.cpp" />
     <ClCompile Include="Source\GameObjects\Ghost.cpp" />
     <ClCompile Include="Source\GameObjects\Map.cpp" />
     <ClCompile Include="Source\GameObjects\PacDot.cpp" />
@@ -140,15 +141,18 @@
     <ClCompile Include="Source\GameObjects\UI.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Scenes\Level.cpp" />
+    <ClCompile Include="Source\Scenes\Menu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Game.h" />
+    <ClInclude Include="Source\GameObjects\Apple.h" />
     <ClInclude Include="Source\GameObjects\Ghost.h" />
     <ClInclude Include="Source\GameObjects\Map.h" />
     <ClInclude Include="Source\GameObjects\PacDot.h" />
     <ClInclude Include="Source\GameObjects\Pacman.h" />
     <ClInclude Include="Source\GameObjects\UI.h" />
     <ClInclude Include="Source\Scenes\Level.h" />
+    <ClInclude Include="Source\Scenes\Menu.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.vcxproj">

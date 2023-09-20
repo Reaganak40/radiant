@@ -9,7 +9,7 @@ namespace rdt {
 
     Renderer::Renderer()
         : m_window(nullptr), m_window_name(""), m_window_width(0), m_window_height(0), m_vertex_array(nullptr),
-        m_current_vbo(0), m_current_ibo(0), m_current_shader(0), m_current_layer(0), m_current_render_cond(0),
+        m_current_vbo(0), m_current_ibo(0), m_current_shader(0), m_current_layer(0), m_current_render_type(DrawFilled),
         m_current_mode(FillMode)
     {
         /* Initialize the library */
@@ -27,15 +27,6 @@ namespace rdt {
 
     Renderer::~Renderer()
     {
-        // Delete all buffers from all layers
-        for (const auto& layer : m_layers) {
-            for (const auto& type : renderUnitOrder) {
-                for (auto& unit : layer.renderUnits[type]) {
-                    delete unit.m_IBO;
-                    delete unit.m_VBO;
-                }
-            }
-        }
 
         for (auto& shader : m_shaders) {
             delete shader;
@@ -183,72 +174,54 @@ namespace rdt {
         bool update_slots = false;
 
         /*
-            Step 1: Run the command queue, filling the buffers and further defining 
-            vertices and textures.
+            Step 1: Run the command queue, sorting meshes into layers.
         */
         while (!m_command_queue.empty()) {
             DrawCommand command = m_command_queue.front();
             Mesh& mesh = m_render_cache.GetMesh(command.meshIdentifier);
-
-            if (mesh.vertices.size() == 2) {
-                AddToRenderUnit(mesh, LineUnit);
-            }
-            else {
-
-                /* If mesh is a rect and a texture is provided, set the vertex texture coords. */
-                if (mesh.vertices.size() == 4 && mesh.texture != nullptr) {
-                    if (TextureManager::ApplyTextureAtlas(mesh.texture, mesh.texAtlasCoords, mesh.vertices)) {
-                        update_slots = true;
-                    }
-                }
-                AddToRenderUnit(mesh, DrawCommand::HasRendCond(command.renderCond, DrawOutline) ? OutlineUnit : FillUnit);
-            }
-
+            m_layers[mesh.layer].AddMesh(mesh, command.renderType);
             m_command_queue.pop();
         }
         
         /*
-            Step 2: If new textures are being used, update the texture slot map of the default texture.
+            Step 2: Go layer by layer, draw batch by batch.
         */
-        if (update_slots) {
-            SetShader(m_shaders[0]->GetID());
-            m_shaders[0]->SetUniform<std::array<TextureID, MAX_TEXTURES>>("uTextures", TextureManager::GetTextureSlots());
-        }
+        for (auto& layer : m_layers) {
+            layer.CompileBatches();
 
-        /*
-            Step 3: Draw layer by layer. Each layer will have different types of draw calls (e.g drawing lines or polygons).
-        */
-        for (const auto& layer : m_layers) {
-            for (const auto& type : renderUnitOrder) {
-                for (auto& unit : layer.renderUnits[type]) {
-                    
-                    // Draw Call Procedure
-                    SetVBO(unit.vboID);
-                    SetIBO(unit.iboID);
-                    SetShader(unit.shaderID);
-                    SetMode(type == OutlineUnit ? OutlineMode : FillMode);
+            if (layer.TextureSlotsChanged()) {
+                SetShader(m_shaders[0]->GetID());
+                m_shaders[0]->SetUniform<std::array<TextureID, MAX_TEXTURES>>("uTextures", TextureManager::GetTextureSlots());
+            }
 
-                    unit.m_VBO->Update();
-                    unit.m_IBO->Update();
+            for (auto& unit : layer.GetRenderUnits()) {
+                
+                // Draw Call Procedure
+                SetVBO(unit.vboID);
+                SetIBO(unit.iboID);
+                SetShader(unit.shaderID);
+                SetMode(unit.type == DrawOutline ? OutlineMode : FillMode);
 
-                    m_vertex_array->DefineVertexBufferLayout();
-                    
-                    glDrawElements(
-                        type == LineUnit ? GL_LINES : GL_TRIANGLES,
-                        unit.m_IBO->GetIndexCount(), GL_UNSIGNED_INT, nullptr);
-                }
+                // Update buffers and notify the GPU
+                unit.m_VBO->Update();
+                unit.m_IBO->Update();
+                m_vertex_array->DefineVertexBufferLayout();
+
+                glDrawElements(
+                    unit.type == RenderType::DrawLine ? GL_LINES : GL_TRIANGLES,
+                    unit.m_IBO->GetIndexCount(), GL_UNSIGNED_INT, nullptr);
             }
         }
 
         /*
-            Step 4: Run the GUI render queue.
+            Step 3: Run the GUI render queue.
         */
         for (const auto& gui : m_GUIs) {
             gui->OnRender();
         }
 
         /*
-            Step 5: Render all the GUI objects.
+            Step 4: Render all the GUI objects.
         */
         if (m_GUIs.size() > 0) {
             GuiTemplate::RenderImGui();
@@ -267,20 +240,13 @@ namespace rdt {
         m_render_cache.OnEndFrame();
 
         // Reset the buffers of each layer.
-        for (const auto& layer : m_layers) {
-            for (const auto& type : renderUnitOrder) {
-                for (auto& unit : layer.renderUnits[type]) {
-                    unit.m_IBO->Flush();
-                    unit.m_VBO->Flush();
-                }
-            }
+        for (auto& layer : m_layers) {
+            layer.Flush();
         }
-
-
     }
 
     void Renderer::DrawRectImpl(const Vec2d& origin, const Vec2d& size, const Color& color,
-        unsigned int layer, const unsigned int rendCond)
+        unsigned int layer)
     {
         // Use the rect cache for efficiency
         std::shared_ptr<Rect> rect;
@@ -299,7 +265,7 @@ namespace rdt {
         // Use draw API
         BeginImpl(layer);
         SetPolygonColorImpl(color);
-        SetRenderCondImpl(rendCond);
+        SetRenderTypeImpl(DrawFilled);
         AddPolygonImpl(*rect);
         EndImpl();
            
@@ -307,7 +273,7 @@ namespace rdt {
         m_polygon_color = old_color;
     }
 
-    void Renderer::DrawLineImpl(const Vec2d& start, const Vec2d& end, const Color& color, unsigned int layer, const unsigned int rendCond)
+    void Renderer::DrawLineImpl(const Vec2d& start, const Vec2d& end, const Color& color, unsigned int layer)
     {
         // Use the line cache for efficiency
         std::shared_ptr<Line> line;
@@ -326,7 +292,7 @@ namespace rdt {
         // Use draw API
         BeginImpl(layer);
         SetLineColorImpl(color);
-        SetRenderCondImpl(rendCond);
+        SetRenderTypeImpl(RenderType::DrawLine);
         AddLineImpl(*line);
         EndImpl();
 
@@ -336,7 +302,8 @@ namespace rdt {
     void Renderer::BeginImpl(unsigned int layer)
     {
         while (m_layers.size() <= layer) {
-            m_layers.push_back(glLayer());
+            m_layers.push_back(Layer());
+            m_layers.back().SetDefaultShader(m_shaders[0]->GetID());
         }
 
         m_current_layer = layer;
@@ -344,7 +311,7 @@ namespace rdt {
 
     void Renderer::EndImpl()
     {
-        m_current_render_cond = 0;
+        m_current_render_type = DrawFilled;
         m_polygon_texture = NO_TEXTURE;
     }
 
@@ -382,7 +349,7 @@ namespace rdt {
         pMesh.texture = m_polygon_texture;
         pMesh.texAtlasCoords = m_polygon_texture_coords;
 
-        m_command_queue.push(DrawCommand(polygon.GetUUID(), m_current_render_cond));
+        m_command_queue.push(DrawCommand(polygon.GetUUID(), m_current_render_type));
     }
 
     void Renderer::AddLineImpl(const Line& line)
@@ -417,13 +384,12 @@ namespace rdt {
         pMesh.texture = nullptr;
         pMesh.texAtlasCoords = Vec2i::Zero();
 
-        m_command_queue.push(DrawCommand(line.GetUUID(), m_current_render_cond));
+        m_command_queue.push(DrawCommand(line.GetUUID(), m_current_render_type));
     }
 
-    void Renderer::SetRenderCondImpl(const unsigned int rendCond)
+    void Renderer::SetRenderTypeImpl(RenderType type)
     {
-        m_current_render_cond = 0;
-        m_current_render_cond = DrawCommand::AddRendCond(0, rendCond);
+        m_current_render_type = type;
     }
 
     void Renderer::SetPolygonColorImpl(const Color& color)
@@ -488,11 +454,6 @@ namespace rdt {
         }
     }
 
-    void Renderer::AddLayer()
-    {
-        m_layers.push_back(glLayer());
-    }
-
     void Renderer::DetachGuiImpl(const GuiTemplate* gui)
     {
         for (auto it = m_GUIs.begin(); it != m_GUIs.end(); ++it) {
@@ -503,38 +464,8 @@ namespace rdt {
         }
     }
 
-    void Renderer::AddToRenderUnit(const Mesh& mesh, const glRenderUnitType type)
-    {
-
-        if (m_layers.at(mesh.layer).renderUnits[type].size() == 0) {
-            m_layers.at(mesh.layer).renderUnits[type].push_back(glRenderUnit());
-            glRenderUnit& unit = m_layers.at(mesh.layer).renderUnits[type].back();
-
-            unit.m_VBO = new VertexBuffer;
-            unit.m_IBO = new IndexBuffer;
-
-            unit.vboID = unit.m_VBO->GetID();
-            unit.iboID = unit.m_IBO->GetID();
-            unit.shaderID = m_shaders.front()->GetID();
-        }
-        glRenderUnit& unit = m_layers.at(mesh.layer).renderUnits[type].back();
-
-        unit.m_VBO->PushToBatch(mesh.vertices);
-        unit.m_IBO->PushToBatch(mesh.indices, mesh.vertices.size());
-    }
-
     void Renderer::FlushPolygonImpl(const UniqueID UUID)
     {
         m_render_cache.Flush(UUID);
-    }
-
-    bool Renderer::DrawCommand::HasRendCond(unsigned int src, unsigned int condQuery)
-    {
-        return (bool)(src & condQuery);
-    }
-
-    unsigned int Renderer::DrawCommand::AddRendCond(unsigned int src, const unsigned int cond) 
-    {
-        return src | cond;
     }
 }

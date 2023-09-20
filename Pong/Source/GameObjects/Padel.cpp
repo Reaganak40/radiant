@@ -73,7 +73,7 @@ void Padel::OnRender()
 	
 	Renderer::Begin(0);
 	if (!m_fill_sprite) {
-		Renderer::SetRenderCond(DrawOutline);
+		Renderer::SetRenderType(DrawOutline);
 	}
 	Renderer::SetPolygonColor(m_sprite_color);
 	Renderer::AddPolygon(Physics::GetPolygon(GetRealmID(), m_model_ID));

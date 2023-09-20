@@ -17,6 +17,7 @@ namespace rdt {
 		m_tileHeight = 0.0f;
 		m_numRows = 0;
 		m_numCols = 0;
+		m_tile_gap = 0;
 
 	}
 

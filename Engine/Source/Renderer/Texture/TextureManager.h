@@ -36,6 +36,7 @@ namespace rdt {
 		static Texture* GetTexture(const std::string& name) { return m_instance->GetTextureImpl(name); }
 
 		friend class Renderer;
+		friend class Layer;
 	private:
 		Texture& LoadTextureFromPNGImpl(const std::string& name, const std::string& filepath);
 		Texture* GetTextureImpl(const std::string& name);

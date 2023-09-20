@@ -9,9 +9,9 @@ namespace rdt {
 		Vec3f position;			// x,y,z coordinats of a vertex
 		Vec4f color;			// the rgba (normalized) color values of a vertex
 		Vec2f texCoords;		// the texture mapping coordinates for this vertex
-		unsigned int texIndex;  // the texture slot that the target texture is currently binded.
+		float texIndex;  // the texture slot that the target texture is currently binded.
 
-		Vertex(Vec3f nPosition, Vec4f nColor, Vec2f nTexCoords, unsigned int nTexIndex)
+		Vertex(Vec3f nPosition, Vec4f nColor, Vec2f nTexCoords, float nTexIndex)
 			: position(nPosition), color(nColor), texCoords(nTexCoords), texIndex(nTexIndex) {}
 	};
 

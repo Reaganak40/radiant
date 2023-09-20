@@ -59,5 +59,9 @@ enum PacmanMessageTypes {
 	PMT_PauseGame,
 	PMT_ResumeGame,
 	PMT_EndDeathAnimation,
-	PMT_Respawn
+	PMT_Respawn,
+	PMT_StartBlinking,
+	PMT_StopBlinking,
+	PMT_MakeVulnerable,
+	PMT_StopVulnerability
 };

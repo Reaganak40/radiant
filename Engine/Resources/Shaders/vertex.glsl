@@ -1,19 +1,19 @@
 #version 450 core
 
-layout (location = 0) in vec4 position;
-layout (location = 1) in vec4 color;
-layout (location = 2) in vec2 texCoords;
-layout (location = 3) in uint texIndex;
+smooth in vec4 vColor;
+in vec2 vTexCoords;
+flat in uint vTexIndex;
 
-smooth out vec4 vColor;
-out vec2 vTexCoords;
-out uint vTexIndex;
+layout(location = 0) out vec4 color;
 
-uniform mat4 uMVP;
+uniform vec4 uColor;
+uniform sampler2D uTextures[30];
 
 void main() {
-    gl_Position = uMVP * position;
-    vColor = color;
-    vTexCoords = texCoords;
-    vTexIndex = texIndex;
+    if (vTexIndex > 0) {
+        color = texture2D(uTextures[vTexIndex], vTexCoords);
+    }
+    else {
+        color = vColor;
+    }
 };

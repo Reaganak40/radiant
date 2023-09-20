@@ -20,6 +20,7 @@ namespace rdt {
 		std::vector<GameObject*> m_game_objects;
 		std::vector<GuiTemplate*> m_GUIs;
 		std::vector<UniqueID> m_realms;
+		GameState GState;
 		
 		/*
 			Runs OnProcssInput on all game objects and OnUpdate on all

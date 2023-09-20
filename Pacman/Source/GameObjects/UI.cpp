@@ -3,12 +3,14 @@
 using namespace rdt;
 
 
-UI::UI(int maxTiles, Vec2d tileSize)
+UI::UI(UIDisplayMode nMode, int maxTiles, rdt::Vec2d tileSize)
 {
 	m_numTiles = maxTiles;
 	m_tileSize = tileSize;
 	m_alignment = TEXT_RIGHT;
 	m_show = true;
+	m_mode = nMode;
+	m_layer = MAP_LAYER;
 }
 
 UI::~UI()
@@ -99,6 +101,11 @@ void UI::SetAlignment(UIAlignment nAlign)
 void UI::SetShow(bool nShow)
 {
 	m_show = nShow;
+}
+
+void UI::SetLayer(int layer)
+{
+	m_layer = layer;
 }
 
 bool UI::IsShowing()
@@ -194,9 +201,29 @@ rdt::Vec2i UI::GetAtlasCoords(char c)
 
 void UI::DrawTile(char c, int tile)
 {
-	Renderer::Begin();
-	Vec2i atlasCoords = GetAtlasCoords(c);
-	Renderer::SetPolygonTexture("font", atlasCoords.x, atlasCoords.y);
+
+	Renderer::Begin(m_layer);
+
+	Vec2i atlasCoords;
+	std::string texName;
+
+	if (m_mode == UI_Text) {
+		texName = "font";
+		atlasCoords = GetAtlasCoords(c);
+	}
+	else {
+
+		if (c == 'L') {
+			texName = "pacman";
+			atlasCoords = { 1, 0 };
+		}
+		else {
+			texName = "font";
+			atlasCoords = GetAtlasCoords(' ');
+		}
+	}
+
+	Renderer::SetPolygonTexture(texName, atlasCoords.x, atlasCoords.y);
 	Renderer::AddPolygon(Physics::GetPolygon(GetRealmID(), m_model_IDs[tile]));
 	Renderer::End();
 }

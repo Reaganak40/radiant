@@ -74,8 +74,6 @@ public:
 	void OnRender() override final;
 	void OnMessage(rdt::Message msg) override final;
 
-	void SetVulnerable(bool state);
-	void SetIsBlinking(bool blink);
 
 	void SetMovementMode(MovementMode mode);
 
@@ -83,6 +81,8 @@ private:
 	void Respawn();
 	void AddGameObjectPtr(rdt::MessageID from, rdt::GameObjectPtrData* data);
 
+	void SetVulnerable(bool state);
+	void SetIsBlinking(bool blink);
 	void SetPause(bool pause);
 	void SelectNewTarget();
 	void SelectRandom();

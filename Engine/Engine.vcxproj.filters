@@ -165,6 +165,9 @@
     <ClCompile Include="Source\GameObject\GameState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Renderer\Layer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vendor\GLAD\glad.h">
@@ -1182,6 +1185,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\GameObject\GameState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer\Layer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

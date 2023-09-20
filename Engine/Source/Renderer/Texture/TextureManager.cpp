@@ -41,7 +41,7 @@ namespace rdt {
 				}
 			}
 		}
-		unsigned int texIndex = texture->CurrentTextureSlot();
+		float texIndex = (float)texture->CurrentTextureSlot();
 
 		if (texture->has_texture_atlas) {
 

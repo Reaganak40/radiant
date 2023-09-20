@@ -9,15 +9,19 @@
 #define _1UP_INDEX 7
 #define _1UP_SCORE_INDEX 8
 #define HIGHSCORE_VAL_INDEX 9
+#define LIFE_DISPLAY_INDEX 10
 
 
+enum LevelStateFlags {
+	LSF_PreviouslyBounded,
+	LSF_LoadedTextures,
+	LSF_GhostsBlinking,
+	LSF_InkyOut,
+	LSF_ClydeOut,
+	LSF_MaxFlags
+};
 class Level : public rdt::Scene {
 private:
-	bool previously_bounded;
-	bool loaded_textures;
-	bool ghosts_blinking;
-	bool inky_out;
-	bool clyde_out;
 
 	rdt::Timer m_power_timer;
 	rdt::Timer m_spawn_timer;
@@ -28,6 +32,7 @@ private:
 	int playerScore;
 	int highScore;
 	int levelDotCount;
+	int lifeCount;
 
 	PacmanDeathSequence m_pacman_death_state;
 
@@ -50,6 +55,7 @@ private:
 	void ResumeGame();
 	void Respawn();
 	void UpdatePlayerScore(int pointsToAdd);
+	void UpdateLifeDisplay();
 
 	void PacmanDeathShowHitPhase(const float deltaTime);
 };

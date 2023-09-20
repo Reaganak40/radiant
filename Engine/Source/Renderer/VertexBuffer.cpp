@@ -4,7 +4,7 @@
 namespace rdt {
 
 	VertexBuffer::VertexBuffer()
-		: m_buffer_defined(false), m_current_count(0), m_last_count(0)
+		: m_buffer_defined(false), m_current_count(0), m_last_count(0), m_ID(0)
 	{
 		m_buffer.reserve(DEFAULT_VERTEX_BUFFER_LIMIT);
 		glGenBuffers(1, &m_ID);

@@ -277,6 +277,18 @@ void Ghost::OnMessage(Message msg)
 	case PMT_Respawn:
 		Respawn();
 		break;
+	case PMT_StartBlinking:
+		SetIsBlinking(true);
+		break;
+	case PMT_StopBlinking:
+		SetIsBlinking(false);
+		break;
+	case PMT_MakeVulnerable:
+		SetVulnerable(true);
+		break;
+	case PMT_StopVulnerability:
+		SetVulnerable(false);
+		break;
 	}
 }
 
@@ -307,7 +319,7 @@ void Ghost::SetVulnerable(bool state)
 	}
 	else {
 		GState.SetState(GSS_IsVulnerable, state);
-
+		SetMovementMode(CHASE);
 
 		SetIsBlinking(false);
 
