@@ -32,16 +32,6 @@ namespace rdt {
 			type = DrawFilled;
 		}
 
-		~glRenderUnit() {
-			if (m_VBO != nullptr) {
-				delete m_VBO;
-			}
-
-			if (m_IBO != nullptr) {
-				delete m_IBO;
-			}
-		}
-
 		void InitBuffers() {
 			if (m_VBO != nullptr) {
 				return;
@@ -50,6 +40,16 @@ namespace rdt {
 			m_IBO = new IndexBuffer;
 			vboID = m_VBO->GetID();
 			iboID = m_IBO->GetID();
+		}
+
+		void DeleteBuffers() {
+			if (m_VBO != nullptr) {
+				delete m_VBO;
+			}
+
+			if (m_IBO != nullptr) {
+				delete m_IBO;
+			}
 		}
 	};
 
@@ -88,6 +88,11 @@ namespace rdt {
 			Returns true if the texture slots changed when compiling the batches.
 		*/
 		bool TextureSlotsChanged();
+
+		/*
+			Returns the current number of batched render units.
+		*/
+		unsigned int GetBatchCount();
 
 		/*
 			Gets the compiled render units.

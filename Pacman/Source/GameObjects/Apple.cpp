@@ -40,7 +40,12 @@ void Apple::OnFinalUpdate()
 void Apple::OnRender()
 {
 	Renderer::Begin();
-	Renderer::SetPolygonTexture(m_texName);
+	//Renderer::SetPolygonTexture(m_texName);
+
+	if (m_texName == "apple") {
+	}
+	Renderer::SetPolygonColor(Color(0.0, 0.8f, 0.0f, 1.0f));
+
 	Renderer::AddPolygon(Physics::GetPolygon(GetRealmID(), m_model_ID));
 	Renderer::End();
 }

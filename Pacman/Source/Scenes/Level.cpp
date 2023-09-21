@@ -143,7 +143,7 @@ void Level::OnRegister()
 	}
 	m_1up_timer.Start();
 
-	//m_GUIs.push_back(new DiagnosticsGUI);
+	m_GUIs.push_back(new DiagnosticsGUI);
 }
 
 void Level::OnBind()

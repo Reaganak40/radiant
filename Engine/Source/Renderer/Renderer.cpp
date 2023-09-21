@@ -23,6 +23,8 @@ namespace rdt {
 
         m_polygon_color = BLACK;
         m_line_color = BLACK;
+
+
     }
 
     Renderer::~Renderer()
@@ -33,6 +35,8 @@ namespace rdt {
         }
 
         delete m_vertex_array;
+
+        TextureManager::Destroy();
 
         glfwTerminate();
     }
@@ -113,8 +117,11 @@ namespace rdt {
         m_vertex_array = new VertexArray;
         VertexArray::Bind(m_vertex_array->GetID());
 
+        TextureManager::Initialize();
+
         // set default shader
         AddDefaultShader();
+        UpdateTextureUniforms();
 
         // Setup Camera (model view project matrix)
         m_screen_origin = Vec3f(0.0f, 0.0f, 0.0f);
@@ -179,6 +186,7 @@ namespace rdt {
         while (!m_command_queue.empty()) {
             DrawCommand command = m_command_queue.front();
             Mesh& mesh = m_render_cache.GetMesh(command.meshIdentifier);
+
             m_layers[mesh.layer].AddMesh(mesh, command.renderType);
             m_command_queue.pop();
         }
@@ -190,12 +198,13 @@ namespace rdt {
             layer.CompileBatches();
 
             if (layer.TextureSlotsChanged()) {
-                SetShader(m_shaders[0]->GetID());
-                m_shaders[0]->SetUniform<std::array<TextureID, MAX_TEXTURES>>("uTextures", TextureManager::GetTextureSlots());
+                UpdateTextureUniforms();
             }
 
-            for (auto& unit : layer.GetRenderUnits()) {
-                
+            auto units = layer.GetRenderUnits();
+            for (int i = 0; i < layer.GetBatchCount(); i++) {
+                auto& unit = units.at(i);
+
                 // Draw Call Procedure
                 SetVBO(unit.vboID);
                 SetIBO(unit.iboID);
@@ -307,12 +316,14 @@ namespace rdt {
         }
 
         m_current_layer = layer;
+        m_current_render_type = DrawFilled;
+        m_polygon_texture = TextureManager::GetTexture("None");
+        m_polygon_color = WHITE;
     }
 
     void Renderer::EndImpl()
     {
-        m_current_render_type = DrawFilled;
-        m_polygon_texture = NO_TEXTURE;
+       
     }
 
     void Renderer::AddPolygonImpl(const Polygon& polygon)
@@ -332,7 +343,7 @@ namespace rdt {
                 pMesh.vertices.push_back(
                     Vertex(
                         Vec3f((float)vertex.x, (float)vertex.y), m_polygon_color.GetColor(),
-                        {0, 0}, NO_TEXTURE
+                        {0, 0}, UNASSIGNED_TEXTURE
                     )
                 );
             }
@@ -340,7 +351,7 @@ namespace rdt {
                 pMesh.vertices[index].position = Vec3f((float)vertex.x, (float)vertex.y);
                 pMesh.vertices[index].color = m_polygon_color.GetColor();
                 pMesh.vertices[index].texCoords = { 0, 0 };
-                pMesh.vertices[index].texIndex = NO_TEXTURE;
+                pMesh.vertices[index].texIndex = UNASSIGNED_TEXTURE;
             }
             index++;
         }
@@ -367,7 +378,7 @@ namespace rdt {
                 pMesh.vertices.push_back(
                     Vertex(
                         Vec3f((float)vertex.x, (float)vertex.y), m_line_color.GetColor(),
-                        { 0, 0 }, NO_TEXTURE
+                        { 0, 0 }, UNASSIGNED_TEXTURE
                     )
                 );
             }
@@ -375,7 +386,7 @@ namespace rdt {
                 pMesh.vertices[index].position = Vec3f((float)vertex.x, (float)vertex.y);
                 pMesh.vertices[index].color = m_line_color.GetColor();
                 pMesh.vertices[index].texCoords = { 0, 0 };
-                pMesh.vertices[index].texIndex = NO_TEXTURE;
+                pMesh.vertices[index].texIndex = UNASSIGNED_TEXTURE;
             }
             index++;
         }
@@ -467,5 +478,11 @@ namespace rdt {
     void Renderer::FlushPolygonImpl(const UniqueID UUID)
     {
         m_render_cache.Flush(UUID);
+    }
+
+    void Renderer::UpdateTextureUniforms()
+    {
+        SetShader(m_shaders[0]->GetID());
+        m_shaders[0]->SetUniform<std::array<TextureID, MAX_TEXTURES>>("uTextures", TextureManager::GetTextureSlots());
     }
 }

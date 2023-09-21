@@ -6,8 +6,9 @@
 typedef unsigned int TextureSlot;
 typedef unsigned int TextureID;
 
-#define NO_TEXTURE 0
 #define MAX_TEXTURES 30
+#define UNASSIGNED_TEXTURE 125
+#define NONE_TEXTURE 1
 
 namespace rdt {
 	class Texture {
@@ -15,7 +16,6 @@ namespace rdt {
 		TextureID m_textureID;
 		TextureSlot m_texture_slot;
 
-		unsigned char* m_imageBuffer;
 		int m_image_width;
 		int m_image_height;
 		int m_bits_per_pixel;
@@ -43,9 +43,9 @@ namespace rdt {
 
 	private:
 		void LoadTexture(const std::string& textureFilePath);
+		void SetToNone();
+
 		void Bind(TextureSlot slot);
 		const TextureSlot CurrentTextureSlot() { return m_texture_slot; }
-		void DeleteTexture();
-
 	};
 }

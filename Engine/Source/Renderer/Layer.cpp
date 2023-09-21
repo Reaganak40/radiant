@@ -5,9 +5,9 @@
 namespace rdt {
 	Layer::Layer()
 	{
+		m_batchCount = 0;
 		m_default_shader = 0;
 		m_updated_texture_slots = false;
-
 	}
 
 	Layer::~Layer()
@@ -42,26 +42,15 @@ namespace rdt {
 
 	void Layer::CompileBatches()
 	{
-		for (auto& [tID, meshes] : m_textured_meshes) {
-			if (meshes.size() == 0) {
-				m_textured_meshes.erase(tID);
-			}
-		}
-
-		// Reserve or resize vector based on number of batches
-		int numBatches = m_textured_meshes.size() + 2;
-		if (m_batches.size() < numBatches) {
-			m_batches.reserve(numBatches);
-		}
-		else if (m_batches.size() > numBatches) {
-			m_batches.resize(numBatches);
-		}
 
 		int unitIndex = 0;
 
 		// Add batches for with textures
 		for (auto& [tID, meshes] : m_textured_meshes) {
-			
+			if (meshes.size() == 0) {
+				continue;
+			}
+
 			if (m_batches.size() <= unitIndex) {
 				PushRenderUnit();
 			}
@@ -78,30 +67,42 @@ namespace rdt {
 		}
 		
 		// Add polygon outline batch
-		if (m_batches.size() <= unitIndex) {
-			PushRenderUnit();
+		if (m_outline_meshes.size() > 0) {
+			if (m_batches.size() <= unitIndex) {
+				PushRenderUnit();
+			}
+			for (auto& mesh : m_outline_meshes) {
+				m_batches[unitIndex].m_VBO->PushToBatch(mesh->vertices);
+				m_batches[unitIndex].m_IBO->PushToBatch(mesh->indices, mesh->vertices.size());
+			}
+			m_batches[unitIndex].type = DrawOutline;
+			unitIndex++;
 		}
-		for (auto& mesh : m_outline_meshes) {
-			m_batches[unitIndex].m_VBO->PushToBatch(mesh->vertices);
-			m_batches[unitIndex].m_IBO->PushToBatch(mesh->indices, mesh->vertices.size());
-		}
-		m_batches[unitIndex].type = DrawOutline;
-		unitIndex++;
 
 		// Add line batch
-		if (m_batches.size() <= unitIndex) {
-			PushRenderUnit();
+		if (m_line_meshes.size() > 0) {
+			if (m_batches.size() <= unitIndex) {
+				PushRenderUnit();
+			}
+			for (auto& mesh : m_line_meshes) {
+				m_batches[unitIndex].m_VBO->PushToBatch(mesh->vertices);
+				m_batches[unitIndex].m_IBO->PushToBatch(mesh->indices, mesh->vertices.size());
+			}
+			m_batches[unitIndex].type = DrawLine;
+			unitIndex++;
 		}
-		for (auto& mesh : m_line_meshes) {
-			m_batches[unitIndex].m_VBO->PushToBatch(mesh->vertices);
-			m_batches[unitIndex].m_IBO->PushToBatch(mesh->indices, mesh->vertices.size());
-		}
-		m_batches[unitIndex].type = DrawLine;
+
+		m_batchCount = unitIndex;
 	}
 
 	bool Layer::TextureSlotsChanged()
 	{
 		return m_updated_texture_slots;
+	}
+
+	unsigned int Layer::GetBatchCount()
+	{
+		return m_batchCount;
 	}
 
 	std::vector<glRenderUnit>& Layer::GetRenderUnits()
@@ -124,6 +125,7 @@ namespace rdt {
 			unit.m_VBO->Flush();
 		}
 
+		m_batchCount = 0;
 	}
 
 	void Layer::PushRenderUnit()

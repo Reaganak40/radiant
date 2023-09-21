@@ -26,7 +26,6 @@ namespace rdt
 		PtagManager::Destroy();
 		MessageBus::Destroy();
 		Input::Destroy();
-		TextureManager::Destroy();
 		Renderer::Destroy();
 	}
 
@@ -35,7 +34,6 @@ namespace rdt
 		Utils::SetRandomSeed();
 
 		Renderer::CreateWindow(appName, windowWidth, windowHeight, resizable);
-		TextureManager::Initialize();
 		Input::Initialize();
 		MessageBus::Initialize();
 		PtagManager::Initialize();

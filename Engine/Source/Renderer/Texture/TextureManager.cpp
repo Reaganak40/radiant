@@ -7,7 +7,10 @@ namespace rdt {
 
 	TextureManager::TextureManager()
 	{
-		m_texture_slots.fill(NO_TEXTURE);
+		m_texture_slots.fill(UNASSIGNED_TEXTURE);
+		m_next_slot = 2;
+
+		AddNoneTexture();
 	}
 
 	TextureManager::~TextureManager()
@@ -31,15 +34,11 @@ namespace rdt {
 	bool TextureManager::ApplyTextureAtlas(Texture* texture, const Vec2i& atlasCoords, std::vector<Vertex>& rectVertices)
 	{
 		bool slots_changed = false;
-		if (texture->CurrentTextureSlot() == NO_TEXTURE) {
-			for (TextureSlot i = 1; i < MAX_TEXTURES; i++) {
-				if (m_instance->m_texture_slots[i] == NO_TEXTURE) {
-					texture->Bind(i);
-					m_instance->m_texture_slots[i] = i;
-					slots_changed = true;
-					break;
-				}
-			}
+		if (texture->CurrentTextureSlot() == UNASSIGNED_TEXTURE) {
+			TextureSlot slot = m_instance->GetNextSlot();
+			texture->Bind(slot);
+			m_instance->m_texture_slots[slot] = slot;
+			slots_changed = true;
 		}
 		float texIndex = (float)texture->CurrentTextureSlot();
 
@@ -84,6 +83,21 @@ namespace rdt {
 	{
 		return m_instance->m_texture_slots;
 	}
+
+	void TextureManager::AddNoneTexture()
+	{
+		m_textures["None"] = Texture();
+		m_textures.at("None").SetToNone();
+		m_textures.at("None").Bind(NONE_TEXTURE);
+		m_texture_slots[NONE_TEXTURE] = NONE_TEXTURE;
+
+	}
+
+	TextureSlot TextureManager::GetNextSlot()
+	{
+		return m_next_slot++;
+	}
+
 	Texture& TextureManager::LoadTextureFromPNGImpl(const std::string& name, const std::string& filepath)
 	{
 		if (m_textures.find(name) == m_textures.end()) {

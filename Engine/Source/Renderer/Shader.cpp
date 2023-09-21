@@ -61,12 +61,7 @@ namespace rdt {
             "\n"
             "void main() {\n"
             "    int index = int(vTexIndex);\n"
-            "    if (index > 0) {\n"
-            "        color = texture2D(uTextures[index], vTexCoords);\n"
-            "    }\n"
-            "    else {\n"
-            "        color = vColor;\n"
-            "    }\n"
+            "    color = texture(uTextures[index], vTexCoords) * vColor;\n"
             "}\n";
 
         CreateShader(vertexShader, fragmentShader);

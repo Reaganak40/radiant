@@ -35,8 +35,6 @@ void Menu::OnRegister()
 	banana->SetTexture("banana");
 
 
-
-
 	UI* highScore;
 	m_game_objects.push_back(highScore = new UI(UI_Text, 10, { 18, 18 }));
 	highScore->RegisterToRealm(m_realms.back());

@@ -305,6 +305,8 @@ namespace rdt {
 		void DetachGuiImpl(const GuiTemplate* gui);
 
 		void FlushPolygonImpl(const UniqueID UUID);
+
+		void UpdateTextureUniforms();
 	};
 
 }

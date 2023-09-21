@@ -14,6 +14,8 @@ namespace rdt {
 		std::unordered_map<std::string, Texture> m_textures;
 		std::array<unsigned int, MAX_TEXTURES> m_texture_slots;
 
+		TextureSlot m_next_slot;
+
 	public:
 		/*
 			Creates a new instance of the TextureManager.
@@ -49,5 +51,10 @@ namespace rdt {
 		*/
 		static bool ApplyTextureAtlas(Texture* texture, const Vec2i& atlasCoords, std::vector<Vertex>& rectVertices);
 		static std::array<unsigned int, MAX_TEXTURES>& GetTextureSlots();
+
+		void AddNoneTexture();
+
+		TextureSlot GetNextSlot();
+
 	};
 }

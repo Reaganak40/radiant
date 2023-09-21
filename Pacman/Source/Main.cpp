@@ -11,7 +11,7 @@ int main(void)
 
     pacmanApp.AddScene("Level", new Level);
     
-    //pacmanApp.AddScene("menu", new Menu);
+    //pacmanApp.AddScene("Menu", new Menu);
     pacmanApp.SetScene("Level");
 
     /* Loop until the user closes the window */
