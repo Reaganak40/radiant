@@ -3,7 +3,7 @@
 using namespace rdt;
 
 Ghost::Ghost(GhostName nName)
-	: m_frame_timer(0.35f), m_blink_timer(0.20f), m_path_finding_timer(0.6f)
+	: m_frame_timer(0.35f), m_blink_timer(0.20f), m_path_finding_timer(0.6f), m_end_timer(1.2f)
 {
 	GState.SetStateCount(GSS_MaxState);
 	spawnPos = Vec2d::Zero();
@@ -122,6 +122,19 @@ void Ghost::OnProcessInput(const float deltaTime)
 		return;
 	}
 
+	if (GState.CheckState(GSS_IsLevelEnded)) {
+
+		if (m_end_timer.IsRunning()) {
+			if (m_end_timer.Update(deltaTime)) {
+				if (m_name == BLINKY) {
+					SendMessage("level", PMT_StartEndLevelAnimation);
+				}
+			}
+		}
+
+		return;
+	}
+
 	const Vec2d location = Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
 	const Vec2d target = m_map_ptr->GetWorldCoordinates(m_target_coords);
 
@@ -236,7 +249,7 @@ void Ghost::OnProcessInput(const float deltaTime)
 
 void Ghost::OnFinalUpdate()
 {
-	if (GState.CheckState(GSS_Paused)) {
+	if (GState.CheckState(GSS_Paused) || GState.CheckState(GSS_IsLevelEnded)) {
 		return;
 	}
 
@@ -247,6 +260,12 @@ void Ghost::OnRender()
 {
 	if (GState.CheckState(GSS_IsGameOver)) {
 		return;
+	}
+
+	if (GState.CheckState(GSS_IsLevelEnded)) {
+		if (!m_end_timer.IsRunning()) {
+			return;
+		}
 	}
 
 	if (!m_pacman_ptr->InRespawn()) {
@@ -292,8 +311,15 @@ void Ghost::OnMessage(Message msg)
 		break;
 	case PMT_StopVulnerability:
 		SetVulnerable(false);
+		break;
 	case PMT_GameOver:
 		GState.SetState(GSS_IsGameOver, true);
+		break;
+	case PMT_LevelEnded:
+		OnEndLevel();
+		break;
+	case PMT_StartNewLevel:
+		OnNewLevel();
 		break;
 	}
 }
@@ -325,13 +351,16 @@ void Ghost::SetVulnerable(bool state)
 	}
 	else {
 		GState.SetState(GSS_IsVulnerable, state);
-		SetMovementMode(CHASE);
-
+		m_speed = GHOST_SPEED;
 		SetIsBlinking(false);
 
+		if (GState.CheckState(GSS_IsEaten)) {
+			return;
+		}
+
+		SetMovementMode(CHASE);
 		ResetFrameRow();
 
-		m_speed = GHOST_SPEED;
 	}
 
 }
@@ -389,7 +418,6 @@ void Ghost::Respawn()
 	Physics::SetVelocity(GetRealmID(), m_model_ID, Vec2d::Zero());
 
 	GState.SetState(GSS_IsVulnerable, false);
-	GState.SetState(GSS_IsBlinking, false);
 	GState.SetState(GSS_IsEaten, false);
 	
 	m_target_coords = { 15, 10 };
@@ -439,6 +467,7 @@ void Ghost::Respawn()
 	Look(m_direction);
 
 	SetMovementMode(CHASE);
+	SetIsBlinking(false);
 
 	m_frame_timer.Start();
 }
@@ -1143,6 +1172,17 @@ void Ghost::OnRevived()
 	GState.SetState(GSS_IsEaten, false);
 	ResetFrameRow();
 	SetMovementMode(CHASE);
+}
+
+void Ghost::OnEndLevel()
+{
+	GState.SetState(GSS_IsLevelEnded, true);
+	m_end_timer.Start();
+}
+
+void Ghost::OnNewLevel()
+{
+	GState.SetState(GSS_IsLevelEnded, false);
 }
 
 void Ghost::ResetFrameRow()

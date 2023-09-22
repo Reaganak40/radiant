@@ -37,6 +37,7 @@ enum GhostGameState {
 	GSS_IsBlinking,
 	GSS_IsEaten,
 	GSS_IsGameOver,
+	GSS_IsLevelEnded,
 	GSS_MaxState,
 };
 class Ghost : public rdt::GameObject {
@@ -54,6 +55,7 @@ private:
 	rdt::Timer m_path_finding_timer;
 	rdt::Timer m_movement_timer;
 	rdt::Timer m_blink_timer;
+	rdt::Timer m_end_timer;
 	
 	int df;
 	int m_frame_row;
@@ -103,6 +105,8 @@ private:
 	void FinalUpdatePosition();
 	void OnEaten();
 	void OnRevived();
+	void OnEndLevel();
+	void OnNewLevel();
 
 	void ResetFrameRow();
 };

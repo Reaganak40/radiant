@@ -44,7 +44,7 @@ void Pacman::OnRelease()
 
 void Pacman::OnProcessInput(const float deltaTime)
 {
-	if (GState.CheckState(PGS_Paused)) {
+	if (GState.CheckState(PGS_Paused) || GState.CheckState(PGS_IsEndLevel)) {
 		return;
 	}
 	
@@ -54,7 +54,7 @@ void Pacman::OnProcessInput(const float deltaTime)
 
 void Pacman::OnFinalUpdate()
 {
-	if (GState.CheckState(PGS_Paused)) {
+	if (GState.CheckState(PGS_Paused) || GState.CheckState(PGS_IsEndLevel)) {
 		return;
 	}
 
@@ -113,6 +113,12 @@ void Pacman::OnMessage(rdt::Message msg)
 	case PMT_GameOver:
 		GState.SetState(PGS_IsGameOver, true);
 		break;
+	case PMT_LevelEnded:
+		OnEndLevel();
+		break;
+	case PMT_StartNewLevel:
+		OnNewLevel();
+		break;
 	}
 }
 
@@ -127,6 +133,20 @@ void Pacman::Respawn()
 
 	GState.SetState(PGS_Spawned, true);
 	GState.SetState(PGS_InRespawn, false);
+}
+
+void Pacman::OnEndLevel()
+{
+	GState.SetState(PGS_IsEndLevel, true);
+	m_frame_col = 1;
+	m_frame_row = 0;
+	current_frame = 2;
+	df = 0;
+}
+
+void Pacman::OnNewLevel()
+{
+	GState.SetState(PGS_IsEndLevel, false);
 }
 
 rdt::Vec2i Pacman::GetMapCoordinates()

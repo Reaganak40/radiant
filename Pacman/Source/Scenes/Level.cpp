@@ -7,7 +7,7 @@
 using namespace rdt;
 
 Level::Level()
-	: m_power_timer(10.0), m_spawn_timer(2.5), m_show_hit_timer(0.5), m_1up_timer(0.25)
+	: m_power_timer(10.0), m_spawn_timer(2.5), m_show_hit_timer(0.5), m_1up_timer(0.25), m_end_level_timer(1.0f)
 {
 	GState.SetStateCount(LSF_MaxFlags);
 
@@ -16,9 +16,9 @@ Level::Level()
 	}
 
 	playerScore = 0;
-	m_highScore = 10000;
+	m_highScore = 12580;
 	levelDotCount = 0;
-	lifeCount = 3;
+	lifeCount = 4;
 	m_pacman_death_state = PDS_NoDeath;
 	RegisterToMessageBus("level");
 }
@@ -111,7 +111,7 @@ void Level::OnRegister()
 	lifeDisplay->RegisterToRealm(m_realms[2]);
 	lifeDisplay->SetOrigin({ 30, 20 });
 	lifeDisplay->SetAlignment(TEXT_LEFT);
-	lifeDisplay->SetText("LL");
+	lifeDisplay->SetText("LLL");
 	
 	UI* readyText;
 	m_game_objects.push_back(readyText = new UI(UI_Text, 6, { 19, 19 }));
@@ -219,6 +219,15 @@ void Level::OnProcessInput(const float deltaTime)
 		return;
 	}
 
+	if (GState.CheckState(LSF_InEndAnimation)) {
+		if (m_end_level_timer.IsRunning()) {
+			if (m_end_level_timer.Update(deltaTime)) {
+				StartNextLevel();
+			}
+		}
+	}
+
+
 	if (m_power_timer.IsRunning()) {
 		if (m_power_timer.Update(deltaTime)) {
 			DeactivatePowerMode();
@@ -253,6 +262,35 @@ void Level::OnFinalUpdate()
 		return;
 	}
 
+	Vec2i pacmanCoords = ((Pacman*)m_game_objects[0])->GetMapCoordinates();
+	PacDot* dot = m_dotMap[pacmanCoords.y][pacmanCoords.x];
+	if (dot != nullptr && !dot->IsEaten() && dot->ShouldEat(((Pacman*)m_game_objects[0])->GetWorldCoordinates())) {
+		dot->Eat();
+
+		if (dot->IsPowerDot()) {
+			ActivatePowerMode();
+			UpdatePlayerScore(50);
+		}
+		else {
+			UpdatePlayerScore(10);
+		}
+		levelDotCount++;
+
+		if (levelDotCount >= 30 && !GState.CheckState(LSF_InkyOut)) {
+			SendMessage("inky", PMT_LeaveHome, nullptr);
+			GState.SetState(LSF_InkyOut, true);
+		}
+		else if (levelDotCount >= 60 && !GState.CheckState(LSF_ClydeOut)) {
+			SendMessage("clyde", PMT_LeaveHome, nullptr);
+			GState.SetState(LSF_ClydeOut, true);
+		}
+
+		if (levelDotCount == DOTS_PER_LEVEL) {
+			OnEndLevel();
+		}
+
+	}
+
 	RunFinalUpdateQueue();
 }
 
@@ -269,28 +307,7 @@ void Level::OnRelease()
 
 void Level::OnRender()
 {
-	Vec2i pacmanCoords = ((Pacman*)m_game_objects[0])->GetMapCoordinates();
-	PacDot* dot = m_dotMap[pacmanCoords.y][pacmanCoords.x];
-	if (dot != nullptr && !dot->IsEaten() && dot->ShouldEat(((Pacman*)m_game_objects[0])->GetWorldCoordinates())) {
-		dot->Eat();
-
-		if (dot->IsPowerDot()) {
-			ActivatePowerMode();
-		}
-
-		UpdatePlayerScore(10);
-		levelDotCount++;
-
-		if (levelDotCount >= 30 && !GState.CheckState(LSF_InkyOut)) {
-			SendMessage("inky", PMT_LeaveHome, nullptr);
-			GState.SetState(LSF_InkyOut, true);
-		}
-		else if (levelDotCount >= 60 && !GState.CheckState(LSF_ClydeOut)) {
-			SendMessage("clyde", PMT_LeaveHome, nullptr);
-			GState.SetState(LSF_ClydeOut, true);
-		}
-
-	}
+	
 
 	RunRenderQueue();
 }
@@ -303,6 +320,9 @@ void Level::OnMessage(rdt::Message msg)
 		break;
 	case PMT_EndDeathAnimation:
 		m_pacman_death_state = PDS_Repawn;
+		break;
+	case PMT_StartEndLevelAnimation:
+		StartEndLevelAnimation();
 		break;
 	}
 }
@@ -426,11 +446,66 @@ void Level::GameOver()
 	SendMessage("inky",   PMT_GameOver);
 	SendMessage("pinky",  PMT_GameOver);
 	SendMessage("clyde",  PMT_GameOver);
-	SendMessage("pacman", PMT_GameOver);
 	GState.SetState(LSF_GameOver, true);
 
 	((UI*)m_game_objects.at(GAMEOVER_INDEX1))->SetShow(true);
 	((UI*)m_game_objects.at(GAMEOVER_INDEX2))->SetShow(true);
+}
+
+void Level::OnEndLevel()
+{
+	SendMessage("pacman", PMT_LevelEnded);
+	SendMessage("blinky", PMT_LevelEnded);
+	SendMessage("inky",   PMT_LevelEnded);
+	SendMessage("pinky",  PMT_LevelEnded);
+	SendMessage("clyde",  PMT_LevelEnded);
+	GState.SetState(LSF_LevelEnded, true);
+	Physics::DeactivateRealm(m_realms[0]);
+}
+
+void Level::StartEndLevelAnimation()
+{
+	m_end_level_timer.Start();
+	GState.SetState(LSF_LevelEnded, false);
+	GState.SetState(LSF_InEndAnimation, true);
+}
+
+void Level::StartNextLevel()
+{
+	// notify end of level animation
+	GState.SetState(LSF_InEndAnimation, false);
+	SendDirectMessage("pacman", PMT_StartNewLevel);
+	SendDirectMessage("blinky", PMT_StartNewLevel);
+	SendDirectMessage("inky",   PMT_StartNewLevel);
+	SendDirectMessage("pinky",  PMT_StartNewLevel);
+	SendDirectMessage("clyde",  PMT_StartNewLevel);
+
+	// Run respawn procedure
+	SendDirectMessage("pacman", PMT_Respawn);
+	SendDirectMessage("blinky", PMT_Respawn);
+	SendDirectMessage("inky",   PMT_Respawn);
+	SendDirectMessage("pinky",  PMT_Respawn);
+	SendDirectMessage("clyde",  PMT_Respawn);
+	SendDirectMessage("pacman", PMT_Respawn);
+
+	PauseGame();
+	m_spawn_timer.SetInterval(1.7f);
+	m_spawn_timer.Start();
+
+	GState.SetState(LSF_InkyOut, false);
+	GState.SetState(LSF_ClydeOut, false);
+
+	GState.SetState(LSF_AtLevelStart, true);
+	((UI*)m_game_objects[READY_INDEX])->SetShow(true);
+
+	levelDotCount = 0;
+	for (int i = 0; i < NUM_TILES_Y; i++) {
+		for (int j = 0; j < NUM_TILES_X; j++) {
+			if (m_dotMap[i][j] != nullptr) {
+				m_dotMap[i][j]->Reset();
+			}
+		}
+	}
 }
 
 void Level::PacmanDeathShowHitPhase(const float deltaTime)

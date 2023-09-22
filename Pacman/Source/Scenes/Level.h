@@ -23,6 +23,8 @@ enum LevelStateFlags {
 	LSF_ClydeOut,
 	LSF_AtLevelStart,
 	LSF_GameOver,
+	LSF_LevelEnded,
+	LSF_InEndAnimation,
 	LSF_MaxFlags
 };
 class Level : public rdt::Scene {
@@ -32,6 +34,7 @@ private:
 	rdt::Timer m_spawn_timer;
 	rdt::Timer m_show_hit_timer;
 	rdt::Timer m_1up_timer;
+	rdt::Timer m_end_level_timer;
 
 	std::array<std::array<PacDot*, NUM_TILES_X>, NUM_TILES_Y> m_dotMap;
 	int playerScore;
@@ -64,6 +67,10 @@ private:
 	void UpdateLifeDisplay();
 
 	void GameOver();
+	void OnEndLevel();
 
+	void StartEndLevelAnimation();
+	void StartNextLevel();
+	
 	void PacmanDeathShowHitPhase(const float deltaTime);
 };

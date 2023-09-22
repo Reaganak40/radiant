@@ -5,7 +5,7 @@
 #define SCREEN_HEIGHT 760
 
 #define PACMAN_SPRITE_WIDTH 40
-#define PACMAN_SPEED 180
+#define PACMAN_SPEED 200
 #define PACMAN_SPAWN_X 300
 #define PACMAN_SPAWN_Y 200
 
@@ -37,6 +37,8 @@
 #define PACMAN_LAYER 2
 #define GHOST_LAYER 3
 
+#define DOTS_PER_LEVEL 244
+
 enum PacmanMoveDirection {
 	UP = 0,
 	DOWN,
@@ -65,4 +67,7 @@ enum PacmanMessageTypes {
 	PMT_MakeVulnerable,
 	PMT_StopVulnerability,
 	PMT_GameOver,
+	PMT_LevelEnded,
+	PMT_StartNewLevel,
+	PMT_StartEndLevelAnimation,
 };
