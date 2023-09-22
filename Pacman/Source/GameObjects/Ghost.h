@@ -36,6 +36,7 @@ enum GhostGameState {
 	GSS_IsVulnerable,
 	GSS_IsBlinking,
 	GSS_IsEaten,
+	GSS_IsGameOver,
 	GSS_MaxState,
 };
 class Ghost : public rdt::GameObject {

@@ -2,7 +2,7 @@
 
 using namespace rdt;
 Pacman::Pacman(double xPos, double yPos)
-	: m_texture_timer(Timer(0.07)), m_death_timer(0.09)
+	: m_texture_timer(Timer(0.02)), m_death_timer(0.09)
 {
 	GState.SetStateCount(PGS_MaxState);
 	spawnPos.x = xPos;
@@ -65,7 +65,7 @@ void Pacman::OnRender()
 {
 	using namespace rdt;
 
-	if (m_frame_col == 10) {
+	if (GState.CheckState(PGS_IsGameOver) || m_frame_col == 10) {
 		return;
 	}
 
@@ -109,6 +109,9 @@ void Pacman::OnMessage(rdt::Message msg)
 		break;
 	case PMT_Respawn:
 		Respawn();
+		break;
+	case PMT_GameOver:
+		GState.SetState(PGS_IsGameOver, true);
 		break;
 	}
 }

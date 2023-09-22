@@ -53,6 +53,9 @@ namespace rdt {
 		case ColorType::POWERSHELL_BLUE:
 			m_color = Vec4f(0.003f, 0.14f, 0.33f, 1.0f);
 			break;
+		case ColorType::YELLOW:
+			m_color = Vec4f(1.0f, 1.0f, 0.0f, 1.0f);
+			break;
 		default:
 			m_color = Vec4f(0.0f, 0.0f, 0.0f, 1.0f);
 			break;

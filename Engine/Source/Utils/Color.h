@@ -10,6 +10,7 @@ namespace rdt {
 		BLACK,
 		WHITE,
 		POWERSHELL_BLUE,
+		YELLOW,
 	};
 
 	class Color {

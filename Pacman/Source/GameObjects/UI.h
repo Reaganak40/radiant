@@ -18,6 +18,7 @@ private:
 	rdt::Vec2d m_tileSize;
 	std::vector<rdt::UniqueID> m_model_IDs;
 	int m_layer;
+	rdt::Color m_textColor;
 
 	UIAlignment m_alignment;
 	bool m_show;
@@ -36,6 +37,7 @@ public:
 
 	void SetOrigin(rdt::Vec2d nOrigin);
 	void SetText(const std::string& nText);
+	void SetTextColor(rdt::Color nColor);
 	void SetAlignment(UIAlignment nAlign);
 	void SetShow(bool nShow);
 	void SetLayer(int layer);

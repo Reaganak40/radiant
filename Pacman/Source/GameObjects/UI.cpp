@@ -11,6 +11,7 @@ UI::UI(UIDisplayMode nMode, int maxTiles, rdt::Vec2d tileSize)
 	m_show = true;
 	m_mode = nMode;
 	m_layer = MAP_LAYER;
+	m_textColor = WHITE;
 }
 
 UI::~UI()
@@ -91,6 +92,11 @@ void UI::SetOrigin(rdt::Vec2d nOrigin)
 void UI::SetText(const std::string& nText)
 {
 	m_text = nText;
+}
+
+void UI::SetTextColor(Color nColor)
+{
+	m_textColor = nColor;
 }
 
 void UI::SetAlignment(UIAlignment nAlign)
@@ -210,6 +216,7 @@ void UI::DrawTile(char c, int tile)
 	if (m_mode == UI_Text) {
 		texName = "font";
 		atlasCoords = GetAtlasCoords(c);
+		Renderer::SetPolygonColor(m_textColor);
 	}
 	else {
 
@@ -224,6 +231,7 @@ void UI::DrawTile(char c, int tile)
 	}
 
 	Renderer::SetPolygonTexture(texName, atlasCoords.x, atlasCoords.y);
+
 	Renderer::AddPolygon(Physics::GetPolygon(GetRealmID(), m_model_IDs[tile]));
 	Renderer::End();
 }

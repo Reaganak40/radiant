@@ -4,10 +4,10 @@
 #define SCREEN_WIDTH 600
 #define SCREEN_HEIGHT 760
 
-#define PACMAN_SPRITE_WIDTH 35
-#define PACMAN_SPEED 250
+#define PACMAN_SPRITE_WIDTH 40
+#define PACMAN_SPEED 180
 #define PACMAN_SPAWN_X 300
-#define PACMAN_SPAWN_Y 195
+#define PACMAN_SPAWN_Y 200
 
 #define GHOST_SPRITE_WIDTH 38
 #define GHOST_SPEED 150
@@ -63,5 +63,6 @@ enum PacmanMessageTypes {
 	PMT_StartBlinking,
 	PMT_StopBlinking,
 	PMT_MakeVulnerable,
-	PMT_StopVulnerability
+	PMT_StopVulnerability,
+	PMT_GameOver,
 };

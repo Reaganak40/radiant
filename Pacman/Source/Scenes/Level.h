@@ -10,6 +10,9 @@
 #define _1UP_SCORE_INDEX 8
 #define HIGHSCORE_VAL_INDEX 9
 #define LIFE_DISPLAY_INDEX 10
+#define READY_INDEX 11
+#define GAMEOVER_INDEX1 12
+#define GAMEOVER_INDEX2 13
 
 
 enum LevelStateFlags {
@@ -18,6 +21,8 @@ enum LevelStateFlags {
 	LSF_GhostsBlinking,
 	LSF_InkyOut,
 	LSF_ClydeOut,
+	LSF_AtLevelStart,
+	LSF_GameOver,
 	LSF_MaxFlags
 };
 class Level : public rdt::Scene {
@@ -30,7 +35,7 @@ private:
 
 	std::array<std::array<PacDot*, NUM_TILES_X>, NUM_TILES_Y> m_dotMap;
 	int playerScore;
-	int highScore;
+	int m_highScore;
 	int levelDotCount;
 	int lifeCount;
 
@@ -43,6 +48,7 @@ public:
 	void OnRegister() override final;
 	void OnBind() override final;
 	void OnProcessInput(const float deltaTime) override final;
+	void OnFinalUpdate() override final;
 	void OnRelease() override final;
 	void OnRender() override final;
 	void OnMessage(rdt::Message msg) override final;
@@ -56,6 +62,8 @@ private:
 	void Respawn();
 	void UpdatePlayerScore(int pointsToAdd);
 	void UpdateLifeDisplay();
+
+	void GameOver();
 
 	void PacmanDeathShowHitPhase(const float deltaTime);
 };

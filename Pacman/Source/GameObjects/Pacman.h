@@ -9,6 +9,7 @@ enum PacmanGameState {
 	PGS_IsHit,
 	PGS_InRespawn,
 	PGS_InDeathAnimation,
+	PGS_IsGameOver,
 	PGS_MaxState
 };
 

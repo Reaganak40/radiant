@@ -245,6 +245,10 @@ void Ghost::OnFinalUpdate()
 
 void Ghost::OnRender()
 {
+	if (GState.CheckState(GSS_IsGameOver)) {
+		return;
+	}
+
 	if (!m_pacman_ptr->InRespawn()) {
 		Renderer::Begin(GHOST_LAYER);
 		Renderer::SetPolygonTexture("ghost", m_frame_col, m_frame_row);
@@ -288,6 +292,8 @@ void Ghost::OnMessage(Message msg)
 		break;
 	case PMT_StopVulnerability:
 		SetVulnerable(false);
+	case PMT_GameOver:
+		GState.SetState(GSS_IsGameOver, true);
 		break;
 	}
 }
