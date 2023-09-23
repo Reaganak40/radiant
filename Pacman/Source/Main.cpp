@@ -1,7 +1,6 @@
 #include "Game.h"
-
 #include "Scenes/Level.h"
-#include "Scenes/Menu.h"
+
 using namespace rdt;
 
 int main(void)
@@ -10,8 +9,6 @@ int main(void)
     pacmanApp.Start("Pacman", SCREEN_WIDTH, SCREEN_HEIGHT, false);
 
     pacmanApp.AddScene("Level", new Level);
-    
-    //pacmanApp.AddScene("Menu", new Menu);
     pacmanApp.SetScene("Level");
 
     /* Loop until the user closes the window */

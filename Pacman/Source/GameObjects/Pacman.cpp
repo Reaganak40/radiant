@@ -205,6 +205,7 @@ void Pacman::UpdateVelocityAndDirection()
 	const Vec2d location = Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
 	Vec2i mapCoords = m_map->GetMapCoordinates(location);
 	Vec2d centeredCoords = m_map->GetWorldCoordinates(mapCoords);
+	PacmanMoveDirection lastDirection = m_direction;
 
 	if (GState.CheckState(PGS_Spawned)) {
 		m_direction = PacmanMoveDirection::RIGHT;
@@ -342,6 +343,33 @@ void Pacman::UpdateVelocityAndDirection()
 	}
 
 	Physics::SetVelocity(GetRealmID(), m_model_ID, nVelocity);
+
+	if ((m_direction == LEFT && lastDirection == RIGHT)) {
+		if (location.x <= mapCoords.x) {
+			if (m_map->IsInMap(m_target_coords.y, m_target_coords.x - 1)) {
+				m_target_coords.x -= 1;
+			}
+		}
+	} else if ((m_direction == RIGHT && lastDirection == LEFT)) {
+		if (location.x >= mapCoords.x) {
+			if (m_map->IsInMap(m_target_coords.y, m_target_coords.x + 1)) {
+				m_target_coords.x += 1;
+			}
+		}
+	} if ((m_direction == UP && lastDirection == DOWN)) {
+		if (location.y >= mapCoords.y) {
+			if (m_map->IsInMap(m_target_coords.y - 1, m_target_coords.x)) {
+				m_target_coords.y -= 1;
+			}
+		}
+	}
+	else if ((m_direction == DOWN && lastDirection == UP)) {
+		if (location.y <= mapCoords.y) {
+			if (m_map->IsInMap(m_target_coords.y + 1, m_target_coords.x)) {
+				m_target_coords.y += 1;
+			}
+		}
+	}
 }
 
 void Pacman::UpdateTextureFrame(const float deltaTime)
@@ -460,10 +488,10 @@ void Pacman::OnHit()
 
 void Pacman::GetTargetInputDirection(bool* input4, float* inputTimestamps4)
 {
-	inputTimestamps4[RIGHT] = Input::GetTimeSinceKeyState(right_cond, 0.5f);
-	inputTimestamps4[LEFT]  = Input::GetTimeSinceKeyState(left_cond, 0.5f);
-	inputTimestamps4[UP]    = Input::GetTimeSinceKeyState(up_cond, 0.5f);
-	inputTimestamps4[DOWN]  = Input::GetTimeSinceKeyState(down_cond, 0.5f);
+	inputTimestamps4[RIGHT] = Input::GetTimeSinceKeyState(right_cond, 0.35f);
+	inputTimestamps4[LEFT]  = Input::GetTimeSinceKeyState(left_cond, 0.35f);
+	inputTimestamps4[UP]    = Input::GetTimeSinceKeyState(up_cond, 0.35f);
+	inputTimestamps4[DOWN]  = Input::GetTimeSinceKeyState(down_cond, 0.35f);
 
 	/* Check if player wants to go left or right (Earliest request if within half a second) */
 	input4[LEFT] = false;

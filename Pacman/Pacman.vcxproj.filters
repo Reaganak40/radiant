@@ -36,10 +36,7 @@
     <ClCompile Include="Source\GameObjects\UI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Scenes\Menu.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GameObjects\Apple.cpp">
+    <ClCompile Include="Source\GameObjects\Fruit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,10 +62,7 @@
     <ClInclude Include="Source\GameObjects\UI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Scenes\Menu.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GameObjects\Apple.h">
+    <ClInclude Include="Source\GameObjects\Fruit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

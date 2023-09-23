@@ -1040,6 +1040,7 @@ void Ghost::ResolveCollision(rdt::CollisionData* data)
 		
 		if (GState.CheckState(GSS_IsVulnerable)) {
 			OnEaten();
+			SendMessage("level", PMT_GhostEaten);
 		}
 		else if (!GState.CheckState(GSS_IsEaten)) {
 			SendMessage("pacman", PMT_PacmanHit, nullptr);

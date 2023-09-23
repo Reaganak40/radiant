@@ -16,9 +16,11 @@ Level::Level()
 	}
 
 	playerScore = 0;
-	m_highScore = 19150;
+	m_highScore = 24730;
 	levelDotCount = 0;
 	lifeCount = 4;
+	levelCount = 1;
+	ghostEatenCount = 0;
 	m_pacman_death_state = PDS_NoDeath;
 	RegisterToMessageBus("level");
 }
@@ -51,6 +53,9 @@ void Level::OnRegister()
 
 		Texture& fontTex = TextureManager::LoadTextureFromPNG("font", "Resources/Textures/font.png");
 		fontTex.DefineTextureAtlas(28, 28, 15, 3, 4);
+
+		Texture& fruitTex = TextureManager::LoadTextureFromPNG("fruit", "Resources/Textures/fruit.png");
+		fruitTex.DefineTextureAtlas(24, 28, 1, 8, 8);
 	}
 
 	Pacman* pacman;
@@ -139,6 +144,10 @@ void Level::OnRegister()
 	gameOverText2->SetTextColor(Color(1.0f, 0.0f, 0.0f, 1.0f));
 	gameOverText2->SetShow(false);
 
+	Fruit* fruit;
+	m_game_objects.push_back(fruit = new Fruit);
+	fruit->RegisterToRealm(m_realms[0]);
+	fruit->SetType(CHERRY);
 
 	/* Adds dots to the map. */
 	for (int row = 0; row < NUM_TILES_Y; row++) {
@@ -285,6 +294,10 @@ void Level::OnFinalUpdate()
 			GState.SetState(LSF_ClydeOut, true);
 		}
 
+		if (levelDotCount == 70 || levelDotCount == 170) {
+			SendMessage("fruit", PMT_ShowFruit);
+		}
+
 		if (levelDotCount == DOTS_PER_LEVEL) {
 			OnEndLevel();
 		}
@@ -307,8 +320,6 @@ void Level::OnRelease()
 
 void Level::OnRender()
 {
-	
-
 	RunRenderQueue();
 }
 
@@ -323,6 +334,12 @@ void Level::OnMessage(rdt::Message msg)
 		break;
 	case PMT_StartEndLevelAnimation:
 		StartEndLevelAnimation();
+		break;
+	case PMT_FruitEaten:
+		OnFruitEaten((FruitData*)msg.data);
+		break;
+	case PMT_GhostEaten:
+		OnGhostEaten();
 		break;
 	}
 }
@@ -339,6 +356,7 @@ void Level::ActivatePowerMode()
 	}
 
 	GState.SetState(LSF_GhostsBlinking, false);
+	ghostEatenCount = 0;
 }
 
 void Level::DeactivatePowerMode()
@@ -412,6 +430,8 @@ void Level::Respawn()
 	SendDirectMessage("clyde",  PMT_Respawn);
 	SendDirectMessage("pacman", PMT_Respawn);
 
+	SendDirectMessage("fruit", PMT_Respawn);
+
 	m_spawn_timer.SetInterval(1.7f);
 	m_spawn_timer.Start();
 
@@ -421,6 +441,7 @@ void Level::Respawn()
 
 void Level::UpdatePlayerScore(int pointsToAdd)
 {
+	printf("%d\n", pointsToAdd);
 	playerScore += pointsToAdd;
 	((UI*)m_game_objects.at(_1UP_SCORE_INDEX))->SetText(std::to_string(playerScore));
 
@@ -472,6 +493,8 @@ void Level::StartEndLevelAnimation()
 
 void Level::StartNextLevel()
 {
+	levelCount++;
+
 	// notify end of level animation
 	GState.SetState(LSF_InEndAnimation, false);
 	SendDirectMessage("pacman", PMT_StartNewLevel);
@@ -479,6 +502,9 @@ void Level::StartNextLevel()
 	SendDirectMessage("inky",   PMT_StartNewLevel);
 	SendDirectMessage("pinky",  PMT_StartNewLevel);
 	SendDirectMessage("clyde",  PMT_StartNewLevel);
+
+	SendDirectMessage("fruit",  PMT_StartNewLevel);
+	SendDirectMessage("fruit", PMT_SetFruit, new FruitData(GetNextFruit()));
 
 	// Run respawn procedure
 	SendDirectMessage("pacman", PMT_Respawn);
@@ -508,6 +534,17 @@ void Level::StartNextLevel()
 	}
 }
 
+void Level::OnFruitEaten(FruitData* fruitData)
+{
+	UpdatePlayerScore(fruitData->GetValue());
+}
+
+void Level::OnGhostEaten()
+{
+	UpdatePlayerScore((2 << ghostEatenCount) * 100);
+	ghostEatenCount++;
+}
+
 void Level::PacmanDeathShowHitPhase(const float deltaTime)
 {
 	if (m_show_hit_timer.IsRunning()) {
@@ -521,5 +558,35 @@ void Level::PacmanDeathShowHitPhase(const float deltaTime)
 		PauseGame();
 		SendDirectMessage("pacman", PMT_ResumeGame);
 	}
+}
+
+FRUIT_TYPE Level::GetNextFruit()
+{
+	if (levelCount <= 4) {
+		switch (levelCount) {
+		case 1:
+			return CHERRY;
+		case 2:
+			return STRAWBERRY;
+		case 3:
+			return PEACH;
+		case 4:
+			return PEACH;
+		}
+	}
+	else if (levelCount == 5 || levelCount == 6) {
+		return APPLE;
+	}
+	else if (levelCount == 7 || levelCount == 8) {
+		return MELON;
+	}
+	else if (levelCount == 9 || levelCount == 10) {
+		return GALAXIAN;
+	}
+	else if (levelCount == 11 || levelCount == 12) {
+		return BELL;
+	}
+	
+	return KEY;
 }
 

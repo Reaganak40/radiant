@@ -32,12 +32,19 @@
 #define TILE_OFFSET_Y 45
 #define TILE_OFFSET_X -32
 
+#define DOTS_PER_LEVEL 244
+
+#define FRUIT_WIDTH 36
+#define FRUIT_HEIGHT 42
+#define FRUIT_POS_X 301
+#define FRUIT_POS_Y 325
+
 #define MAP_LAYER 0
 #define PAC_DOT_LAYER 1
 #define PACMAN_LAYER 2
 #define GHOST_LAYER 3
 
-#define DOTS_PER_LEVEL 244
+
 
 enum PacmanMoveDirection {
 	UP = 0,
@@ -56,6 +63,7 @@ enum PacmanDeathSequence {
 
 enum PacmanMessageTypes {
 	PMT_PacmanHit,
+	PMT_GhostEaten,
 	PMT_LeaveHome,
 	PMT_StartDeathAnimation,
 	PMT_PauseGame,
@@ -70,4 +78,7 @@ enum PacmanMessageTypes {
 	PMT_LevelEnded,
 	PMT_StartNewLevel,
 	PMT_StartEndLevelAnimation,
+	PMT_ShowFruit,
+	PMT_FruitEaten,
+	PMT_SetFruit,
 };

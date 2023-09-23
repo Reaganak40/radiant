@@ -1,6 +1,7 @@
 #pragma once
 #include "Game.h"
 #include "GameObjects/PacDot.h"
+#include "GameObjects/Fruit.h"
 
 #define PACMAN_INDEX 0
 #define GHOST_INDEX_START 2
@@ -41,6 +42,9 @@ private:
 	int m_highScore;
 	int levelDotCount;
 	int lifeCount;
+	
+	int ghostEatenCount;
+	unsigned int levelCount;
 
 	PacmanDeathSequence m_pacman_death_state;
 
@@ -72,5 +76,9 @@ private:
 	void StartEndLevelAnimation();
 	void StartNextLevel();
 	
+	void OnFruitEaten(FruitData* fruitData);
+	void OnGhostEaten();
 	void PacmanDeathShowHitPhase(const float deltaTime);
+
+	FRUIT_TYPE GetNextFruit();
 };
