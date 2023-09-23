@@ -8,7 +8,7 @@ namespace rdt {
 	private:
 		std::vector<uint32_t> m_bit_field;
 	public:
-		BitSet(unsigned int max_flags);
+		BitSet(unsigned int max_flags = 0);
 		~BitSet();
 
 		/*

@@ -16,7 +16,7 @@ Level::Level()
 	}
 
 	playerScore = 0;
-	m_highScore = 12580;
+	m_highScore = 19150;
 	levelDotCount = 0;
 	lifeCount = 4;
 	m_pacman_death_state = PDS_NoDeath;

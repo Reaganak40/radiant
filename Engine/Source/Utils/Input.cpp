@@ -1,15 +1,19 @@
 #include "pch.h"
 #include "Input.h"
+#include "Utils.h"
 #include "Renderer/Renderer.h"
 
 namespace rdt {
-    Input* Input::m_singleton = nullptr;
+    Input* Input::m_instance = nullptr;
 
     Input::Input()
-        : m_window(nullptr), m_mouse_changed(false),
-        m_keyboard_state{BitSet(InputState::NAIS), BitSet(InputState::NAIS)}
+        : m_window(nullptr), m_mouse_changed(false)
     {
-        m_current_state = 0;
+        m_state_index = 0;
+        m_timestep = 0;
+        for (int i = 0; i < STATE_CACHE_SIZE; i++) {
+            m_keyboard_state[i].SetNewFlagMax(NAIS);
+        }
     }
 
     Input::~Input()
@@ -21,19 +25,19 @@ namespace rdt {
     {
         Destroy();
         GetInstance();
-        m_singleton->m_window = Renderer::GetInstance()->m_window;
+        m_instance->m_window = Renderer::GetInstance()->m_window;
 
-        glfwSetKeyCallback(m_singleton->m_window, Input::KeyCallback);
-        glfwSetCursorPosCallback(m_singleton->m_window, Input::CursorPositionCallback);
-        glfwSetMouseButtonCallback(m_singleton->m_window, Input::MouseButtonCallback);
-        glfwSetWindowSizeCallback(m_singleton->m_window, Input::WindowSizeCallback);
+        glfwSetKeyCallback(m_instance->m_window, Input::KeyCallback);
+        glfwSetCursorPosCallback(m_instance->m_window, Input::CursorPositionCallback);
+        glfwSetMouseButtonCallback(m_instance->m_window, Input::MouseButtonCallback);
+        glfwSetWindowSizeCallback(m_instance->m_window, Input::WindowSizeCallback);
     }
 
     void Input::Destroy()
     {
-        if (m_singleton != nullptr) {
-            delete m_singleton;
-            m_singleton = nullptr;
+        if (m_instance != nullptr) {
+            delete m_instance;
+            m_instance = nullptr;
         }
     }
 
@@ -53,6 +57,9 @@ namespace rdt {
         else if (key >= GLFW_KEY_RIGHT && key <= GLFW_KEY_UP) {
             flag = RIGHT_KEY_PRESS + (key - GLFW_KEY_RIGHT) * 3;
         }
+        else {
+            return;
+        }
 
 
         switch (action) {
@@ -69,16 +76,16 @@ namespace rdt {
             return;
         }
 
-        m_singleton->m_keyboard_state[m_singleton->m_current_state].ActivateFlag(flag);
+        m_instance->m_keyboard_state[m_instance->m_state_index].ActivateFlag(flag);
 
     }
 
     void Input::CursorPositionCallback(GLFWwindow* window, double xpos, double ypos)
     {
         ImGui_ImplGlfw_CursorPosCallback(window, xpos, ypos);
-        m_singleton->m_mouse_state[m_singleton->m_current_state].position.x = xpos;
-        m_singleton->m_mouse_state[m_singleton->m_current_state].position.y = ypos;
-        m_singleton->m_mouse_changed = true;
+        m_instance->m_mouse_state[m_instance->m_state_index].position.x = xpos;
+        m_instance->m_mouse_state[m_instance->m_state_index].position.y = ypos;
+        m_instance->m_mouse_changed = true;
     }
 
     void Input::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
@@ -89,12 +96,17 @@ namespace rdt {
     void Input::WindowSizeCallback(GLFWwindow* window, int width, int height)
     {
         glViewport(0, 0, width, height);
-        m_singleton->m_window_state[m_singleton->m_current_state].windowResize = true;
+        m_instance->m_window_state[m_instance->m_state_index].windowResize = true;
     }
 
-    bool Input::CheckKeyboardState(const std::vector<InputState>& stateQuery)
+    bool Input::CheckKeyboardState(const std::vector<InputState>& stateQuery, unsigned int targetFrame)
     {
-        return m_singleton->CheckStateImpl((unsigned int*)stateQuery.data(), stateQuery.size());
+        return m_instance->CheckStateImpl((unsigned int*)stateQuery.data(), stateQuery.size(), targetFrame);
+    }
+
+    void Input::UpdateTimeImpl(const float deltaTime)
+    {
+        m_timestep += deltaTime;
     }
 
     void Input::PollInputsImpl()
@@ -109,44 +121,65 @@ namespace rdt {
         for (unsigned int stateCode = A_KEY_PRESS; stateCode < (NAIS-2); stateCode += 3) {
 
             // if key has not been released
-            if (!m_keyboard_state[m_current_state].CheckFlag(stateCode + 2)) {
+            if (!m_keyboard_state[m_state_index].CheckFlag(stateCode + 2)) {
                 stateQuery[0] = stateCode;
                 stateQuery[1] = stateCode + 1;
 
                 // if not a key press event
-                if (CheckStateImpl(stateQuery, 2)) {
+                if (CheckStateImpl(stateQuery, 2, 1)) {
                     
                     // add key down state
-                    m_keyboard_state[m_current_state].ActivateFlag(stateCode + 1);
+                    m_keyboard_state[m_state_index].ActivateFlag(stateCode + 1);
                 }
             }
         }
 
-        m_current_state = (m_current_state == 0 ? 1 : 0);
-        m_keyboard_state[m_current_state].Clear();
+        m_timestamps[m_state_index] = m_timestep;
+
+        // Go to the next buffer in cache arrays
+        m_state_index = (m_state_index + 1) % STATE_CACHE_SIZE;
+        m_keyboard_state[m_state_index].Clear();
 
         if (!m_mouse_changed) {
-            m_mouse_state[m_current_state] = GetMouseStateImpl();
+            m_mouse_state[m_state_index] = GetMouseStateImpl();
         }
         m_mouse_changed = false;
 
-        m_window_state[m_current_state].windowResize = false;
+        m_window_state[m_state_index].windowResize = false;
 
     }
 
-    bool Input::CheckStateImpl(unsigned int* stateQuery, unsigned int count)
+    bool Input::CheckStateImpl(unsigned int* stateQuery, unsigned int count, unsigned int target)
     {
-        return m_keyboard_state[(m_current_state == 0 ? 1 : 0)].CheckFlags(stateQuery, count);
+        return m_keyboard_state[(m_state_index - target + STATE_CACHE_SIZE) % STATE_CACHE_SIZE].CheckFlags(stateQuery, count);
     }
 
     MouseState Input::GetMouseStateImpl()
     {
-        return m_mouse_state[(m_current_state == 0 ? 1 : 0)];
+        return m_mouse_state[(m_state_index - 1 + STATE_CACHE_SIZE) % STATE_CACHE_SIZE];
     }
 
     bool Input::CheckWindowResizeImpl()
     {
-        return m_window_state[(m_current_state == 0 ? 1 : 0)].windowResize;
+        return m_window_state[(m_state_index - 1 + STATE_CACHE_SIZE) % STATE_CACHE_SIZE].windowResize;
+    }
+
+    float Input::GetTimeSinceKeyStateImpl(unsigned int* stateQuery, unsigned int count, const float maxTime)
+    {
+        int index = (m_state_index - 1 + STATE_CACHE_SIZE) % STATE_CACHE_SIZE;
+        float current = 0.0f;
+        float limit =  Utils::Max(0, m_timestamps[index] - maxTime);
+
+        do {
+            if (m_keyboard_state[index].CheckFlags(stateQuery, count)) {
+                return current;
+            }
+            float timeLapsed = m_timestamps[index];
+            index = (index - 1 + STATE_CACHE_SIZE) % STATE_CACHE_SIZE;
+            current += timeLapsed - m_timestamps[index];
+        } while (m_timestamps[index] > limit && index != m_state_index);
+
+        return maxTime;
     }
 
     Vec2d Input::GetMouseCoordsImpl(MouseCond cond) {

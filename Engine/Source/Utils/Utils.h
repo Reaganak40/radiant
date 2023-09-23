@@ -60,6 +60,11 @@ namespace rdt {
         double Max(double x, double y);
 
         /*
+            Returns the max between two floats.
+        */
+        float Max(float x, float y);
+
+        /*
             Returns the minimum between two doubles
         */
         double Min(double x, double y);

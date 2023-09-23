@@ -212,96 +212,83 @@ void Pacman::UpdateVelocityAndDirection()
 		GState.SetState(PGS_Spawned, false);
 	}
 
-	bool options[4] = { false };
-	bool keys[4] = { true, true, true, true };
+	bool validOptions[4] = { false };
+	bool userInput[4] = { false };
+	bool canMoveInCurrentDir = false;
+	float inputTimestamp[4] = { 0 };
 
 	/* Check legal moves */
+
 	/* Check can move right. */
 	if ((m_direction == RIGHT || m_direction == LEFT) && (location.x < centeredCoords.x || m_map->IsInMap(mapCoords.y, mapCoords.x + 1))) {
-		options[RIGHT] = true;
+		validOptions[RIGHT] = true;
 	}
 	else if (location.y == centeredCoords.y && m_map->IsInMap(mapCoords.y, mapCoords.x + 1)) {
-		options[RIGHT] = true;
+		validOptions[RIGHT] = true;
 	}
 
 	/* Check can move left. */
 	if ((m_direction == RIGHT || m_direction == LEFT) && (location.x > centeredCoords.x || m_map->IsInMap(mapCoords.y, mapCoords.x - 1))) {
-		options[LEFT] = true;
+		validOptions[LEFT] = true;
 	}
 	else if (location.y == centeredCoords.y && m_map->IsInMap(mapCoords.y, mapCoords.x - 1)) {
-		options[LEFT] = true;
+		validOptions[LEFT] = true;
 	}
 
 	/* Check can move up. */
 	if ((m_direction == UP || m_direction == DOWN) && (location.y < centeredCoords.y || m_map->IsInMap(mapCoords.y - 1, mapCoords.x))) {
-		options[UP] = true;
+		validOptions[UP] = true;
 	}
 	else if (location.x == centeredCoords.x && m_map->IsInMap(mapCoords.y - 1, mapCoords.x)) {
-		options[UP] = true;
+		validOptions[UP] = true;
 	}
 
 	/* Check can move down. */
 	if ((m_direction == UP || m_direction == DOWN) && (location.y > centeredCoords.y || m_map->IsInMap(mapCoords.y + 1, mapCoords.x))) {
-		options[DOWN] = true;
+		validOptions[DOWN] = true;
 	}
 	else if (location.x == centeredCoords.x && m_map->IsInMap(mapCoords.y + 1, mapCoords.x)) {
-		options[DOWN] = true;
+		validOptions[DOWN] = true;
 	}
 
-	/* Check if player wants to go left or right and the move is legal. */
-	if (Input::CheckKeyboardState(right_cond)) {
-		keys[LEFT] = false;
-	}
-	else if (Input::CheckKeyboardState(left_cond)) {
-		keys[RIGHT] = false;
-	}
-	else {
-		keys[LEFT] = false;
-		keys[RIGHT] = false;
-	}
+	canMoveInCurrentDir = validOptions[m_direction];
 
-	/* Check if player wants to go up or down and the move is legal. */
-	if (Input::CheckKeyboardState(up_cond)) {
-		keys[DOWN] = false;
-	}
-	else if (Input::CheckKeyboardState(down_cond)) {
-		keys[UP] = false;
-	}
-	else {
-		keys[UP] = false;
-		keys[DOWN] = false;
-	}
+	/* Get the requested input of direction from the user. */
+	GetTargetInputDirection(userInput, inputTimestamp);
 
-	/* If the player has multiple keys down and both options are legal directions. */
-	bool resolved = false;
-	if ((keys[LEFT] || keys[RIGHT]) && (keys[UP] || keys[DOWN])) {
+	if (!userInput[LEFT])  { validOptions[LEFT]  = false; }
+	if (!userInput[RIGHT]) { validOptions[RIGHT] = false; }
+	if (!userInput[UP])    { validOptions[UP]    = false; }
+	if (!userInput[DOWN])  { validOptions[DOWN]  = false; }
 
-		if (m_direction == LEFT || m_direction == DOWN) {
-			if (options[UP] && keys[UP]) {
-				m_direction = PacmanMoveDirection::UP;
-				resolved = true;
+	/* If the player has 2 intended directions and both options are legal directions. */
+	if ((validOptions[LEFT] || validOptions[RIGHT]) && (validOptions[UP] || validOptions[DOWN])) {
+		PacmanMoveDirection xDir, yDir;
+		xDir = validOptions[LEFT] ? LEFT : RIGHT;
+		yDir = validOptions[UP] ? UP : DOWN;
+
+		/* Both are pressed at the same time. */
+		if (inputTimestamp[xDir] == inputTimestamp[yDir]) {
+			if (m_direction == LEFT || m_direction == RIGHT) {
+				m_direction = yDir;
 			}
-			else if (options[DOWN] && keys[DOWN]) {
-				m_direction = PacmanMoveDirection::DOWN;
-				resolved = true;
+			else {
+				m_direction = xDir;
 			}
 		}
+
+		/* Choose the most recent desired direction */
+		else if (inputTimestamp[xDir] < inputTimestamp[yDir]) {
+			m_direction = xDir;
+		}
 		else {
-			if (options[LEFT] && keys[LEFT]) {
-				m_direction = PacmanMoveDirection::LEFT;
-				resolved = true;
-			}
-			else if(options[RIGHT] && keys[RIGHT]){
-				m_direction = PacmanMoveDirection::RIGHT;
-				resolved = true;
-			}
+			m_direction = yDir;
 		}
 	}
 	/* The user has keyDown with one or no legal directions(s). */
-	else if (keys[LEFT] || keys[RIGHT] || keys[UP] || keys[DOWN]) {
-		
+	else if (validOptions[LEFT] || validOptions[RIGHT] || validOptions[UP] || validOptions[DOWN]) {
 		for (int i = 0; i < 4; i++) {
-			if (keys[i] && options[i]) {
+			if (userInput[i] && validOptions[i]) {
 				switch (i) {
 				case UP:
 					m_direction = PacmanMoveDirection::UP;
@@ -316,17 +303,13 @@ void Pacman::UpdateVelocityAndDirection()
 					m_direction = PacmanMoveDirection::RIGHT;
 					break;
 				}
-				resolved = true;
 				break;
 			}
 		}
 	}
-
-	/* If the direction is still not resolved, use the existing direction unless hit a wall. */
-	if (!resolved) {
-		if (!options[m_direction]) {
-			m_direction = PacmanMoveDirection::NOMOVE;
-		}
+	/* None of the input or directions resolved */
+	else if (!canMoveInCurrentDir) {
+		m_direction = PacmanMoveDirection::NOMOVE;
 	}
 
 	switch (m_direction) {
@@ -473,5 +456,33 @@ void Pacman::OnHit()
 	m_frame_col = 0;
 	m_texture_timer.End();
 	SendDirectMessage("level", PMT_PacmanHit);
+}
+
+void Pacman::GetTargetInputDirection(bool* input4, float* inputTimestamps4)
+{
+	inputTimestamps4[RIGHT] = Input::GetTimeSinceKeyState(right_cond, 0.5f);
+	inputTimestamps4[LEFT]  = Input::GetTimeSinceKeyState(left_cond, 0.5f);
+	inputTimestamps4[UP]    = Input::GetTimeSinceKeyState(up_cond, 0.5f);
+	inputTimestamps4[DOWN]  = Input::GetTimeSinceKeyState(down_cond, 0.5f);
+
+	/* Check if player wants to go left or right (Earliest request if within half a second) */
+	input4[LEFT] = false;
+	input4[RIGHT] = false;
+	if (inputTimestamps4[RIGHT] < inputTimestamps4[LEFT]) {
+		input4[RIGHT] = true;
+	}
+	else if (inputTimestamps4[LEFT] < inputTimestamps4[RIGHT]) {
+		input4[LEFT] = true;
+	}
+
+	/* Check if player wants to go left or right (Earliest request if within half a second) */
+	input4[UP] = false;
+	input4[DOWN] = false;
+	if (inputTimestamps4[UP] < inputTimestamps4[DOWN]) {
+		input4[UP] = true;
+	}
+	else if (inputTimestamps4[DOWN] < inputTimestamps4[UP]) {
+		input4[DOWN] = true;
+	}
 }
 

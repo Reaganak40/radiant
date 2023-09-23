@@ -117,6 +117,8 @@ namespace rdt
 	void Application::EndFrame()
 	{
 		Renderer::OnEndFrame();
+
+		Input::UpdateTime(m_timestep.deltaTime);
 		Input::PollInputs();
 	}
 

@@ -96,6 +96,11 @@ namespace rdt {
             return (x > y ? x : y);
         }
 
+        float Max(float x, float y)
+        {
+            return (x > y ? x : y);
+        }
+
         double Min(double x, double y)
         {
             return (x > y ? y : x);

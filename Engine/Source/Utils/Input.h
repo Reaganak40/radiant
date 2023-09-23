@@ -140,14 +140,6 @@ namespace rdt {
         KeyUp,
     };
 
-    enum KeyCode {
-        A_KEYCODE,
-        S_KEYCODE,
-        D_KEYCODE,
-        W_KEYCODE,
-        E_KEYCODE,
-    };
-
     struct MouseState {
         Vec2d position;
 
@@ -167,54 +159,87 @@ namespace rdt {
         WORLD_COORDS
     };
 
+// 120 frames = ~2 seconds of stored input
+#define STATE_CACHE_SIZE 120
+
     class Input {
     private:
         Input();
         ~Input();
-        static Input* m_singleton;
+        static Input* m_instance;
+        float m_timestep;
 
         GLFWwindow* m_window;
-        BitSet m_keyboard_state[2];
-        int m_current_state;
+        
+        // the buffer index where new input is being added.
+        // The last polled input will be m_current_state-1.
+        int m_state_index; 
 
-        MouseState m_mouse_state[2];
-        WindowState m_window_state[2];
+        float m_timestamps[STATE_CACHE_SIZE];
+        BitSet m_keyboard_state[STATE_CACHE_SIZE];
+        MouseState m_mouse_state[STATE_CACHE_SIZE];
+        WindowState m_window_state[STATE_CACHE_SIZE];
         bool m_mouse_changed;
 
     public:
         static Input* GetInstance() {
-            if (m_singleton == nullptr) {
-                m_singleton = new Input;
+            if (m_instance == nullptr) {
+                m_instance = new Input;
             }
-            return m_singleton;
+            return m_instance;
         }
 
         /* Sets up the input handling with the given glfw window. */
         static void Initialize();
         static void Destroy();
 
+
+        /**********************************************
+        * 
+        *           Input Callback Functions
+        * 
+        ***********************************************/
         static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
         static void CursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
         static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
         static void WindowSizeCallback(GLFWwindow* window, int width, int height);
 
-        static void PollInputs() { m_singleton->PollInputsImpl(); }
+        /*
+            Updates the inner clock of the input singleton, which is used
+            to cache time-sensitive input data.
+        */
+        static void UpdateTime(const float deltaTime) { m_instance->UpdateTimeImpl(deltaTime); }
 
-        /* Get all trigged events by their assigned ListenerIDs. */
-        static bool CheckKeyboardState(const std::vector<InputState>& stateQuery);
+        /*
+            Marks the end of input gathering for the current frame, and stored it to be
+            queried in the next update cylce.
+        */
+        static void PollInputs() { m_instance->PollInputsImpl(); }
 
-        static inline MouseState GetMouseState() { return m_singleton->GetMouseStateImpl(); }
+        /*
+            Returns true if any of keystate in the input query is true.
+            The target frame indicates how many frames ago to check for input, starting at 1 (current-frame), up to 5 frames ago.
+        */
+        static bool CheckKeyboardState(const std::vector<InputState>& stateQuery, unsigned int targetFrame = 1);
 
-        static Vec2d GetMouseCoords(const MouseCond cond) { return m_singleton->GetMouseCoordsImpl(cond); }
+        static inline MouseState GetMouseState() { return m_instance->GetMouseStateImpl(); }
 
-        static bool CheckWindowResize() { return m_singleton->CheckWindowResizeImpl(); }
+        static Vec2d GetMouseCoords(const MouseCond cond) { return m_instance->GetMouseCoordsImpl(cond); }
+
+        static bool CheckWindowResize() { return m_instance->CheckWindowResizeImpl(); }
+
+        static float GetTimeSinceKeyState(const std::vector<InputState>& stateQuery, const float maxTime = 1.0f) {
+            return m_instance->GetTimeSinceKeyStateImpl((unsigned int*)stateQuery.data(), stateQuery.size(), maxTime);
+        }
 
     private:
+        void UpdateTimeImpl(const float deltaTime);
         void PollInputsImpl();
-        bool CheckStateImpl(unsigned int* stateQuery, unsigned int count);
+        bool CheckStateImpl(unsigned int* stateQuery, unsigned int count, unsigned int target);
         MouseState GetMouseStateImpl();
         bool CheckWindowResizeImpl();
 
+        float GetTimeSinceKeyStateImpl(unsigned int* stateQuery, unsigned int count, const float maxTime);
         Vec2d GetMouseCoordsImpl(const MouseCond cond);
 
     };

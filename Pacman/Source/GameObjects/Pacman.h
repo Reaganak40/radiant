@@ -67,5 +67,6 @@ private:
 	void UpdateTextureFrame(const float deltaTime);
 	void ReAlignToMap();
 	void OnHit();
+	void GetTargetInputDirection(bool* input4, float* inputTimestamps4);
 
 };
