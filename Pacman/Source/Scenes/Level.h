@@ -1,5 +1,6 @@
 #pragma once
 #include "Game.h"
+#include "GameObjects/Pacman.h"
 #include "GameObjects/PacDot.h"
 #include "GameObjects/Fruit.h"
 
@@ -30,12 +31,14 @@ enum LevelStateFlags {
 };
 class Level : public rdt::Scene {
 private:
+	Pacman* m_pacman_ptr;
 
 	rdt::Timer m_power_timer;
 	rdt::Timer m_spawn_timer;
 	rdt::Timer m_show_hit_timer;
 	rdt::Timer m_1up_timer;
 	rdt::Timer m_end_level_timer;
+	rdt::Timer m_show_eaten_timer;
 
 	std::array<std::array<PacDot*, NUM_TILES_X>, NUM_TILES_Y> m_dotMap;
 	int playerScore;
@@ -80,6 +83,7 @@ private:
 	
 	void OnFruitEaten(FruitData* fruitData);
 	void OnGhostEaten();
+	void StopShowingEatenGhost();
 	void PacmanDeathShowHitPhase(const float deltaTime);
 
 	void OnDevTools();

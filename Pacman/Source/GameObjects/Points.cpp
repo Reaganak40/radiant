@@ -82,7 +82,7 @@ void Points::SetPointVal(unsigned int nVal)
 	SetAtlasCoordinates();
 
 	if (m_atlasX == 0) {
-		m_color = Color(39, 170, 166, false);
+		m_color = Color(39, 170, 166, 255, false);
 	}
 	else {
 		m_color = WHITE;
@@ -97,16 +97,16 @@ void Points::SetAtlasCoordinates()
 		m_atlasX = 0;
 		break;
 	case 400:
-		m_atlasY = 0;
-		m_atlasX = 1;
+		m_atlasY = 1;
+		m_atlasX = 0;
 		break;
 	case 800:
-		m_atlasY = 0;
-		m_atlasX = 2;
+		m_atlasY = 2;
+		m_atlasX = 0;
 		break;
 	case 1600:
-		m_atlasY = 0;
-		m_atlasX = 3;
+		m_atlasY = 3;
+		m_atlasX = 0;
 		break;
 	case 100:
 		m_atlasY = 0;

@@ -38,6 +38,8 @@ enum GhostGameState {
 	GSS_IsEaten,
 	GSS_IsGameOver,
 	GSS_IsLevelEnded,
+	GSS_FreezeIfNotEaten,
+	GSS_UseSavedVelocity,
 	GSS_MaxState,
 };
 class Ghost : public rdt::GameObject {
@@ -66,6 +68,7 @@ private:
 	MovementMode m_movement_mode;
 	std::queue<PacmanMoveDirection> m_direction_queue;
 
+	rdt::Vec2d savedVel;
 public:
 	Ghost(GhostName nName);
 	~Ghost();
@@ -107,6 +110,6 @@ private:
 	void OnRevived();
 	void OnEndLevel();
 	void OnNewLevel();
-
+	void OnEatenGhost(bool showing);
 	void ResetFrameRow();
 };

@@ -65,7 +65,7 @@ void Pacman::OnRender()
 {
 	using namespace rdt;
 
-	if (GState.CheckState(PGS_IsGameOver) || m_frame_col == 10) {
+	if (GState.CheckState(PGS_IsGameOver) || m_frame_col == 10 || GState.CheckState(PGS_ShowEatenGhost)) {
 		return;
 	}
 
@@ -119,6 +119,12 @@ void Pacman::OnMessage(rdt::Message msg)
 	case PMT_StartNewLevel:
 		OnNewLevel();
 		break;
+	case PMT_ShowEatenGhost:
+		OnShowEaten(true);
+		break;
+	case PMT_StopShowingEatenGhost:
+		OnShowEaten(false);
+		break;
 	}
 }
 
@@ -147,6 +153,11 @@ void Pacman::OnEndLevel()
 void Pacman::OnNewLevel()
 {
 	GState.SetState(PGS_IsEndLevel, false);
+}
+
+void Pacman::OnShowEaten(bool showing)
+{
+	GState.SetState(PGS_ShowEatenGhost, showing);
 }
 
 rdt::Vec2i Pacman::GetMapCoordinates()
@@ -199,6 +210,11 @@ void Pacman::UpdateVelocityAndDirection()
 	Vec2d nVelocity = Vec2d::Zero();
 
 	if (GState.CheckState(PGS_InDeathAnimation)) {
+		return;
+	}
+
+	if (GState.CheckState(PGS_ShowEatenGhost)) {
+		Physics::SetVelocity(GetRealmID(), m_model_ID, nVelocity);
 		return;
 	}
 

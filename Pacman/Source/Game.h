@@ -10,7 +10,9 @@
 #define PACMAN_SPAWN_Y 200
 
 #define GHOST_SPRITE_WIDTH 38
-#define GHOST_SPEED 150
+#define GHOST_SPEED_NORMAL 150
+#define GHOST_SPEED_VULNERABLE 80
+#define GHOST_SPEED_EATEN 300
 #define GHOST_HOME_Y 388.89
 #define MAX_HOME_Y_RANGE 15
 
@@ -83,4 +85,6 @@ enum PacmanMessageTypes {
 	PMT_FruitEaten,
 	PMT_SetFruit,
 	PMT_ShowPointsEarned,
+	PMT_ShowEatenGhost,
+	PMT_StopShowingEatenGhost,
 };

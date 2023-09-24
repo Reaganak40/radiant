@@ -11,6 +11,7 @@ enum PacmanGameState {
 	PGS_InDeathAnimation,
 	PGS_IsGameOver,
 	PGS_IsEndLevel,
+	PGS_ShowEatenGhost,
 	PGS_MaxState
 };
 
@@ -61,6 +62,7 @@ private:
 	void Respawn();
 	void OnEndLevel();
 	void OnNewLevel();
+	void OnShowEaten(bool showing);
 	void SetPause(bool pause);
 	void AddGameObjectPtr(rdt::MessageID from, rdt::GameObjectPtrData* data);
 	void UpdateVelocityAndDirection();

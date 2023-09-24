@@ -8,7 +8,7 @@ Ghost::Ghost(GhostName nName)
 	GState.SetStateCount(GSS_MaxState);
 	spawnPos = Vec2d::Zero();
 	m_target_coords = { 15, 10 };
-	m_speed = GHOST_SPEED;
+	m_speed = GHOST_SPEED_NORMAL;
 
 	m_map_ptr = nullptr;
 	m_pacman_ptr = nullptr;
@@ -135,6 +135,17 @@ void Ghost::OnProcessInput(const float deltaTime)
 		return;
 	}
 
+	if (GState.CheckState(GSS_FreezeIfNotEaten) && !GState.CheckState(GSS_IsEaten)) {
+
+		if (!GState.CheckState(GSS_UseSavedVelocity)) {
+			savedVel = Physics::GetVelocity(GetRealmID(), m_model_ID);
+			GState.SetState(GSS_UseSavedVelocity, true);
+		}
+
+		Physics::SetVelocity(GetRealmID(), m_model_ID, Vec2d::Zero());
+		return;
+	}
+
 	const Vec2d location = Physics::GetPolygon(GetRealmID(), m_model_ID).GetOrigin();
 	const Vec2d target = m_map_ptr->GetWorldCoordinates(m_target_coords);
 
@@ -176,12 +187,12 @@ void Ghost::OnProcessInput(const float deltaTime)
 
 			// time to leave base
 			if (location.x > BLINKY_HOME_X) {
-				nVelocity.x = -GHOST_SPEED * 0.50;
+				nVelocity.x = -GHOST_SPEED_NORMAL * 0.50;
 				m_direction = PacmanMoveDirection::LEFT;
 				Look(m_direction);
 			}
 			else if (location.x < BLINKY_HOME_X) {
-				nVelocity.x = GHOST_SPEED * 0.50;
+				nVelocity.x = GHOST_SPEED_NORMAL * 0.50;
 				m_direction = PacmanMoveDirection::RIGHT;
 				Look(m_direction);
 			}
@@ -190,7 +201,7 @@ void Ghost::OnProcessInput(const float deltaTime)
 					m_direction = PacmanMoveDirection::UP;
 					Look(m_direction);
 				}
-				nVelocity.y = GHOST_SPEED * 0.45;
+				nVelocity.y = GHOST_SPEED_NORMAL * 0.45;
 			}
 		}
 		else {
@@ -207,7 +218,7 @@ void Ghost::OnProcessInput(const float deltaTime)
 	else {
 		if (Physics::GetVelocity(GetRealmID(), m_model_ID) == Vec2d::Zero()) {
 			/* This should only happen to clyde on a new level. */
-			Physics::SetVelocity(GetRealmID(), m_model_ID, { -GHOST_SPEED, 0 });
+			Physics::SetVelocity(GetRealmID(), m_model_ID, { -GHOST_SPEED_NORMAL, 0 });
 		}
 	}
 
@@ -321,6 +332,12 @@ void Ghost::OnMessage(Message msg)
 	case PMT_StartNewLevel:
 		OnNewLevel();
 		break;
+	case PMT_ShowEatenGhost:
+		OnEatenGhost(true);
+		break;
+	case PMT_StopShowingEatenGhost:
+		OnEatenGhost(false);
+		break;
 	}
 }
 
@@ -344,14 +361,14 @@ void Ghost::SetVulnerable(bool state)
 
 		/* If ghost not currently vulnerable */
 		if (GState.CheckState(GSS_IsVulnerable) != state) {
-			m_speed *= 0.50;
+			m_speed = GHOST_SPEED_VULNERABLE;
 			SetMovementMode(FRIGHTENED);
 		}
 		GState.SetState(GSS_IsVulnerable, state);
 	}
 	else {
 		GState.SetState(GSS_IsVulnerable, state);
-		m_speed = GHOST_SPEED;
+		m_speed = GHOST_SPEED_NORMAL;
 		SetIsBlinking(false);
 
 		if (GState.CheckState(GSS_IsEaten)) {
@@ -421,7 +438,7 @@ void Ghost::Respawn()
 	GState.SetState(GSS_IsEaten, false);
 	
 	m_target_coords = { 15, 10 };
-	m_speed = GHOST_SPEED;
+	m_speed = GHOST_SPEED_NORMAL;
 
 	switch (m_name) {
 	case BLINKY:
@@ -1165,6 +1182,7 @@ void Ghost::OnEaten()
 	m_frame_timer.End();
 	
 	SetMovementMode(GOHOME);
+	m_speed = GHOST_SPEED_EATEN;
 	CreateShortestPath({ 15, 10 });
 }
 
@@ -1173,6 +1191,7 @@ void Ghost::OnRevived()
 	GState.SetState(GSS_IsEaten, false);
 	ResetFrameRow();
 	SetMovementMode(CHASE);
+	m_speed = GHOST_SPEED_NORMAL;
 }
 
 void Ghost::OnEndLevel()
@@ -1184,6 +1203,26 @@ void Ghost::OnEndLevel()
 void Ghost::OnNewLevel()
 {
 	GState.SetState(GSS_IsLevelEnded, false);
+}
+
+void Ghost::OnEatenGhost(bool showing)
+{
+	if (showing) {
+		GState.SetState(GSS_FreezeIfNotEaten, true);
+
+		if (!GState.CheckState(GSS_IsEaten)) {
+			savedVel = Physics::GetVelocity(GetRealmID(), m_model_ID);
+			GState.SetState(GSS_UseSavedVelocity, true);
+		}
+	}
+	else {
+		GState.SetState(GSS_FreezeIfNotEaten, false);
+
+		if (GState.CheckState(GSS_UseSavedVelocity)) {
+			Physics::SetVelocity(GetRealmID(), m_model_ID, savedVel);
+			GState.SetState(GSS_UseSavedVelocity, false);
+		}
+	}
 }
 
 void Ghost::ResetFrameRow()

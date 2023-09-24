@@ -1,5 +1,4 @@
 #include "Level.h"
-#include "GameObjects/Pacman.h"
 #include "GameObjects/Map.h"
 #include "GameObjects/Ghost.h"
 #include "GameObjects/UI.h"
@@ -8,7 +7,8 @@
 using namespace rdt;
 
 Level::Level()
-	: m_power_timer(10.0), m_spawn_timer(2.5), m_show_hit_timer(0.5), m_1up_timer(0.25), m_end_level_timer(1.0f)
+	: m_power_timer(10.0), m_spawn_timer(2.5), m_show_hit_timer(0.5), m_1up_timer(0.25), m_end_level_timer(1.0f),
+	m_show_eaten_timer(1.0f)
 {
 	GState.SetStateCount(LSF_MaxFlags);
 
@@ -17,7 +17,7 @@ Level::Level()
 	}
 
 	playerScore = 0;
-	m_highScore = 24730;
+	m_highScore = 28180;
 	levelDotCount = 0;
 	lifeCount = 4;
 	levelCount = 1;
@@ -64,9 +64,8 @@ void Level::OnRegister()
 		pointsTex.DefineTextureAtlas(64, 28, 8, 2, 8);
 	}
 
-	Pacman* pacman;
-	m_game_objects.push_back(pacman = new Pacman(PACMAN_SPAWN_X, PACMAN_SPAWN_Y));
-	pacman->RegisterToRealm(m_realms[0]);
+	m_game_objects.push_back(m_pacman_ptr = new Pacman(PACMAN_SPAWN_X, PACMAN_SPAWN_Y));
+	m_pacman_ptr->RegisterToRealm(m_realms[0]);
 
 	Map* map;
 	m_game_objects.push_back(map = new Map);
@@ -247,8 +246,11 @@ void Level::OnProcessInput(const float deltaTime)
 		}
 	}
 
-
-	if (m_power_timer.IsRunning()) {
+	if (m_show_eaten_timer.IsRunning()) {
+		if (m_show_eaten_timer.Update(deltaTime)) {
+			StopShowingEatenGhost();
+		}
+	} else if (m_power_timer.IsRunning()) {
 		if (m_power_timer.Update(deltaTime)) {
 			DeactivatePowerMode();
 		}
@@ -552,8 +554,29 @@ void Level::OnFruitEaten(FruitData* fruitData)
 
 void Level::OnGhostEaten()
 {
-	UpdatePlayerScore((2 << ghostEatenCount) * 100);
+	unsigned int scored = (2 << ghostEatenCount) * 100;
+	UpdatePlayerScore(scored);
 	ghostEatenCount++;
+
+	SendMessage("pacman", PMT_ShowEatenGhost);
+	SendMessage("blinky", PMT_ShowEatenGhost);
+	SendMessage("pinky",  PMT_ShowEatenGhost);
+	SendMessage("inky",   PMT_ShowEatenGhost);
+	SendMessage("clyde",  PMT_ShowEatenGhost);
+	m_show_eaten_timer.Start();
+
+	Vec2d showPos = m_pacman_ptr->GetWorldCoordinates();
+	showPos.x -= 2;
+	SendMessage("points", PMT_ShowPointsEarned, new PointData(scored, showPos));
+}
+
+void Level::StopShowingEatenGhost()
+{
+	SendMessage("pacman", PMT_StopShowingEatenGhost);
+	SendMessage("blinky", PMT_StopShowingEatenGhost);
+	SendMessage("pinky",  PMT_StopShowingEatenGhost);
+	SendMessage("inky",   PMT_StopShowingEatenGhost);
+	SendMessage("clyde",  PMT_StopShowingEatenGhost);
 }
 
 void Level::PacmanDeathShowHitPhase(const float deltaTime)
