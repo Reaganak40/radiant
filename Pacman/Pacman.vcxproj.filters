@@ -39,6 +39,9 @@
     <ClCompile Include="Source\GameObjects\Fruit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\GameObjects\Points.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Game.h">
@@ -63,6 +66,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\GameObjects\Fruit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameObjects\Points.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

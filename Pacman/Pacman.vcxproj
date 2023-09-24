@@ -138,6 +138,7 @@
     <ClCompile Include="Source\GameObjects\Map.cpp" />
     <ClCompile Include="Source\GameObjects\PacDot.cpp" />
     <ClCompile Include="Source\GameObjects\Pacman.cpp" />
+    <ClCompile Include="Source\GameObjects\Points.cpp" />
     <ClCompile Include="Source\GameObjects\UI.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Scenes\Level.cpp" />
@@ -149,6 +150,7 @@
     <ClInclude Include="Source\GameObjects\Map.h" />
     <ClInclude Include="Source\GameObjects\PacDot.h" />
     <ClInclude Include="Source\GameObjects\Pacman.h" />
+    <ClInclude Include="Source\GameObjects\Points.h" />
     <ClInclude Include="Source\GameObjects\UI.h" />
     <ClInclude Include="Source\Scenes\Level.h" />
   </ItemGroup>

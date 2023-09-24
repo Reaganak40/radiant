@@ -23,19 +23,19 @@ struct FruitData {
 	unsigned int GetValue() {
 		switch (type) {
 		case CHERRY:
-			return isSecondCapture ? 200 : 100;
+			return 100;
 		case STRAWBERRY:
-			return isSecondCapture ? 400 : 300;
+			return 300;
 		case PEACH:
-			return isSecondCapture ? 600 : 500;
+			return 500;
 		case APPLE:
-			return isSecondCapture ? 800 : 700;
+			return 700;
 		case MELON:
-			return isSecondCapture ? 1500 : 1000;
+			return 1000;
 		case GALAXIAN:
-			return isSecondCapture ? 2500 : 2000;
+			return 2000;
 		case BELL:
-			return isSecondCapture ? 4000 : 3000;
+			return 3000;
 		case KEY:
 			return 5000;
 		default:

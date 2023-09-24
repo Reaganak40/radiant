@@ -48,6 +48,8 @@ private:
 
 	PacmanDeathSequence m_pacman_death_state;
 
+	bool devToolsEnabled;
+
 public:
 	Level();
 	~Level();
@@ -80,5 +82,6 @@ private:
 	void OnGhostEaten();
 	void PacmanDeathShowHitPhase(const float deltaTime);
 
+	void OnDevTools();
 	FRUIT_TYPE GetNextFruit();
 };

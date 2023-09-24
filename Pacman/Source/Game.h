@@ -44,6 +44,7 @@
 #define PACMAN_LAYER 2
 #define GHOST_LAYER 3
 
+#define INPUT_GRACE_PERIOD 0.25f
 
 
 enum PacmanMoveDirection {
@@ -81,4 +82,5 @@ enum PacmanMessageTypes {
 	PMT_ShowFruit,
 	PMT_FruitEaten,
 	PMT_SetFruit,
+	PMT_ShowPointsEarned,
 };

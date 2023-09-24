@@ -3,6 +3,7 @@
 #include "GameObjects/Map.h"
 #include "GameObjects/Ghost.h"
 #include "GameObjects/UI.h"
+#include "GameObjects/Points.h"
 
 using namespace rdt;
 
@@ -23,6 +24,8 @@ Level::Level()
 	ghostEatenCount = 0;
 	m_pacman_death_state = PDS_NoDeath;
 	RegisterToMessageBus("level");
+
+	devToolsEnabled = true;
 }
 
 Level::~Level()
@@ -56,6 +59,9 @@ void Level::OnRegister()
 
 		Texture& fruitTex = TextureManager::LoadTextureFromPNG("fruit", "Resources/Textures/fruit.png");
 		fruitTex.DefineTextureAtlas(24, 28, 1, 8, 8);
+
+		Texture& pointsTex = TextureManager::LoadTextureFromPNG("points", "Resources/Textures/points.png");
+		pointsTex.DefineTextureAtlas(64, 28, 8, 2, 8);
 	}
 
 	Pacman* pacman;
@@ -149,6 +155,10 @@ void Level::OnRegister()
 	fruit->RegisterToRealm(m_realms[0]);
 	fruit->SetType(CHERRY);
 
+	Points* points;
+	m_game_objects.push_back(points = new Points);
+	points->RegisterToRealm(m_realms[0]);
+
 	/* Adds dots to the map. */
 	for (int row = 0; row < NUM_TILES_Y; row++) {
 		for (int col = 0; col < NUM_TILES_X; col++) {
@@ -209,6 +219,7 @@ void Level::OnBind()
 
 void Level::OnProcessInput(const float deltaTime)
 {
+	OnDevTools();
 
 	switch (m_pacman_death_state) {
 	case PDS_NoDeath:
@@ -441,7 +452,6 @@ void Level::Respawn()
 
 void Level::UpdatePlayerScore(int pointsToAdd)
 {
-	printf("%d\n", pointsToAdd);
 	playerScore += pointsToAdd;
 	((UI*)m_game_objects.at(_1UP_SCORE_INDEX))->SetText(std::to_string(playerScore));
 
@@ -537,6 +547,7 @@ void Level::StartNextLevel()
 void Level::OnFruitEaten(FruitData* fruitData)
 {
 	UpdatePlayerScore(fruitData->GetValue());
+	SendMessage("points", PMT_ShowPointsEarned, new PointData(fruitData->GetValue()));
 }
 
 void Level::OnGhostEaten()
@@ -557,6 +568,21 @@ void Level::PacmanDeathShowHitPhase(const float deltaTime)
 		m_show_hit_timer.Start();
 		PauseGame();
 		SendDirectMessage("pacman", PMT_ResumeGame);
+	}
+}
+
+void Level::OnDevTools()
+{
+	if (!devToolsEnabled) {
+		return;
+	}
+
+	if (Input::CheckKeyboardState(std::vector<InputState>{L_KEY_PRESS})) {
+		lifeCount++;
+		UpdateLifeDisplay();
+	}
+	if (Input::CheckKeyboardState(std::vector<InputState>{P_KEY_PRESS})) {
+		OnEndLevel();
 	}
 }
 

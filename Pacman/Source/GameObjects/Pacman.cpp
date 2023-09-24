@@ -488,10 +488,11 @@ void Pacman::OnHit()
 
 void Pacman::GetTargetInputDirection(bool* input4, float* inputTimestamps4)
 {
-	inputTimestamps4[RIGHT] = Input::GetTimeSinceKeyState(right_cond, 0.35f);
-	inputTimestamps4[LEFT]  = Input::GetTimeSinceKeyState(left_cond, 0.35f);
-	inputTimestamps4[UP]    = Input::GetTimeSinceKeyState(up_cond, 0.35f);
-	inputTimestamps4[DOWN]  = Input::GetTimeSinceKeyState(down_cond, 0.35f);
+
+	inputTimestamps4[RIGHT] = Input::GetTimeSinceKeyState(right_cond, INPUT_GRACE_PERIOD);
+	inputTimestamps4[LEFT]  = Input::GetTimeSinceKeyState(left_cond, INPUT_GRACE_PERIOD);
+	inputTimestamps4[UP]    = Input::GetTimeSinceKeyState(up_cond, INPUT_GRACE_PERIOD);
+	inputTimestamps4[DOWN]  = Input::GetTimeSinceKeyState(down_cond, INPUT_GRACE_PERIOD);
 
 	/* Check if player wants to go left or right (Earliest request if within half a second) */
 	input4[LEFT] = false;
