@@ -359,6 +359,10 @@ void Level::OnMessage(rdt::Message msg)
 
 void Level::ActivatePowerMode()
 {
+	if (levelCount >= 19) {
+		return;
+	}
+
 	m_power_timer.Start();
 
 	if (m_power_timer.IsRunning()) {
@@ -544,6 +548,8 @@ void Level::StartNextLevel()
 			}
 		}
 	}
+
+	SetVulnerableTimer();
 }
 
 void Level::OnFruitEaten(FruitData* fruitData)
@@ -591,6 +597,34 @@ void Level::PacmanDeathShowHitPhase(const float deltaTime)
 		m_show_hit_timer.Start();
 		PauseGame();
 		SendDirectMessage("pacman", PMT_ResumeGame);
+	}
+}
+
+void Level::SetVulnerableTimer()
+{
+	if (levelCount == 2) {
+		m_power_timer.SetInterval(9.0f);
+	}
+	else if (levelCount == 3) {
+		m_power_timer.SetInterval(8.0f);
+	}
+	else if (levelCount == 4 || levelCount == 5) {
+		m_power_timer.SetInterval(7.0f);
+	}
+	else if (levelCount == 6 || levelCount == 7) {
+		m_power_timer.SetInterval(6.0f);
+	}
+	else if (levelCount == 8 || levelCount == 9) {
+		m_power_timer.SetInterval(5.0f);
+	}
+	else if (levelCount >= 10 && levelCount <= 13) {
+		m_power_timer.SetInterval(4.0f);
+	}
+	else if (levelCount >= 14 && levelCount <= 17) {
+		m_power_timer.SetInterval(2.0f);
+	}
+	else {
+		m_power_timer.SetInterval(1.0f);
 	}
 }
 

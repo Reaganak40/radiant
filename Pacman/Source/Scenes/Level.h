@@ -85,7 +85,7 @@ private:
 	void OnGhostEaten();
 	void StopShowingEatenGhost();
 	void PacmanDeathShowHitPhase(const float deltaTime);
-
+	void SetVulnerableTimer();
 	void OnDevTools();
 	FRUIT_TYPE GetNextFruit();
 };
