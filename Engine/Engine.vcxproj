@@ -173,8 +173,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\Application.cpp" />
+    <ClCompile Include="Source\Audio\AudioError.cpp" />
     <ClCompile Include="Source\Audio\SoundBuffer.cpp" />
     <ClCompile Include="Source\Audio\SoundManager.cpp" />
+    <ClCompile Include="Source\Audio\SoundSource.cpp" />
     <ClCompile Include="Source\GameObject\GameObject.cpp" />
     <ClCompile Include="Source\GameObject\GameState.cpp" />
     <ClCompile Include="Source\Gui\Diagnostics.cpp" />
@@ -294,6 +296,7 @@
     <ClInclude Include="Source\Audio\AudioError.h" />
     <ClInclude Include="Source\Audio\SoundBuffer.h" />
     <ClInclude Include="Source\Audio\SoundManager.h" />
+    <ClInclude Include="Source\Audio\SoundSource.h" />
     <ClInclude Include="Source\GameObject\GameObject.h" />
     <ClInclude Include="Source\GameObject\GameState.h" />
     <ClInclude Include="Source\Gui\Diagnostics.h" />

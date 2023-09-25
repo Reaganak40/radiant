@@ -174,6 +174,12 @@
     <ClCompile Include="Source\Audio\SoundBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Audio\SoundSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Audio\AudioError.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vendor\GLAD\glad.h">
@@ -1226,14 +1232,14 @@
     <ClInclude Include="Source\Audio\AudioError.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Audio\SoundSource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="Vendor\GLFW\lib-vc2022\glfw3.lib" />
     <Library Include="Vendor\GLFW\lib-vc2022\glfw3_mt.lib" />
     <Library Include="Vendor\GLFW\lib-vc2022\glfw3dll.lib" />
-    <Library Include="Vendor\AL\Debug\alcommon.lib" />
-    <Library Include="Vendor\AL\Debug\al-excommon.lib" />
-    <Library Include="Vendor\AL\Debug\OpenAL32.lib" />
     <Library Include="Vendor\AL\OpenAL32.lib" />
   </ItemGroup>
   <ItemGroup>
@@ -1647,17 +1653,6 @@
     </None>
     <None Include="Resources\Shaders\fragment.glsl" />
     <None Include="Resources\Shaders\vertex.glsl" />
-    <None Include="Vendor\AL\Debug\alcommon.pdb" />
-    <None Include="Vendor\AL\Debug\al-excommon.pdb" />
-    <None Include="Vendor\AL\Debug\alrecord.exe" />
-    <None Include="Vendor\AL\Debug\alrecord.pdb" />
-    <None Include="Vendor\AL\Debug\altonegen.exe" />
-    <None Include="Vendor\AL\Debug\altonegen.pdb" />
-    <None Include="Vendor\AL\Debug\OpenAL32.dll" />
-    <None Include="Vendor\AL\Debug\OpenAL32.exp" />
-    <None Include="Vendor\AL\Debug\OpenAL32.pdb" />
-    <None Include="Vendor\AL\Debug\openal-info.exe" />
-    <None Include="Vendor\AL\Debug\openal-info.pdb" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Textures\apple.png">
