@@ -71,6 +71,22 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(SolutionDir)Engine\Vendor;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Engine\Vendor\AL;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>$(SolutionDir)Engine\Vendor;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Engine\Vendor\AL;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(SolutionDir)Engine\Vendor;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Engine\Vendor\AL;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(SolutionDir)Engine\Vendor;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Engine\Vendor\AL;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -157,6 +173,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\Application.cpp" />
+    <ClCompile Include="Source\Audio\SoundBuffer.cpp" />
+    <ClCompile Include="Source\Audio\SoundManager.cpp" />
     <ClCompile Include="Source\GameObject\GameObject.cpp" />
     <ClCompile Include="Source\GameObject\GameState.cpp" />
     <ClCompile Include="Source\Gui\Diagnostics.cpp" />
@@ -273,7 +291,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Application.h" />
-    <ClInclude Include="Source\Audio\Audio.h" />
+    <ClInclude Include="Source\Audio\AudioError.h" />
+    <ClInclude Include="Source\Audio\SoundBuffer.h" />
+    <ClInclude Include="Source\Audio\SoundManager.h" />
     <ClInclude Include="Source\GameObject\GameObject.h" />
     <ClInclude Include="Source\GameObject\GameState.h" />
     <ClInclude Include="Source\Gui\Diagnostics.h" />
@@ -317,6 +337,13 @@
     <ClInclude Include="Source\Utils\Timestep.h" />
     <ClInclude Include="Source\Utils\UniqueID.h" />
     <ClInclude Include="Source\Utils\Utils.h" />
+    <ClInclude Include="Vendor\AL\al.h" />
+    <ClInclude Include="Vendor\AL\alc.h" />
+    <ClInclude Include="Vendor\AL\alext.h" />
+    <ClInclude Include="Vendor\AL\efx-creative.h" />
+    <ClInclude Include="Vendor\AL\efx-presets.h" />
+    <ClInclude Include="Vendor\AL\efx.h" />
+    <ClInclude Include="Vendor\AudioFile-1.1.1\AudioFile.h" />
     <ClInclude Include="Vendor\GLAD\glad.h" />
     <ClInclude Include="Vendor\GLFW\glfw3.h" />
     <ClInclude Include="Vendor\GLFW\glfw3native.h" />
@@ -615,6 +642,7 @@
     <ClInclude Include="Vendor\stb\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <Library Include="Vendor\AL\OpenAL32.lib" />
     <Library Include="Vendor\GLFW\lib-vc2022\glfw3.lib" />
     <Library Include="Vendor\GLFW\lib-vc2022\glfw3dll.lib" />
     <Library Include="Vendor\GLFW\lib-vc2022\glfw3_mt.lib" />

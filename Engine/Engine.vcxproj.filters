@@ -168,6 +168,12 @@
     <ClCompile Include="Source\Renderer\Layer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Audio\SoundManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Audio\SoundBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vendor\GLAD\glad.h">
@@ -1190,7 +1196,34 @@
     <ClInclude Include="Source\Renderer\Layer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Audio\Audio.h">
+    <ClInclude Include="Source\Audio\SoundManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vendor\AL\al.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vendor\AL\alc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vendor\AL\alext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vendor\AL\efx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vendor\AL\efx-creative.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vendor\AL\efx-presets.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Audio\SoundBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vendor\AudioFile-1.1.1\AudioFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Audio\AudioError.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1198,6 +1231,10 @@
     <Library Include="Vendor\GLFW\lib-vc2022\glfw3.lib" />
     <Library Include="Vendor\GLFW\lib-vc2022\glfw3_mt.lib" />
     <Library Include="Vendor\GLFW\lib-vc2022\glfw3dll.lib" />
+    <Library Include="Vendor\AL\Debug\alcommon.lib" />
+    <Library Include="Vendor\AL\Debug\al-excommon.lib" />
+    <Library Include="Vendor\AL\Debug\OpenAL32.lib" />
+    <Library Include="Vendor\AL\OpenAL32.lib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Vendor\glm\detail\func_common.inl">
@@ -1610,6 +1647,17 @@
     </None>
     <None Include="Resources\Shaders\fragment.glsl" />
     <None Include="Resources\Shaders\vertex.glsl" />
+    <None Include="Vendor\AL\Debug\alcommon.pdb" />
+    <None Include="Vendor\AL\Debug\al-excommon.pdb" />
+    <None Include="Vendor\AL\Debug\alrecord.exe" />
+    <None Include="Vendor\AL\Debug\alrecord.pdb" />
+    <None Include="Vendor\AL\Debug\altonegen.exe" />
+    <None Include="Vendor\AL\Debug\altonegen.pdb" />
+    <None Include="Vendor\AL\Debug\OpenAL32.dll" />
+    <None Include="Vendor\AL\Debug\OpenAL32.exp" />
+    <None Include="Vendor\AL\Debug\OpenAL32.pdb" />
+    <None Include="Vendor\AL\Debug\openal-info.exe" />
+    <None Include="Vendor\AL\Debug\openal-info.pdb" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Textures\apple.png">

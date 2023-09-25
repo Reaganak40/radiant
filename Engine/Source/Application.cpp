@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Application.h"
 #include "Renderer/Renderer.h"
+#include "Audio/SoundManager.h"
 #include "Utils/Input.h"
 #include "Utils/Utils.h"
 #include "Messaging/MessageBus.h"
@@ -26,6 +27,7 @@ namespace rdt
 		PtagManager::Destroy();
 		MessageBus::Destroy();
 		Input::Destroy();
+		SoundManager::Destroy();
 		Renderer::Destroy();
 	}
 
@@ -34,6 +36,7 @@ namespace rdt
 		Utils::SetRandomSeed();
 
 		Renderer::CreateWindow(appName, windowWidth, windowHeight, resizable);
+		SoundManager::Initialize();
 		Input::Initialize();
 		MessageBus::Initialize();
 		PtagManager::Initialize();
