@@ -1,7 +1,7 @@
 #pragma once
 #include "Application.h"
 #include "Renderer/Renderer.h"
-#include "Audio/SoundManager.h"
+#include "Audio/SoundEngine.h"
 #include "Utils/Input.h"
 #include "Physics/Physics.h"
 

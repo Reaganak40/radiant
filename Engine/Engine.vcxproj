@@ -174,8 +174,8 @@
   <ItemGroup>
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\Audio\AudioError.cpp" />
-    <ClCompile Include="Source\Audio\SoundBuffer.cpp" />
-    <ClCompile Include="Source\Audio\SoundManager.cpp" />
+    <ClCompile Include="Source\Audio\Sound.cpp" />
+    <ClCompile Include="Source\Audio\SoundEngine.cpp" />
     <ClCompile Include="Source\Audio\SoundSource.cpp" />
     <ClCompile Include="Source\GameObject\GameObject.cpp" />
     <ClCompile Include="Source\GameObject\GameState.cpp" />
@@ -294,8 +294,8 @@
   <ItemGroup>
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\Audio\AudioError.h" />
-    <ClInclude Include="Source\Audio\SoundBuffer.h" />
-    <ClInclude Include="Source\Audio\SoundManager.h" />
+    <ClInclude Include="Source\Audio\Sound.h" />
+    <ClInclude Include="Source\Audio\SoundEngine.h" />
     <ClInclude Include="Source\Audio\SoundSource.h" />
     <ClInclude Include="Source\GameObject\GameObject.h" />
     <ClInclude Include="Source\GameObject\GameState.h" />

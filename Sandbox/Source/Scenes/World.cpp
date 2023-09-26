@@ -12,7 +12,7 @@ World::~World()
 
 void World::OnRegister()
 {
-	m_sound = SoundManager::LoadAudio("Resources/Sounds/sample3.wav");
+	m_sound = SoundEngine::LoadAudio("Resources/Sounds/30countdown.wav");
 }
 
 void World::OnProcessInput(float deltaTime)
@@ -20,7 +20,7 @@ void World::OnProcessInput(float deltaTime)
 
 	if (Input::CheckKeyboardState(std::vector<InputState>{T_KEY_PRESS})) {
 		printf("Play sound!\n");
-		SoundManager::PlaySound(m_sound);
+		SoundEngine::PlaySound(m_sound, Vec3f::Zero());
 	}
 
 	RunProcessInputQueue(deltaTime);

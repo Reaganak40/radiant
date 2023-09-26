@@ -1,19 +1,15 @@
 #pragma once
-#include "SoundBuffer.h"
 #include "SoundSource.h"
+#include "Sound.h"
+
 namespace rdt {
 	typedef unsigned int SoundID;
 
-	struct Sound {
-		SoundBuffer buffer;
-		SoundSource source;
-	};
-
-	class SoundManager {
+	class SoundEngine {
 	private:
-		SoundManager();
-		~SoundManager();
-		static SoundManager* m_instance;
+		SoundEngine();
+		~SoundEngine();
+		static SoundEngine* m_instance;
 		SoundID m_SoundCounter;
 
 		ALCdevice* m_ALCdevice;
@@ -41,13 +37,14 @@ namespace rdt {
 		}
 
 		/*
-			Plays the sound referenced by the provided SoundID.
+			Plays the sound referenced by the provided SoundID at the provided
+			source location.
 		*/
-		static void PlaySound(const SoundID sID) { m_instance->PlaySoundImpl(sID); }
+		static void PlaySound(const SoundID sID, const Vec3f& srcPos) { m_instance->PlaySoundImpl(sID, srcPos); }
 
 	private:
 		SoundID LoadAudioImpl(const std::string& audioFilepath);
-		void PlaySoundImpl(const SoundID sID);
+		void PlaySoundImpl(const SoundID sID, const Vec3f& srcPos);
 		SoundID GetNextSoundID();
 
 	};

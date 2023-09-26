@@ -1,11 +1,11 @@
 #include "pch.h"
-#include "SoundManager.h"
+#include "SoundEngine.h"
 
 namespace rdt {
 	
-	SoundManager* SoundManager::m_instance = nullptr;
+	SoundEngine* SoundEngine::m_instance = nullptr;
 	
-	SoundManager::SoundManager()
+	SoundEngine::SoundEngine()
 	{
 		m_ALCdevice = alcOpenDevice(nullptr);
 		if (!m_ALCdevice) {
@@ -27,23 +27,23 @@ namespace rdt {
 		m_SoundCounter = 0;
 	}
 
-	SoundManager::~SoundManager()
+	SoundEngine::~SoundEngine()
 	{
 		
 		alcDestroyContext(m_context);
 		alcCloseDevice(m_ALCdevice);
 	}
 
-	void SoundManager::Initialize()
+	void SoundEngine::Initialize()
 	{
 		if (m_instance != nullptr) {
 			Destroy();
 		}
 
-		m_instance = new SoundManager;
+		m_instance = new SoundEngine;
 	}
 
-	void SoundManager::Destroy()
+	void SoundEngine::Destroy()
 	{
 		if (m_instance != nullptr) {
 			delete m_instance;
@@ -51,42 +51,36 @@ namespace rdt {
 		}
 	}
 
-	SoundID SoundManager::LoadAudioImpl(const std::string& audioFilepath)
+	SoundID SoundEngine::LoadAudioImpl(const std::string& audioFilepath)
 	{
 		SoundID nSID = GetNextSoundID();
 		m_sounds[nSID];
 
-		if (!m_sounds.at(nSID).buffer.LoadFile(audioFilepath.c_str())) {
+		if (!m_sounds.at(nSID).LoadFile(audioFilepath.c_str())) {
 			m_sounds.erase(nSID);
 			return 0;
 		}
 
-		auto& nSound = m_sounds.at(nSID);
-		nSound.source.Init();
-		nSound.source.SetPosition({ 0, 0, 0 });
-		nSound.source.SetVelocity({ 0, 0, 0 });
-		nSound.source.AttachBuffer(nSound.buffer.GetID());
-
 		return nSID;
 	}
 
-	void SoundManager::PlaySoundImpl(const SoundID sID)
+	void SoundEngine::PlaySoundImpl(const SoundID sID, const Vec3f& srcPos)
 	{
 		if (m_sounds.find(sID) == m_sounds.end()) {
 			return;
 		}
 
-		alSourcePlay(m_sounds.at(sID).source.GetID());
+		SoundSource source;
+		source.Init();
+		source.SetPosition(srcPos);
+		source.SetVelocity(Vec3f::Zero());
 
-		ALint state = AL_PLAYING;
-		while (state == AL_PLAYING)
-		{
-			alGetSourcei(m_sounds.at(sID).source.GetID(), AL_SOURCE_STATE, &state);
-		}
+		m_sounds.at(sID).PlaySound(source.GetID());
+
 		printf("Done\n");
 	}
 
-	SoundID SoundManager::GetNextSoundID()
+	SoundID SoundEngine::GetNextSoundID()
 	{
 		return ++m_SoundCounter;
 	}

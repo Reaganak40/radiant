@@ -168,16 +168,16 @@
     <ClCompile Include="Source\Renderer\Layer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Audio\SoundManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Audio\SoundBuffer.cpp">
+    <ClCompile Include="Source\Audio\SoundEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Audio\SoundSource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Audio\AudioError.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Audio\Sound.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1202,7 +1202,7 @@
     <ClInclude Include="Source\Renderer\Layer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Audio\SoundManager.h">
+    <ClInclude Include="Source\Audio\SoundEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Vendor\AL\al.h">
@@ -1223,9 +1223,6 @@
     <ClInclude Include="Vendor\AL\efx-presets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Audio\SoundBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Vendor\AudioFile-1.1.1\AudioFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1233,6 +1230,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Audio\SoundSource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Audio\Sound.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

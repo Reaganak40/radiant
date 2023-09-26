@@ -13,7 +13,7 @@ namespace rdt {
 		/*
 			Returns the ID for this Source.
 		*/
-		ALuint GetID() { return m_sourceID; }
+		ALuint GetID() const { return m_sourceID; }
 
 		void Init();
 		void SetPosition(const Vec3f& nPos);

@@ -120,4 +120,9 @@ namespace rdt {
         return Vec2i(vector1.x - vector2.x, vector1.y - vector2.y);
     }
 
+    Vec3f Vec3f::Zero()
+    {
+        return Vec3f(0.0f, 0.0f, 0.0f);
+    }
+
 }

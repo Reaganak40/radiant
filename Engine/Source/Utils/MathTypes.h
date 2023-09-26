@@ -67,6 +67,8 @@ namespace rdt {
 
 		Vec3f(float nX = 0, float nY = 0, float nZ = 0)
 			: x(nX), y(nY), z(nZ) {}
+
+		static Vec3f Zero();
 	};
 
 	struct Vec4f {
