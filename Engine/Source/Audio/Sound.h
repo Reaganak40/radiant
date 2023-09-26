@@ -22,6 +22,7 @@ namespace rdt {
 		std::vector<uint8_t> m_soundData;
 
 		ALuint m_buffers[NUM_AUDIO_BUFFERS];
+		std::vector<ALuint> m_unused_buffers;
 		std::size_t m_cursor;
 
 	public:
@@ -37,7 +38,7 @@ namespace rdt {
 		/*
 			Plays the loaded sound from the provided source.
 		*/
-		void PlaySound(const ALuint source);
+		void PlaySound(const ALuint source, bool loop);
 		
 	private:
 		/*
@@ -50,6 +51,12 @@ namespace rdt {
 		*/
 		void PreLoadBuffers();
 
-		void UpdateStream(const ALuint source);
+		/*
+			Called in the case the file data is smaller than the full
+			buffer space, and a loop is requested: fill the remaining buffers.
+		*/
+		void UseUnusedBuffers();
+
+		void UpdateStream(const ALuint source, bool loop);
 	};
 }

@@ -38,13 +38,13 @@ namespace rdt {
 
 		/*
 			Plays the sound referenced by the provided SoundID at the provided
-			source location.
+			source location. Looping is set to false by default.
 		*/
-		static void PlaySound(const SoundID sID, const Vec3f& srcPos) { m_instance->PlaySoundImpl(sID, srcPos); }
+		static void PlaySound(const SoundID sID, const Vec3f& srcPos, bool looping = false) { m_instance->PlaySoundImpl(sID, srcPos, looping); }
 
 	private:
 		SoundID LoadAudioImpl(const std::string& audioFilepath);
-		void PlaySoundImpl(const SoundID sID, const Vec3f& srcPos);
+		void PlaySoundImpl(const SoundID sID, const Vec3f& srcPos, bool looping);
 		SoundID GetNextSoundID();
 
 	};

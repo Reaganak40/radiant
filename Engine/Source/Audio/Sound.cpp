@@ -46,16 +46,27 @@ namespace rdt {
 		return true;
 	}
 
-	void Sound::PlaySound(const ALuint source)
+	void Sound::PlaySound(const ALuint source, bool loop)
 	{
-		alSourceQueueBuffers(source, NUM_AUDIO_BUFFERS, m_buffers);
+		ALsizei numBuffers = NUM_AUDIO_BUFFERS;
+		if (loop && m_unused_buffers.size()) {
+			UseUnusedBuffers();
+		}
+		else {
+			numBuffers -= m_unused_buffers.size();
+		}
+
+		alSourceQueueBuffers(source, numBuffers, m_buffers);
 		alSourcePlay(source);
 
 		ALint playState = AL_PLAYING;
 		while (playState == AL_PLAYING) {
-			UpdateStream(source);
+			UpdateStream(source, loop);
 			alGetSourcei(source, AL_SOURCE_STATE, &playState);
 		}
+		UpdateStream(source, false);
+
+		PreLoadBuffers();
 	}
 
 	bool Sound::SetBufferFormat(unsigned int numChannels, unsigned int bitDepth)
@@ -84,30 +95,40 @@ namespace rdt {
 	}
 	void Sound::PreLoadBuffers()
 	{
-		std::size_t i = 0;
+		m_cursor = 0;
+		unsigned int i = 0;
+
 		for (; i < NUM_AUDIO_BUFFERS; ++i)
 		{
-			alBufferData(m_buffers[i], m_format, &m_soundData[i * AUDIO_BUFFER_SIZE], AUDIO_BUFFER_SIZE, m_sampleRate);
+			if (m_cursor == m_soundData.size()) {
+				break;
+			}
+
+			std::size_t dataSizeToCopy = AUDIO_BUFFER_SIZE;
+			if (m_cursor + AUDIO_BUFFER_SIZE > m_soundData.size()) {
+				dataSizeToCopy = m_soundData.size() - m_cursor;
+			}
+
+			printf("Add data\n");
+			alBufferData(m_buffers[i], m_format, &m_soundData[m_cursor], dataSizeToCopy, m_sampleRate);
+			printf("Done\n");
+
+
+			m_cursor += dataSizeToCopy;
 		}
 
-		m_cursor = i * AUDIO_BUFFER_SIZE;
+		for (; i < NUM_AUDIO_BUFFERS; ++i)
+		{
+			m_unused_buffers.push_back(m_buffers[i]);
+		}
 	}
 
-	void Sound::UpdateStream(const ALuint source)
+	void Sound::UseUnusedBuffers()
 	{
-		ALint buffersProcessed;
-		alGetSourcei(source, AL_BUFFERS_PROCESSED, &buffersProcessed);
-
-		if (buffersProcessed <= 0) {
-			return;
-		}
-
+		m_cursor = 0;
+		
 		char* data = new char[AUDIO_BUFFER_SIZE];
-		while (buffersProcessed--) {
-			ALuint buffer;
-			alSourceUnqueueBuffers(source, 1, &buffer);
-
-			std::memset(data, 0, AUDIO_BUFFER_SIZE);
+		for (auto& buffer : m_unused_buffers) {
 
 			std::size_t dataSizeToCopy = AUDIO_BUFFER_SIZE;
 			if (m_cursor + AUDIO_BUFFER_SIZE > m_soundData.size()) {
@@ -122,9 +143,54 @@ namespace rdt {
 				m_cursor = 0;
 				std::memcpy(&data[dataSizeToCopy], &m_soundData[m_cursor], AUDIO_BUFFER_SIZE - dataSizeToCopy);
 				m_cursor = AUDIO_BUFFER_SIZE - dataSizeToCopy;
+				dataSizeToCopy = AUDIO_BUFFER_SIZE;
 			}
 
-			alBufferData(buffer, m_format, data, AUDIO_BUFFER_SIZE, m_sampleRate);
+			alBufferData(buffer, m_format, &m_soundData[m_cursor], dataSizeToCopy, m_sampleRate);
+		}
+
+		m_unused_buffers.clear();
+		delete[] data;
+	}
+
+	void Sound::UpdateStream(const ALuint source, bool loop)
+	{
+		ALint buffersProcessed;
+		alGetSourcei(source, AL_BUFFERS_PROCESSED, &buffersProcessed);
+
+		if (buffersProcessed <= 0) {
+			return;
+		}
+
+		char* data = new char[AUDIO_BUFFER_SIZE];
+		while (buffersProcessed--) {
+			ALuint buffer;
+
+			alSourceUnqueueBuffers(source, 1, &buffer);
+
+			std::memset(data, 0, AUDIO_BUFFER_SIZE);
+
+			std::size_t dataSizeToCopy = AUDIO_BUFFER_SIZE;
+			if (m_cursor + AUDIO_BUFFER_SIZE > m_soundData.size()) {
+				dataSizeToCopy = m_soundData.size() - m_cursor;
+			}
+
+			if (dataSizeToCopy == 0) {
+				continue;
+			}
+
+			std::memcpy(data, &m_soundData[m_cursor], dataSizeToCopy);
+			m_cursor += dataSizeToCopy;
+
+			if (dataSizeToCopy < AUDIO_BUFFER_SIZE && loop)
+			{
+				m_cursor = 0;
+				std::memcpy(&data[dataSizeToCopy], &m_soundData[m_cursor], AUDIO_BUFFER_SIZE - dataSizeToCopy);
+				m_cursor = AUDIO_BUFFER_SIZE - dataSizeToCopy;
+				dataSizeToCopy = AUDIO_BUFFER_SIZE;
+			}
+
+			alBufferData(buffer, m_format, data, dataSizeToCopy, m_sampleRate);
 			alSourceQueueBuffers(source, 1, &buffer);
 		}
 

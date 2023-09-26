@@ -64,7 +64,7 @@ namespace rdt {
 		return nSID;
 	}
 
-	void SoundEngine::PlaySoundImpl(const SoundID sID, const Vec3f& srcPos)
+	void SoundEngine::PlaySoundImpl(const SoundID sID, const Vec3f& srcPos, bool looping)
 	{
 		if (m_sounds.find(sID) == m_sounds.end()) {
 			return;
@@ -75,9 +75,7 @@ namespace rdt {
 		source.SetPosition(srcPos);
 		source.SetVelocity(Vec3f::Zero());
 
-		m_sounds.at(sID).PlaySound(source.GetID());
-
-		printf("Done\n");
+		m_sounds.at(sID).PlaySound(source.GetID(), looping);
 	}
 
 	SoundID SoundEngine::GetNextSoundID()
