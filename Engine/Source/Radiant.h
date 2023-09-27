@@ -1,7 +1,10 @@
 #pragma once
 #include "Application.h"
 #include "Renderer/Renderer.h"
+
 #include "Audio/SoundEngine.h"
+#include "Audio/Sound/SoundEffect.h"
+
 #include "Utils/Input.h"
 #include "Physics/Physics.h"
 
@@ -16,5 +19,7 @@
 #include "Gui/GuiManager.h"
 
 #include "Messaging/MessageTypes.h"
+
+
 
 

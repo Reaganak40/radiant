@@ -10,6 +10,8 @@
 #include "Scene/SceneManager.h"
 #include "Physics/Ptag.h"
 
+#include <thread>
+
 namespace rdt
 {
 	Application::Application()
@@ -43,6 +45,36 @@ namespace rdt
 		Physics::Initialize();
 		GuiManager::Initialize();
 		SceneManager::Initialize();
+	}
+
+	void Application::RunGameLoop()
+	{
+		std::thread audioThread(SoundEngine::StartAudioLoop);
+
+		/* Loop until the user closes the window */
+		while (IsRunning())
+		{
+			/* Clears window and prepares for next game loop.*/
+			BeginFrame();
+
+			/* Process input from user and update game objects. */
+			ProcessInput();
+
+			/* Update the physical world. Detect and resolve collisions. */
+			UpdateWorld();
+
+			/* Final update of game objects before render. */
+			FinalUpdate();
+
+			/* Render the current frame. */
+			Render();
+
+			/* End the Frame, poll inputs, swap buffers. */
+			EndFrame();
+		}
+
+		SoundEngine::StopAudioLoop();
+		audioThread.join();
 	}
 
 	bool Application::IsRunning()

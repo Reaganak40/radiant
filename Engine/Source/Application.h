@@ -20,11 +20,18 @@ namespace rdt {
 			Window is resizable by default.
 		*/
 		void Start(std::string appName, unsigned int windowWidth = 1280, unsigned int windowHeight = 720, bool resizable=true);
-
+		
+		/*
+			Runs and manages the game loop, and will continue to run until
+			the application is closed.
+		*/
+		void RunGameLoop();
+		
 		/*
 			Returns true if the application is running and the window is launched.
 		*/
 		bool IsRunning();
+		
 
 		/*
 			Start of game loop, clears the window, gets new deltaTime and prepares internals

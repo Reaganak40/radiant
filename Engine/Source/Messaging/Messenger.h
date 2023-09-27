@@ -47,5 +47,9 @@ namespace rdt {
 			Called when a message is received through the message bus.
 		*/
 		virtual void OnMessage(Message msg) = 0;
+
+		friend class MessageBus;
+	private:
+		void SetMessageID(MessageID nID) { m_messageID = nID; }
 	};
 }

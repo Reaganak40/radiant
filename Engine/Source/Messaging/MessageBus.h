@@ -4,6 +4,8 @@
 
 namespace rdt {
 
+	constexpr MessageID SoundMessengerID = 1;
+
 	class MessageBus {
 	private:
 		MessageBus();
@@ -82,9 +84,9 @@ namespace rdt {
 		*/
 		static void SendDirectMessage(const MessageID from, const MessageID to, MessageType type, void* data);
 
-
 	private:
 		static MessageID GetNextMessageID();
 		void SendMessagesImpl();
+
 	};
 }

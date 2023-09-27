@@ -4,7 +4,7 @@
 namespace rdt {
 	
 	MessageBus* MessageBus::m_instance = nullptr;
-	MessageID MessageBus::idCounter = 0;
+	MessageID MessageBus::idCounter = 1;
 
 	MessageBus::MessageBus()
 	{
@@ -149,4 +149,5 @@ namespace rdt {
 			m_message_queue.pop();
 		}
 	}
+
 }
