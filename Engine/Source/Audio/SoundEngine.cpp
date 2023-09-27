@@ -129,9 +129,6 @@ namespace rdt {
 			if (command.data != nullptr) {
 				switch (command.type) {
 				case SCT_LoadResource:
-					if (((LoadResourceData*)command.data)->dataPtr) {
-						delete ((LoadResourceData*)command.data)->dataPtr;
-					}
 					break;
 				case SCT_CreateSound:
 					if (((CreateSoundData*)command.data)->sPtr) {
@@ -149,25 +146,21 @@ namespace rdt {
 
 	void SoundEngine::LoadResourceImpl(const std::string& alias, const std::string& filepath)
 	{
-		SoundData* sData = new SoundData;
-		if (!sData->LoadFile(filepath.c_str())) {
-			delete sData;
-			return;
-		}
-
 		LoadResourceData* command_data = new LoadResourceData;
-		command_data->dataPtr = sData;
+		command_data->filepath = filepath;
 		command_data->soundAlias = alias;
 		m_command_queue[m_queue_index].push_back({SCT_LoadResource, command_data});
 	}
 
 	void SoundEngine::AddResourceToMap(LoadResourceData* data)
 	{
-		if (m_data_map.find(data->soundAlias) != m_data_map.end()) {
-			delete m_data_map.at(data->soundAlias);
+		SoundData* nData = new SoundData;
+		
+		if (!nData->LoadFile(data->filepath.c_str())) {
+			printf("SoundEngine: Could not located resource at [%s]\n", data->filepath.c_str());
+			return;
 		}
-
-		m_data_map[data->soundAlias] = data->dataPtr;
+		m_data_map[data->soundAlias] = nData;
 	}
 
 	void SoundEngine::AddSound(CreateSoundData* data)
@@ -177,8 +170,7 @@ namespace rdt {
 			return;
 		}
 
-		auto& res = m_data_map.at(data->resource);
-		data->sPtr->OnCreate(res);
+		data->sPtr->OnCreate(m_data_map.at(data->resource));
 		m_sounds[data->sID] = data->sPtr;
 	}
 

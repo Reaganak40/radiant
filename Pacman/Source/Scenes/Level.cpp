@@ -7,7 +7,7 @@
 using namespace rdt;
 
 Level::Level()
-	: m_power_timer(10.0), m_spawn_timer(2.5), m_show_hit_timer(0.5), m_1up_timer(0.25), m_end_level_timer(1.0f),
+	: m_power_timer(10.0), m_spawn_timer(5.0f), m_show_hit_timer(0.5), m_1up_timer(0.25), m_end_level_timer(1.0f),
 	m_show_eaten_timer(1.0f)
 {
 	GState.SetStateCount(LSF_MaxFlags);
@@ -26,6 +26,10 @@ Level::Level()
 	RegisterToMessageBus("level");
 
 	devToolsEnabled = true;
+	m_pacman_ptr = nullptr;
+	m_startLevelSound = 0;
+	m_currChomp = 0;
+	m_currSiren = 0;
 }
 
 Level::~Level()
@@ -40,7 +44,7 @@ void Level::OnRegister()
 		m_realms.push_back(Physics::CreateRealm());
 	}
 
-	if (!GState.CheckState(LSF_LoadedTextures)) {
+	if (!GState.CheckState(LSF_LoadedResources)) {
 		Texture& pacmanTex = TextureManager::LoadTextureFromPNG("pacman", "Resources/Textures/pacman.png");
 		pacmanTex.DefineTextureAtlas(52, 52, 4, 3, 16);
 
@@ -62,6 +66,25 @@ void Level::OnRegister()
 
 		Texture& pointsTex = TextureManager::LoadTextureFromPNG("points", "Resources/Textures/points.png");
 		pointsTex.DefineTextureAtlas(64, 28, 8, 2, 8);
+
+		SoundEngine::LoadResource("startLevel", "Resources/Sounds/pacman_beginning.wav");
+		m_startLevelSound = SoundEngine::CreateNewSound("startLevel", new SoundEffect);
+
+		SoundEngine::LoadResource("chomp1", "Resources/Sounds/munch_1.wav");
+		SoundEngine::LoadResource("chomp2", "Resources/Sounds/munch_2.wav");
+		m_chompSound[0] = SoundEngine::CreateNewSound("chomp1", new SoundEffect);
+		m_chompSound[1] = SoundEngine::CreateNewSound("chomp2", new SoundEffect);
+
+		SoundEngine::LoadResource("siren1", "Resources/Sounds/siren_1.wav");
+		SoundEngine::LoadResource("siren2", "Resources/Sounds/siren_2.wav");
+		SoundEngine::LoadResource("siren3", "Resources/Sounds/siren_3.wav");
+		SoundEngine::LoadResource("siren4", "Resources/Sounds/siren_4.wav");
+		SoundEngine::LoadResource("siren5", "Resources/Sounds/siren_5.wav");
+		m_sirenSound[0] = SoundEngine::CreateNewSound("siren1", new SoundEffect);
+		m_sirenSound[1] = SoundEngine::CreateNewSound("siren2", new SoundEffect);
+		m_sirenSound[2] = SoundEngine::CreateNewSound("siren3", new SoundEffect);
+		m_sirenSound[3] = SoundEngine::CreateNewSound("siren4", new SoundEffect);
+		m_sirenSound[4] = SoundEngine::CreateNewSound("siren5", new SoundEffect);
 	}
 
 	m_game_objects.push_back(m_pacman_ptr = new Pacman(PACMAN_SPAWN_X, PACMAN_SPAWN_Y));
@@ -209,6 +232,8 @@ void Level::OnBind()
 	Physics::ActivateRealm(m_realms[0]);
 
 	GState.SetState(LSF_AtLevelStart, true);
+	GState.SetState(LSF_StartOfGame, true);
+	SoundEngine::PlaySound(m_startLevelSound);
 	PauseGame();
 	m_spawn_timer.Start();
 
@@ -264,6 +289,12 @@ void Level::OnProcessInput(const float deltaTime)
 	if (m_spawn_timer.IsRunning()) {
 		if (m_spawn_timer.Update(deltaTime)) {
 			ResumeGame();
+			SoundEngine::PlaySound(m_sirenSound[m_currSiren], Vec3f::Zero(), true);
+
+			if (GState.CheckState(LSF_StartOfGame)) {
+				m_spawn_timer.SetInterval(2.5f);
+				GState.SetState(LSF_StartOfGame, false);
+			}
 		}
 	}
 
@@ -287,34 +318,7 @@ void Level::OnFinalUpdate()
 	Vec2i pacmanCoords = ((Pacman*)m_game_objects[0])->GetMapCoordinates();
 	PacDot* dot = m_dotMap[pacmanCoords.y][pacmanCoords.x];
 	if (dot != nullptr && !dot->IsEaten() && dot->ShouldEat(((Pacman*)m_game_objects[0])->GetWorldCoordinates())) {
-		dot->Eat();
-
-		if (dot->IsPowerDot()) {
-			ActivatePowerMode();
-			UpdatePlayerScore(50);
-		}
-		else {
-			UpdatePlayerScore(10);
-		}
-		levelDotCount++;
-
-		if (levelDotCount >= 30 && !GState.CheckState(LSF_InkyOut)) {
-			SendMessage("inky", PMT_LeaveHome, nullptr);
-			GState.SetState(LSF_InkyOut, true);
-		}
-		else if (levelDotCount >= 60 && !GState.CheckState(LSF_ClydeOut)) {
-			SendMessage("clyde", PMT_LeaveHome, nullptr);
-			GState.SetState(LSF_ClydeOut, true);
-		}
-
-		if (levelDotCount == 70 || levelDotCount == 170) {
-			SendMessage("fruit", PMT_ShowFruit);
-		}
-
-		if (levelDotCount == DOTS_PER_LEVEL) {
-			OnEndLevel();
-		}
-
+		OnEat(dot);
 	}
 
 	RunFinalUpdateQueue();
@@ -341,6 +345,7 @@ void Level::OnMessage(rdt::Message msg)
 	switch (msg.type) {
 	case PMT_PacmanHit:
 		m_pacman_death_state = PDS_ShowHit;
+		SoundEngine::StopSound(m_sirenSound[m_currSiren]);
 		break;
 	case PMT_EndDeathAnimation:
 		m_pacman_death_state = PDS_Repawn;
@@ -498,6 +503,42 @@ void Level::OnEndLevel()
 	SendMessage("clyde",  PMT_LevelEnded);
 	GState.SetState(LSF_LevelEnded, true);
 	Physics::DeactivateRealm(m_realms[0]);
+
+	SoundEngine::StopSound(m_sirenSound[m_currSiren]);
+}
+
+void Level::OnEat(PacDot* dot)
+{
+	dot->Eat();
+
+	SoundEngine::PlaySound(m_chompSound[m_currChomp], Vec3f::Zero(), false);
+	m_currChomp = m_currChomp == 0 ? 1 : 0;
+
+	if (dot->IsPowerDot()) {
+		ActivatePowerMode();
+		UpdatePlayerScore(50);
+	}
+	else {
+		UpdatePlayerScore(10);
+	}
+	levelDotCount++;
+
+	if (levelDotCount >= 30 && !GState.CheckState(LSF_InkyOut)) {
+		SendMessage("inky", PMT_LeaveHome, nullptr);
+		GState.SetState(LSF_InkyOut, true);
+	}
+	else if (levelDotCount >= 60 && !GState.CheckState(LSF_ClydeOut)) {
+		SendMessage("clyde", PMT_LeaveHome, nullptr);
+		GState.SetState(LSF_ClydeOut, true);
+	}
+
+	if (levelDotCount == 70 || levelDotCount == 170) {
+		SendMessage("fruit", PMT_ShowFruit);
+	}
+
+	if (levelDotCount == DOTS_PER_LEVEL) {
+		OnEndLevel();
+	}
 }
 
 void Level::StartEndLevelAnimation()

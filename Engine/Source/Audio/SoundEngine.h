@@ -36,7 +36,7 @@ namespace rdt {
 
 		struct LoadResourceData {
 			std::string soundAlias;
-			SoundData* dataPtr = nullptr;
+			std::string filepath;
 		};
 
 		struct CreateSoundData {
@@ -103,7 +103,7 @@ namespace rdt {
 			Plays the sound referenced by the provided SoundID at the provided
 			source location. Looping is set to false by default.
 		*/
-		static void PlaySound(const SoundID sID, const Vec3f& srcPos, bool looping = false) { m_instance->PushPlaySoundCommand(sID, srcPos, looping); }
+		static void PlaySound(const SoundID sID, const Vec3f& srcPos = Vec3f::Zero(), bool looping = false) { m_instance->PushPlaySoundCommand(sID, srcPos, looping); }
 
 		/*
 			Adds a new sound object to the audio queue, which will be processed by the

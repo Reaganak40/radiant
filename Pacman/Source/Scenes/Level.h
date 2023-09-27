@@ -18,8 +18,9 @@
 
 
 enum LevelStateFlags {
+	LSF_StartOfGame,
 	LSF_PreviouslyBounded,
-	LSF_LoadedTextures,
+	LSF_LoadedResources,
 	LSF_GhostsBlinking,
 	LSF_InkyOut,
 	LSF_ClydeOut,
@@ -27,6 +28,7 @@ enum LevelStateFlags {
 	LSF_GameOver,
 	LSF_LevelEnded,
 	LSF_InEndAnimation,
+	LSF_Chomping,
 	LSF_MaxFlags
 };
 class Level : public rdt::Scene {
@@ -53,6 +55,12 @@ private:
 
 	bool devToolsEnabled;
 
+	rdt::SoundID m_startLevelSound;
+	rdt::SoundID m_chompSound[2];
+	rdt::SoundID m_sirenSound[5];
+	unsigned int m_currChomp;
+	unsigned int m_currSiren;
+
 public:
 	Level();
 	~Level();
@@ -77,6 +85,7 @@ private:
 
 	void GameOver();
 	void OnEndLevel();
+	void OnEat(PacDot* dot);
 
 	void StartEndLevelAnimation();
 	void StartNextLevel();

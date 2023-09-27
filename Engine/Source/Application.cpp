@@ -57,11 +57,17 @@ namespace rdt
 			/* Clears window and prepares for next game loop.*/
 			BeginFrame();
 
+			/* Get start of frame messages. */
+			PollMessages1();
+
 			/* Process input from user and update game objects. */
 			ProcessInput();
 
 			/* Update the physical world. Detect and resolve collisions. */
 			UpdateWorld();
+
+			/* Get late update messages. */
+			PollMessages2();
 
 			/* Final update of game objects before render. */
 			FinalUpdate();
