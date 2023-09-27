@@ -184,6 +184,7 @@
     <ClCompile Include="Source\Gui\Diagnostics.cpp" />
     <ClCompile Include="Source\Gui\Gui.cpp" />
     <ClCompile Include="Source\Gui\GuiManager.cpp" />
+    <ClCompile Include="Source\Messaging\Broadcast.cpp" />
     <ClCompile Include="Source\Messaging\Message.cpp" />
     <ClCompile Include="Source\Messaging\MessageBus.cpp" />
     <ClCompile Include="Source\Messaging\Messenger.cpp" />
@@ -306,6 +307,7 @@
     <ClInclude Include="Source\Gui\Diagnostics.h" />
     <ClInclude Include="Source\Gui\Gui.h" />
     <ClInclude Include="Source\Gui\GuiManager.h" />
+    <ClInclude Include="Source\Messaging\Broadcast.h" />
     <ClInclude Include="Source\Messaging\Message.h" />
     <ClInclude Include="Source\Messaging\MessageBus.h" />
     <ClInclude Include="Source\Messaging\MessageTypes.h" />

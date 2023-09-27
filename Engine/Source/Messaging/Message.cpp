@@ -3,6 +3,8 @@
 
 void rdt::Message::Destroy()
 {
-	delete data;
-	data = nullptr;
+	if (data != nullptr) {
+		delete data;
+		data = nullptr;
+	}
 }

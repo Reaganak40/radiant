@@ -34,39 +34,38 @@ namespace rdt {
 
 		MessageID nID = GetNextMessageID();
 
-		m_instance->m_AliasToId[alias] = nID;
-		m_instance->m_IdToAlias[nID] = alias;
-		m_instance->m_objects[nID] = messenger;
+		m_instance->m_messengers_AliasToId[alias] = nID;
+		m_instance->m_messengers_IdToAlias[nID] = alias;
+		m_instance->m_messengers[nID] = messenger;
 
 		return nID;
-
 	}
 
 	std::string MessageBus::GetAlias(MessageID mID)
 	{
-		if (m_instance->m_IdToAlias.find(mID) == m_instance->m_IdToAlias.end()) {
+		if (m_instance->m_messengers_IdToAlias.find(mID) == m_instance->m_messengers_IdToAlias.end()) {
 			return "";
 		}
 
-		return m_instance->m_IdToAlias.at(mID);
+		return m_instance->m_messengers_IdToAlias.at(mID);
 	}
 
 	const MessageID MessageBus::GetMessageID(const std::string& alias)
 	{
-		if (m_instance->m_AliasToId.find(alias) == m_instance->m_AliasToId.end()) {
+		if (m_instance->m_messengers_AliasToId.find(alias) == m_instance->m_messengers_AliasToId.end()) {
 			return 0;
 		}
 
-		return m_instance->m_AliasToId.at(alias);
+		return m_instance->m_messengers_AliasToId.at(alias);
 	}
 
 	void MessageBus::AddToQueue(const Message& msg)
 	{
-		if (m_instance->m_objects.find(msg.from) == m_instance->m_objects.end()) {
+		if (m_instance->m_messengers.find(msg.from) == m_instance->m_messengers.end()) {
 			return;
 		}
 
-		if (m_instance->m_objects.find(msg.to) == m_instance->m_objects.end()) {
+		if (m_instance->m_messengers.find(msg.to) == m_instance->m_messengers.end()) {
 			return;
 		}
 
@@ -99,15 +98,15 @@ namespace rdt {
 
 	void MessageBus::SendDirectMessage(Message& msg)
 	{
-		if (m_instance->m_objects.find(msg.from) == m_instance->m_objects.end()) {
+		if (m_instance->m_messengers.find(msg.from) == m_instance->m_messengers.end()) {
 			return;
 		}
 
-		if (m_instance->m_objects.find(msg.to) == m_instance->m_objects.end()) {
+		if (m_instance->m_messengers.find(msg.to) == m_instance->m_messengers.end()) {
 			return;
 		}
 
-		m_instance->m_objects[msg.to]->OnMessage(msg);
+		m_instance->m_messengers[msg.to]->OnMessage(msg);
 		msg.Destroy();
 	}
 
@@ -144,9 +143,54 @@ namespace rdt {
 	{
 		while (!m_message_queue.empty()) {
 			auto& msg = m_message_queue.front();
-			m_objects[msg.to]->OnMessage(msg);
+			m_messengers[msg.to]->OnMessage(msg);
 			msg.Destroy();
 			m_message_queue.pop();
+		}
+	}
+
+	MessageID MessageBus::CreateBroadcastImpl(const std::string& alias, Broadcast* broadcast)
+	{
+		if (alias.empty()) {
+			return 0;
+		}
+
+		MessageID nID = GetNextMessageID();
+
+		m_broadcasts_AliasToId[alias] = nID;
+		m_broadcasts_IdToAlias[nID] = alias;
+		m_broadcasts[nID] = broadcast;
+
+		return nID;
+	}
+
+	const std::vector<Message>& MessageBus::GetBroadcastImpl(const std::string& alias)
+	{
+		if (m_broadcasts_AliasToId.find(alias) == m_broadcasts_AliasToId.end()) {
+			return {};
+		}
+		return m_broadcasts.at(m_broadcasts_AliasToId.at(alias))->GetMessages();
+	}
+
+	void MessageBus::AddToBroadcastImpl(const MessageID broadcastID, MessageType type, void* data)
+	{
+		if (m_broadcasts.find(broadcastID) == m_broadcasts.end()) {
+			return;
+		}
+
+		Message nMsg;
+		nMsg.from = broadcastID;
+		nMsg.to = broadcastID;
+		nMsg.type = type;
+		nMsg.data = data;
+
+		m_broadcasts.at(broadcastID)->AddToBroadcast(nMsg);
+	}
+
+	void MessageBus::ResetBroadcastsImpl()
+	{
+		for (auto& [mID, broadcast] : m_broadcasts) {
+			broadcast->SwapBuffers();
 		}
 	}
 

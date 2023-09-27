@@ -186,6 +186,9 @@
     <ClCompile Include="Source\Audio\SoundData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Messaging\Broadcast.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vendor\GLAD\glad.h">
@@ -1245,6 +1248,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Audio\SoundData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Messaging\Broadcast.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

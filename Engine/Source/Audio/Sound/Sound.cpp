@@ -122,6 +122,11 @@ namespace rdt {
 		}
 	}
 
+	bool Sound::JustStopped()
+	{
+		return m_justStopped;
+	}
+
 	void Sound::UseUnusedBuffers()
 	{
 		m_cursor = 0;

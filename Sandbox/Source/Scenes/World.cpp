@@ -17,14 +17,13 @@ void World::OnRegister()
 
 	m_sound1 = SoundEngine::CreateNewSound("sample3", new SoundEffect);
 	m_sound2 = SoundEngine::CreateNewSound("pacman_beginning", new SoundEffect);
-
 }
 
 void World::OnProcessInput(float deltaTime)
 {
 
 	if (Input::CheckKeyboardState(std::vector<InputState>{T_KEY_PRESS})) {
-		SoundEngine::PlaySound(m_sound1, Vec3f::Zero(), false);
+		SoundEngine::PlaySound(m_sound1, Vec3f::Zero(), true);
 	} else if (Input::CheckKeyboardState(std::vector<InputState>{Y_KEY_PRESS})) {
 		SoundEngine::StopSound(m_sound1);
 	}
@@ -34,6 +33,14 @@ void World::OnProcessInput(float deltaTime)
 	}
 	else if (Input::CheckKeyboardState(std::vector<InputState>{P_KEY_PRESS})) {
 		SoundEngine::StopSound(m_sound2);
+	}
+
+	for (auto& msg : MessageBus::GetBroadcast("SoundEngine")) {
+		switch (msg.type) {
+		case MT_SoundStopped:
+			printf("Sound stopped\n");
+			break;
+		}
 	}
 
 	RunProcessInputQueue(deltaTime);

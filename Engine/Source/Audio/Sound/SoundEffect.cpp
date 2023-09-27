@@ -16,8 +16,13 @@ namespace rdt {
 
 	void SoundEffect::OnUpdate()
 	{
+		m_justStopped = false;
 		if (m_state == IS_PLAYING) {
 			OnPlaying();
+
+			if (m_state != IS_PLAYING) {
+				m_justStopped = true;
+			}
 		}
 	}
 
@@ -35,5 +40,6 @@ namespace rdt {
 
 	void SoundEffect::OnStop()
 	{
+		m_justStopped = true;
 	}
 }

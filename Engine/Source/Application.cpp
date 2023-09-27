@@ -27,9 +27,9 @@ namespace rdt
 		GuiManager::Destroy();
 		Physics::Destroy();
 		PtagManager::Destroy();
-		MessageBus::Destroy();
 		Input::Destroy();
 		SoundEngine::Destroy();
+		MessageBus::Destroy();
 		Renderer::Destroy();
 	}
 
@@ -38,9 +38,9 @@ namespace rdt
 		Utils::SetRandomSeed();
 
 		Renderer::CreateWindow(appName, windowWidth, windowHeight, resizable);
+		MessageBus::Initialize();
 		SoundEngine::Initialize();
 		Input::Initialize();
-		MessageBus::Initialize();
 		PtagManager::Initialize();
 		Physics::Initialize();
 		GuiManager::Initialize();
@@ -152,9 +152,9 @@ namespace rdt
 	void Application::EndFrame()
 	{
 		Renderer::OnEndFrame();
-
 		Input::UpdateTime(m_timestep.deltaTime);
 		Input::PollInputs();
+		MessageBus::ResetBroadcasts();
 	}
 
 	const int Application::WindowWidth() {

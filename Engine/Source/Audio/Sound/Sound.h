@@ -24,6 +24,7 @@ namespace rdt {
 		SoundData* m_data;
 		SoundSource m_source;
 		bool m_shouldLoop;
+		bool m_justStopped;
 
 		/*
 			Configures the OpenAL buffers with the provided SoundData.
@@ -85,12 +86,17 @@ namespace rdt {
 		/*
 			Called when this sound has finished playing and has exited the sound queue.
 		*/
-		virtual void OnStop() {}
+		virtual void OnStop() { m_justStopped = true; }
 
 		/*
 			Returns the current state of the audio sound.
 		*/
 		SoundState GetState() { return m_state; }
+
+		/*
+			Returns true if the sound had just stopped playing
+		*/
+		bool JustStopped();
 		
 	private:
 		/*

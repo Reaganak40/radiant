@@ -2,7 +2,7 @@
 #include "SoundData.h"
 #include "SoundSource.h"
 #include "Sound/Sound.h"
-
+#include "Messaging/Message.h"
 
 namespace rdt {
 	typedef unsigned int SoundID;
@@ -12,6 +12,7 @@ namespace rdt {
 		SoundEngine();
 		~SoundEngine();
 		static SoundEngine* m_instance;
+		MessageID m_broadcast;
 
 		/* ***********************************************
 		*
@@ -53,7 +54,6 @@ namespace rdt {
 		struct StopSoundData {
 			SoundID sID = 0;
 		};
-
 
 		/************************************************
 		* 
