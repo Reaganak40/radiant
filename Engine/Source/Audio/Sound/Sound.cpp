@@ -174,7 +174,7 @@ namespace rdt {
 			ALuint buffer;
 			alSourceUnqueueBuffers(source, 1, &buffer);
 
-			if (m_cursor == 0 && !loop) {
+			if ((m_cursor == 0 || m_cursor == dataSize) && !loop) {
 				continue;
 			}
 

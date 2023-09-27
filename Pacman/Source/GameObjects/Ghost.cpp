@@ -110,6 +110,8 @@ void Ghost::OnBind()
 	if (m_name == INKY) {
 		SendMessage("blinky", MT_RequestGameObjectPtr, nullptr);
 	}
+
+	m_eatenSound = SoundEngine::CreateNewSound("ghostEaten", new SoundEffect);
 }
 
 void Ghost::OnRelease()
@@ -337,6 +339,9 @@ void Ghost::OnMessage(Message msg)
 		break;
 	case PMT_StopShowingEatenGhost:
 		OnEatenGhost(false);
+		break;
+	case PMT_AreYouVuln:
+		OnAreYouEatenRequest();
 		break;
 	}
 }
@@ -1184,6 +1189,8 @@ void Ghost::OnEaten()
 	SetMovementMode(GOHOME);
 	m_speed = GHOST_SPEED_EATEN;
 	CreateShortestPath({ 15, 10 });
+
+	SoundEngine::PlaySound(m_eatenSound);
 }
 
 void Ghost::OnRevived()
@@ -1222,6 +1229,13 @@ void Ghost::OnEatenGhost(bool showing)
 			Physics::SetVelocity(GetRealmID(), m_model_ID, savedVel);
 			GState.SetState(GSS_UseSavedVelocity, false);
 		}
+	}
+}
+
+void Ghost::OnAreYouEatenRequest()
+{
+	if (GState.CheckState(GSS_IsVulnerable)) {
+		SendDirectMessage("level", PMT_AreYouVulnResponse);
 	}
 }
 

@@ -69,6 +69,8 @@ private:
 	std::queue<PacmanMoveDirection> m_direction_queue;
 
 	rdt::Vec2d savedVel;
+
+	rdt::SoundID m_eatenSound;
 public:
 	Ghost(GhostName nName);
 	~Ghost();
@@ -111,5 +113,6 @@ private:
 	void OnEndLevel();
 	void OnNewLevel();
 	void OnEatenGhost(bool showing);
+	void OnAreYouEatenRequest();
 	void ResetFrameRow();
 };

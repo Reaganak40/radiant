@@ -7,7 +7,7 @@
 using namespace rdt;
 
 Level::Level()
-	: m_power_timer(10.0), m_spawn_timer(5.0f), m_show_hit_timer(0.5), m_1up_timer(0.25), m_end_level_timer(1.0f),
+	: m_power_timer(10.0), m_spawn_timer(5.5f), m_show_hit_timer(0.5), m_1up_timer(0.25), m_end_level_timer(1.0f),
 	m_show_eaten_timer(1.0f)
 {
 	GState.SetStateCount(LSF_MaxFlags);
@@ -30,6 +30,7 @@ Level::Level()
 	m_startLevelSound = 0;
 	m_currChomp = 0;
 	m_currSiren = 0;
+	m_currPower = 0;
 }
 
 Level::~Level()
@@ -85,6 +86,15 @@ void Level::OnRegister()
 		m_sirenSound[2] = SoundEngine::CreateNewSound("siren3", new SoundEffect);
 		m_sirenSound[3] = SoundEngine::CreateNewSound("siren4", new SoundEffect);
 		m_sirenSound[4] = SoundEngine::CreateNewSound("siren5", new SoundEffect);
+
+		SoundEngine::LoadResource("power1", "Resources/Sounds/power_pellet.wav");
+		SoundEngine::LoadResource("power2", "Resources/Sounds/retreating.wav");
+		m_powerSound[0] = SoundEngine::CreateNewSound("power1", new SoundEffect);
+		m_powerSound[1] = SoundEngine::CreateNewSound("power2", new SoundEffect);
+		
+		SoundEngine::LoadResource("death1", "Resources/Sounds/death_1.wav");
+		SoundEngine::LoadResource("death2", "Resources/Sounds/death_2.wav");
+		SoundEngine::LoadResource("ghostEaten", "Resources/Sounds/eat_ghost.wav");
 	}
 
 	m_game_objects.push_back(m_pacman_ptr = new Pacman(PACMAN_SPAWN_X, PACMAN_SPAWN_Y));
@@ -259,6 +269,10 @@ void Level::OnProcessInput(const float deltaTime)
 		break;
 	}
 
+	if (GState.CheckState(LSF_PowerMode)) {
+		OnPowerMove();
+	}
+
 	if (GState.CheckState(LSF_GameOver)) {
 		return;
 	}
@@ -359,6 +373,9 @@ void Level::OnMessage(rdt::Message msg)
 	case PMT_GhostEaten:
 		OnGhostEaten();
 		break;
+	case PMT_AreYouVulnResponse:
+		numVulnGhosts++;
+		break;
 	}
 }
 
@@ -377,8 +394,26 @@ void Level::ActivatePowerMode()
 		SendDirectMessage("clyde",  PMT_MakeVulnerable);
 	}
 
+	m_currPower = 0;
+	SoundEngine::StopSound(m_sirenSound[m_currSiren]);
+	SoundEngine::PlaySound(m_powerSound[m_currPower], Vec3f::Zero(), true);
+
 	GState.SetState(LSF_GhostsBlinking, false);
+	GState.SetState(LSF_PowerMode, true);
 	ghostEatenCount = 0;
+}
+
+void Level::OnPowerMove()
+{
+	numVulnGhosts = 0;
+	SendDirectMessage("blinky", PMT_AreYouVuln);
+	SendDirectMessage("inky",	PMT_AreYouVuln);
+	SendDirectMessage("pinky",	PMT_AreYouVuln);
+	SendDirectMessage("clyde",	PMT_AreYouVuln);
+
+	if (numVulnGhosts == 0) {
+		DeactivatePowerMode();
+	}
 }
 
 void Level::DeactivatePowerMode()
@@ -389,6 +424,11 @@ void Level::DeactivatePowerMode()
 	SendDirectMessage("clyde",  PMT_StopVulnerability);
 
 	GState.SetState(LSF_GhostsBlinking, false);
+	GState.SetState(LSF_PowerMode, false);
+	m_power_timer.End();
+
+	SoundEngine::StopSound(m_powerSound[m_currPower]);
+	SoundEngine::PlaySound(m_sirenSound[m_currSiren], Vec3f::Zero(), true);
 }
 
 void Level::StartBlinking()
@@ -539,7 +579,33 @@ void Level::OnEat(PacDot* dot)
 	if (levelDotCount == DOTS_PER_LEVEL) {
 		OnEndLevel();
 	}
+
+	unsigned int lastCurr = m_currSiren;
+	switch (levelDotCount) {
+	case 150:
+		m_currSiren = 1;
+		break;
+	case 180:
+		m_currSiren = 2;
+		break;
+	case 200:
+		m_currSiren = 3;
+		break;
+	case 220:
+		m_currSiren = 4;
+		break;
+	}
+
+	if (lastCurr != m_currSiren) {
+		SoundEngine::StopSound(m_sirenSound[lastCurr]);
+
+		if (!GState.CheckState(LSF_PowerMode)) {
+			SoundEngine::PlaySound(m_sirenSound[m_currSiren], Vec3f::Zero(), true);
+		}
+	}
+
 }
+
 
 void Level::StartEndLevelAnimation()
 {
@@ -551,6 +617,7 @@ void Level::StartEndLevelAnimation()
 void Level::StartNextLevel()
 {
 	levelCount++;
+	m_currSiren = 0;
 
 	// notify end of level animation
 	GState.SetState(LSF_InEndAnimation, false);
@@ -615,6 +682,8 @@ void Level::OnGhostEaten()
 	Vec2d showPos = m_pacman_ptr->GetWorldCoordinates();
 	showPos.x -= 2;
 	SendMessage("points", PMT_ShowPointsEarned, new PointData(scored, showPos));
+
+
 }
 
 void Level::StopShowingEatenGhost()
@@ -624,6 +693,11 @@ void Level::StopShowingEatenGhost()
 	SendMessage("pinky",  PMT_StopShowingEatenGhost);
 	SendMessage("inky",   PMT_StopShowingEatenGhost);
 	SendMessage("clyde",  PMT_StopShowingEatenGhost);
+
+	if (m_currPower == 0 && GState.CheckState(LSF_PowerMode)) {
+		SoundEngine::StopSound(m_powerSound[m_currPower++]);
+		SoundEngine::PlaySound(m_powerSound[m_currPower], Vec3f::Zero(), true);
+	}
 }
 
 void Level::PacmanDeathShowHitPhase(const float deltaTime)

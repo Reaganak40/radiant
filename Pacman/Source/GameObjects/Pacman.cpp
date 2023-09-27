@@ -2,7 +2,7 @@
 
 using namespace rdt;
 Pacman::Pacman(double xPos, double yPos)
-	: m_texture_timer(Timer(0.02)), m_death_timer(0.09)
+	: m_texture_timer(Timer(0.02)), m_death_timer(0.15)
 {
 	GState.SetStateCount(PGS_MaxState);
 	spawnPos.x = xPos;
@@ -34,6 +34,9 @@ void Pacman::OnBind()
 	Physics::SetHitBoxSize(GetRealmID(), m_model_ID, {0.35, 0.35});
 	Physics::SetAcceleration(GetRealmID(), m_model_ID, Vec2d::Zero());
 	Physics::SetFriction(GetRealmID(), m_model_ID, 0);
+
+	m_deathSound1 = SoundEngine::CreateNewSound("death1", new SoundEffect);
+	m_deathSound2 = SoundEngine::CreateNewSound("death2", new SoundEffect);
 
 	Respawn();
 }
@@ -185,6 +188,7 @@ void Pacman::BeginDeathAnimation()
 {
 	GState.SetState(PGS_InDeathAnimation, true);
 	GState.SetState(PGS_InRespawn, true);
+	SoundEngine::PlaySound(m_deathSound1);
 	m_death_timer.Start();
 }
 
@@ -413,6 +417,8 @@ void Pacman::UpdateTextureFrame(const float deltaTime)
 				GState.SetState(PGS_InDeathAnimation, false);
 				GState.SetState(PGS_IsHit, false);
 				SendMessage("level", PMT_EndDeathAnimation);
+				SoundEngine::StopSound(m_deathSound1);
+				SoundEngine::PlaySound(m_deathSound2);
 			}
 			else {
 				m_death_timer.Start();

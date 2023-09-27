@@ -37,6 +37,9 @@ private:
 	int m_frame_row;
 	int m_frame_col;
 
+	rdt::SoundID m_deathSound1;
+	rdt::SoundID m_deathSound2;
+
 public:
 	Pacman(double xPos, double yPos);
 	~Pacman();

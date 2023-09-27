@@ -21,6 +21,7 @@ enum LevelStateFlags {
 	LSF_StartOfGame,
 	LSF_PreviouslyBounded,
 	LSF_LoadedResources,
+	LSF_PowerMode,
 	LSF_GhostsBlinking,
 	LSF_InkyOut,
 	LSF_ClydeOut,
@@ -47,7 +48,8 @@ private:
 	int m_highScore;
 	int levelDotCount;
 	int lifeCount;
-	
+
+	int numVulnGhosts;
 	int ghostEatenCount;
 	unsigned int levelCount;
 
@@ -58,8 +60,11 @@ private:
 	rdt::SoundID m_startLevelSound;
 	rdt::SoundID m_chompSound[2];
 	rdt::SoundID m_sirenSound[5];
+	rdt::SoundID m_powerSound[2];
+
 	unsigned int m_currChomp;
 	unsigned int m_currSiren;
+	unsigned int m_currPower;
 
 public:
 	Level();
@@ -75,6 +80,7 @@ public:
 
 private:
 	void ActivatePowerMode();
+	void OnPowerMove();
 	void DeactivatePowerMode();
 	void StartBlinking();
 	void PauseGame();
