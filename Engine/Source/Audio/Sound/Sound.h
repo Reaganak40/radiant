@@ -52,6 +52,11 @@ namespace rdt {
 		void PlaySound(const Vec3f& srcPos, bool loop);
 
 		/*
+			Stops playing the sound if it is currently running.
+		*/
+		void StopSound();
+
+		/*
 			When this Sound is first created and added to the SoundEngine
 			audio queue. 
 		*/

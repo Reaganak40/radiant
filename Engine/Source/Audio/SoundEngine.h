@@ -22,6 +22,7 @@ namespace rdt {
 			SCT_LoadResource,
 			SCT_CreateSound,
 			SCT_PlaySound,
+			SCT_StopSound,
 		};
 
 		struct SoundCommand {
@@ -32,22 +33,27 @@ namespace rdt {
 				: type(nType), data(nData) {}
 		};
 
+		struct LoadResourceData {
+			std::string soundAlias;
+			SoundData* dataPtr = nullptr;
+		};
+
 		struct CreateSoundData {
-			SoundID sID;
-			Sound* sPtr;
+			SoundID sID = 0;
+			Sound* sPtr = nullptr;
 			std::string resource;
 		};
 
 		struct PlaySoundData {
-			SoundID sID;
+			SoundID sID = 0;
 			Vec3f srcPos;
-			bool looping;
+			bool looping = false;
 		};
 
-		struct LoadResourceData {
-			std::string soundAlias;
-			SoundData* dataPtr;
+		struct StopSoundData {
+			SoundID sID = 0;
 		};
+
 
 		/************************************************
 		* 
@@ -97,14 +103,20 @@ namespace rdt {
 			Plays the sound referenced by the provided SoundID at the provided
 			source location. Looping is set to false by default.
 		*/
-		static void PlaySound(const SoundID sID, const Vec3f& srcPos, bool looping = false) { m_instance->AddPlaySoundCommand(sID, srcPos, looping); }
+		static void PlaySound(const SoundID sID, const Vec3f& srcPos, bool looping = false) { m_instance->PushPlaySoundCommand(sID, srcPos, looping); }
 
 		/*
 			Adds a new sound object to the audio queue, which will be processed by the
 			audio loop. This Sound object is now owned by the SoundEngine and will be
 			freed by it.
 		*/
-		static SoundID CreateNewSound(const std::string& resource, Sound* nSound) { return m_instance->AddCreateSoundCommand(resource, nSound); }
+		static SoundID CreateNewSound(const std::string& resource, Sound* nSound) { return m_instance->PushCreateSoundCommand(resource, nSound); }
+
+
+		/*
+			Stops a sound referenced by the provided SoundID if it is currently playing.
+		*/
+		static void StopSound(const SoundID sID) { m_instance->PushStopSoundCommand(sID); }
 
 	private:
 
@@ -120,13 +132,25 @@ namespace rdt {
 		*/
 		void UpdateSounds();
 
+		/*
+			Unbinds and stops all audio instances.
+		*/
+		void Teardown();
+
+		/*
+			Removes all allocated memory in the command queue.
+		*/
+		void DeleteCommandQueue(unsigned int queueIndex);
+
 		void LoadResourceImpl(const std::string& alias, const std::string& filepath);
 		void AddResourceToMap(LoadResourceData* data);
 		void AddSound(CreateSoundData* data);
 		void PlaySound(PlaySoundData* data);
+		void StopSound(StopSoundData* data);
 
-		SoundID AddCreateSoundCommand(const std::string& resource, Sound* nSound);
-		void AddPlaySoundCommand(const SoundID sID, const Vec3f& srcPos, bool looping);
+		SoundID PushCreateSoundCommand(const std::string& resource, Sound* nSound);
+		void PushPlaySoundCommand(const SoundID sID, const Vec3f& srcPos, bool looping);
+		void PushStopSoundCommand(const SoundID sID);
 		SoundID GetNextSoundID();
 
 	};

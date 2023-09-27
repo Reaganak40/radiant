@@ -6,8 +6,9 @@ using namespace rdt;
 int main(void) {
 
 	Application app;
-	app.Start("Sandbox");
-
+    app.Start("Sandbox");
+    
+    /* Set the initial Scene, */
     app.AddScene("world", new World);
     app.SetScene("world");
 

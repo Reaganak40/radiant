@@ -36,6 +36,10 @@ namespace rdt {
 			delete sound;
 		}
 
+		for (int i = 0; i < 2; i++) {
+			DeleteCommandQueue(i);
+		}
+
 		alcDestroyContext(m_context);
 		alcCloseDevice(m_ALCdevice);
 	}
@@ -65,6 +69,8 @@ namespace rdt {
 			RunCommandQueue();
 			UpdateSounds();
 		}
+
+		Teardown();
 	}
 
 	void SoundEngine::RunCommandQueue()
@@ -82,6 +88,9 @@ namespace rdt {
 			case SCT_PlaySound:
 				PlaySound((PlaySoundData*)command.data);
 				break;
+			case SCT_StopSound:
+				StopSound((StopSoundData*)command.data);
+				break;
 			}
 
 			if (command.data != nullptr) {
@@ -95,6 +104,38 @@ namespace rdt {
 	{
 		for (auto& [sID, sound] : m_sounds) {
 			sound->OnUpdate();
+		}
+	}
+
+	void SoundEngine::Teardown()
+	{
+		for (auto& [sID, sound] : m_sounds) {
+			sound->StopSound();
+		}
+	}
+
+	void SoundEngine::DeleteCommandQueue(unsigned int queueIndex)
+	{
+		for (auto& command : m_command_queue[queueIndex]) {
+
+			if (command.data != nullptr) {
+				switch (command.type) {
+				case SCT_LoadResource:
+					if (((LoadResourceData*)command.data)->dataPtr) {
+						delete ((LoadResourceData*)command.data)->dataPtr;
+					}
+					break;
+				case SCT_CreateSound:
+					if (((CreateSoundData*)command.data)->sPtr) {
+						delete ((CreateSoundData*)command.data)->sPtr;
+					}
+					break;
+				case SCT_PlaySound:
+					break;
+				}
+
+				delete command.data;
+			}
 		}
 	}
 
@@ -114,14 +155,20 @@ namespace rdt {
 
 	void SoundEngine::AddResourceToMap(LoadResourceData* data)
 	{
+		if (m_data_map.find(data->soundAlias) != m_data_map.end()) {
+			delete m_data_map.at(data->soundAlias);
+		}
+
 		m_data_map[data->soundAlias] = data->dataPtr;
 	}
 
 	void SoundEngine::AddSound(CreateSoundData* data)
 	{
 		if (m_data_map.find(data->resource) == m_data_map.end()) {
+			printf("SoundEngine: Could not create sound. [Resource '%s' was not found]\n", data->resource.c_str());
 			return;
 		}
+
 		auto& res = m_data_map.at(data->resource);
 		data->sPtr->OnCreate(res);
 		m_sounds[data->sID] = data->sPtr;
@@ -129,10 +176,23 @@ namespace rdt {
 
 	void SoundEngine::PlaySound(PlaySoundData* data)
 	{
+		if (m_sounds.find(data->sID) == m_sounds.end()) {
+			return;
+		}
+
 		m_sounds.at(data->sID)->PlaySound(data->srcPos, data->looping);
 	}
 
-	SoundID SoundEngine::AddCreateSoundCommand(const std::string& resource, Sound* nSound)
+	void SoundEngine::StopSound(StopSoundData* data)
+	{
+		if (m_sounds.find(data->sID) == m_sounds.end()) {
+			return;
+		}
+
+		m_sounds.at(data->sID)->StopSound();
+	}
+
+	SoundID SoundEngine::PushCreateSoundCommand(const std::string& resource, Sound* nSound)
 	{
 		CreateSoundData* command_data = new CreateSoundData;
 		command_data->sID = GetNextSoundID();
@@ -143,17 +203,20 @@ namespace rdt {
 		return command_data->sID;
 	}
 
-	void SoundEngine::AddPlaySoundCommand(const SoundID sID, const Vec3f& srcPos, bool looping)
+	void SoundEngine::PushPlaySoundCommand(const SoundID sID, const Vec3f& srcPos, bool looping)
 	{
-		if (m_sounds.find(sID) == m_sounds.end()) {
-			return;
-		}
-
 		PlaySoundData* command_data = new PlaySoundData;
 		command_data->sID = sID;
 		command_data->srcPos = srcPos;
 		command_data->looping = looping;
 		m_command_queue[m_queue_index].push_back({SCT_PlaySound, command_data});
+	}
+
+	void SoundEngine::PushStopSoundCommand(const SoundID sID)
+	{
+		StopSoundData* command_data = new StopSoundData;
+		command_data->sID = sID;
+		m_command_queue[m_queue_index].push_back({ SCT_StopSound, command_data });
 	}
 
 	SoundID SoundEngine::GetNextSoundID()

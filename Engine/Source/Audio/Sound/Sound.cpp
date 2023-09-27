@@ -68,15 +68,42 @@ namespace rdt {
 		OnStart();
 	}
 
+	void Sound::StopSound()
+	{
+		if (m_state != IS_PLAYING) {
+			return;
+		}
+
+		m_shouldLoop = false;
+		alSourceStop(m_source.GetID());
+
+		// Unbind all in-use buffers.
+		ALint bufferCount;
+		alGetSourcei(m_source.GetID(), AL_BUFFERS_QUEUED, &bufferCount);
+		while (bufferCount--) {
+			ALuint buffer;
+			alSourceUnqueueBuffers(m_source.GetID(), 1, &buffer);
+		}
+
+		// Preload buffers for next use.
+		PreLoadBuffers();
+
+		m_state = NOT_PLAYING;
+		OnStop();
+	}
+
 	void Sound::PreLoadBuffers()
 	{
 		m_cursor = 0;
+		m_unused_buffers.clear();
 		unsigned int i = 0;
 
 		std::size_t dataSize = m_data->GetSize();
 		for (; i < NUM_AUDIO_BUFFERS; ++i)
 		{
 			if (m_cursor == dataSize) {
+				// should only happen with audio files smaller than the buffers.
+				m_cursor = 0;
 				break;
 			}
 
@@ -103,26 +130,27 @@ namespace rdt {
 		std::size_t dataSize = m_data->GetSize();
 		for (auto& buffer : m_unused_buffers) {
 
-			std::size_t dataSizeToCopy = AUDIO_BUFFER_SIZE;
-			if (m_cursor + AUDIO_BUFFER_SIZE > dataSize) {
-				dataSizeToCopy = dataSize - m_cursor;
+			unsigned int dataIndex = 0;
+			
+			while (dataIndex != AUDIO_BUFFER_SIZE) {
+				
+				std::size_t dataSizeToCopy = AUDIO_BUFFER_SIZE - dataIndex;
+				if (m_cursor + dataSizeToCopy > dataSize) {
+					dataSizeToCopy = dataSize - m_cursor;
+				}
+				
+				std::memcpy(&data[dataIndex], m_data->GetDataAt(m_cursor), dataSizeToCopy);
+				m_cursor += dataSizeToCopy;
+				dataIndex += dataSizeToCopy;
+
+				if (m_cursor >= dataSize) {
+					m_cursor = 0;
+				}
 			}
 
-			std::memcpy(data, m_data->GetDataAt(m_cursor), dataSizeToCopy);
-			m_cursor += dataSizeToCopy;
-
-			if (dataSizeToCopy < AUDIO_BUFFER_SIZE)
-			{
-				m_cursor = 0;
-				std::memcpy(&data[dataSizeToCopy], m_data->GetDataAt(m_cursor), AUDIO_BUFFER_SIZE - dataSizeToCopy);
-				m_cursor = AUDIO_BUFFER_SIZE - dataSizeToCopy;
-				dataSizeToCopy = AUDIO_BUFFER_SIZE;
-			}
-
-			alBufferData(buffer, m_data->GetFormat(), m_data->GetDataAt(m_cursor), dataSizeToCopy, m_data->GetSampleRate());
+			alBufferData(buffer, m_data->GetFormat(), data, AUDIO_BUFFER_SIZE, m_data->GetSampleRate());
 		}
 
-		m_unused_buffers.clear();
 		delete[] data;
 	}
 
@@ -139,33 +167,35 @@ namespace rdt {
 		std::size_t dataSize = m_data->GetSize();
 		while (buffersProcessed--) {
 			ALuint buffer;
-
 			alSourceUnqueueBuffers(source, 1, &buffer);
 
-			std::memset(data, 0, AUDIO_BUFFER_SIZE);
-
-			std::size_t dataSizeToCopy = AUDIO_BUFFER_SIZE;
-			if (m_cursor + AUDIO_BUFFER_SIZE > dataSize) {
-				dataSizeToCopy = dataSize - m_cursor;
-			}
-
-			if (dataSizeToCopy == 0) {
+			if (m_cursor == 0 && !loop) {
 				continue;
 			}
 
-			std::memcpy(data, m_data->GetDataAt(m_cursor), dataSizeToCopy);
-			m_cursor += dataSizeToCopy;
+			unsigned int dataIndex = 0;
+			while (dataIndex != AUDIO_BUFFER_SIZE) {
 
-			if (dataSizeToCopy < AUDIO_BUFFER_SIZE && loop)
-			{
-				OnEndOfCycle();
-				m_cursor = 0;
-				std::memcpy(&data[dataSizeToCopy], m_data->GetDataAt(m_cursor), AUDIO_BUFFER_SIZE - dataSizeToCopy);
-				m_cursor = AUDIO_BUFFER_SIZE - dataSizeToCopy;
-				dataSizeToCopy = AUDIO_BUFFER_SIZE;
+				std::size_t dataSizeToCopy = AUDIO_BUFFER_SIZE - dataIndex;
+				if (m_cursor + dataSizeToCopy > dataSize) {
+					dataSizeToCopy = dataSize - m_cursor;
+				}
+
+				std::memcpy(&data[dataIndex], m_data->GetDataAt(m_cursor), dataSizeToCopy);
+				m_cursor += dataSizeToCopy;
+				dataIndex += dataSizeToCopy;
+
+				if (m_cursor >= dataSize) {
+					m_cursor = 0;
+					OnEndOfCycle();
+
+					if (!loop) {
+						break;
+					}
+				}
 			}
 
-			alBufferData(buffer, m_data->GetFormat(), data, dataSizeToCopy, m_data->GetSampleRate());
+			alBufferData(buffer, m_data->GetFormat(), data, dataIndex, m_data->GetSampleRate());
 			alSourceQueueBuffers(source, 1, &buffer);
 		}
 
