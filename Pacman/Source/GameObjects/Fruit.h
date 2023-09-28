@@ -55,6 +55,7 @@ private:
 	Pacman* m_pacman_ptr;
 
 	rdt::Timer m_show_timer;
+	rdt::SoundID m_fruitEatenSound;
 public:
 	Fruit();
 	~Fruit();

@@ -235,11 +235,11 @@ namespace rdt {
     private:
         void UpdateTimeImpl(const float deltaTime);
         void PollInputsImpl();
-        bool CheckStateImpl(unsigned int* stateQuery, unsigned int count, unsigned int target);
+        bool CheckStateImpl(unsigned int* stateQuery, size_t count, unsigned int target);
         MouseState GetMouseStateImpl();
         bool CheckWindowResizeImpl();
 
-        float GetTimeSinceKeyStateImpl(unsigned int* stateQuery, unsigned int count, const float maxTime);
+        float GetTimeSinceKeyStateImpl(unsigned int* stateQuery, size_t count, const float maxTime);
         Vec2d GetMouseCoordsImpl(const MouseCond cond);
 
     };

@@ -343,6 +343,9 @@ void Ghost::OnMessage(Message msg)
 	case PMT_AreYouVuln:
 		OnAreYouEatenRequest();
 		break;
+	case PMT_AreYouRetreating:
+		OnAreYouRetreatingRequest();
+		break;
 	}
 }
 
@@ -363,17 +366,12 @@ void Ghost::SetVulnerable(bool state)
 		df = 1;
 
 		SetIsBlinking(false);
-
-		/* If ghost not currently vulnerable */
-		if (GState.CheckState(GSS_IsVulnerable) != state) {
-			m_speed = GHOST_SPEED_VULNERABLE;
-			SetMovementMode(FRIGHTENED);
-		}
+		SetMovementMode(FRIGHTENED);
 		GState.SetState(GSS_IsVulnerable, state);
 	}
 	else {
 		GState.SetState(GSS_IsVulnerable, state);
-		m_speed = GHOST_SPEED_NORMAL;
+		
 		SetIsBlinking(false);
 
 		if (GState.CheckState(GSS_IsEaten)) {
@@ -414,6 +412,21 @@ void Ghost::SetPause(bool pause)
 
 void Ghost::SetMovementMode(MovementMode mode)
 {
+	switch (mode) {
+	case CHASE:
+		m_speed = GHOST_SPEED_NORMAL;
+		break;
+	case SCATTER:
+		m_speed = GHOST_SPEED_NORMAL;
+		break;
+	case FRIGHTENED:
+		m_speed = GHOST_SPEED_VULNERABLE;
+		break;
+	case RETREAT:
+		m_speed = GHOST_SPEED_EATEN;
+		break;
+	}
+
 	m_movement_mode = mode;
 
 	if (!m_direction_queue.empty()) {
@@ -443,7 +456,6 @@ void Ghost::Respawn()
 	GState.SetState(GSS_IsEaten, false);
 	
 	m_target_coords = { 15, 10 };
-	m_speed = GHOST_SPEED_NORMAL;
 
 	switch (m_name) {
 	case BLINKY:
@@ -535,7 +547,7 @@ void Ghost::SelectNewTarget()
 	case SCATTER:
 		SelectNext();
 		break;
-	case GOHOME:
+	case RETREAT:
 		SelectNext();
 		break;
 	case FRIGHTENED:
@@ -684,7 +696,7 @@ void Ghost::SelectNext()
 	else if (m_movement_mode == SCATTER) {
 		CreateScatterPath();
 	}
-	else if (m_movement_mode == GOHOME) {
+	else if (m_movement_mode == RETREAT) {
 		CreateHomePath();
 	}
 
@@ -1186,8 +1198,7 @@ void Ghost::OnEaten()
 	m_frame_row = 1;
 	m_frame_timer.End();
 	
-	SetMovementMode(GOHOME);
-	m_speed = GHOST_SPEED_EATEN;
+	SetMovementMode(RETREAT);
 	CreateShortestPath({ 15, 10 });
 
 	SoundEngine::PlaySound(m_eatenSound);
@@ -1198,7 +1209,6 @@ void Ghost::OnRevived()
 	GState.SetState(GSS_IsEaten, false);
 	ResetFrameRow();
 	SetMovementMode(CHASE);
-	m_speed = GHOST_SPEED_NORMAL;
 }
 
 void Ghost::OnEndLevel()
@@ -1236,6 +1246,13 @@ void Ghost::OnAreYouEatenRequest()
 {
 	if (GState.CheckState(GSS_IsVulnerable)) {
 		SendDirectMessage("level", PMT_AreYouVulnResponse);
+	}
+}
+
+void Ghost::OnAreYouRetreatingRequest()
+{
+	if (GState.CheckState(GSS_IsEaten)) {
+		SendDirectMessage("level", PMT_AreYouRetreatingResponse);
 	}
 }
 

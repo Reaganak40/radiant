@@ -89,4 +89,6 @@ enum PacmanMessageTypes {
 	PMT_StopShowingEatenGhost,
 	PMT_AreYouVuln,
 	PMT_AreYouVulnResponse,
+	PMT_AreYouRetreating,
+	PMT_AreYouRetreatingResponse,
 };

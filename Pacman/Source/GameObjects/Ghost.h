@@ -26,7 +26,7 @@ enum MovementMode {
 	CHASE,
 	SCATTER,
 	FRIGHTENED,
-	GOHOME,
+	RETREAT,
 };
 
 enum GhostGameState {
@@ -114,5 +114,6 @@ private:
 	void OnNewLevel();
 	void OnEatenGhost(bool showing);
 	void OnAreYouEatenRequest();
+	void OnAreYouRetreatingRequest();
 	void ResetFrameRow();
 };

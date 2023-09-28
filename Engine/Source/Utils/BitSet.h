@@ -29,7 +29,7 @@ namespace rdt {
 		/*
 			Checks all the flags and returns true if at least one is marked.
 		*/
-		bool CheckFlags(unsigned int* flags, unsigned int flagCount);
+		bool CheckFlags(unsigned int* flags, size_t flagCount);
 
 		/*
 			Resets the bit field to all 0s.

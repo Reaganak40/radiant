@@ -13,6 +13,7 @@ namespace rdt {
 		~SoundEngine();
 		static SoundEngine* m_instance;
 		MessageID m_broadcast;
+		std::mutex m_mutex;
 
 		/* ***********************************************
 		*
@@ -142,6 +143,7 @@ namespace rdt {
 		*/
 		void DeleteCommandQueue(unsigned int queueIndex);
 
+		void AddToCommandQueue(const SoundCommand& command);
 		void LoadResourceImpl(const std::string& alias, const std::string& filepath);
 		void AddResourceToMap(LoadResourceData* data);
 		void AddSound(CreateSoundData* data);

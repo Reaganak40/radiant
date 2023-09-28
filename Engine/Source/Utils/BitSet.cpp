@@ -26,7 +26,7 @@ namespace rdt {
 		return (bool)(m_bit_field.at(index / 32) & (1 << (index % 32)));
 	}
 
-	bool BitSet::CheckFlags(unsigned int* flags, unsigned int flagCount)
+	bool BitSet::CheckFlags(unsigned int* flags, size_t flagCount)
 	{
 		for (unsigned int i = 0; i < flagCount; i++) {
 			if (CheckFlag(flags[i])) {

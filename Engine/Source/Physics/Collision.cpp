@@ -31,14 +31,14 @@ bool rdt::Collision::CheckCollisionSAT(const Polygon& A, const Polygon& B)
 	std::vector<Vec2d> A_normals;
 	std::vector<Vec2d> B_normals;
 
-	unsigned int A_vertex_count = A.GetVertices().size();
+	unsigned int A_vertex_count = (unsigned int)A.GetVertices().size();
 	for (unsigned int i = 0; i < A_vertex_count; i++) {
 		A_normals.push_back(Vec2d(
 			A.GetVertices().at((i + 1) % A_vertex_count).x - A.GetVertices().at(i).x,
 			A.GetVertices().at((i + 1) % A_vertex_count).y - A.GetVertices().at(i).y).Normal());
 	}
 
-	unsigned int B_vertex_count = B.GetVertices().size();
+	unsigned int B_vertex_count = (unsigned int)B.GetVertices().size();
 	for (unsigned int i = 0; i < B_vertex_count; i++) {
 		B_normals.push_back(Vec2d(
 			B.GetVertices().at((i + 1) % B_vertex_count).x - B.GetVertices().at(i).x,
@@ -84,7 +84,7 @@ bool rdt::Collision::CheckCollisionSAT(const Circle& A, const Polygon& B)
 	*/
 	std::vector<Vec2d> B_normals;
 
-	unsigned int B_vertex_count = B.GetVertices().size();
+	unsigned int B_vertex_count = (unsigned int)B.GetVertices().size();
 	for (unsigned int i = 0; i < B_vertex_count; i++) {
 		B_normals.push_back(Vec2d(
 			B.GetVertices().at((i + 1) % B_vertex_count).x - B.GetVertices().at(i).x,

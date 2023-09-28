@@ -23,6 +23,7 @@ enum LevelStateFlags {
 	LSF_LoadedResources,
 	LSF_PowerMode,
 	LSF_GhostsBlinking,
+	LSF_GhostRetreating,
 	LSF_InkyOut,
 	LSF_ClydeOut,
 	LSF_AtLevelStart,
@@ -50,6 +51,7 @@ private:
 	int lifeCount;
 
 	int numVulnGhosts;
+	int numRetreatingGhosts;
 	int ghostEatenCount;
 	unsigned int levelCount;
 
@@ -60,11 +62,11 @@ private:
 	rdt::SoundID m_startLevelSound;
 	rdt::SoundID m_chompSound[2];
 	rdt::SoundID m_sirenSound[5];
-	rdt::SoundID m_powerSound[2];
+	rdt::SoundID m_powerSound;
+	rdt::SoundID m_retreatSound;
 
 	unsigned int m_currChomp;
 	unsigned int m_currSiren;
-	unsigned int m_currPower;
 
 public:
 	Level();
@@ -88,6 +90,7 @@ private:
 	void Respawn();
 	void UpdatePlayerScore(int pointsToAdd);
 	void UpdateLifeDisplay();
+	void CheckRetreat();
 
 	void GameOver();
 	void OnEndLevel();
@@ -103,4 +106,6 @@ private:
 	void SetVulnerableTimer();
 	void OnDevTools();
 	FRUIT_TYPE GetNextFruit();
+
+	bool ReadyToStart();
 };

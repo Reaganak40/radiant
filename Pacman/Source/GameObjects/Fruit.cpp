@@ -9,6 +9,7 @@ Fruit::Fruit()
 	m_shouldShow = false;
 	m_eaten_once = false;
 	m_pacman_ptr = nullptr;
+	m_fruitEatenSound = 0;
 
 	RegisterToMessageBus("fruit");
 }
@@ -28,6 +29,7 @@ void Fruit::OnBind()
 
 	SendMessage("pacman", MT_RequestGameObjectPtr, nullptr);
 
+	m_fruitEatenSound = SoundEngine::CreateNewSound("fruitEaten", new SoundEffect);
 }
 
 void Fruit::OnRelease()
@@ -106,6 +108,7 @@ void Fruit::ResolveCollision(rdt::CollisionData* data)
 		SendMessage("level", PMT_FruitEaten, new FruitData(m_type, m_eaten_once));
 		m_shouldShow = false;
 		m_eaten_once = true;
+		SoundEngine::PlaySound(m_fruitEatenSound);
 	}
 }
 

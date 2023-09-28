@@ -149,7 +149,7 @@ namespace rdt {
 
     }
 
-    bool Input::CheckStateImpl(unsigned int* stateQuery, unsigned int count, unsigned int target)
+    bool Input::CheckStateImpl(unsigned int* stateQuery, size_t count, unsigned int target)
     {
         return m_keyboard_state[(m_state_index - target + STATE_CACHE_SIZE) % STATE_CACHE_SIZE].CheckFlags(stateQuery, count);
     }
@@ -164,7 +164,7 @@ namespace rdt {
         return m_window_state[(m_state_index - 1 + STATE_CACHE_SIZE) % STATE_CACHE_SIZE].windowResize;
     }
 
-    float Input::GetTimeSinceKeyStateImpl(unsigned int* stateQuery, unsigned int count, const float maxTime)
+    float Input::GetTimeSinceKeyStateImpl(unsigned int* stateQuery, size_t count, const float maxTime)
     {
         int index = (m_state_index - 1 + STATE_CACHE_SIZE) % STATE_CACHE_SIZE;
         float current = 0.0f;

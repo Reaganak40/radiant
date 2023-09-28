@@ -7,7 +7,7 @@
 using namespace rdt;
 
 Level::Level()
-	: m_power_timer(10.0), m_spawn_timer(5.5f), m_show_hit_timer(0.5), m_1up_timer(0.25), m_end_level_timer(1.0f),
+	: m_power_timer(10.0), m_spawn_timer(2.5f), m_show_hit_timer(0.5), m_1up_timer(0.25), m_end_level_timer(1.0f),
 	m_show_eaten_timer(1.0f)
 {
 	GState.SetStateCount(LSF_MaxFlags);
@@ -30,7 +30,6 @@ Level::Level()
 	m_startLevelSound = 0;
 	m_currChomp = 0;
 	m_currSiren = 0;
-	m_currPower = 0;
 }
 
 Level::~Level()
@@ -87,14 +86,15 @@ void Level::OnRegister()
 		m_sirenSound[3] = SoundEngine::CreateNewSound("siren4", new SoundEffect);
 		m_sirenSound[4] = SoundEngine::CreateNewSound("siren5", new SoundEffect);
 
-		SoundEngine::LoadResource("power1", "Resources/Sounds/power_pellet.wav");
-		SoundEngine::LoadResource("power2", "Resources/Sounds/retreating.wav");
-		m_powerSound[0] = SoundEngine::CreateNewSound("power1", new SoundEffect);
-		m_powerSound[1] = SoundEngine::CreateNewSound("power2", new SoundEffect);
+		SoundEngine::LoadResource("power", "Resources/Sounds/power_pellet.wav");
+		SoundEngine::LoadResource("retreat", "Resources/Sounds/retreating.wav");
+		m_powerSound = SoundEngine::CreateNewSound("power", new SoundEffect);
+		m_retreatSound = SoundEngine::CreateNewSound("retreat", new SoundEffect);
 		
 		SoundEngine::LoadResource("death1", "Resources/Sounds/death_1.wav");
 		SoundEngine::LoadResource("death2", "Resources/Sounds/death_2.wav");
 		SoundEngine::LoadResource("ghostEaten", "Resources/Sounds/eat_ghost.wav");
+		SoundEngine::LoadResource("fruitEaten", "Resources/Sounds/eat_fruit.wav");
 	}
 
 	m_game_objects.push_back(m_pacman_ptr = new Pacman(PACMAN_SPAWN_X, PACMAN_SPAWN_Y));
@@ -221,7 +221,7 @@ void Level::OnRegister()
 	}
 	m_1up_timer.Start();
 
-	m_GUIs.push_back(new DiagnosticsGUI);
+	//m_GUIs.push_back(new DiagnosticsGUI);
 }
 
 void Level::OnBind()
@@ -245,7 +245,6 @@ void Level::OnBind()
 	GState.SetState(LSF_StartOfGame, true);
 	SoundEngine::PlaySound(m_startLevelSound);
 	PauseGame();
-	m_spawn_timer.Start();
 
 	GState.SetState(LSF_InkyOut, false);
 	GState.SetState(LSF_ClydeOut, false);
@@ -304,12 +303,11 @@ void Level::OnProcessInput(const float deltaTime)
 		if (m_spawn_timer.Update(deltaTime)) {
 			ResumeGame();
 			SoundEngine::PlaySound(m_sirenSound[m_currSiren], Vec3f::Zero(), true);
-
-			if (GState.CheckState(LSF_StartOfGame)) {
-				m_spawn_timer.SetInterval(2.5f);
-				GState.SetState(LSF_StartOfGame, false);
-			}
 		}
+	} else if (GState.CheckState(LSF_StartOfGame) && ReadyToStart()) {
+		GState.SetState(LSF_StartOfGame, false);
+		ResumeGame();
+		SoundEngine::PlaySound(m_sirenSound[m_currSiren], Vec3f::Zero(), true);
 	}
 
 	if (m_1up_timer.IsRunning()) {
@@ -334,6 +332,8 @@ void Level::OnFinalUpdate()
 	if (dot != nullptr && !dot->IsEaten() && dot->ShouldEat(((Pacman*)m_game_objects[0])->GetWorldCoordinates())) {
 		OnEat(dot);
 	}
+
+	CheckRetreat();
 
 	RunFinalUpdateQueue();
 }
@@ -376,6 +376,9 @@ void Level::OnMessage(rdt::Message msg)
 	case PMT_AreYouVulnResponse:
 		numVulnGhosts++;
 		break;
+	case PMT_AreYouRetreatingResponse:
+		numRetreatingGhosts++;
+		break;
 	}
 }
 
@@ -394,9 +397,8 @@ void Level::ActivatePowerMode()
 		SendDirectMessage("clyde",  PMT_MakeVulnerable);
 	}
 
-	m_currPower = 0;
 	SoundEngine::StopSound(m_sirenSound[m_currSiren]);
-	SoundEngine::PlaySound(m_powerSound[m_currPower], Vec3f::Zero(), true);
+	SoundEngine::PlaySound(m_powerSound, Vec3f::Zero(), true);
 
 	GState.SetState(LSF_GhostsBlinking, false);
 	GState.SetState(LSF_PowerMode, true);
@@ -427,7 +429,7 @@ void Level::DeactivatePowerMode()
 	GState.SetState(LSF_PowerMode, false);
 	m_power_timer.End();
 
-	SoundEngine::StopSound(m_powerSound[m_currPower]);
+	SoundEngine::StopSound(m_powerSound);
 	SoundEngine::PlaySound(m_sirenSound[m_currSiren], Vec3f::Zero(), true);
 }
 
@@ -521,6 +523,33 @@ void Level::UpdateLifeDisplay()
 	((UI*)m_game_objects.at(LIFE_DISPLAY_INDEX))->SetText(txt);
 }
 
+void Level::CheckRetreat()
+{
+
+	numRetreatingGhosts = 0;
+	SendDirectMessage("blinky", PMT_AreYouRetreating);
+	SendDirectMessage("inky",	PMT_AreYouRetreating);
+	SendDirectMessage("pinky",	PMT_AreYouRetreating);
+	SendDirectMessage("clyde",	PMT_AreYouRetreating);
+
+	if (numRetreatingGhosts > 0 && !GState.CheckState(LSF_GhostRetreating)) {
+		if (GState.CheckState(LSF_PowerMode)) {
+			SoundEngine::StopSound(m_powerSound);
+		}
+		SoundEngine::PlaySound(m_retreatSound, Vec3f::Zero(), true);
+		GState.SetState(LSF_GhostRetreating, true);
+
+	}
+	else if (numRetreatingGhosts == 0 && GState.CheckState(LSF_GhostRetreating)) {
+		SoundEngine::StopSound(m_retreatSound);
+		GState.SetState(LSF_GhostRetreating, false);
+
+		if (GState.CheckState(LSF_PowerMode)) {
+			SoundEngine::PlaySound(m_powerSound, Vec3f::Zero(), true);
+		}
+	}
+}
+
 void Level::GameOver()
 {
 	SendMessage("pacman", PMT_GameOver);
@@ -541,10 +570,15 @@ void Level::OnEndLevel()
 	SendMessage("inky",   PMT_LevelEnded);
 	SendMessage("pinky",  PMT_LevelEnded);
 	SendMessage("clyde",  PMT_LevelEnded);
-	GState.SetState(LSF_LevelEnded, true);
 	Physics::DeactivateRealm(m_realms[0]);
 
+	GState.SetState(LSF_LevelEnded, true);
+	GState.SetState(LSF_PowerMode, false);
+	GState.SetState(LSF_GhostRetreating, false);
+
 	SoundEngine::StopSound(m_sirenSound[m_currSiren]);
+	SoundEngine::StopSound(m_powerSound);
+	SoundEngine::StopSound(m_retreatSound);
 }
 
 void Level::OnEat(PacDot* dot)
@@ -682,8 +716,6 @@ void Level::OnGhostEaten()
 	Vec2d showPos = m_pacman_ptr->GetWorldCoordinates();
 	showPos.x -= 2;
 	SendMessage("points", PMT_ShowPointsEarned, new PointData(scored, showPos));
-
-
 }
 
 void Level::StopShowingEatenGhost()
@@ -693,11 +725,6 @@ void Level::StopShowingEatenGhost()
 	SendMessage("pinky",  PMT_StopShowingEatenGhost);
 	SendMessage("inky",   PMT_StopShowingEatenGhost);
 	SendMessage("clyde",  PMT_StopShowingEatenGhost);
-
-	if (m_currPower == 0 && GState.CheckState(LSF_PowerMode)) {
-		SoundEngine::StopSound(m_powerSound[m_currPower++]);
-		SoundEngine::PlaySound(m_powerSound[m_currPower], Vec3f::Zero(), true);
-	}
 }
 
 void Level::PacmanDeathShowHitPhase(const float deltaTime)
@@ -786,5 +813,20 @@ FRUIT_TYPE Level::GetNextFruit()
 	}
 	
 	return KEY;
+}
+
+bool Level::ReadyToStart()
+{
+	for (auto& msg : MessageBus::GetBroadcast("SoundEngine")) {
+		switch (msg.type) {
+		case MT_SoundStopped:
+			if (((SoundStoppedData*)msg.data)->sID == m_startLevelSound) {
+				return true;
+			}
+			break;
+		}
+	}
+
+	return false;
 }
 

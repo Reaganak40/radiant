@@ -79,6 +79,7 @@ namespace rdt {
 
 	void SoundEngine::RunCommandQueue()
 	{
+		m_mutex.lock();
 		m_queue_index = m_queue_index == 1 ? 0 : 1;
 
 		for (auto& command : m_command_queue[m_queue_index == 1 ? 0 : 1]) {
@@ -102,6 +103,7 @@ namespace rdt {
 			}
 		}
 		m_command_queue[m_queue_index == 1 ? 0 : 1].clear();
+		m_mutex.unlock();
 	}
 
 	void SoundEngine::UpdateSounds()
@@ -144,12 +146,19 @@ namespace rdt {
 		}
 	}
 
+	void SoundEngine::AddToCommandQueue(const SoundCommand& command)
+	{
+		m_mutex.lock();
+		m_command_queue[m_queue_index].push_back(command);
+		m_mutex.unlock();
+	}
+
 	void SoundEngine::LoadResourceImpl(const std::string& alias, const std::string& filepath)
 	{
 		LoadResourceData* command_data = new LoadResourceData;
 		command_data->filepath = filepath;
 		command_data->soundAlias = alias;
-		m_command_queue[m_queue_index].push_back({SCT_LoadResource, command_data});
+		AddToCommandQueue({ SCT_LoadResource, command_data });
 	}
 
 	void SoundEngine::AddResourceToMap(LoadResourceData* data)
@@ -203,7 +212,7 @@ namespace rdt {
 		command_data->sPtr = nSound;
 		command_data->resource = resource;
 
-		m_command_queue[m_queue_index].push_back({SCT_CreateSound, command_data});
+		AddToCommandQueue({ SCT_CreateSound, command_data });
 		return command_data->sID;
 	}
 
@@ -213,14 +222,16 @@ namespace rdt {
 		command_data->sID = sID;
 		command_data->srcPos = srcPos;
 		command_data->looping = looping;
-		m_command_queue[m_queue_index].push_back({SCT_PlaySound, command_data});
+
+		AddToCommandQueue({ SCT_PlaySound, command_data });
 	}
 
 	void SoundEngine::PushStopSoundCommand(const SoundID sID)
 	{
 		StopSoundData* command_data = new StopSoundData;
 		command_data->sID = sID;
-		m_command_queue[m_queue_index].push_back({ SCT_StopSound, command_data });
+
+		AddToCommandQueue({ SCT_StopSound, command_data });
 	}
 
 	SoundID SoundEngine::GetNextSoundID()
