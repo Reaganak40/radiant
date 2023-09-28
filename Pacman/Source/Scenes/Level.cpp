@@ -29,7 +29,6 @@ Level::Level()
 	m_pacman_ptr = nullptr;
 	m_startLevelSound = 0;
 	m_currChomp = 0;
-	m_currSiren = 0;
 }
 
 Level::~Level()
@@ -76,15 +75,7 @@ void Level::OnRegister()
 		m_chompSound[1] = SoundEngine::CreateNewSound("chomp2", new SoundEffect);
 
 		SoundEngine::LoadResource("siren1", "Resources/Sounds/siren_1.wav");
-		SoundEngine::LoadResource("siren2", "Resources/Sounds/siren_2.wav");
-		SoundEngine::LoadResource("siren3", "Resources/Sounds/siren_3.wav");
-		SoundEngine::LoadResource("siren4", "Resources/Sounds/siren_4.wav");
-		SoundEngine::LoadResource("siren5", "Resources/Sounds/siren_5.wav");
-		m_sirenSound[0] = SoundEngine::CreateNewSound("siren1", new SoundEffect);
-		m_sirenSound[1] = SoundEngine::CreateNewSound("siren2", new SoundEffect);
-		m_sirenSound[2] = SoundEngine::CreateNewSound("siren3", new SoundEffect);
-		m_sirenSound[3] = SoundEngine::CreateNewSound("siren4", new SoundEffect);
-		m_sirenSound[4] = SoundEngine::CreateNewSound("siren5", new SoundEffect);
+		m_sirenSound = SoundEngine::CreateNewSound("siren1", new SoundEffect);
 
 		SoundEngine::LoadResource("power", "Resources/Sounds/power_pellet.wav");
 		SoundEngine::LoadResource("retreat", "Resources/Sounds/retreating.wav");
@@ -302,12 +293,12 @@ void Level::OnProcessInput(const float deltaTime)
 	if (m_spawn_timer.IsRunning()) {
 		if (m_spawn_timer.Update(deltaTime)) {
 			ResumeGame();
-			SoundEngine::PlaySound(m_sirenSound[m_currSiren], Vec3f::Zero(), true);
+			SoundEngine::PlaySound(m_sirenSound, Vec3f::Zero(), true);
 		}
 	} else if (GState.CheckState(LSF_StartOfGame) && ReadyToStart()) {
 		GState.SetState(LSF_StartOfGame, false);
 		ResumeGame();
-		SoundEngine::PlaySound(m_sirenSound[m_currSiren], Vec3f::Zero(), true);
+		SoundEngine::PlaySound(m_sirenSound, Vec3f::Zero(), true);
 	}
 
 	if (m_1up_timer.IsRunning()) {
@@ -359,7 +350,7 @@ void Level::OnMessage(rdt::Message msg)
 	switch (msg.type) {
 	case PMT_PacmanHit:
 		m_pacman_death_state = PDS_ShowHit;
-		SoundEngine::StopSound(m_sirenSound[m_currSiren]);
+		SoundEngine::StopSound(m_sirenSound);
 		break;
 	case PMT_EndDeathAnimation:
 		m_pacman_death_state = PDS_Repawn;
@@ -397,7 +388,7 @@ void Level::ActivatePowerMode()
 		SendDirectMessage("clyde",  PMT_MakeVulnerable);
 	}
 
-	SoundEngine::StopSound(m_sirenSound[m_currSiren]);
+	SoundEngine::StopSound(m_sirenSound);
 	SoundEngine::PlaySound(m_powerSound, Vec3f::Zero(), true);
 
 	GState.SetState(LSF_GhostsBlinking, false);
@@ -430,7 +421,7 @@ void Level::DeactivatePowerMode()
 	m_power_timer.End();
 
 	SoundEngine::StopSound(m_powerSound);
-	SoundEngine::PlaySound(m_sirenSound[m_currSiren], Vec3f::Zero(), true);
+	SoundEngine::PlaySound(m_sirenSound, Vec3f::Zero(), true);
 }
 
 void Level::StartBlinking()
@@ -576,7 +567,7 @@ void Level::OnEndLevel()
 	GState.SetState(LSF_PowerMode, false);
 	GState.SetState(LSF_GhostRetreating, false);
 
-	SoundEngine::StopSound(m_sirenSound[m_currSiren]);
+	SoundEngine::StopSound(m_sirenSound);
 	SoundEngine::StopSound(m_powerSound);
 	SoundEngine::StopSound(m_retreatSound);
 }
@@ -613,31 +604,6 @@ void Level::OnEat(PacDot* dot)
 	if (levelDotCount == DOTS_PER_LEVEL) {
 		OnEndLevel();
 	}
-
-	unsigned int lastCurr = m_currSiren;
-	switch (levelDotCount) {
-	case 150:
-		m_currSiren = 1;
-		break;
-	case 180:
-		m_currSiren = 2;
-		break;
-	case 200:
-		m_currSiren = 3;
-		break;
-	case 220:
-		m_currSiren = 4;
-		break;
-	}
-
-	if (lastCurr != m_currSiren) {
-		SoundEngine::StopSound(m_sirenSound[lastCurr]);
-
-		if (!GState.CheckState(LSF_PowerMode)) {
-			SoundEngine::PlaySound(m_sirenSound[m_currSiren], Vec3f::Zero(), true);
-		}
-	}
-
 }
 
 
@@ -651,7 +617,6 @@ void Level::StartEndLevelAnimation()
 void Level::StartNextLevel()
 {
 	levelCount++;
-	m_currSiren = 0;
 
 	// notify end of level animation
 	GState.SetState(LSF_InEndAnimation, false);
