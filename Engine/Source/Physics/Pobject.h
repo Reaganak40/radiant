@@ -4,12 +4,18 @@
 #include "Ptag.h"
 
 namespace rdt {
-
 	enum PhysicalProperties {
 		NoCollision = 1,
 		ppBouncy = 2,
 		DontResolve = 4,
 	};
+
+	class Physics;
+}
+
+namespace rdt::core {
+
+	
 	class Pobject {
 	private:
 		std::shared_ptr<Polygon> m_polygon;

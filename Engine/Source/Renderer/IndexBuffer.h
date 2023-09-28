@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 
-namespace rdt {
+namespace rdt::core {
 
 	typedef unsigned int IBO_ID;
 

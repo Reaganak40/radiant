@@ -2,7 +2,7 @@
 #include "Translation.h"
 #include "Utils/Utils.h"
 
-namespace rdt {
+namespace rdt::core {
 	
 	Translation::Translation(Vec2d initial_velocity, Vec2d initial_acceleration)
 		: m_current_velocity(initial_velocity), m_acceleration(initial_acceleration),

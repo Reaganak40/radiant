@@ -2,6 +2,7 @@
 #include "TextureManager.h"
 
 namespace rdt {
+	using namespace core;
 
 	TextureManager* TextureManager::m_instance = nullptr;
 

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "VertexBuffer.h"
 
-namespace rdt {
+namespace rdt::core {
 
 	VertexBuffer::VertexBuffer()
 		: m_buffer_defined(false), m_current_count(0), m_last_count(0), m_ID(0)

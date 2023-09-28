@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Ptag.h"
 
-namespace rdt {
+namespace rdt::core {
 	PtagManager* PtagManager::m_instance = nullptr;
 
 	PtagManager::PtagManager()

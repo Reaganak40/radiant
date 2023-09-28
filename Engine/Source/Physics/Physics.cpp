@@ -7,6 +7,7 @@
 #include "Renderer/Renderer.h"
 
 namespace rdt {
+    using namespace core;
 
     Physics* Physics::m_instance = nullptr;
 

@@ -6,13 +6,14 @@
 #include "Messaging/MessageBus.h"
 
 namespace rdt {
+
 	class Physics {
 	private:
 		Physics();
 		~Physics();
 		static Physics* m_instance;
 
-		std::unordered_map<UniqueID, Realm*> m_realms;
+		std::unordered_map<UniqueID, core::Realm*> m_realms;
 		std::set<UniqueID> m_active_realms;
 
 		Polygon m_bad_poly;

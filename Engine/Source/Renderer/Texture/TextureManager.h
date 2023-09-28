@@ -3,6 +3,10 @@
 #include "Texture.h"
 #include "Renderer/Mesh.h"
 
+namespace rdt::core {
+	class Layer;
+}
+
 namespace rdt {
 
 	class TextureManager {
@@ -38,7 +42,8 @@ namespace rdt {
 		static Texture* GetTexture(const std::string& name) { return m_instance->GetTextureImpl(name); }
 
 		friend class Renderer;
-		friend class Layer;
+		friend class core::Layer;
+
 	private:
 		Texture& LoadTextureFromPNGImpl(const std::string& name, const std::string& filepath);
 		Texture* GetTextureImpl(const std::string& name);
@@ -49,7 +54,7 @@ namespace rdt {
 			tile map.
 			Returns true if the texture slots changed.
 		*/
-		static bool ApplyTextureAtlas(Texture* texture, const Vec2i& atlasCoords, std::vector<Vertex>& rectVertices);
+		static bool ApplyTextureAtlas(Texture* texture, const Vec2i& atlasCoords, std::vector<core::Vertex>& rectVertices);
 		static std::array<unsigned int, MAX_TEXTURES>& GetTextureSlots();
 
 		void AddNoneTexture();

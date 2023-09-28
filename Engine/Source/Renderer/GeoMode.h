@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 
-namespace rdt {
+namespace rdt::core {
 	enum GeoMode {
 		FillMode = 1,
 		OutlineMode = 2

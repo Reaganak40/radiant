@@ -5,6 +5,8 @@
 
 namespace rdt {
 	
+	using namespace core;
+
 	SoundEngine* SoundEngine::m_instance = nullptr;
 	
 	SoundEngine::SoundEngine()

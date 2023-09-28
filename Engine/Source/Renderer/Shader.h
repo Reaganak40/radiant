@@ -2,7 +2,7 @@
 #include "Texture/Texture.h"
 #include "pch.h"
 
-namespace rdt {
+namespace rdt::core {
 
 	typedef unsigned int ShaderID;
 	typedef unsigned int UniformID;

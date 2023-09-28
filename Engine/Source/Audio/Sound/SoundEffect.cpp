@@ -2,6 +2,8 @@
 #include "SoundEffect.h"
 
 namespace rdt {
+	using namespace core;
+
 	SoundEffect::SoundEffect()
 	{
 	}

@@ -2,7 +2,7 @@
 #include "SoundData.h"
 
 
-namespace rdt {
+namespace rdt::core {
 	SoundData::SoundData()
 	{
 	}

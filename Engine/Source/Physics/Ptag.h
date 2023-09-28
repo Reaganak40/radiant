@@ -1,6 +1,6 @@
 #pragma once
 
-namespace rdt {
+namespace rdt::core {
 
 	// Physics Tags are used to sort objects of similar nature.
 	typedef unsigned int Ptag;

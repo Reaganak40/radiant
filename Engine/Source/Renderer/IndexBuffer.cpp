@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "IndexBuffer.h"
 
-namespace rdt {
+namespace rdt::core {
 
     IndexBuffer::IndexBuffer()
         : m_vertex_count(0), m_should_update(false)

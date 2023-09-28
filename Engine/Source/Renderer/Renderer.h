@@ -46,16 +46,16 @@ namespace rdt {
 		// *****************************************************
 		struct DrawCommand {
 			UniqueID meshIdentifier;
-			RenderType renderType;
+			core::RenderType renderType;
 
 
-			DrawCommand(UniqueID nMeshIdentifier, RenderType nRenderType)
+			DrawCommand(UniqueID nMeshIdentifier, core::RenderType nRenderType)
 				: meshIdentifier(nMeshIdentifier), renderType(nRenderType) {}
 		};
 
 		unsigned int m_current_layer;
-		RenderType m_current_render_type;
-		RenderCache m_render_cache;
+		core::RenderType m_current_render_type;
+		core::RenderCache m_render_cache;
 		std::queue<DrawCommand> m_command_queue;
 
 		Color m_polygon_color;
@@ -71,19 +71,19 @@ namespace rdt {
 		// *****************************************************
 
 		// Use only one VAO
-		VertexArray* m_vertex_array;
+		core::VertexArray* m_vertex_array;
 
 		// Each layer contains render units (specified draw calls).
-		std::vector<Layer> m_layers;
+		std::vector<core::Layer> m_layers;
 
 		// Keep shaders independent from render units.
-		std::vector<Shader*> m_shaders;
+		std::vector<core::Shader*> m_shaders;
 
 		// Track currently bounded gl objects.
-		VBO_ID m_current_vbo;
-		IBO_ID m_current_ibo;
-		ShaderID m_current_shader;
-		GeoMode m_current_mode;
+		core::VBO_ID m_current_vbo;
+		core::IBO_ID m_current_ibo;
+		core::ShaderID m_current_shader;
+		core::GeoMode m_current_mode;
 
 		// For ImGui instances.
 		std::vector<GuiTemplate*> m_GUIs;
@@ -210,7 +210,7 @@ namespace rdt {
 		/*
 			Sets the render condition for the current context.
 		*/
-		static void SetRenderType(RenderType type) { m_instance->SetRenderTypeImpl(type); }
+		static void SetRenderType(core::RenderType type) { m_instance->SetRenderTypeImpl(type); }
 
 		/*
 			Adds a polygon to the render queue to be drawn next frame.
@@ -289,16 +289,16 @@ namespace rdt {
 		void EndImpl();
 		void AddPolygonImpl(const Polygon& polygon);
 		void AddLineImpl(const Line& line);
-		void SetRenderTypeImpl(RenderType type);
+		void SetRenderTypeImpl(core::RenderType type);
 		void SetPolygonColorImpl(const Color& color);
 		void SetPolygonTextureImpl(const std::string& texName, unsigned int atlasX, unsigned int atlasY);
 		void SetLineColorImpl(const Color& color);
 
 
-		void SetVBO(VBO_ID vbo);
-		void SetIBO(IBO_ID ibo);
-		void SetShader(ShaderID shader);
-		void SetMode(GeoMode mode);
+		void SetVBO(core::VBO_ID vbo);
+		void SetIBO(core::IBO_ID ibo);
+		void SetShader(core::ShaderID shader);
+		void SetMode(core::GeoMode mode);
 
 		void AddDefaultShader();
 

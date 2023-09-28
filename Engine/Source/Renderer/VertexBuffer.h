@@ -2,7 +2,7 @@
 #include "pch.h"
 #include "Mesh.h"
 
-namespace rdt {
+namespace rdt::core {
 
 	typedef unsigned int VBO_ID;
 #define DEFAULT_VERTEX_BUFFER_LIMIT 64

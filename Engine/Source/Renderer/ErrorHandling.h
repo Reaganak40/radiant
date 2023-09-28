@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 
-namespace rdt {
+namespace rdt::core {
 
 #define ASSERT(x) if (!(x)) __debugbreak();
 

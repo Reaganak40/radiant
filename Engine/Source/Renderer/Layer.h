@@ -4,7 +4,7 @@
 #include "Shader.h"
 #include "Mesh.h"
 
-namespace rdt {
+namespace rdt::core {
 	
 	enum RenderType {
 		DrawFilled = 0,

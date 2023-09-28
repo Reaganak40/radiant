@@ -8,7 +8,7 @@
 #include "Polygon/Line.h"
 
 
-namespace rdt {
+namespace rdt::core {
 	class RenderCache {
 	private:
 		std::unordered_map<UniqueID, Mesh> m_mesh_cache;

@@ -7,22 +7,24 @@ namespace rdt {
 #define AUDIO_BUFFER_SIZE 65536
 #define NUM_AUDIO_BUFFERS 4
 
-	enum SoundState {
-		NO_BINDING,
-		NOT_PLAYING,
-		IS_PLAYING,
-	};
+	namespace core {
+		enum SoundState {
+			NO_BINDING,
+			NOT_PLAYING,
+			IS_PLAYING,
+		};
+	}
 
 	class Sound {
 	private:
 		
 	protected:
-		SoundState m_state;
+		core::SoundState m_state;
 		ALuint m_buffers[NUM_AUDIO_BUFFERS];
 		std::vector<ALuint> m_unused_buffers;
 		std::size_t m_cursor;
-		SoundData* m_data;
-		SoundSource m_source;
+		core::SoundData* m_data;
+		core::SoundSource m_source;
 		bool m_shouldLoop;
 		bool m_justStopped;
 
@@ -31,7 +33,7 @@ namespace rdt {
 			This should be called by OnCreate(). Also preloads the buffers
 			with the SoundData.
 		*/
-		void InitBuffers(SoundData* nData);
+		void InitBuffers(core::SoundData* nData);
 
 		/*
 			Loads the starting data from the audio file into the buffers.
@@ -61,7 +63,7 @@ namespace rdt {
 			When this Sound is first created and added to the SoundEngine
 			audio queue. 
 		*/
-		virtual void OnCreate(SoundData* data) {}
+		virtual void OnCreate(core::SoundData* data) {}
 
 		/*
 			Allows for more dynamic logic with this sound during its Update Cylce.
@@ -91,7 +93,7 @@ namespace rdt {
 		/*
 			Returns the current state of the audio sound.
 		*/
-		SoundState GetState() { return m_state; }
+		core::SoundState GetState() { return m_state; }
 
 		/*
 			Returns true if the sound had just stopped playing

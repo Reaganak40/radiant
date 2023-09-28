@@ -66,7 +66,7 @@ namespace rdt {
 		ALCcontext* m_context;
 		
 		std::unordered_map<SoundID, Sound*> m_sounds;
-		std::unordered_map<std::string, SoundData*> m_data_map;
+		std::unordered_map<std::string, core::SoundData*> m_data_map;
 
 		std::vector<SoundCommand> m_command_queue[2];
 		unsigned int m_queue_index;

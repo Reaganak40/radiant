@@ -3,7 +3,7 @@
 #include <fstream>
 #include <string>
 
-namespace rdt {
+namespace rdt::core {
 
     Shader::Shader()
         : m_ID(0)

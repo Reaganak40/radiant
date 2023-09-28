@@ -2,7 +2,7 @@
 #include "GeoMode.h"
 #include "ErrorHandling.h"
 
-namespace rdt {
+namespace rdt::core {
 
     void ActivateGeoMode(GeoMode mode)
     {

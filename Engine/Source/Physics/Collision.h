@@ -5,7 +5,7 @@
 
 #include "Pobject.h"
 
-namespace rdt {
+namespace rdt::core {
 
 	class Collision {
 	private:

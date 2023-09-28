@@ -3,6 +3,10 @@
 #include "Utils/MathTypes.h"
 #include "Utils/UniqueID.h"
 
+namespace rdt::core {
+	class Translation;
+}
+
 namespace rdt {
 
 	enum PolygonProperies {
@@ -99,7 +103,7 @@ namespace rdt {
 
 
 
-		friend class Translation;
+		friend class core::Translation;
 		friend class Renderer;
 	};
 }

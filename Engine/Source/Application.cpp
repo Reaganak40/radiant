@@ -26,7 +26,7 @@ namespace rdt
 		SceneManager::Destroy();
 		GuiManager::Destroy();
 		Physics::Destroy();
-		PtagManager::Destroy();
+		core::PtagManager::Destroy();
 		Input::Destroy();
 		SoundEngine::Destroy();
 		MessageBus::Destroy();
@@ -41,7 +41,7 @@ namespace rdt
 		MessageBus::Initialize();
 		SoundEngine::Initialize();
 		Input::Initialize();
-		PtagManager::Initialize();
+		core::PtagManager::Initialize();
 		Physics::Initialize();
 		GuiManager::Initialize();
 		SceneManager::Initialize();

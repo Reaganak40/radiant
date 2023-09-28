@@ -2,7 +2,7 @@
 #include "Layer.h"
 #include "Texture/TextureManager.h"
 
-namespace rdt {
+namespace rdt::core {
 	Layer::Layer()
 	{
 		m_batchCount = 0;

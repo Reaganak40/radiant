@@ -2,7 +2,7 @@
 #include "VertexArray.h"
 #include "Mesh.h"
 
-namespace rdt {
+namespace rdt::core {
 
 	VertexArray::VertexArray()
 	{

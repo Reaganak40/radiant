@@ -1,6 +1,6 @@
 #pragma once
 
-namespace rdt {
+namespace rdt::core {
 
 	typedef unsigned int VAO_ID;
 

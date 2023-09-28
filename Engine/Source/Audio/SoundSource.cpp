@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "SoundSource.h"
 
-namespace rdt {
+namespace rdt::core {
 	SoundSource::SoundSource()
 	{
 		m_sourceID = 0;

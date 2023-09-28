@@ -2,7 +2,7 @@
 #include "ErrorHandling.h"
 #include <sstream>
 
-namespace rdt {
+namespace rdt::core {
 
 	void glClearError() {
 		int count = 0;

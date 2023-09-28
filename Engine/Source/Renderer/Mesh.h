@@ -3,7 +3,7 @@
 #include "Utils/UniqueID.h"
 #include "Texture/Texture.h"
 
-namespace rdt {
+namespace rdt::core {
 
 	struct Vertex {
 		Vec3f position;			// x,y,z coordinats of a vertex

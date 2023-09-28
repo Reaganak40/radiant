@@ -5,7 +5,7 @@
 #include "Pobject.h"
 #include "Messaging/MessageBus.h"
 
-namespace rdt {
+namespace rdt::core {
 
 	class Realm {
 	private:

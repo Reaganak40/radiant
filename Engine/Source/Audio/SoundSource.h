@@ -1,7 +1,7 @@
 #pragma once
 #include "Utils/MathTypes.h"
 
-namespace rdt {
+namespace rdt::core {
 	class SoundSource {
 	private:
 		ALuint m_sourceID;

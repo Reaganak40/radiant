@@ -1,7 +1,12 @@
 #pragma once
 #include "Utils/MathTypes.h"
 #include "Polygon/Polygon.h"
+
 namespace rdt {
+	class Physics;
+}
+
+namespace rdt::core {
 
 	class Translation {
 	private:

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace rdt {
+namespace rdt::core {
 	class SoundData {
 	private:
 		ALenum m_format;

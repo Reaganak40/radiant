@@ -23,7 +23,7 @@ namespace rdt {
 
 			Child SoundEffect classes should return this if it overrides OnCreate().
 		*/
-		virtual void OnCreate(SoundData* data) override;
+		virtual void OnCreate(core::SoundData* data) override;
 
 		/*
 			Allows for more dynamic logic with this sound during its Update Cylce.

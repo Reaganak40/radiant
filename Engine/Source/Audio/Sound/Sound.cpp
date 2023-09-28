@@ -2,6 +2,8 @@
 #include "Sound.h"
 
 namespace rdt {
+	using namespace core;
+
 	void Sound::InitBuffers(SoundData* nData)
 	{
 		m_data = nData;

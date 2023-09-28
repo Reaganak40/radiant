@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Pobject.h"
 
-namespace rdt {
+namespace rdt::core {
 	Pobject::Pobject(std::shared_ptr<Polygon> polygon)
 		: m_polygon(polygon), translation(Vec2d(0, 0), Vec2d(0, 0)), m_properties(0), m_hitbox_size(1, 1)
 	{

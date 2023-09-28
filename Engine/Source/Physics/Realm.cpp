@@ -3,7 +3,7 @@
 #include "Collision.h"
 #include "Messaging/MessageTypes.h"
 
-namespace rdt {
+namespace rdt::core {
 
     Realm::Realm()
         : m_ID(GetUniqueID())

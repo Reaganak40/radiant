@@ -5,6 +5,8 @@
 
 namespace rdt {
 
+    using namespace core;
+
     Renderer* Renderer::m_instance = nullptr;
 
     Renderer::Renderer()
