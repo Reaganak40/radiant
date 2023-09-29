@@ -1,6 +1,9 @@
 #pragma once
+/*
+	To be used by Radiant Applications
+*/
+#include "Engine/Application.h"
 
-namespace rdt {
-
-	__declspec(dllexport) void Print();
-}
+// -- Entry Point ----------------------------
+#include "Engine/EntryPoint.h"
+// ------------------------------------------
