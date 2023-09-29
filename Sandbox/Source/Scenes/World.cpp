@@ -13,7 +13,7 @@ World::~World()
 void World::OnRegister()
 {
 	SoundEngine::LoadResource("sample3", "Resources/Sounds/sample3.wav");
-	SoundEngine::LoadResource("pacman_beginning", "Resources/Sounds/pacman_beginning.wav");
+	SoundEngine::LoadResource("pacman_beginning", "Resources/Sounds/meow.wav");
 
 	m_sound1 = SoundEngine::CreateNewSound("sample3", new SoundEffect);
 	m_sound2 = SoundEngine::CreateNewSound("pacman_beginning", new SoundEffect);

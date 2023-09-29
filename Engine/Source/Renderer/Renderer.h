@@ -11,7 +11,7 @@
 
 // For Opengl rendering
 #include "VertexArray.h"
-#include "Layer.h"
+#include "RenderLayer.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
@@ -74,7 +74,7 @@ namespace rdt {
 		core::VertexArray* m_vertex_array;
 
 		// Each layer contains render units (specified draw calls).
-		std::vector<core::Layer> m_layers;
+		std::vector<core::RenderLayer> m_layers;
 
 		// Keep shaders independent from render units.
 		std::vector<core::Shader*> m_shaders;

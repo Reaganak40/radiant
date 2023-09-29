@@ -165,7 +165,7 @@
     <ClCompile Include="Source\GameObject\GameState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Renderer\Layer.cpp">
+    <ClCompile Include="Source\Renderer\RenderLayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Audio\SoundEngine.cpp">
@@ -1208,7 +1208,7 @@
     <ClInclude Include="Source\GameObject\GameState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Renderer\Layer.h">
+    <ClInclude Include="Source\Renderer\RenderLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Audio\SoundEngine.h">

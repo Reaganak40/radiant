@@ -4,7 +4,7 @@
 #include "Renderer/Mesh.h"
 
 namespace rdt::core {
-	class Layer;
+	class RenderLayer;
 }
 
 namespace rdt {
@@ -42,7 +42,7 @@ namespace rdt {
 		static Texture* GetTexture(const std::string& name) { return m_instance->GetTextureImpl(name); }
 
 		friend class Renderer;
-		friend class core::Layer;
+		friend class core::RenderLayer;
 
 	private:
 		Texture& LoadTextureFromPNGImpl(const std::string& name, const std::string& filepath);

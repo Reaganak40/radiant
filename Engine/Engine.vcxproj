@@ -227,7 +227,7 @@
     <ClCompile Include="Source\Renderer\ErrorHandling.cpp" />
     <ClCompile Include="Source\Renderer\GeoMode.cpp" />
     <ClCompile Include="Source\Renderer\IndexBuffer.cpp" />
-    <ClCompile Include="Source\Renderer\Layer.cpp" />
+    <ClCompile Include="Source\Renderer\RenderLayer.cpp" />
     <ClCompile Include="Source\Renderer\RenderCache.cpp" />
     <ClCompile Include="Source\Renderer\Renderer.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -335,7 +335,7 @@
     <ClInclude Include="Source\Polygon\Circle.h" />
     <ClInclude Include="Source\Polygon\Line.h" />
     <ClInclude Include="Source\Renderer\GeoMode.h" />
-    <ClInclude Include="Source\Renderer\Layer.h" />
+    <ClInclude Include="Source\Renderer\RenderLayer.h" />
     <ClInclude Include="Source\Renderer\RenderCache.h" />
     <ClInclude Include="Source\Scene\Scene.h" />
     <ClInclude Include="Source\Scene\SceneManager.h" />

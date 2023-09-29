@@ -313,7 +313,7 @@ namespace rdt {
     void Renderer::BeginImpl(unsigned int layer)
     {
         while (m_layers.size() <= layer) {
-            m_layers.push_back(Layer());
+            m_layers.push_back(RenderLayer());
             m_layers.back().SetDefaultShader(m_shaders[0]->GetID());
         }
 
