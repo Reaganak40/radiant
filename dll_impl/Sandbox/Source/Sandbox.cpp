@@ -17,5 +17,5 @@ public:
 
 rdt::Application* rdt::CreateApplication()
 {
-	return new Sandbox();
+	return new Sandbox;
 }
