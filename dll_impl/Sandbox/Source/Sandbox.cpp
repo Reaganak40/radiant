@@ -5,7 +5,6 @@ class Sandbox : public rdt::Application
 public:
 	Sandbox()
 	{
-
 	}
 
 	~Sandbox()

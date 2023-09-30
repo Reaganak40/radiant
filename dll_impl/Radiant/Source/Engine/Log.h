@@ -7,6 +7,9 @@ namespace rdt {
 	class RADIANT_API Log {
 	private:
 	public:
+		/*
+			Initialize the logging system for the engine core and the client.
+		*/
 		static void Init();
 
 		inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return m_CoreLogger; }
