@@ -105,6 +105,9 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Editor\Editor.h" />
+    <ClInclude Include="Source\Editor\DevTools.h" />
+    <ClInclude Include="Source\Editor\Panels\Diagnostics.h" />
     <ClInclude Include="Source\Engine\Application.h" />
     <ClInclude Include="Source\Engine\Audio\AudioError.h" />
     <ClInclude Include="Source\Engine\Audio\Sound\Sound.h" />
@@ -130,7 +133,6 @@
     <ClInclude Include="Source\Engine\Graphics\Renderer.h" />
     <ClInclude Include="Source\Engine\Graphics\Texture\Texture.h" />
     <ClInclude Include="Source\Engine\Graphics\Texture\TextureManager.h" />
-    <ClInclude Include="Source\Engine\Gui\Diagnostics.h" />
     <ClInclude Include="Source\Engine\Gui\Gui.h" />
     <ClInclude Include="Source\Engine\Gui\GuiManager.h" />
     <ClInclude Include="Source\Engine\Logging\Log.h" />
@@ -150,6 +152,7 @@
     <ClInclude Include="Source\Engine\Polygon\Polygon.h" />
     <ClInclude Include="Source\Engine\Polygon\Rect.h" />
     <ClInclude Include="Source\Engine\Polygon\Triangle.h" />
+    <ClInclude Include="Source\Engine\Scene\Layer.h" />
     <ClInclude Include="Source\Engine\Scene\Scene.h" />
     <ClInclude Include="Source\Engine\Scene\SceneManager.h" />
     <ClInclude Include="Source\Engine\Utils\BitSet.h" />
@@ -221,6 +224,8 @@
     <ClInclude Include="Vendor\stb\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Editor\DevTools.cpp" />
+    <ClCompile Include="Source\Editor\Panels\Diagnostics.cpp" />
     <ClCompile Include="Source\Engine\Application.cpp" />
     <ClCompile Include="Source\Engine\Audio\AudioError.cpp" />
     <ClCompile Include="Source\Engine\Audio\Sound\Sound.cpp" />
@@ -242,7 +247,6 @@
     <ClCompile Include="Source\Engine\Graphics\Renderer.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Texture\Texture.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Texture\TextureManager.cpp" />
-    <ClCompile Include="Source\Engine\Gui\Diagnostics.cpp" />
     <ClCompile Include="Source\Engine\Gui\Gui.cpp" />
     <ClCompile Include="Source\Engine\Gui\GuiManager.cpp" />
     <ClCompile Include="Source\Engine\Logging\Log.cpp" />
@@ -261,6 +265,7 @@
     <ClCompile Include="Source\Engine\Polygon\Polygon.cpp" />
     <ClCompile Include="Source\Engine\Polygon\Rect.cpp" />
     <ClCompile Include="Source\Engine\Polygon\Triangle.cpp" />
+    <ClCompile Include="Source\Engine\Scene\Layer.cpp" />
     <ClCompile Include="Source\Engine\Scene\Scene.cpp" />
     <ClCompile Include="Source\Engine\Scene\SceneManager.cpp" />
     <ClCompile Include="Source\Engine\Utils\BitSet.cpp" />

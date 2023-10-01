@@ -9,5 +9,11 @@
 #include "Engine/EntryPoint.h"
 // -------------------------------------------
 
-// -- Radiant APIs ---------------------------
+// -- Radiant Engine APIs --------------------
 #include "Engine/Graphics/Renderer.h"
+// -------------------------------------------
+
+// -- Game Developer APIs --------------------
+#include "Editor/Editor.h"
+// -------------------------------------------
+

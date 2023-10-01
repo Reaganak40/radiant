@@ -1,20 +1,52 @@
 #include "pch.h"
 #include "Scene.h"
 #include "SceneManager.h"
+#include "Editor/DevTools.h"
+
+#ifdef RDT_DEBUG
+#define ADD_DEV_LAYER 1
+#else
+#define ADD_DEV_LAYER 0
+#endif
 
 namespace rdt {
+
 	Scene::Scene()
 		: m_ID(GetUniqueID())
 	{
+		if (ADD_DEV_LAYER) {
+			m_layers.push_back(new core::DevLayer);
+			m_layers.back()->OnAttach();
+			RDT_CORE_WARN("Developer tools are enabled");
+		}
 	}
+
 	Scene::~Scene()
 	{
-		for (auto& object : m_game_objects) {
-			delete object;
-		}
+		FreeUniqueID(m_ID);
+	}
 
-		for (auto& gui: m_GUIs) {
-			delete gui;
+	void Scene::RunProcessInputQueue(const float deltaTime)
+	{
+		for (auto it = m_layers.rbegin(); it != m_layers.rend(); ++it)
+		{
+			(*it)->OnProcessInput(deltaTime);
+		}
+	}
+
+	void Scene::RunFinalUpdateQueue()
+	{
+		for (auto it = m_layers.rbegin(); it != m_layers.rend(); ++it)
+		{
+			(*it)->OnFinalUpdate();
+		}
+	}
+
+	void Scene::RunRenderQueue()
+	{
+		for (auto it = m_layers.rbegin(); it != m_layers.rend(); ++it)
+		{
+			(*it)->OnRender();
 		}
 	}
 
@@ -23,37 +55,15 @@ namespace rdt {
 		SceneManager::SetScene(nScene);
 	}
 
-	Scene* Scene::GetOtherScene(const std::string& nScene) {
-		return SceneManager::GetAnyScene(nScene);
-	}
-
-	void Scene::BeginExit() {
-		SceneManager::UnselectScene();
-	}
-
-	void Scene::RunProcessInputQueue(const float deltaTime)
+	void Scene::AttachLayer(Layer* nLayer)
 	{
-		for (auto& object : m_game_objects) {
-			object->OnProcessInput(deltaTime);
+		if (ADD_DEV_LAYER) {
+			m_layers.insert(m_layers.begin() + (m_layers.size() - 1), nLayer);
+		}
+		else {
+			m_layers.push_back(nLayer);
 		}
 
-		for (auto& gui : m_GUIs) {
-			gui->OnUpdate(deltaTime);
-		}
+		nLayer->OnAttach();
 	}
-	
-	void Scene::RunFinalUpdateQueue()
-	{
-		for (auto& object : m_game_objects) {
-			object->OnFinalUpdate();
-		}
-	}
-
-	void Scene::RunRenderQueue()
-	{
-		for (auto& object : m_game_objects) {
-			object->OnRender();
-		}
-	}
-
 }

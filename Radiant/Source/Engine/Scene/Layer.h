@@ -1,15 +1,30 @@
 #pragma once
-#include "Utils/UniqueID.h"
 #include "Messaging/Messenger.h"
-#include "Layer.h"
+#include "Utils/UniqueID.h"
+#include "GameObject/GameObject.h"
+#include "Gui/Gui.h"
+
 
 namespace rdt {
+	
+	class Scene;
 
-	class Scene : public Messenger {
+	/*
+		Scenes own game objects and GUIs that can be used by the application under
+		specified conditions.
+
+
+	*/
+	class Layer : public Messenger {
 	private:
 		UniqueID m_ID;
-		std::vector<Layer*> m_layers;
 
+	protected:
+		std::vector<GameObject*> m_game_objects;
+		std::vector<GuiTemplate*> m_GUIs;
+		std::vector<UniqueID> m_realms;
+		GameState GState;
+		
 		/*
 			Runs OnProcssInput on all game objects and OnUpdate on all
 			GUIs. This should be called at the end of OnProcessInput().
@@ -34,57 +49,49 @@ namespace rdt {
 		void OnMessage(Message msg) override {}
 
 	public:
-		Scene();
-		~Scene();
+		Layer();
+		~Layer();
 
 		const UniqueID GetID() { return m_ID; }
 
 		/*
-			Changes the scene dynamically to a known scene. This change is delayed
-			until the start of the next game loop.
+			Function called when this layer is first attached to a Scene.
 		*/
-		void ChangeScene(const std::string& nScene);
+		virtual void OnAttach() {}
 
 		/*
-			Adds a layer to the top of the layer stack. The scene is
-			now responsible for freeing this layer.
+			Function called when this layer is to be awakened and active.
 		*/
-		void AttachLayer(Layer* nLayer);
+		virtual void Awake() {}
 
 		/*
-			Function called prior to the host application registering
-			the scene with the SceneManager for the first time.
+			Function to be called when this layer is to go to sleep but no destroyed.
 		*/
-		virtual void OnRegister() {}
+		virtual void Sleep() {}
 
 		/*
-			Function called prior to when the application switches to the
-			scene.
+			Function called when a layer is about to be released, not active.
 		*/
-		virtual void OnBind() {}
+		virtual void OnDetach() {}
 
 		/*
-			Function called when a scene is about to be released, changed
-			to another scene.
-		*/
-		virtual void OnRelease() {}
-
-		/*
-			Function called when the scene is active and the host application
+			Function called when the layer is active and the host application
 			calls ProcessInput.
 		*/
 		virtual void OnProcessInput(const float deltaTime) { RunProcessInputQueue(deltaTime); }
 
 		/*
-			Function called when the scene is active and the host application
+			Function called when the layer is active and the host application
 			calls FinalUpdate()
 		*/
 		virtual void OnFinalUpdate() { RunFinalUpdateQueue(); }
 
 		/*
-			Function called when the scene is active and the host application
+			Function called when the layer is active and the host application
 			calls Render()
 		*/
 		virtual void OnRender() { RunRenderQueue(); }
+
+	private:
 	};
 }

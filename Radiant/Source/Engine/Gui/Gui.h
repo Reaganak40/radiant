@@ -1,15 +1,13 @@
 #pragma once
-#include <stdio.h>
+#include "Core.h"
+#include "Logging/Log.h"
 
 namespace rdt {
-	
-	
-
-	class GuiTemplate {
+	class RADIANT_API GuiTemplate {
 	private:
 	public:
 		virtual void OnUpdate(const float deltaTime) {}
-		virtual void OnRender() { printf("Warning: Using GuiTemplate::OnRender()!\n"); }
+		virtual void OnRender() { RDT_WARN("Using virtual GuiTemplate::OnRender()!"); }
 		static void RenderImGui();
 	protected:
 	};

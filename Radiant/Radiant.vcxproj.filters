@@ -219,9 +219,6 @@
     <ClInclude Include="Source\Engine\Graphics\Texture\TextureManager.h">
       <Filter>Source\Engine\Graphics\Texture</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Engine\Gui\Diagnostics.h">
-      <Filter>Source\Engine\Gui</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Engine\Gui\Gui.h">
       <Filter>Source\Engine\Gui</Filter>
     </ClInclude>
@@ -279,7 +276,7 @@
     <ClInclude Include="Source\Engine\Polygon\Triangle.h">
       <Filter>Source\Engine\Polygon</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Engine\Scene\Scene.h">
+    <ClInclude Include="Source\Engine\Scene\Layer.h">
       <Filter>Source\Engine\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Scene\SceneManager.h">
@@ -486,6 +483,10 @@
     <ClInclude Include="Vendor\stb\stb_image.h">
       <Filter>Vendor\stb</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Editor\Editor.h" />
+    <ClInclude Include="Source\Editor\Panels\Diagnostics.h" />
+    <ClInclude Include="Source\Editor\DevTools.h" />
+    <ClInclude Include="Source\Engine\Scene\Scene.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Engine\Application.cpp">
@@ -551,9 +552,6 @@
     <ClCompile Include="Source\Engine\Graphics\Texture\TextureManager.cpp">
       <Filter>Source\Engine\Graphics\Texture</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Gui\Diagnostics.cpp">
-      <Filter>Source\Engine\Gui</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Engine\Gui\Gui.cpp">
       <Filter>Source\Engine\Gui</Filter>
     </ClCompile>
@@ -608,7 +606,7 @@
     <ClCompile Include="Source\Engine\Polygon\Triangle.cpp">
       <Filter>Source\Engine\Polygon</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Scene\Scene.cpp">
+    <ClCompile Include="Source\Engine\Scene\Layer.cpp">
       <Filter>Source\Engine\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine\Scene\SceneManager.cpp">
@@ -641,5 +639,8 @@
     <ClCompile Include="Vendor\stb\stb_image.cpp">
       <Filter>Vendor\stb</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Editor\Panels\Diagnostics.cpp" />
+    <ClCompile Include="Source\Engine\Scene\Scene.cpp" />
+    <ClCompile Include="Source\Editor\DevTools.cpp" />
   </ItemGroup>
 </Project>
