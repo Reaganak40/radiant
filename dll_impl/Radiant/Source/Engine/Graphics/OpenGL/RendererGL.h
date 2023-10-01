@@ -2,22 +2,13 @@
 #include "Core.h"
 #include "Graphics/Renderer.h"
 
-// For Render API
-#include "Polygon/Polygon.h"
-#include "Polygon/Rect.h"
-#include "Polygon/Line.h"
-#include "Mesh.h"
-#include "Utils/Color.h"
-#include "Texture/TextureManager.h"
-
 // For Opengl rendering
 #include "VertexArray.h"
-#include "RenderLayer.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
+#include "RenderLayer.h"
 #include "GeoMode.h"
-#include "Gui/Gui.h"
 #include "RenderCache.h"
 
 namespace rdt::core {
@@ -104,8 +95,30 @@ namespace rdt::core {
 		unsigned int GetWindowWidthImpl() override final;
 		unsigned int GetWindowHeightImpl() override final;
 		Vec2i CreateWindowImpl(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight, bool resizable) override final;
+		void* GetWindowInstanceImpl() override final;
 		Vec2d GetCameraCoordinates2DImpl() override final;
 		void SetBackgroundColorImpl(const Color& color) override final;
+		Vec2i OnWindowResizeImpl() override final;
+
+		void ClearImpl() override final;
+		void OnBeginFrameImpl() override final;
+		void OnUpdateImpl(const float deltaTime) override final;
+		void RenderImpl() override final;
+		void OnEndFrameImpl() override final;
+		void DrawRectImpl(const Vec2d& origin, const Vec2d& size, const Color& color, unsigned int layer = 0) override final;
+		void DrawLineImpl(const Vec2d& start, const Vec2d& end, const Color& color, unsigned int layer = 0) override final;
+		void BeginImpl(unsigned int layer) override final;
+		void EndImpl() override final;
+
+		void SetRenderTypeImpl(core::RenderType type) override final;
+		void AddPolygonImpl(const Polygon& polygon) override final;
+		void AddLineImpl(const Line& line) override final;
+		void SetLineColorImpl(const Color& color) override final;
+		void SetPolygonColorImpl(const Color& color) override final;
+		void SetPolygonTextureImpl(const std::string& texName, unsigned int atlasX = 0, unsigned int atlasY = 0) override final;
+		void AttachGuiImpl(GuiTemplate* gui) override final;
+		void DetachGuiImpl(const GuiTemplate* gui) override final;
+
 		void _FlushPolygonImpl(const UniqueID UUID) override final;
 
 		/* ***********************************************

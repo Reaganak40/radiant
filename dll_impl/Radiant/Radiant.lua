@@ -20,6 +20,8 @@ project "Radiant"
         "Vendor/imgui/backends/**.h",
         "Vendor/stb/**.h",
         "Vendor/stb/**.cpp",
+        "Vendor/AL/**.h",
+        "Vendor/AudioFile-1.1.1/**.h",
         "Vendor/spdlog/include/spdlog/spdlog.h",
         "Vendor/spdlog/include/spdlog/sinks/stdout_color_sinks.h",
     }
@@ -35,6 +37,8 @@ project "Radiant"
 		"%{IncludeDir.ImGuiBackend}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.stb}",
+		"%{IncludeDir.openal}",
+		"%{IncludeDir.AudioFile}",
 		"%{IncludeDir.spdlog}",
     }
 

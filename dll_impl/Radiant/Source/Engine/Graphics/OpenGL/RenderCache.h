@@ -1,5 +1,5 @@
 #pragma once
-#include "Mesh.h"
+#include "Graphics/Mesh.h"
 #include "Utils/MathTypes.h"
 #include "Utils/UniqueID.h"
 

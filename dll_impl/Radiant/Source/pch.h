@@ -21,9 +21,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 // Audio
-//#include <AL/al.h>
-//#include <AL/alc.h>
-//#include <AudioFile-1.1.1/AudioFile.h>
+#include <al.h>
+#include <alc.h>
+#include <AudioFile.h>
 
 // Logging
 #pragma warning(push, 0)   

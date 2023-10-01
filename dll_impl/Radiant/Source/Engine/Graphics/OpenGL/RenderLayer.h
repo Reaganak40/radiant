@@ -2,16 +2,11 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
-#include "Mesh.h"
+#include "Graphics/Mesh.h"
+#include "Graphics/RenderTypes.h"
 
 namespace rdt::core {
 	
-	enum RenderType {
-		DrawFilled = 0,
-		DrawOutline,
-		DrawLine
-	};
-
 	// Opengl render unit contains all needed data for 1 draw call.
 	struct glRenderUnit {
 		VBO_ID vboID;

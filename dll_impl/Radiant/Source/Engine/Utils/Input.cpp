@@ -25,7 +25,7 @@ namespace rdt {
     {
         Destroy();
         GetInstance();
-        m_instance->m_window;
+        m_instance->m_window = (GLFWwindow*)Renderer::GetWindowInstance();
 
         glfwSetKeyCallback(m_instance->m_window, Input::KeyCallback);
         glfwSetCursorPosCallback(m_instance->m_window, Input::CursorPositionCallback);

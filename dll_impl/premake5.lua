@@ -18,6 +18,8 @@ IncludeDir["ImGui"] = "Vendor/imgui"
 IncludeDir["ImGuiBackend"] = "Vendor/imgui/backends"
 IncludeDir["glm"] = "Vendor/glm"
 IncludeDir["stb"] = "Vendor/stb"
+IncludeDir["openal"] = "Vendor/AL"
+IncludeDir["AudioFile"] = "Vendor/AudioFile-1.1.1"
 IncludeDir["spdlog"] = "Vendor/spdlog/include"
 
 -- Projects

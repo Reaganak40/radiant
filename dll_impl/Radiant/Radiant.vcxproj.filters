@@ -7,14 +7,23 @@
     <Filter Include="Source\Engine">
       <UniqueIdentifier>{1BF9622F-87B9-DE65-50F4-27E3BC732342}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Engine\Audio">
+      <UniqueIdentifier>{5CAFDAA6-C810-B8B4-517E-FE66BDDEEE73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Engine\Audio\Sound">
+      <UniqueIdentifier>{140A8F0F-80CC-C299-C97C-5126357E9B77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Engine\GameObject">
+      <UniqueIdentifier>{BBECECE1-A711-3C62-D05C-21F2BCE03A80}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source\Engine\Graphics">
       <UniqueIdentifier>{BB2FDC6C-A729-05BF-9096-9BCF7C2F6B2B}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Engine\Graphics\OpenGL">
       <UniqueIdentifier>{8F78E469-FB90-CB93-C43D-5B2D3015602D}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Engine\Graphics\OpenGL\Texture">
-      <UniqueIdentifier>{EFBCE70A-5B81-E6FA-24E7-16C5906A8230}</UniqueIdentifier>
+    <Filter Include="Source\Engine\Graphics\Texture">
+      <UniqueIdentifier>{1BE0090F-0706-D475-F04B-5941DC10F941}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Engine\Gui">
       <UniqueIdentifier>{EF113BAC-5B28-3942-A49F-C46310F509CA}</UniqueIdentifier>
@@ -22,14 +31,29 @@
     <Filter Include="Source\Engine\Logging">
       <UniqueIdentifier>{B1C43A09-1D31-F603-E624-8E615250186C}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Engine\Messaging">
+      <UniqueIdentifier>{28120D34-9449-55CB-9D53-B9EE090A7CC4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Engine\Physics">
+      <UniqueIdentifier>{8DE71B2E-F953-D728-C247-6F862E73F990}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source\Engine\Polygon">
       <UniqueIdentifier>{B208883D-1E75-4338-E768-DB95539465A0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Engine\Scene">
+      <UniqueIdentifier>{788E16A8-E4EF-F3B5-6D5D-3A68D9BD2A75}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Engine\Utils">
       <UniqueIdentifier>{BB2244A8-2784-21B6-B0F1-67681C525875}</UniqueIdentifier>
     </Filter>
     <Filter Include="Vendor">
       <UniqueIdentifier>{935FDCD7-7F01-07AE-68BC-1A0254FD8DFE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Vendor\AL">
+      <UniqueIdentifier>{4F6BC54E-BBD5-79C5-0414-2B6B70BD571A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Vendor\AudioFile-1.1.1">
+      <UniqueIdentifier>{509D3046-3C97-5998-2504-F0A8119DBF04}</UniqueIdentifier>
     </Filter>
     <Filter Include="Vendor\glad">
       <UniqueIdentifier>{7AE6E215-E69B-5B0B-6F90-55E2DB44520F}</UniqueIdentifier>
@@ -123,11 +147,38 @@
     <ClInclude Include="Source\Engine\Application.h">
       <Filter>Source\Engine</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Engine\Audio\AudioError.h">
+      <Filter>Source\Engine\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Engine\Audio\Sound\Sound.h">
+      <Filter>Source\Engine\Audio\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Engine\Audio\Sound\SoundEffect.h">
+      <Filter>Source\Engine\Audio\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Engine\Audio\SoundData.h">
+      <Filter>Source\Engine\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Engine\Audio\SoundEngine.h">
+      <Filter>Source\Engine\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Engine\Audio\SoundSource.h">
+      <Filter>Source\Engine\Audio</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Engine\Core.h">
       <Filter>Source\Engine</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\EntryPoint.h">
       <Filter>Source\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Engine\GameObject\GameObject.h">
+      <Filter>Source\Engine\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Engine\GameObject\GameState.h">
+      <Filter>Source\Engine\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Engine\Graphics\Mesh.h">
+      <Filter>Source\Engine\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Graphics\OpenGL\ErrorHandling.h">
       <Filter>Source\Engine\Graphics\OpenGL</Filter>
@@ -136,9 +187,6 @@
       <Filter>Source\Engine\Graphics\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Graphics\OpenGL\IndexBuffer.h">
-      <Filter>Source\Engine\Graphics\OpenGL</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Engine\Graphics\OpenGL\Mesh.h">
       <Filter>Source\Engine\Graphics\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Graphics\OpenGL\RenderCache.h">
@@ -153,20 +201,23 @@
     <ClInclude Include="Source\Engine\Graphics\OpenGL\Shader.h">
       <Filter>Source\Engine\Graphics\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Engine\Graphics\OpenGL\Texture\Texture.h">
-      <Filter>Source\Engine\Graphics\OpenGL\Texture</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Engine\Graphics\OpenGL\Texture\TextureManager.h">
-      <Filter>Source\Engine\Graphics\OpenGL\Texture</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Engine\Graphics\OpenGL\VertexArray.h">
       <Filter>Source\Engine\Graphics\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Graphics\OpenGL\VertexBuffer.h">
       <Filter>Source\Engine\Graphics\OpenGL</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Engine\Graphics\RenderTypes.h">
+      <Filter>Source\Engine\Graphics</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Engine\Graphics\Renderer.h">
       <Filter>Source\Engine\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Engine\Graphics\Texture\Texture.h">
+      <Filter>Source\Engine\Graphics\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Engine\Graphics\Texture\TextureManager.h">
+      <Filter>Source\Engine\Graphics\Texture</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Gui\Diagnostics.h">
       <Filter>Source\Engine\Gui</Filter>
@@ -179,6 +230,39 @@
     </ClInclude>
     <ClInclude Include="Source\Engine\Logging\Log.h">
       <Filter>Source\Engine\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Engine\Messaging\Broadcast.h">
+      <Filter>Source\Engine\Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Engine\Messaging\Message.h">
+      <Filter>Source\Engine\Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Engine\Messaging\MessageBus.h">
+      <Filter>Source\Engine\Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Engine\Messaging\MessageTypes.h">
+      <Filter>Source\Engine\Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Engine\Messaging\Messenger.h">
+      <Filter>Source\Engine\Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Engine\Physics\Collision.h">
+      <Filter>Source\Engine\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Engine\Physics\Physics.h">
+      <Filter>Source\Engine\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Engine\Physics\Pobject.h">
+      <Filter>Source\Engine\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Engine\Physics\Ptag.h">
+      <Filter>Source\Engine\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Engine\Physics\Realm.h">
+      <Filter>Source\Engine\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Engine\Physics\Translation.h">
+      <Filter>Source\Engine\Physics</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Polygon\Circle.h">
       <Filter>Source\Engine\Polygon</Filter>
@@ -194,6 +278,12 @@
     </ClInclude>
     <ClInclude Include="Source\Engine\Polygon\Triangle.h">
       <Filter>Source\Engine\Polygon</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Engine\Scene\Scene.h">
+      <Filter>Source\Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Engine\Scene\SceneManager.h">
+      <Filter>Source\Engine\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Utils\BitSet.h">
       <Filter>Source\Engine\Utils</Filter>
@@ -221,6 +311,27 @@
     </ClInclude>
     <ClInclude Include="Source\pch.h">
       <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Vendor\AL\al.h">
+      <Filter>Vendor\AL</Filter>
+    </ClInclude>
+    <ClInclude Include="Vendor\AL\alc.h">
+      <Filter>Vendor\AL</Filter>
+    </ClInclude>
+    <ClInclude Include="Vendor\AL\alext.h">
+      <Filter>Vendor\AL</Filter>
+    </ClInclude>
+    <ClInclude Include="Vendor\AL\efx-creative.h">
+      <Filter>Vendor\AL</Filter>
+    </ClInclude>
+    <ClInclude Include="Vendor\AL\efx-presets.h">
+      <Filter>Vendor\AL</Filter>
+    </ClInclude>
+    <ClInclude Include="Vendor\AL\efx.h">
+      <Filter>Vendor\AL</Filter>
+    </ClInclude>
+    <ClInclude Include="Vendor\AudioFile-1.1.1\AudioFile.h">
+      <Filter>Vendor\AudioFile-1.1.1</Filter>
     </ClInclude>
     <ClInclude Include="Vendor\glad\include\KHR\khrplatform.h">
       <Filter>Vendor\glad\include\KHR</Filter>
@@ -380,6 +491,30 @@
     <ClCompile Include="Source\Engine\Application.cpp">
       <Filter>Source\Engine</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Engine\Audio\AudioError.cpp">
+      <Filter>Source\Engine\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\Audio\Sound\Sound.cpp">
+      <Filter>Source\Engine\Audio\Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\Audio\Sound\SoundEffect.cpp">
+      <Filter>Source\Engine\Audio\Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\Audio\SoundData.cpp">
+      <Filter>Source\Engine\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\Audio\SoundEngine.cpp">
+      <Filter>Source\Engine\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\Audio\SoundSource.cpp">
+      <Filter>Source\Engine\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\GameObject\GameObject.cpp">
+      <Filter>Source\Engine\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\GameObject\GameState.cpp">
+      <Filter>Source\Engine\GameObject</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Engine\Graphics\OpenGL\ErrorHandling.cpp">
       <Filter>Source\Engine\Graphics\OpenGL</Filter>
     </ClCompile>
@@ -401,12 +536,6 @@
     <ClCompile Include="Source\Engine\Graphics\OpenGL\Shader.cpp">
       <Filter>Source\Engine\Graphics\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Graphics\OpenGL\Texture\Texture.cpp">
-      <Filter>Source\Engine\Graphics\OpenGL\Texture</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Engine\Graphics\OpenGL\Texture\TextureManager.cpp">
-      <Filter>Source\Engine\Graphics\OpenGL\Texture</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Engine\Graphics\OpenGL\VertexArray.cpp">
       <Filter>Source\Engine\Graphics\OpenGL</Filter>
     </ClCompile>
@@ -415,6 +544,12 @@
     </ClCompile>
     <ClCompile Include="Source\Engine\Graphics\Renderer.cpp">
       <Filter>Source\Engine\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\Graphics\Texture\Texture.cpp">
+      <Filter>Source\Engine\Graphics\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\Graphics\Texture\TextureManager.cpp">
+      <Filter>Source\Engine\Graphics\Texture</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine\Gui\Diagnostics.cpp">
       <Filter>Source\Engine\Gui</Filter>
@@ -427,6 +562,36 @@
     </ClCompile>
     <ClCompile Include="Source\Engine\Logging\Log.cpp">
       <Filter>Source\Engine\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\Messaging\Broadcast.cpp">
+      <Filter>Source\Engine\Messaging</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\Messaging\Message.cpp">
+      <Filter>Source\Engine\Messaging</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\Messaging\MessageBus.cpp">
+      <Filter>Source\Engine\Messaging</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\Messaging\Messenger.cpp">
+      <Filter>Source\Engine\Messaging</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\Physics\Collision.cpp">
+      <Filter>Source\Engine\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\Physics\Physics.cpp">
+      <Filter>Source\Engine\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\Physics\Pobject.cpp">
+      <Filter>Source\Engine\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\Physics\Ptag.cpp">
+      <Filter>Source\Engine\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\Physics\Realm.cpp">
+      <Filter>Source\Engine\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\Physics\Translation.cpp">
+      <Filter>Source\Engine\Physics</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine\Polygon\Circle.cpp">
       <Filter>Source\Engine\Polygon</Filter>
@@ -442,6 +607,12 @@
     </ClCompile>
     <ClCompile Include="Source\Engine\Polygon\Triangle.cpp">
       <Filter>Source\Engine\Polygon</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\Scene\Scene.cpp">
+      <Filter>Source\Engine\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\Scene\SceneManager.cpp">
+      <Filter>Source\Engine\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine\Utils\BitSet.cpp">
       <Filter>Source\Engine\Utils</Filter>

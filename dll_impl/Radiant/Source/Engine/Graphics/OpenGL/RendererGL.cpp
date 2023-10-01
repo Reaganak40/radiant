@@ -138,6 +138,11 @@ namespace rdt::core {
         return aspect_ratio;
 	}
 
+    void* RendererGL::GetWindowInstanceImpl()
+    {
+        return m_window;
+    }
+
     Vec2d RendererGL::GetCameraCoordinates2DImpl()
     {
         return Vec2d(m_screen_origin.x, m_screen_origin.y);
@@ -147,6 +152,293 @@ namespace rdt::core {
     {
         const Vec4f& colorBits = color.GetColor();
         glClearColor(colorBits.x1, colorBits.x2, colorBits.x3, colorBits.x4);
+    }
+
+    Vec2i RendererGL::OnWindowResizeImpl()
+    {
+        glfwGetWindowSize(m_window, (int*)&m_window_width, (int*)&m_window_height);
+        if (m_window_width == 0 || m_window_height == 0) {
+            return Vec2i(0, 0);
+        }
+        return Utils::GetRatio(m_window_width, m_window_height);
+    }
+
+    void RendererGL::ClearImpl()
+    {
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
+
+    void RendererGL::OnBeginFrameImpl()
+    {
+        if (m_GUIs.size() > 0) {
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+        }
+    }
+
+    void RendererGL::OnUpdateImpl(const float deltaTime)
+    {
+        for (const auto& gui : m_GUIs) {
+            gui->OnUpdate(deltaTime);
+        }
+    }
+
+    void RendererGL::RenderImpl()
+    {
+        bool update_slots = false;
+
+        /*
+            Step 1: Run the command queue, sorting meshes into layers.
+        */
+        while (!m_command_queue.empty()) {
+            DrawCommand command = m_command_queue.front();
+            Mesh& mesh = m_render_cache.GetMesh(command.meshIdentifier);
+
+            m_layers[mesh.layer].AddMesh(mesh, command.renderType);
+            m_command_queue.pop();
+        }
+
+        /*
+            Step 2: Go layer by layer, draw batch by batch.
+        */
+        for (auto& layer : m_layers) {
+            layer.CompileBatches();
+
+            if (layer.TextureSlotsChanged()) {
+                UpdateTextureUniforms();
+            }
+
+            auto units = layer.GetRenderUnits();
+            for (int i = 0; i < layer.GetBatchCount(); i++) {
+                auto& unit = units.at(i);
+
+                // Draw Call Procedure
+                SetVBO(unit.vboID);
+                SetIBO(unit.iboID);
+                SetShader(unit.shaderID);
+                SetMode(unit.type == DrawOutline ? OutlineMode : FillMode);
+
+                // Update buffers and notify the GPU
+                unit.m_VBO->Update();
+                unit.m_IBO->Update();
+                m_vertex_array->DefineVertexBufferLayout();
+
+                glDrawElements(
+                    unit.type == RenderType::DrawLine ? GL_LINES : GL_TRIANGLES,
+                    unit.m_IBO->GetIndexCount(), GL_UNSIGNED_INT, nullptr);
+            }
+        }
+
+        /*
+            Step 3: Run the GUI render queue.
+        */
+        for (const auto& gui : m_GUIs) {
+            gui->OnRender();
+        }
+
+        /*
+            Step 4: Render all the GUI objects.
+        */
+        if (m_GUIs.size() > 0) {
+            GuiTemplate::RenderImGui();
+        }
+
+        /* Swap front and back buffers */
+        glfwSwapBuffers(m_window);
+    }
+
+    void RendererGL::OnEndFrameImpl()
+    {
+        /* Poll for and process events */
+        glfwPollEvents();
+
+        m_render_cache.OnEndFrame();
+
+        // Reset the buffers of each layer.
+        for (auto& layer : m_layers) {
+            layer.Flush();
+        }
+    }
+
+    void RendererGL::DrawRectImpl(const Vec2d& origin, const Vec2d& size, const Color& color, unsigned int layer)
+    {
+        // Use the rect cache for efficiency
+        std::shared_ptr<Rect> rect;
+
+        if ((rect = m_render_cache.GetFreeRect()) == nullptr) {
+            m_render_cache.AddRectToCache(std::shared_ptr<Rect>(new Rect(origin, size.x, size.y)));
+            rect = m_render_cache.GetFreeRect();
+        }
+        else {
+            rect->SetPosition(origin);
+            rect->SetSize(size);
+        }
+
+        Color old_color = m_polygon_color;
+
+        // Use draw API
+        BeginImpl(layer);
+        SetPolygonColorImpl(color);
+        SetRenderTypeImpl(DrawFilled);
+        AddPolygonImpl(*rect);
+        EndImpl();
+
+        // Go back to saved settings
+        m_polygon_color = old_color;
+    }
+
+    void RendererGL::DrawLineImpl(const Vec2d& start, const Vec2d& end, const Color& color, unsigned int layer)
+    {
+        // Use the line cache for efficiency
+        std::shared_ptr<Line> line;
+
+        if ((line = m_render_cache.GetFreeLine()) == nullptr) {
+            m_render_cache.AddLineToCache(std::shared_ptr<Line>(new Line(start, end)));
+            line = m_render_cache.GetFreeLine();
+        }
+        else {
+            line->SetStart(start);
+            line->SetEnd(end);
+        }
+
+        Color old_line_color = m_line_color;
+
+        // Use draw API
+        BeginImpl(layer);
+        SetLineColorImpl(color);
+        SetRenderTypeImpl(RenderType::DrawLine);
+        AddLineImpl(*line);
+        EndImpl();
+
+        m_line_color = old_line_color;
+    }
+
+    void RendererGL::BeginImpl(unsigned int layer)
+    {
+        while (m_layers.size() <= layer) {
+            m_layers.push_back(RenderLayer());
+            m_layers.back().SetDefaultShader(m_shaders[0]->GetID());
+        }
+
+        m_current_layer = layer;
+        m_current_render_type = DrawFilled;
+        m_polygon_texture = TextureManager::GetTexture("None");
+        m_polygon_color = WHITE;
+    }
+
+    void RendererGL::EndImpl()
+    {
+        /* TODO:end of render context procedures... */
+    }
+
+    void RendererGL::SetRenderTypeImpl(core::RenderType type)
+    {
+        m_current_render_type = type;
+    }
+
+    void RendererGL::AddPolygonImpl(const Polygon& polygon)
+    {
+        Mesh& pMesh = m_render_cache.GetMesh(polygon.GetUUID());
+
+        if (pMesh.indices.size() != polygon.GetIndices().size()) {
+            pMesh.indices = polygon.GetIndices();
+        }
+
+        int index = 0;
+
+
+        for (const auto& vertex : polygon.GetVertices()) {
+            if (pMesh.vertices.size() == index) {
+
+                pMesh.vertices.push_back(
+                    Vertex(
+                        Vec3f((float)vertex.x, (float)vertex.y), m_polygon_color.GetColor(),
+                        { 0, 0 }, UNASSIGNED_TEXTURE
+                    )
+                );
+            }
+            else {
+                pMesh.vertices[index].position = Vec3f((float)vertex.x, (float)vertex.y);
+                pMesh.vertices[index].color = m_polygon_color.GetColor();
+                pMesh.vertices[index].texCoords = { 0, 0 };
+                pMesh.vertices[index].texIndex = UNASSIGNED_TEXTURE;
+            }
+            index++;
+        }
+
+        pMesh.layer = m_current_layer;
+        pMesh.texture = m_polygon_texture;
+        pMesh.texAtlasCoords = m_polygon_texture_coords;
+
+        m_command_queue.push(DrawCommand(polygon.GetUUID(), m_current_render_type));
+    }
+
+    void RendererGL::AddLineImpl(const Line& line)
+    {
+        Mesh& pMesh = m_render_cache.GetMesh(line.GetUUID());
+
+        if (pMesh.indices.size() != line.GetIndices().size()) {
+            pMesh.indices = line.GetIndices();
+        }
+
+        int index = 0;
+        for (const auto& vertex : line.GetVertices()) {
+            if (pMesh.vertices.size() == index) {
+
+                pMesh.vertices.push_back(
+                    Vertex(
+                        Vec3f((float)vertex.x, (float)vertex.y), m_line_color.GetColor(),
+                        { 0, 0 }, UNASSIGNED_TEXTURE
+                    )
+                );
+            }
+            else {
+                pMesh.vertices[index].position = Vec3f((float)vertex.x, (float)vertex.y);
+                pMesh.vertices[index].color = m_line_color.GetColor();
+                pMesh.vertices[index].texCoords = { 0, 0 };
+                pMesh.vertices[index].texIndex = UNASSIGNED_TEXTURE;
+            }
+            index++;
+        }
+
+        pMesh.layer = m_current_layer;
+        pMesh.texture = nullptr;
+        pMesh.texAtlasCoords = Vec2i::Zero();
+
+        m_command_queue.push(DrawCommand(line.GetUUID(), m_current_render_type));
+    }
+
+    void RendererGL::SetLineColorImpl(const Color& color)
+    {
+        m_line_color = color;
+    }
+
+    void RendererGL::SetPolygonColorImpl(const Color& color)
+    {
+        m_polygon_color = color;
+    }
+
+    void RendererGL::SetPolygonTextureImpl(const std::string& texName, unsigned int atlasX, unsigned int atlasY)
+    {
+        m_polygon_texture = TextureManager::GetTexture(texName);
+        m_polygon_texture_coords.x = atlasX;
+        m_polygon_texture_coords.y = atlasY;
+    }
+
+    void RendererGL::AttachGuiImpl(GuiTemplate* gui)
+    {
+        m_GUIs.push_back(gui);
+    }
+
+    void RendererGL::DetachGuiImpl(const GuiTemplate* gui)
+    {
+        for (auto it = m_GUIs.begin(); it != m_GUIs.end(); ++it) {
+            if (*it == gui) {
+                m_GUIs.erase(it);
+                return;
+            }
+        }
     }
 
     void RendererGL::_FlushPolygonImpl(const UniqueID UUID)

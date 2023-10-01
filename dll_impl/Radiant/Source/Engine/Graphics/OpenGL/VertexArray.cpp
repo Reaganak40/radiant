@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "VertexArray.h"
-#include "Mesh.h"
+#include "Graphics/Mesh.h"
 
 namespace rdt::core {
 

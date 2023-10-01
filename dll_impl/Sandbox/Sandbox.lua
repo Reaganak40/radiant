@@ -24,6 +24,8 @@ project "Sandbox"
 		"../Radiant/%{IncludeDir.ImGuiBackend}",
 		"../Radiant/%{IncludeDir.glm}",
 		"../Radiant/%{IncludeDir.stb}",
+        "../Radiant/%{IncludeDir.openal}",
+		"../Radiant/%{IncludeDir.AudioFile}",
 		"../Radiant/%{IncludeDir.spdlog}",
     }
 
