@@ -1,5 +1,6 @@
 workspace "Radiant"
     architecture "x64"
+    startproject "Sandbox"
 
     configurations 
     {
@@ -9,96 +10,23 @@ workspace "Radiant"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
--- ===============================================================================================
--- Radiant Engine Build Configuration
--- ===============================================================================================
-project "Radiant"
-    location "Radiant"
-    kind "SharedLib"
-    language "C++"
-    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("bin/obj/" .. outputdir .. "/%{prj.name}")
+-- Include directories relative to Radiant Project
+IncludeDir = {}
+IncludeDir["GLFW"] = "Vendor/glfw/include"
+IncludeDir["glad"] = "Vendor/glad/include"
+IncludeDir["ImGui"] = "Vendor/imgui"
+IncludeDir["ImGuiBackend"] = "Vendor/imgui/backends"
+IncludeDir["glm"] = "Vendor/glm"
+IncludeDir["stb"] = "Vendor/stb"
+IncludeDir["spdlog"] = "Vendor/spdlog/include"
 
-    files
-    {
-        "%{prj.name}/Source/**.h",
-        "%{prj.name}/Source/**.cpp"
+-- Projects
+group "Dependencies"
+	include "Radiant/Vendor/glfw.lua"
+	include "Radiant/Vendor/glad.lua"
+	include "Radiant/Vendor/glm.lua"
+	include "Radiant/Vendor/imgui.lua"
+group ""
 
-    }
-    pchheader "pch.h"
-    pchsource "%{prj.name}/Source/pch.cpp"
-
-    includedirs
-    {
-        "%{prj.name}/Source",
-        "%{prj.name}/Vendor/spdlog/include",
-    }
-
-    filter "system:windows"
-        cppdialect "C++20"
-        staticruntime "On"
-        systemversion "latest"
-
-        defines
-        {
-            "RDT_PLATFORM_WINDOWS",
-            "RDT_BUILD_DLL"
-        }
-    
-        postbuildcommands
-        {
-            ("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox")
-        }
-    
-    filter "configurations:Debug"
-        defines "RDT_DEBUG"
-        symbols "On"
-
-    filter "configurations:Release"
-        defines "RDT_RELEASE"
-        optimize "On"
-
--- ===============================================================================================
--- Sandbox Build Configuration
--- ===============================================================================================
-project "Sandbox"
-    location "Sandbox"
-    kind "ConsoleApp"
-    language "C++"
-    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("bin/obj/" .. outputdir .. "/%{prj.name}")
-
-    files
-    {
-        "%{prj.name}/Source/**.h",
-        "%{prj.name}/Source/**.cpp"
-    }
-
-    includedirs
-    {
-        "Radiant/Source",
-        "Radiant/Vendor/spdlog/include",
-    }
-
-    links
-    {
-        "Radiant"
-    }
-
-    filter "system:windows"
-        cppdialect "C++20"
-        staticruntime "On"
-        systemversion "latest"
-
-        defines
-        {
-            "RDT_PLATFORM_WINDOWS",
-        }
-    
-    filter "configurations:Debug"
-        defines "RDT_DEBUG"
-        symbols "On"
-
-    filter "configurations:Release"
-        defines "RDT_RELEASE"
-        optimize "On"
+include "Radiant/Radiant.lua"
+include "Sandbox/Sandbox.lua"

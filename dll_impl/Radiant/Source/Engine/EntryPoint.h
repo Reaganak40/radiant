@@ -1,5 +1,4 @@
 #pragma once
-
 #ifdef RDT_PLATFORM_WINDOWS
 
 extern rdt::Application* rdt::CreateApplication();

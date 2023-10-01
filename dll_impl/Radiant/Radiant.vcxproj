@@ -1,0 +1,347 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{A8497895-1429-F730-1D41-8207899F5D92}</ProjectGuid>
+    <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Radiant</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>..\bin\Debug-windows-x86_64\Radiant\</OutDir>
+    <IntDir>..\bin\obj\Debug-windows-x86_64\Radiant\</IntDir>
+    <TargetName>Radiant</TargetName>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\bin\Release-windows-x86_64\Radiant\</OutDir>
+    <IntDir>..\bin\obj\Release-windows-x86_64\Radiant\</IntDir>
+    <TargetName>Radiant</TargetName>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;RDT_BUILD_DLL;RDT_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>Source;Source\Engine;Vendor\glfw\include;Vendor\glad\include;Vendor\imgui;Vendor\imgui\backends;Vendor\glm;Vendor\stb;Vendor\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ImportLibrary>..\bin\Debug-windows-x86_64\Radiant\Radiant.lib</ImportLibrary>
+    </Link>
+    <PostBuildEvent>
+      <Command>IF EXIST ..\bin\Debug-windows-x86_64\Radiant\Radiant.dll\ (xcopy /Q /E /Y /I ..\bin\Debug-windows-x86_64\Radiant\Radiant.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Debug-windows-x86_64\Radiant\Radiant.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;RDT_BUILD_DLL;RDT_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>Source;Source\Engine;Vendor\glfw\include;Vendor\glad\include;Vendor\imgui;Vendor\imgui\backends;Vendor\glm;Vendor\stb;Vendor\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <ImportLibrary>..\bin\Release-windows-x86_64\Radiant\Radiant.lib</ImportLibrary>
+    </Link>
+    <PostBuildEvent>
+      <Command>IF EXIST ..\bin\Release-windows-x86_64\Radiant\Radiant.dll\ (xcopy /Q /E /Y /I ..\bin\Release-windows-x86_64\Radiant\Radiant.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Release-windows-x86_64\Radiant\Radiant.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\Engine\Application.h" />
+    <ClInclude Include="Source\Engine\Core.h" />
+    <ClInclude Include="Source\Engine\EntryPoint.h" />
+    <ClInclude Include="Source\Engine\Graphics\OpenGL\ErrorHandling.h" />
+    <ClInclude Include="Source\Engine\Graphics\OpenGL\GeoMode.h" />
+    <ClInclude Include="Source\Engine\Graphics\OpenGL\IndexBuffer.h" />
+    <ClInclude Include="Source\Engine\Graphics\OpenGL\Mesh.h" />
+    <ClInclude Include="Source\Engine\Graphics\OpenGL\RenderCache.h" />
+    <ClInclude Include="Source\Engine\Graphics\OpenGL\RenderLayer.h" />
+    <ClInclude Include="Source\Engine\Graphics\OpenGL\RendererGL.h" />
+    <ClInclude Include="Source\Engine\Graphics\OpenGL\Shader.h" />
+    <ClInclude Include="Source\Engine\Graphics\OpenGL\Texture\Texture.h" />
+    <ClInclude Include="Source\Engine\Graphics\OpenGL\Texture\TextureManager.h" />
+    <ClInclude Include="Source\Engine\Graphics\OpenGL\VertexArray.h" />
+    <ClInclude Include="Source\Engine\Graphics\OpenGL\VertexBuffer.h" />
+    <ClInclude Include="Source\Engine\Graphics\Renderer.h" />
+    <ClInclude Include="Source\Engine\Gui\Diagnostics.h" />
+    <ClInclude Include="Source\Engine\Gui\Gui.h" />
+    <ClInclude Include="Source\Engine\Gui\GuiManager.h" />
+    <ClInclude Include="Source\Engine\Log\Log.h" />
+    <ClInclude Include="Source\Engine\Polygon\Circle.h" />
+    <ClInclude Include="Source\Engine\Polygon\Line.h" />
+    <ClInclude Include="Source\Engine\Polygon\Polygon.h" />
+    <ClInclude Include="Source\Engine\Polygon\Rect.h" />
+    <ClInclude Include="Source\Engine\Polygon\Triangle.h" />
+    <ClInclude Include="Source\Engine\Utils\BitSet.h" />
+    <ClInclude Include="Source\Engine\Utils\Color.h" />
+    <ClInclude Include="Source\Engine\Utils\Input.h" />
+    <ClInclude Include="Source\Engine\Utils\MathTypes.h" />
+    <ClInclude Include="Source\Engine\Utils\Timestep.h" />
+    <ClInclude Include="Source\Engine\Utils\UniqueID.h" />
+    <ClInclude Include="Source\Engine\Utils\Utils.h" />
+    <ClInclude Include="Source\Radiant.h" />
+    <ClInclude Include="Source\pch.h" />
+    <ClInclude Include="Vendor\glad\include\KHR\khrplatform.h" />
+    <ClInclude Include="Vendor\glad\include\glad\glad.h" />
+    <ClInclude Include="Vendor\glfw\include\GLFW\glfw3.h" />
+    <ClInclude Include="Vendor\glfw\include\GLFW\glfw3native.h" />
+    <ClInclude Include="Vendor\glm\glm\simd\common.h" />
+    <ClInclude Include="Vendor\glm\glm\simd\exponential.h" />
+    <ClInclude Include="Vendor\glm\glm\simd\geometric.h" />
+    <ClInclude Include="Vendor\glm\glm\simd\integer.h" />
+    <ClInclude Include="Vendor\glm\glm\simd\matrix.h" />
+    <ClInclude Include="Vendor\glm\glm\simd\neon.h" />
+    <ClInclude Include="Vendor\glm\glm\simd\packing.h" />
+    <ClInclude Include="Vendor\glm\glm\simd\platform.h" />
+    <ClInclude Include="Vendor\glm\glm\simd\trigonometric.h" />
+    <ClInclude Include="Vendor\glm\glm\simd\vector_relational.h" />
+    <ClInclude Include="Vendor\imgui\backends\imgui_impl_allegro5.h" />
+    <ClInclude Include="Vendor\imgui\backends\imgui_impl_android.h" />
+    <ClInclude Include="Vendor\imgui\backends\imgui_impl_dx10.h" />
+    <ClInclude Include="Vendor\imgui\backends\imgui_impl_dx11.h" />
+    <ClInclude Include="Vendor\imgui\backends\imgui_impl_dx12.h" />
+    <ClInclude Include="Vendor\imgui\backends\imgui_impl_dx9.h" />
+    <ClInclude Include="Vendor\imgui\backends\imgui_impl_glfw.h" />
+    <ClInclude Include="Vendor\imgui\backends\imgui_impl_glut.h" />
+    <ClInclude Include="Vendor\imgui\backends\imgui_impl_metal.h" />
+    <ClInclude Include="Vendor\imgui\backends\imgui_impl_opengl2.h" />
+    <ClInclude Include="Vendor\imgui\backends\imgui_impl_opengl3.h" />
+    <ClInclude Include="Vendor\imgui\backends\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="Vendor\imgui\backends\imgui_impl_osx.h" />
+    <ClInclude Include="Vendor\imgui\backends\imgui_impl_sdl2.h" />
+    <ClInclude Include="Vendor\imgui\backends\imgui_impl_sdl3.h" />
+    <ClInclude Include="Vendor\imgui\backends\imgui_impl_sdlrenderer2.h" />
+    <ClInclude Include="Vendor\imgui\backends\imgui_impl_sdlrenderer3.h" />
+    <ClInclude Include="Vendor\imgui\backends\imgui_impl_vulkan.h" />
+    <ClInclude Include="Vendor\imgui\backends\imgui_impl_wgpu.h" />
+    <ClInclude Include="Vendor\imgui\backends\imgui_impl_win32.h" />
+    <ClInclude Include="Vendor\imgui\examples\example_allegro5\imconfig_allegro5.h" />
+    <ClInclude Include="Vendor\imgui\examples\libs\emscripten\emscripten_mainloop_stub.h" />
+    <ClInclude Include="Vendor\imgui\examples\libs\glfw\include\GLFW\glfw3.h" />
+    <ClInclude Include="Vendor\imgui\examples\libs\glfw\include\GLFW\glfw3native.h" />
+    <ClInclude Include="Vendor\imgui\examples\libs\usynergy\uSynergy.h" />
+    <ClInclude Include="Vendor\imgui\imconfig.h" />
+    <ClInclude Include="Vendor\imgui\imgui.h" />
+    <ClInclude Include="Vendor\imgui\imgui_internal.h" />
+    <ClInclude Include="Vendor\imgui\imstb_rectpack.h" />
+    <ClInclude Include="Vendor\imgui\imstb_textedit.h" />
+    <ClInclude Include="Vendor\imgui\imstb_truetype.h" />
+    <ClInclude Include="Vendor\imgui\misc\cpp\imgui_stdlib.h" />
+    <ClInclude Include="Vendor\imgui\misc\freetype\imgui_freetype.h" />
+    <ClInclude Include="Vendor\imgui\misc\single_file\imgui_single_file.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\async.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\async_logger-inl.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\async_logger.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\cfg\argv.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\cfg\env.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\cfg\helpers-inl.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\cfg\helpers.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\common-inl.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\common.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\backtracer-inl.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\backtracer.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\circular_q.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\console_globals.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\file_helper-inl.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\file_helper.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\fmt_helper.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\log_msg-inl.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\log_msg.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\log_msg_buffer-inl.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\log_msg_buffer.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\mpmc_blocking_q.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\null_mutex.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\os-inl.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\os.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\periodic_worker-inl.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\periodic_worker.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\registry-inl.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\registry.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\synchronous_factory.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\tcp_client-windows.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\tcp_client.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\thread_pool-inl.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\thread_pool.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\udp_client-windows.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\udp_client.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\details\windows_include.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\fmt\bin_to_hex.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\fmt\bundled\args.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\fmt\bundled\chrono.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\fmt\bundled\color.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\fmt\bundled\compile.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\fmt\bundled\core.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\fmt\bundled\format-inl.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\fmt\bundled\format.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\fmt\bundled\locale.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\fmt\bundled\os.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\fmt\bundled\ostream.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\fmt\bundled\printf.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\fmt\bundled\ranges.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\fmt\bundled\std.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\fmt\bundled\xchar.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\fmt\chrono.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\fmt\compile.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\fmt\fmt.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\fmt\ostr.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\fmt\ranges.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\fmt\std.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\fmt\xchar.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\formatter.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\fwd.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\logger-inl.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\logger.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\pattern_formatter-inl.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\pattern_formatter.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\android_sink.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\ansicolor_sink-inl.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\ansicolor_sink.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\base_sink-inl.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\base_sink.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\basic_file_sink-inl.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\basic_file_sink.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\callback_sink.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\daily_file_sink.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\dist_sink.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\dup_filter_sink.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\hourly_file_sink.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\kafka_sink.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\mongo_sink.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\msvc_sink.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\null_sink.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\ostream_sink.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\qt_sinks.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\ringbuffer_sink.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\rotating_file_sink-inl.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\rotating_file_sink.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\sink-inl.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\sink.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\stdout_color_sinks-inl.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\stdout_color_sinks.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\stdout_sinks-inl.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\stdout_sinks.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\syslog_sink.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\systemd_sink.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\tcp_sink.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\udp_sink.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\win_eventlog_sink.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\wincolor_sink-inl.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\sinks\wincolor_sink.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\spdlog-inl.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\spdlog.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\stopwatch.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\tweakme.h" />
+    <ClInclude Include="Vendor\spdlog\include\spdlog\version.h" />
+    <ClInclude Include="Vendor\stb\stb_image.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\Engine\Application.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\OpenGL\ErrorHandling.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\OpenGL\GeoMode.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\OpenGL\IndexBuffer.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\OpenGL\RenderCache.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\OpenGL\RenderLayer.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\OpenGL\RendererGL.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\OpenGL\Shader.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\OpenGL\Texture\Texture.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\OpenGL\Texture\TextureManager.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\OpenGL\VertexArray.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\OpenGL\VertexBuffer.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\Renderer.cpp" />
+    <ClCompile Include="Source\Engine\Gui\Diagnostics.cpp" />
+    <ClCompile Include="Source\Engine\Gui\Gui.cpp" />
+    <ClCompile Include="Source\Engine\Gui\GuiManager.cpp" />
+    <ClCompile Include="Source\Engine\Log\Log.cpp" />
+    <ClCompile Include="Source\Engine\Polygon\Circle.cpp" />
+    <ClCompile Include="Source\Engine\Polygon\Line.cpp" />
+    <ClCompile Include="Source\Engine\Polygon\Polygon.cpp" />
+    <ClCompile Include="Source\Engine\Polygon\Rect.cpp" />
+    <ClCompile Include="Source\Engine\Polygon\Triangle.cpp" />
+    <ClCompile Include="Source\Engine\Utils\BitSet.cpp" />
+    <ClCompile Include="Source\Engine\Utils\Color.cpp" />
+    <ClCompile Include="Source\Engine\Utils\Input.cpp" />
+    <ClCompile Include="Source\Engine\Utils\MathTypes.cpp" />
+    <ClCompile Include="Source\Engine\Utils\Timestep.cpp" />
+    <ClCompile Include="Source\Engine\Utils\UniqueID.cpp" />
+    <ClCompile Include="Source\Engine\Utils\Utils.cpp" />
+    <ClCompile Include="Source\pch.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Vendor\stb\stb_image.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Vendor\GLFW.vcxproj">
+      <Project>{154B857C-0182-860D-AA6E-6C109684020F}</Project>
+    </ProjectReference>
+    <ProjectReference Include="Vendor\GLM.vcxproj">
+      <Project>{05EB870B-71F4-877C-FA6F-9E7C6678937C}</Project>
+    </ProjectReference>
+    <ProjectReference Include="Vendor\GLAD.vcxproj">
+      <Project>{5D4A857C-4981-860D-F26D-6C10DE83020F}</Project>
+    </ProjectReference>
+    <ProjectReference Include="Vendor\ImGui.vcxproj">
+      <Project>{C0FF640D-2C14-8DBE-F595-301E616989EF}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
