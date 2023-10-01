@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "ErrorHandling.h"
-#include "Log/Log.h"
+#include "Logging/Log.h"
 #include <sstream>
 
 namespace rdt::core {

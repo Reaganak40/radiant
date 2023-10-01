@@ -66,7 +66,7 @@ namespace rdt {
 
 		if (m_fonts.at(magicWord).font_ptrs.find(fontSize) == m_fonts.at(magicWord).font_ptrs.end()) {
 			ImGuiIO& io = ImGui::GetIO();
-			ImFont* font = io.Fonts->AddFontFromFileTTF(m_fonts.at(magicWord).filepath.c_str(), fontSize);
+			ImFont* font = io.Fonts->AddFontFromFileTTF(m_fonts.at(magicWord).filepath.c_str(), (float)fontSize);
 
 			m_fonts.at(magicWord).font_ptrs[fontSize] = font;
 		}

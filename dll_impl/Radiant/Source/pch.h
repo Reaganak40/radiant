@@ -26,8 +26,11 @@
 //#include <AudioFile-1.1.1/AudioFile.h>
 
 // Logging
+#pragma warning(push, 0)   
+#pragma warning (disable : 26498 26495 26800)
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
+#pragma warning(pop)
 
 /**********************************
 *

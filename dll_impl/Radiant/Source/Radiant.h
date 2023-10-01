@@ -3,7 +3,7 @@
 	To be used by Radiant Applications
 */
 #include "Engine/Application.h"
-#include "Engine/Log/Log.h"
+#include "Engine/Logging/Log.h"
 
 // -- Entry Point ----------------------------
 #include "Engine/EntryPoint.h"

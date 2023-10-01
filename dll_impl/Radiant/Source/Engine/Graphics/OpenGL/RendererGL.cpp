@@ -1,19 +1,44 @@
 #include "pch.h"
 #include "RendererGL.h"
 
-#include "Log/Log.h"
+#include "Logging/Log.h"
 #include "Utils/Utils.h"
 
 #include "ErrorHandling.h"
 
 namespace rdt::core {
 	RendererGL::RendererGL()
+        : m_window(nullptr), m_window_name(""), m_window_width(0), m_window_height(0), m_vertex_array(nullptr),
+        m_current_vbo(0), m_current_ibo(0), m_current_shader(0), m_current_layer(0), m_current_render_type(DrawFilled),
+        m_current_mode(FillMode)
 	{
 		RDT_CORE_INFO("Renderer is using OpenGL");
+
+        /* Initialize the library */
+        if (!glfwInit()) {
+            RDT_CORE_FATAL("Could not initliaze glfw.");
+            ASSERT(false);
+        }
+
+        m_proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
+        m_view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+        m_model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+
+        m_polygon_color = BLACK;
+        m_line_color = BLACK;
 	}
 
 	RendererGL::~RendererGL()
 	{
+        for (auto& shader : m_shaders) {
+            delete shader;
+        }
+
+        delete m_vertex_array;
+
+        TextureManager::Destroy();
+
+        glfwTerminate();
 	}
 
     bool RendererGL::ShouldWindowCloseImpl()
@@ -33,6 +58,7 @@ namespace rdt::core {
 
     Vec2i RendererGL::CreateWindowImpl(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight, bool resizable)
 	{
+        RDT_CORE_TRACE("Launching new window instance...");
         Vec2i aspect_ratio = Utils::GetRatio(windowWidth, windowHeight);
 
         m_window_name = windowName;

@@ -5,10 +5,6 @@
 #include "Utils/UniqueID.h"
 #include "Utils/Color.h"
 
-#ifdef CreateWindow
-#undef CreateWindow
-#endif
-
 namespace rdt {
 
 	class RADIANT_API Renderer {
@@ -32,7 +28,7 @@ namespace rdt {
 		/*
 			Creates a new GLFW window with the provided specifications.
 		*/
-		static Vec2i CreateWindow(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight, bool resizable) { return m_instance->CreateWindowImpl(windowName, windowWidth, windowHeight, resizable); }
+		static Vec2i CreateRadiantWindow(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight, bool resizable) { return m_instance->CreateWindowImpl(windowName, windowWidth, windowHeight, resizable); }
 
 		// *****************************************************
 		// 

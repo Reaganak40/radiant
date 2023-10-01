@@ -27,7 +27,11 @@ namespace rdt::core {
 
 		// Window management
 		GLFWwindow* m_window;
+		
+#pragma warning(push)
+#pragma warning(disable: 4251)
 		std::string m_window_name;
+
 		unsigned int m_window_width;
 		unsigned int m_window_height;
 
@@ -85,6 +89,8 @@ namespace rdt::core {
 
 		// For ImGui instances.
 		std::vector<GuiTemplate*> m_GUIs;
+
+#pragma warning(pop)
 
 	public:
 		RendererGL();

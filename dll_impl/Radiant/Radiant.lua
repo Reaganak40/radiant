@@ -6,6 +6,7 @@ project "Radiant"
     language "C++"
     targetdir ("../bin/" .. outputdir .. "/%{prj.name}")
     objdir ("../bin/obj/" .. outputdir .. "/%{prj.name}")
+    ignoredefaultlibraries { "LIBCMTD" }
 
     files
     {
@@ -19,7 +20,8 @@ project "Radiant"
         "Vendor/imgui/backends/**.h",
         "Vendor/stb/**.h",
         "Vendor/stb/**.cpp",
-        "Vendor/spdlog/include/**.h",
+        "Vendor/spdlog/include/spdlog/spdlog.h",
+        "Vendor/spdlog/include/spdlog/sinks/stdout_color_sinks.h",
     }
 
     includedirs
@@ -65,7 +67,12 @@ project "Radiant"
     filter "configurations:Debug"
         defines "RDT_DEBUG"
         symbols "On"
+        staticruntime "off"
+        runtime "Debug"
 
     filter "configurations:Release"
         defines "RDT_RELEASE"
         optimize "On"
+        staticruntime "off"
+        runtime "Release"
+    

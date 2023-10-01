@@ -7,7 +7,7 @@ class Sandbox : public Application
 public:
 	Sandbox()
 	{
-		Renderer::CreateWindow("Sandbox", 1280, 720, false);
+		Start("Sandbox", 1280, 720);
 	}
 
 	~Sandbox()

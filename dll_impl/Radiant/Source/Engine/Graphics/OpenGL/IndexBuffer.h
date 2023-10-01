@@ -9,7 +9,7 @@ namespace rdt::core {
 	private:
 		IBO_ID m_ID;
 
-		unsigned int m_vertex_count;
+		size_t m_vertex_count;
 		bool m_should_update;
 
 		std::vector<unsigned int> m_buffer;
@@ -21,7 +21,7 @@ namespace rdt::core {
 		~IndexBuffer();
 
 
-		void PushToBatch(const std::vector<unsigned int>& indices, unsigned int vertexCount);
+		void PushToBatch(const std::vector<unsigned int>& indices, size_t vertexCount);
 
 		/*
 			Sends new index buffer data to GPU via opengl.
