@@ -9,7 +9,7 @@ namespace rdt::core {
 	{
 		m_GUIs.push_back(new DiagnosticsGUI);
 		m_GUIs.push_back(new ScenePanel);
-		m_showTools = false;
+		m_showTools = true;
 	}
 	DevLayer::~DevLayer()
 	{

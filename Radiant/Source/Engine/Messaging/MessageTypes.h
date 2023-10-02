@@ -2,6 +2,7 @@
 #include "Utils/UniqueID.h"
 #include "GameObject/GameObject.h"
 #include "Audio/SoundEngine.h"
+#include "Scene/Scene.h"
 
 namespace rdt {
 
@@ -10,6 +11,10 @@ namespace rdt {
 		MT_RequestGameObjectPtr,
 		MT_SendGameObjectPtr,
 		MT_SoundStopped,
+
+		MT_RequestScenePtr,
+		MT_SendScenePtr,
+		MT_SceneChanged,
 	};
 
 	struct CollisionData {
@@ -31,5 +36,19 @@ namespace rdt {
 
 		SoundStoppedData(SoundID nSID)
 			: sID (nSID) {}
+	};
+
+	struct ScenePtrData {
+		Scene* ptr;
+
+		ScenePtrData(Scene* nPtr)
+			: ptr(nPtr) {}
+	};
+
+	struct SceneChangedData {
+		Scene* ptr;
+
+		SceneChangedData(Scene* nPtr)
+			: ptr(nPtr) {}
 	};
 }

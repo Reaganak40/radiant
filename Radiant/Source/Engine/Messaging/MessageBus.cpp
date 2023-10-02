@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "MessageBus.h"
+#include "Logging/Log.h"
 
 namespace rdt {
 	
@@ -32,11 +33,18 @@ namespace rdt {
 			return 0;
 		}
 
+		if (m_instance->m_messengers_AliasToId.find(alias) != m_instance->m_messengers_AliasToId.end()) {
+			RDT_CORE_WARN("MessageBus: Could not register '{}' (already exists)", alias);
+			return 0;
+		}
+
 		MessageID nID = GetNextMessageID();
 
 		m_instance->m_messengers_AliasToId[alias] = nID;
 		m_instance->m_messengers_IdToAlias[nID] = alias;
 		m_instance->m_messengers[nID] = messenger;
+
+		RDT_CORE_TRACE("MessageBus: Registered new object '{}' to [mID: {}]", alias, nID);
 
 		return nID;
 	}
@@ -61,11 +69,18 @@ namespace rdt {
 
 	void MessageBus::AddToQueue(const Message& msg)
 	{
+		if (msg.from == 0) {
+			RDT_CORE_WARN("Message sent from unregister object. Message dropped.", msg.from);
+			return;
+		}
+
 		if (m_instance->m_messengers.find(msg.from) == m_instance->m_messengers.end()) {
+			RDT_CORE_WARN("Message sent from unknown object [mID: {}]. Message dropped.", msg.from);
 			return;
 		}
 
 		if (m_instance->m_messengers.find(msg.to) == m_instance->m_messengers.end()) {
+			RDT_CORE_WARN("Message sent to unknown object [mID: {}]. Message dropped.", msg.to);
 			return;
 		}
 
@@ -152,6 +167,11 @@ namespace rdt {
 	MessageID MessageBus::CreateBroadcastImpl(const std::string& alias, Broadcast* broadcast)
 	{
 		if (alias.empty()) {
+			return 0;
+		}
+
+		if (m_broadcasts_AliasToId.find(alias) != m_broadcasts_AliasToId.end()) {
+			RDT_CORE_WARN("MessageBus: Could not register broadcast '{}' (already exists)", alias);
 			return 0;
 		}
 
