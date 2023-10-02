@@ -1,21 +1,16 @@
 #pragma once
-#include "Gui/Gui.h"
+#include "Panel.h"
 
-namespace rdt {
+namespace rdt::core {
 
-	class DiagnosticsGUI : public GuiTemplate {
+	class DiagnosticsGUI : public Panel {
 	private:
-		const float m_gui_width;
-		const float m_gui_height;
-
-		int m_window_width;
-		int m_window_height;
-
-		ImFont* m_font;
 	public:
 		DiagnosticsGUI();
 
 		void OnUpdate(const float deltaTime) override;
 		void OnRender() override;
+
+		void OnMessage(Message msg) override final;
 	};
 }

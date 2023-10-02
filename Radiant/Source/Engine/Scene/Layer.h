@@ -62,12 +62,12 @@ namespace rdt {
 		/*
 			Function called when this layer is to be awakened and active.
 		*/
-		virtual void Awake() {}
+		virtual void OnAwake() {}
 
 		/*
 			Function to be called when this layer is to go to sleep but no destroyed.
 		*/
-		virtual void Sleep() {}
+		virtual void OnSleep() {}
 
 		/*
 			Function called when a layer is about to be released, not active.

@@ -104,5 +104,10 @@ namespace rdt {
             Rotates 'point' by dr about the origin.
         */
         void RotatePoint(const Vec2d& origin, Vec2d& point, const double dr);
+
+        /*
+            Returns the absolute path to the current working directory.
+        */
+        std::string GetCWD();
     }
 }

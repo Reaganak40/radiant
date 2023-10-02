@@ -487,6 +487,8 @@
     <ClInclude Include="Source\Editor\Panels\Diagnostics.h" />
     <ClInclude Include="Source\Editor\DevTools.h" />
     <ClInclude Include="Source\Engine\Scene\Scene.h" />
+    <ClInclude Include="Source\Editor\Panels\ScenePanel.h" />
+    <ClInclude Include="Source\Editor\Panels\Panel.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Engine\Application.cpp">
@@ -642,5 +644,7 @@
     <ClCompile Include="Source\Editor\Panels\Diagnostics.cpp" />
     <ClCompile Include="Source\Engine\Scene\Scene.cpp" />
     <ClCompile Include="Source\Editor\DevTools.cpp" />
+    <ClCompile Include="Source\Editor\Panels\ScenePanel.cpp" />
+    <ClCompile Include="Source\Editor\Panels\Panel.cpp" />
   </ItemGroup>
 </Project>

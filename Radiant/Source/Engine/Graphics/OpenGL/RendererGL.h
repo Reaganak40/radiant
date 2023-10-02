@@ -80,6 +80,7 @@ namespace rdt::core {
 
 		// For ImGui instances.
 		std::vector<GuiTemplate*> m_GUIs;
+		bool m_imgui_newFrameCalled;
 
 #pragma warning(pop)
 
@@ -132,5 +133,6 @@ namespace rdt::core {
 
 		void AddDefaultShader();
 		void UpdateTextureUniforms();
+		void StartImGuiFrame();
 	};
 }
