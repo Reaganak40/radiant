@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{A8497895-1429-F730-1D41-8207899F5D92}</ProjectGuid>
+    <ProjectGuid>{1FED84C6-8BA2-FDBB-1497-F792804BF4BF}</ProjectGuid>
     <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Radiant</RootNamespace>
@@ -73,9 +73,6 @@
       <ImportLibrary>..\bin\Debug-windows-x86_64\Radiant\Radiant.lib</ImportLibrary>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
-    <PostBuildEvent>
-      <Command>IF EXIST ..\bin\Debug-windows-x86_64\Radiant\Radiant.dll\ (xcopy /Q /E /Y /I ..\bin\Debug-windows-x86_64\Radiant\Radiant.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Debug-windows-x86_64\Radiant\Radiant.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul)</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -100,14 +97,13 @@
       <ImportLibrary>..\bin\Release-windows-x86_64\Radiant\Radiant.lib</ImportLibrary>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
-    <PostBuildEvent>
-      <Command>IF EXIST ..\bin\Release-windows-x86_64\Radiant\Radiant.dll\ (xcopy /Q /E /Y /I ..\bin\Release-windows-x86_64\Radiant\Radiant.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Release-windows-x86_64\Radiant\Radiant.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul)</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Source\Editor\Editor.h" />
     <ClInclude Include="Source\Editor\DevTools.h" />
+    <ClInclude Include="Source\Editor\Editor.h" />
     <ClInclude Include="Source\Editor\Panels\Diagnostics.h" />
+    <ClInclude Include="Source\Editor\Panels\Panel.h" />
+    <ClInclude Include="Source\Editor\Panels\ScenePanel.h" />
     <ClInclude Include="Source\Engine\Application.h" />
     <ClInclude Include="Source\Engine\Audio\AudioError.h" />
     <ClInclude Include="Source\Engine\Audio\Sound\Sound.h" />
@@ -226,6 +222,8 @@
   <ItemGroup>
     <ClCompile Include="Source\Editor\DevTools.cpp" />
     <ClCompile Include="Source\Editor\Panels\Diagnostics.cpp" />
+    <ClCompile Include="Source\Editor\Panels\Panel.cpp" />
+    <ClCompile Include="Source\Editor\Panels\ScenePanel.cpp" />
     <ClCompile Include="Source\Engine\Application.cpp" />
     <ClCompile Include="Source\Engine\Audio\AudioError.cpp" />
     <ClCompile Include="Source\Engine\Audio\Sound\Sound.cpp" />
@@ -284,16 +282,16 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Vendor\GLFW.vcxproj">
-      <Project>{154B857C-0182-860D-AA6E-6C109684020F}</Project>
+      <Project>{0CDDDE85-F8A9-3991-21C3-27390DEF6E1F}</Project>
     </ProjectReference>
     <ProjectReference Include="Vendor\GLM.vcxproj">
-      <Project>{05EB870B-71F4-877C-FA6F-9E7C6678937C}</Project>
+      <Project>{FCF40F14-68D4-8EAF-71EC-1986DD4AF510}</Project>
     </ProjectReference>
     <ProjectReference Include="Vendor\GLAD.vcxproj">
-      <Project>{5D4A857C-4981-860D-F26D-6C10DE83020F}</Project>
+      <Project>{5440DD78-400D-3884-6926-262C55526D12}</Project>
     </ProjectReference>
     <ProjectReference Include="Vendor\ImGui.vcxproj">
-      <Project>{C0FF640D-2C14-8DBE-F595-301E616989EF}</Project>
+      <Project>{37EF8E33-A359-43AA-EC97-F44F584121FF}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

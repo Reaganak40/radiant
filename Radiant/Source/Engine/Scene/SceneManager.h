@@ -3,16 +3,19 @@
 
 namespace rdt {
 
-	class SceneManager {
+	class SceneManager : public Messenger {
 	private:
 		SceneManager();
 		~SceneManager();
 		static SceneManager* m_instance;
 
+		MessageID m_broadcast;
+
 		std::unordered_map<std::string, Scene*> m_scenes;
 		std::string m_currentSceneName;
 		Scene* m_current_scene;
 
+		void OnMessage(Message msg) override final;
 	public:
 
 		/*

@@ -4,6 +4,12 @@
     <Filter Include="Source">
       <UniqueIdentifier>{56EB95D1-428D-C0A7-2B48-D4FB178947F8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Editor">
+      <UniqueIdentifier>{CC4BAF2E-380C-2B65-0147-74E26DC66F41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Editor\Panels">
+      <UniqueIdentifier>{9EBE4965-8A4D-D32E-336C-E7291FDAE3D4}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source\Engine">
       <UniqueIdentifier>{1BF9622F-87B9-DE65-50F4-27E3BC732342}</UniqueIdentifier>
     </Filter>
@@ -144,6 +150,21 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Editor\DevTools.h">
+      <Filter>Source\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Editor\Editor.h">
+      <Filter>Source\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Editor\Panels\Diagnostics.h">
+      <Filter>Source\Editor\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Editor\Panels\Panel.h">
+      <Filter>Source\Editor\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Editor\Panels\ScenePanel.h">
+      <Filter>Source\Editor\Panels</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Engine\Application.h">
       <Filter>Source\Engine</Filter>
     </ClInclude>
@@ -277,6 +298,9 @@
       <Filter>Source\Engine\Polygon</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Scene\Layer.h">
+      <Filter>Source\Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Engine\Scene\Scene.h">
       <Filter>Source\Engine\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Scene\SceneManager.h">
@@ -483,12 +507,20 @@
     <ClInclude Include="Vendor\stb\stb_image.h">
       <Filter>Vendor\stb</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Editor\Editor.h" />
-    <ClInclude Include="Source\Editor\Panels\Diagnostics.h" />
-    <ClInclude Include="Source\Editor\DevTools.h" />
-    <ClInclude Include="Source\Engine\Scene\Scene.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Editor\DevTools.cpp">
+      <Filter>Source\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Editor\Panels\Diagnostics.cpp">
+      <Filter>Source\Editor\Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Editor\Panels\Panel.cpp">
+      <Filter>Source\Editor\Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Editor\Panels\ScenePanel.cpp">
+      <Filter>Source\Editor\Panels</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Engine\Application.cpp">
       <Filter>Source\Engine</Filter>
     </ClCompile>
@@ -609,6 +641,9 @@
     <ClCompile Include="Source\Engine\Scene\Layer.cpp">
       <Filter>Source\Engine\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Engine\Scene\Scene.cpp">
+      <Filter>Source\Engine\Scene</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Engine\Scene\SceneManager.cpp">
       <Filter>Source\Engine\Scene</Filter>
     </ClCompile>
@@ -639,8 +674,5 @@
     <ClCompile Include="Vendor\stb\stb_image.cpp">
       <Filter>Vendor\stb</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Editor\Panels\Diagnostics.cpp" />
-    <ClCompile Include="Source\Engine\Scene\Scene.cpp" />
-    <ClCompile Include="Source\Editor\DevTools.cpp" />
   </ItemGroup>
 </Project>

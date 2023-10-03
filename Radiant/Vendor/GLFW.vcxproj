@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{154B857C-0182-860D-AA6E-6C109684020F}</ProjectGuid>
+    <ProjectGuid>{0CDDDE85-F8A9-3991-21C3-27390DEF6E1F}</ProjectGuid>
     <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>GLFW</RootNamespace>

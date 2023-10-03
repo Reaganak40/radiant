@@ -128,6 +128,9 @@ namespace rdt {
         UP_KEY_DOWN,
         UP_KEY_UP,
 
+        CTRL_KEY_PRESS,
+        CTRL_KEY_DOWN,
+        CTRL_KEY_UP,
 
         NAIS // Not an input state
     };

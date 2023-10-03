@@ -1,7 +1,9 @@
+
 project "GLFW"
 	kind "StaticLib"
 	language "C"
 	architecture "x86_64"
+    uuid (os.uuid("GLFWUUID"))
 
 	targetdir ("../../bin/" .. outputdir .. "/%{prj.name}")
     objdir ("../../bin/obj/" .. outputdir .. "/%{prj.name}")

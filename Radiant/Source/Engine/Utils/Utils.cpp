@@ -1,7 +1,16 @@
 #include "pch.h"
+#include "Core.h"
 #include "Utils.h"
 
 #include <filesystem>
+
+#ifdef RDT_PLATFORM_WINDOWS
+#include <direct.h>
+#define GetCurrentDir _getcwd
+#else
+#include <unistd.h>
+#define GetCurrentDir getcwd
+#endif
 
 namespace rdt {
 
@@ -158,6 +167,14 @@ namespace rdt {
             double theta = GetRotation(origin, point) + dr;
             point.x = origin.x + (magnitude * std::cos(theta));
             point.y = origin.y + (magnitude * std::sin(theta));
+        }
+
+        std::string GetCWD()
+        {
+            char buff[FILENAME_MAX]; //create string buffer to hold path
+            GetCurrentDir(buff, FILENAME_MAX);
+            std::string current_working_dir(buff);
+            return current_working_dir;
         }
     }
 }

@@ -26,6 +26,7 @@ namespace rdt::core {
 
         m_polygon_color = BLACK;
         m_line_color = BLACK;
+        m_imgui_newFrameCalled = false;
 	}
 
 	RendererGL::~RendererGL()
@@ -170,11 +171,7 @@ namespace rdt::core {
 
     void RendererGL::OnBeginFrameImpl()
     {
-        if (m_GUIs.size() > 0) {
-            ImGui_ImplOpenGL3_NewFrame();
-            ImGui_ImplGlfw_NewFrame();
-            ImGui::NewFrame();
-        }
+        StartImGuiFrame();
     }
 
     void RendererGL::OnUpdateImpl(const float deltaTime)
@@ -240,9 +237,10 @@ namespace rdt::core {
         /*
             Step 4: Render all the GUI objects.
         */
-        if (m_GUIs.size() > 0) {
+        if (m_imgui_newFrameCalled) {
             GuiTemplate::RenderImGui();
         }
+        m_imgui_newFrameCalled = false;
 
         /* Swap front and back buffers */
         glfwSwapBuffers(m_window);
@@ -429,6 +427,7 @@ namespace rdt::core {
     void RendererGL::AttachGuiImpl(GuiTemplate* gui)
     {
         m_GUIs.push_back(gui);
+        StartImGuiFrame();
     }
 
     void RendererGL::DetachGuiImpl(const GuiTemplate* gui)
@@ -495,5 +494,15 @@ namespace rdt::core {
     {
         SetShader(m_shaders[0]->GetID());
         m_shaders[0]->SetUniform<std::array<TextureID, MAX_TEXTURES>>("uTextures", TextureManager::GetTextureSlots());
+    }
+    void RendererGL::StartImGuiFrame()
+    {
+        if (m_GUIs.size() > 0 && !m_imgui_newFrameCalled) {
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+
+            m_imgui_newFrameCalled = true;
+        }
     }
 }

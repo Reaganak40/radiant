@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "SceneManager.h"
+#include "Messaging/MessageTypes.h"
 
 namespace rdt {
 	SceneManager* SceneManager::m_instance = nullptr;
@@ -9,12 +10,24 @@ namespace rdt {
 	{
 		m_scenes[""] = new Scene;
 		m_scenes.at("")->OnRegister();
+
+		RegisterToMessageBus("SceneManager");
+		m_broadcast = MessageBus::CreateBroadcast("SceneManager", new Broadcast);
 	}
 
 	SceneManager::~SceneManager()
 	{
 		for (auto& [sceneName, scenePtr] : m_scenes) {
 			delete scenePtr;
+		}
+	}
+
+	void SceneManager::OnMessage(Message msg)
+	{
+		switch (msg.type) {
+		case MT_RequestScenePtr:
+			SendDirectMessage(msg.from, MT_SendScenePtr, new ScenePtrData(m_current_scene));
+			break;
 		}
 	}
 
@@ -70,6 +83,7 @@ namespace rdt {
 			}
 			m_current_scene = m_scenes[m_currentSceneName];
 			m_current_scene->OnBind();
+			MessageBus::AddToBroadcast(m_broadcast, MT_SceneChanged, new SceneChangedData(m_current_scene));
 		}
 
 		return m_current_scene;

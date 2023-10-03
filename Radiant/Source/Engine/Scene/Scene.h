@@ -33,6 +33,9 @@ namespace rdt {
 		*/
 		void OnMessage(Message msg) override {}
 
+	protected:
+
+
 	public:
 		Scene();
 		~Scene();

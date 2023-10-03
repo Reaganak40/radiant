@@ -1,9 +1,11 @@
 -- ===============================================================================================
 -- Radiant Engine Build Configuration
 -- ===============================================================================================
+
 project "Radiant"
     kind "SharedLib"
     language "C++"
+    uuid (os.uuid("RadiantUUID"))
     targetdir ("../bin/" .. outputdir .. "/%{prj.name}")
     objdir ("../bin/obj/" .. outputdir .. "/%{prj.name}")
     ignoredefaultlibraries { "LIBCMTD" }
@@ -61,11 +63,6 @@ project "Radiant"
         {
             "RDT_PLATFORM_WINDOWS",
             "RDT_BUILD_DLL"
-        }
-    
-        postbuildcommands
-        {
-            ("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox")
         }
     
     filter "configurations:Debug"

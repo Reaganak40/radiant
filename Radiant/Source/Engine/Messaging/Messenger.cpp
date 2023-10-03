@@ -7,6 +7,7 @@ namespace rdt {
 	Messenger::Messenger()
 		: m_messageID(0)
 	{
+		m_name = "NoName";
 	}
 	Messenger::~Messenger()
 	{
@@ -32,8 +33,15 @@ namespace rdt {
 		MessageBus::AddToQueue(m_messageID, MessageBus::GetMessageID(to), type, data);
 	}
 
-	void Messenger::RegisterToMessageBus(const std::string& alias)
+	bool Messenger::RegisterToMessageBus(const std::string& alias)
 	{
 		m_messageID = MessageBus::Register(alias, this);
+
+		if (!m_messageID) {
+			return false;
+		}
+
+		m_name = alias;
+		return true;
 	}
 }
