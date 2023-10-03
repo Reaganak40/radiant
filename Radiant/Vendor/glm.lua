@@ -2,6 +2,7 @@ project "GLM"
 	kind "StaticLib"
 	language "C"
 	architecture "x86_64"
+    uuid ("GLMUUID")
 
 	targetdir ("../../bin/" .. outputdir .. "/%{prj.name}")
     objdir ("../../bin/obj/" .. outputdir .. "/%{prj.name}")

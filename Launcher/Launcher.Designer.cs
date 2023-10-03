@@ -250,9 +250,9 @@
             // 
             // ProjectCreationProgressBar
             // 
-            ProjectCreationProgressBar.Location = new Point(134, 620);
+            ProjectCreationProgressBar.Location = new Point(137, 624);
             ProjectCreationProgressBar.Name = "ProjectCreationProgressBar";
-            ProjectCreationProgressBar.Size = new Size(995, 29);
+            ProjectCreationProgressBar.Size = new Size(1000, 25);
             ProjectCreationProgressBar.TabIndex = 3;
             ProjectCreationProgressBar.Visible = false;
             // 

@@ -1,10 +1,9 @@
 -- ===============================================================================================
--- Sandbox Build Configuration
+-- Project Build Configuration
 -- ===============================================================================================
-project "Sandbox"
+project "RADIANTPROJECTNAME"
     kind "ConsoleApp"
     language "C++"
-    uuid ("SandboxUUID")
     targetdir ("../bin/" .. outputdir .. "/%{prj.name}")
     objdir ("../bin/obj/" .. outputdir .. "/%{prj.name}")
 
@@ -16,18 +15,18 @@ project "Sandbox"
 
     includedirs
     {
-        "../Radiant/Source",
-        "../Radiant/Source/Engine",
+        "RADIANTBASEDIR/Radiant/Source",
+        "RADIANTBASEDIR/Radiant/Source/Engine",
 
-        "../Radiant/%{IncludeDir.GLFW}",
-		"../Radiant/%{IncludeDir.glad}",
-		"../Radiant/%{IncludeDir.ImGui}",
-		"../Radiant/%{IncludeDir.ImGuiBackend}",
-		"../Radiant/%{IncludeDir.glm}",
-		"../Radiant/%{IncludeDir.stb}",
-        "../Radiant/%{IncludeDir.openal}",
-		"../Radiant/%{IncludeDir.AudioFile}",
-		"../Radiant/%{IncludeDir.spdlog}",
+        "RADIANTBASEDIR/Radiant/%{IncludeDir.GLFW}",
+		"RADIANTBASEDIR/Radiant/%{IncludeDir.glad}",
+		"RADIANTBASEDIR/Radiant/%{IncludeDir.ImGui}",
+		"RADIANTBASEDIR/Radiant/%{IncludeDir.ImGuiBackend}",
+		"RADIANTBASEDIR/Radiant/%{IncludeDir.glm}",
+		"RADIANTBASEDIR/Radiant/%{IncludeDir.stb}",
+        "RADIANTBASEDIR/Radiant/%{IncludeDir.openal}",
+		"RADIANTBASEDIR/Radiant/%{IncludeDir.AudioFile}",
+		"RADIANTBASEDIR/Radiant/%{IncludeDir.spdlog}",
     }
 
     links

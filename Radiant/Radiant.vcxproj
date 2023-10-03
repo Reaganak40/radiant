@@ -105,8 +105,8 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Source\Editor\Editor.h" />
     <ClInclude Include="Source\Editor\DevTools.h" />
+    <ClInclude Include="Source\Editor\Editor.h" />
     <ClInclude Include="Source\Editor\Panels\Diagnostics.h" />
     <ClInclude Include="Source\Editor\Panels\Panel.h" />
     <ClInclude Include="Source\Editor\Panels\ScenePanel.h" />

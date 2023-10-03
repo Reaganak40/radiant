@@ -4,6 +4,7 @@
 project "Radiant"
     kind "SharedLib"
     language "C++"
+    uuid ("RadiantUUID")
     targetdir ("../bin/" .. outputdir .. "/%{prj.name}")
     objdir ("../bin/obj/" .. outputdir .. "/%{prj.name}")
     ignoredefaultlibraries { "LIBCMTD" }
