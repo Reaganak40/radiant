@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -158,6 +159,8 @@ namespace Launcher.Source
 
             worker.ReportProgress(100, "Opening project...");
             Thread.Sleep(750);
+
+            OpenWithDefaultProgram(Path.Combine(projectBaseDir, projectName + ".sln"));
         }
 
         private bool CopyFile(string src, string dest)
@@ -171,7 +174,16 @@ namespace Launcher.Source
             return true;
         }
 
-       private void ReplaceInFile(string filename, string find, string replace)
+        public static void OpenWithDefaultProgram(string path)
+        {
+            using Process fileopener = new Process();
+
+            fileopener.StartInfo.FileName = "explorer";
+            fileopener.StartInfo.Arguments = "\"" + path + "\"";
+            fileopener.Start();
+        }
+
+        private void ReplaceInFile(string filename, string find, string replace)
         {
             string text = File.ReadAllText(filename);
             text = text.Replace(find, replace);
