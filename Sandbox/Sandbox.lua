@@ -4,7 +4,7 @@
 project "Sandbox"
     kind "ConsoleApp"
     language "C++"
-    uuid ("SandboxUUID")
+    uuid (os.uuid("SandboxUUID"))
     targetdir ("../bin/" .. outputdir .. "/%{prj.name}")
     objdir ("../bin/obj/" .. outputdir .. "/%{prj.name}")
 
@@ -33,6 +33,12 @@ project "Sandbox"
     links
     {
         "Radiant"
+    }
+
+    postbuildcommands
+    {
+        ("{COPY} %{cfg.targetdir}/../Radiant/Radiant.dll %{cfg.targetdir}"),
+        ("{COPY} %{cfg.targetdir}/../Radiant/OpenAL32.dll %{cfg.targetdir}")
     }
 
     filter "system:windows"

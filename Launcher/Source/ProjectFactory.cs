@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -100,24 +101,47 @@ namespace Launcher.Source
             string configureFilename = Path.Combine(projectBaseDir, "premake5.lua");
             ReplaceInFile(configureFilename, "RADIANTPROJECTNAME", projectName);
             ReplaceInFile(configureFilename, "RADIANTBASEDIR", radiantSourcePath);
+            while (!Path.Exists(configureFilename)) ;
 
             // Configure project.lua
             worker.ReportProgress(45, "Configuring project.lua...");
             configureFilename = Path.Combine(projectContainerDir, projectName + ".lua");
             ReplaceInFile(configureFilename, "RADIANTPROJECTNAME", projectName);
             ReplaceInFile(configureFilename, "RADIANTBASEDIR", radiantSourcePath);
+            while (!Path.Exists(configureFilename)) ;
 
-            // Add lua projec file
+
+            // Create Source folder
+            string projectSouceDir = Path.Combine(projectContainerDir, "Source");
+            Directory.CreateDirectory(projectSouceDir);
+            worker.ReportProgress(55, "Creating " + projectSouceDir);
+
+            // Copy application source file
+            resFilepathSrc = Path.Combine(creationResourcePath, "app_template.cpp");
+            resFilepathDest = Path.Combine(projectSouceDir, projectName + ".cpp");
+            worker.ReportProgress(60, "Copying " + resFilepathSrc + " to " + resFilepathDest);
+            if (!CopyFile(resFilepathSrc, resFilepathDest))
+            {
+                return;
+            }
+
+            // Configure application source file
+            worker.ReportProgress(65, "Configuring " + projectName + ".cpp ...");
+            string baseClassName = Regex.Replace(projectName, @"\s+", ""); ;
+            configureFilename = resFilepathDest;
+            ReplaceInFile(configureFilename, "RADIANTPROJECTNAME", baseClassName);
+
+            // Add bat project file
             resFilepathSrc = Path.Combine(creationResourcePath, "build.bat");
             resFilepathDest = Path.Combine(projectBaseDir, "build.bat");
-            worker.ReportProgress(50, "Copying " + resFilepathSrc + " to " + resFilepathDest);
+            worker.ReportProgress(70, "Copying " + resFilepathSrc + " to " + resFilepathDest);
             if (!CopyFile(resFilepathSrc, resFilepathDest))
             {
                 return;
             }
 
             // Configure build.bat
-            worker.ReportProgress(55, "Configuring build.bat...");
+            worker.ReportProgress(75, "Configuring build.bat...");
             string premakeExepath = Path.Combine(radiantSourcePath, "Vendor", "bin", "premake", "premake5.exe");
             if (!Path.Exists(premakeExepath))
             {
@@ -126,10 +150,10 @@ namespace Launcher.Source
             }
             configureFilename = resFilepathDest;
             ReplaceInFile(configureFilename, "RADIANTPREMAKE5EXE", premakeExepath);
-
+            ReplaceInFile(configureFilename, "PROJECTBASEDIR", projectBaseDir);
 
             // Run premake5 to create visual studio solution and project files
-            worker.ReportProgress(65, "Running premake5...");
+            worker.ReportProgress(85, "Running premake5...");
             System.Diagnostics.Process.Start(configureFilename);
 
             worker.ReportProgress(100, "Opening project...");

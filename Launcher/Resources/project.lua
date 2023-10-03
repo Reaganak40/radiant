@@ -4,6 +4,7 @@
 project "RADIANTPROJECTNAME"
     kind "ConsoleApp"
     language "C++"
+    uuid (os.uuid("RADIANTPROJECTNAMEUUID"))
     targetdir ("../bin/" .. outputdir .. "/%{prj.name}")
     objdir ("../bin/obj/" .. outputdir .. "/%{prj.name}")
 
@@ -32,6 +33,12 @@ project "RADIANTPROJECTNAME"
     links
     {
         "Radiant"
+    }
+
+    postbuildcommands
+    {
+        ("{COPY} %{builddir}/Radiant.dll %{cfg.targetdir}"),
+        ("{COPY} %{builddir}/OpenAL32.dll %{cfg.targetdir}")
     }
 
     filter "system:windows"

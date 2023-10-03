@@ -2,7 +2,7 @@ project "ImGui"
 	kind "StaticLib"
 	language "C"
 	architecture "x86_64"
-    uuid ("ImGuiUUID")
+    uuid (os.uuid("ImGuiUUID"))
 
 	targetdir ("../../bin/" .. outputdir .. "/%{prj.name}")
     objdir ("../../bin/obj/" .. outputdir .. "/%{prj.name}")

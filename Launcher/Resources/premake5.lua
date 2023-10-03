@@ -9,6 +9,7 @@ workspace "RADIANTPROJECTNAME"
     }
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+builddir = ("RADIANTBASEDIR" .. "/bin/" .. outputdir .. "/Radiant")
 
 -- Include directories relative to Radiant Project
 IncludeDir = {}
@@ -26,38 +27,38 @@ IncludeDir["spdlog"] = "Vendor/spdlog/include"
 group "Dependencies"
     externalproject "GLFW"
         location "RADIANTBASEDIR/Radiant/Vendor"
-        uuid ("GLFWUUID")
+        uuid (os.uuid("GLFWUUID"))
         kind "StaticLib"
         language "C"
     
     externalproject "GLAD"
         location "RADIANTBASEDIR/Radiant/Vendor"
-        uuid ("GLADUUID")
+        uuid (os.uuid("GLADUUID"))
         kind "StaticLib"
         language "C"
 
     externalproject "GLM"
         location "RADIANTBASEDIR/Radiant/Vendor"
-        uuid ("GLMUUID")
+        uuid (os.uuid("GLMUUID"))
         kind "StaticLib"
         language "C"
 
     externalproject "ImGui"
         location "RADIANTBASEDIR/Radiant/Vendor"
-        uuid ("ImGuiUUID")
+        uuid (os.uuid("ImGuiUUID"))
         kind "StaticLib"
         language "C"
 
     externalproject "ImGui"
         location "RADIANTBASEDIR/Radiant/Vendor"
-        uuid ("ALUUID")
+        uuid (os.uuid("ALUUID"))
         kind "StaticLib"
         language "C"
 group ""
 
 externalproject "Radiant"
     location "RADIANTBASEDIR/Radiant"
-    uuid ("RadiantUUID")
+    uuid (os.uuid("RadiantUUID"))
     kind "SharedLib"
     language "C++"
 

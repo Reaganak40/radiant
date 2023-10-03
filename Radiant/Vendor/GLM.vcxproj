@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{05EB870B-71F4-877C-FA6F-9E7C6678937C}</ProjectGuid>
+    <ProjectGuid>{FCF40F14-68D4-8EAF-71EC-1986DD4AF510}</ProjectGuid>
     <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>GLM</RootNamespace>

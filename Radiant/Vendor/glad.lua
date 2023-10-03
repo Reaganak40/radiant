@@ -2,7 +2,7 @@ project "GLAD"
 	kind "StaticLib"
 	language "C"
 	architecture "x86_64"
-    uuid ("GLADUUID")
+    uuid (os.uuid("GLADUUID"))
 
 	targetdir ("../../bin/" .. outputdir .. "/%{prj.name}")
     objdir ("../../bin/obj/" .. outputdir .. "/%{prj.name}")
