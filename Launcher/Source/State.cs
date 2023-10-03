@@ -10,6 +10,7 @@ namespace Launcher.Source
     {
         WelcomeScreen,
         CreateProject,
+        CreatingProject,
     }
 
     internal class State
@@ -36,6 +37,8 @@ namespace Launcher.Source
                     return "Radiant > Welcome";
                 case StateOptions.CreateProject:
                     return "Radiant > Welcome > Create Project";
+                case StateOptions.CreatingProject:
+                    return "Radiant > Welcome > Create Project > Creating...";
                 default:
                     return "Radiant >";
             }

@@ -43,6 +43,9 @@
             NewProjectMenuButton = new ToolStripMenuItem();
             LoadProjectMenuButton = new ToolStripMenuItem();
             ProjectNameBox = new TextBox();
+            ProjectCreationProgressBar = new ProgressBar();
+            UpdateMessageLabel = new Label();
+            projectCreatorWorker = new System.ComponentModel.BackgroundWorker();
             ProjectPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)CreateProjectCreateDirectorySplitContainer).BeginInit();
             CreateProjectCreateDirectorySplitContainer.Panel1.SuspendLayout();
@@ -245,12 +248,41 @@
             ProjectNameBox.Visible = false;
             ProjectNameBox.TextChanged += ProjectNameBox_TextChanged;
             // 
+            // ProjectCreationProgressBar
+            // 
+            ProjectCreationProgressBar.Location = new Point(134, 620);
+            ProjectCreationProgressBar.Name = "ProjectCreationProgressBar";
+            ProjectCreationProgressBar.Size = new Size(995, 29);
+            ProjectCreationProgressBar.TabIndex = 3;
+            ProjectCreationProgressBar.Visible = false;
+            // 
+            // UpdateMessageLabel
+            // 
+            UpdateMessageLabel.AutoSize = true;
+            UpdateMessageLabel.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            UpdateMessageLabel.ForeColor = SystemColors.ButtonFace;
+            UpdateMessageLabel.Location = new Point(137, 589);
+            UpdateMessageLabel.Name = "UpdateMessageLabel";
+            UpdateMessageLabel.Size = new Size(160, 20);
+            UpdateMessageLabel.TabIndex = 4;
+            UpdateMessageLabel.Text = "Creating project files ...";
+            UpdateMessageLabel.Visible = false;
+            // 
+            // projectCreatorWorker
+            // 
+            projectCreatorWorker.WorkerReportsProgress = true;
+            projectCreatorWorker.DoWork += projectCreatorWorker_DoWork;
+            projectCreatorWorker.ProgressChanged += projectCreatorWorker_ProgressChanged;
+            projectCreatorWorker.RunWorkerCompleted += projectCreatorWorker_RunWorkerCompleted;
+            // 
             // Launcher
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(37, 37, 38);
             ClientSize = new Size(1262, 673);
+            Controls.Add(UpdateMessageLabel);
+            Controls.Add(ProjectCreationProgressBar);
             Controls.Add(ProjectLabel);
             Controls.Add(DirectoryLabel);
             Controls.Add(ProjectPanel);
@@ -290,5 +322,8 @@
         private Button CreateProjectButton;
         private Button BackButton;
         private Label CreationErrorLabel;
+        private ProgressBar ProjectCreationProgressBar;
+        private Label UpdateMessageLabel;
+        private System.ComponentModel.BackgroundWorker projectCreatorWorker;
     }
 }

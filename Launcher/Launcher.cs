@@ -1,5 +1,7 @@
 using Launcher.Source;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace Launcher
 {
@@ -16,6 +18,8 @@ namespace Launcher
 
             ChangeState(StateOptions.WelcomeScreen);
         }
+
+
 
         [DllImport("DwmApi")] //System.Runtime.InteropServices
         private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, int[] attrValue, int attrSize);
@@ -45,12 +49,14 @@ namespace Launcher
         {
             switch (nState)
             {
+                case StateOptions.WelcomeScreen:
+                    EnableWelcomeScreenForm();
+                    break;
                 case StateOptions.CreateProject:
                     EnableCreateProjectForm();
                     break;
-
-                case StateOptions.WelcomeScreen:
-                    EnableWelcomeScreenForm();
+                case StateOptions.CreatingProject:
+                    EnableCreatingProjectView();
                     break;
             }
 
@@ -60,21 +66,30 @@ namespace Launcher
 
         private void EnableCreateProjectForm()
         {
+
+            this.ProjectPanel.Visible = true;
+            this.ProjectLabel.Visible = true;
+
             this.CreateProjectCreateDirectorySplitContainer.Visible = true;
+            this.ProjectNameBox.Visible = true;
             this.DirectoryTextbox.Visible = true;
             this.BrowseCreateDirectoryButton.Visible = true;
-            this.ProjectNameBox.Visible = true;
             this.CreateFolderCheckbox.Visible = true;
             this.BackButton.Visible = true;
             this.CreateProjectButton.Visible = true;
 
             this.NoLoadedProjectsLabel.Visible = false;
+            this.ProjectCreationProgressBar.Visible = false;
+            this.UpdateMessageLabel.Visible = false;
 
             this.ProjectLabel.Text = "Create Project";
         }
 
         private void EnableWelcomeScreenForm()
         {
+            this.ProjectPanel.Visible = true;
+            this.ProjectLabel.Visible = true;
+
             this.CreateProjectCreateDirectorySplitContainer.Visible = false;
             this.DirectoryTextbox.Visible = false;
             this.BrowseCreateDirectoryButton.Visible = false;
@@ -85,7 +100,19 @@ namespace Launcher
 
             this.NoLoadedProjectsLabel.Visible = true;
 
+            this.ProjectCreationProgressBar.Visible = false;
+            this.UpdateMessageLabel.Visible = false;
+
             this.ProjectLabel.Text = "Projects";
+        }
+
+        private void EnableCreatingProjectView()
+        {
+            this.ProjectPanel.Visible = false;
+            this.ProjectLabel.Visible = false;
+
+            this.ProjectCreationProgressBar.Visible = true;
+            this.UpdateMessageLabel.Visible = true;
         }
 
         private void NewProjectMenuButton_Click(object sender, EventArgs e)
@@ -175,8 +202,6 @@ namespace Launcher
                 return;
             }
             this.CreationErrorLabel.Visible = false;
-
-
             this.CreateProjectButton.Enabled = true;
         }
 
@@ -189,7 +214,28 @@ namespace Launcher
                 projectPath = Path.Combine(projectPath, this.ProjectNameBox.Text);
             }
 
-            this.m_factory.CreateProject(projectPath);
+            m_factory.SetProjectName(this.ProjectNameBox.Text);
+            m_factory.SetStartPoint(projectPath);
+            projectCreatorWorker.RunWorkerAsync();
+
+            ChangeState(StateOptions.CreatingProject);
+        }
+
+        private void projectCreatorWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            BackgroundWorker worker = (BackgroundWorker)sender;
+            m_factory.CreateProject(ref worker);
+        }
+
+        private void projectCreatorWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            UpdateMessageLabel.Text = e.UserState?.ToString() + " " + e.ProgressPercentage.ToString();
+            ProjectCreationProgressBar.Value = e.ProgressPercentage;
+        }
+
+        private void projectCreatorWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            Application.Exit();
         }
     }
 }
