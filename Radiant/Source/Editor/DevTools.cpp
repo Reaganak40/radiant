@@ -13,6 +13,7 @@ namespace rdt::core {
 	{
 		RDT_CORE_WARN("Developer tools are enabled");
 
+		Panel::SetTheme(Theme_Gray);
 		m_GUIs.push_back(new DiagnosticsGUI);
 		m_GUIs.push_back(new ScenePanel);
 		m_showTools = true;
@@ -31,6 +32,18 @@ namespace rdt::core {
 		else {
 			RDT_CORE_WARN("No project found!");
 		}
+
+		Renderer::SetBackgroundColor(Color(0.1f, 0.1, 0.1f, 1.0f));
+
+		Camera* defaultCamera = Renderer::GetCamera();
+		
+		int viewportWidth = 1280;
+		int viewportHeight = 720;
+		int cameraPosX = (((int)Renderer::GetWindowWidth()) / 2) - (viewportWidth / 2);
+		int cameraPosY = (((int)Renderer::GetWindowHeight()) / 2) - (viewportHeight / 2);
+
+		defaultCamera->SetViewport({ cameraPosX, cameraPosY }, { viewportWidth, viewportHeight });
+		defaultCamera->SetBackgroundColor(Color(173, 216, 230, 255, false));
 	}
 	DevLayer::~DevLayer()
 	{

@@ -19,6 +19,7 @@ namespace rdt::core {
 	void DiagnosticsGUI::OnRender()
 	{
 		PrepareRender();
+		ThemeBegin();
 
 		// Start drawing window
 		ImGui::Begin("Diagnostic Tools");
@@ -27,8 +28,9 @@ namespace rdt::core {
 		ImGui::NewLine();
 		ImGui::NewLine();
 		ImGui::Text("Performance: %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		
 		ImGui::End();
-
+		ThemeEnd();
 	}
 	void DiagnosticsGUI::OnMessage(Message msg)
 	{

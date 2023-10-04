@@ -33,6 +33,7 @@ namespace rdt::core {
 	void ScenePanel::OnRender()
 	{
 		PrepareRender();
+		ThemeBegin();
 
 		// Start drawing window
 		ImGui::Begin("Scene Panel");
@@ -43,7 +44,9 @@ namespace rdt::core {
 		else {
 			ImGui::Text("Scene: %s", m_scene->GetName().c_str());
 		}
+
 		ImGui::End();
+		ThemeEnd();
 	}
 	void ScenePanel::OnMessage(Message msg)
 	{

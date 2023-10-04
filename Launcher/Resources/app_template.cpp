@@ -1,4 +1,5 @@
 #include <Radiant.h>
+#include <Engine/EntryPoint.h>
 
 using namespace rdt;
 
