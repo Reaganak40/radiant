@@ -16,8 +16,6 @@ namespace rdt {
 		: m_current_scene(nullptr)
 	{
 		Renderer::Initialize();
-		m_cwd = Utils::GetCWD();
-		RDT_CORE_INFO("Current filepath: {}", m_cwd);
 	}
 
 	Application::~Application()

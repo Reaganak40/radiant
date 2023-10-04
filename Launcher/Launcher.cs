@@ -66,6 +66,9 @@ namespace Launcher
 
         private void EnableCreateProjectForm()
         {
+            this.NoLoadedProjectsLabel.Visible = false;
+            this.ProjectCreationProgressBar.Visible = false;
+            this.UpdateMessageLabel.Visible = false;
 
             this.ProjectPanel.Visible = true;
             this.ProjectLabel.Visible = true;
@@ -78,18 +81,12 @@ namespace Launcher
             this.BackButton.Visible = true;
             this.CreateProjectButton.Visible = true;
 
-            this.NoLoadedProjectsLabel.Visible = false;
-            this.ProjectCreationProgressBar.Visible = false;
-            this.UpdateMessageLabel.Visible = false;
 
             this.ProjectLabel.Text = "Create Project";
         }
 
         private void EnableWelcomeScreenForm()
         {
-            this.ProjectPanel.Visible = true;
-            this.ProjectLabel.Visible = true;
-
             this.CreateProjectCreateDirectorySplitContainer.Visible = false;
             this.DirectoryTextbox.Visible = false;
             this.BrowseCreateDirectoryButton.Visible = false;
@@ -102,6 +99,10 @@ namespace Launcher
 
             this.ProjectCreationProgressBar.Visible = false;
             this.UpdateMessageLabel.Visible = false;
+
+            this.ProjectPanel.Visible = true;
+            this.ProjectLabel.Visible = true;
+
 
             this.ProjectLabel.Text = "Projects";
         }

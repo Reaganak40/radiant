@@ -109,5 +109,15 @@ namespace rdt {
             Returns the absolute path to the current working directory.
         */
         std::string GetCWD();
+
+        /*
+            Tokenizes a string by the provided delimeter and returns a vector of the tokenized strings
+        */
+        void Tokenize(const std::string& str, const std::string& delimeter, std::vector<std::string>& out);
+
+        /*
+            Returns the parent directory of the filepath
+        */
+        std::string ParentPath(const std::string& path);
     }
 }

@@ -99,6 +99,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Engine\Utils\ConfigReader.h" />
     <ClInclude Include="Source\Editor\DevTools.h" />
     <ClInclude Include="Source\Editor\Editor.h" />
     <ClInclude Include="Source\Editor\Panels\Diagnostics.h" />
@@ -268,6 +269,7 @@
     <ClCompile Include="Source\Engine\Scene\SceneManager.cpp" />
     <ClCompile Include="Source\Engine\Utils\BitSet.cpp" />
     <ClCompile Include="Source\Engine\Utils\Color.cpp" />
+    <ClCompile Include="Source\Engine\Utils\ConfigReader.cpp" />
     <ClCompile Include="Source\Engine\Utils\Input.cpp" />
     <ClCompile Include="Source\Engine\Utils\MathTypes.cpp" />
     <ClCompile Include="Source\Engine\Utils\Timestep.cpp" />

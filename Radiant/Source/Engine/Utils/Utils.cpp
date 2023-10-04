@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Core.h"
 #include "Utils.h"
+#include "Engine/Logging/Log.h"
 
 #include <filesystem>
 
@@ -81,7 +82,7 @@ namespace rdt {
             std::ifstream infile(filepath);
 
             if (!infile.is_open()) {
-                printf("Warning: Could not open file: [%s]\n", filepath.c_str());
+                RDT_CORE_WARN("Warning: Could not open file: [{}]", filepath.c_str());
                 return;
             }
 
@@ -175,6 +176,36 @@ namespace rdt {
             GetCurrentDir(buff, FILENAME_MAX);
             std::string current_working_dir(buff);
             return current_working_dir;
+        }
+        void Tokenize(const std::string& str, const std::string& delimeter, std::vector<std::string>& out)
+        {
+            std::string delimProgress = "";
+            std::string curr = "";
+            for (char c : str) {
+
+                if (delimProgress.size() < delimeter.size() && delimeter[delimProgress.size()] == c) {
+                    delimProgress += c;
+                }
+                else {
+                    curr += delimProgress + c;
+                    delimProgress.clear();
+                }
+
+                if (delimProgress.size() == delimeter.size()) {
+                    out.push_back(curr);
+                    curr.clear();
+                    delimProgress.clear();
+                }
+            }
+
+            if (curr.size() > 0) {
+                out.push_back(curr);
+            }
+        }
+        std::string ParentPath(const std::string& path)
+        {
+            size_t pos = path.find_last_of("\\/");
+            return (std::string::npos == pos) ? "" : path.substr(0, pos);
         }
     }
 }

@@ -3,6 +3,7 @@
 #include "Panels/Diagnostics.h"
 #include "Panels/ScenePanel.h"
 #include "Graphics/Renderer.h"
+#include "Utils/Utils.h"
 
 namespace rdt::core {
 	DevLayer::DevLayer()
@@ -10,6 +11,22 @@ namespace rdt::core {
 		m_GUIs.push_back(new DiagnosticsGUI);
 		m_GUIs.push_back(new ScenePanel);
 		m_showTools = true;
+		
+		m_base_directory = Utils::GetCWD();
+		RDT_CORE_INFO("DevTools base directory: {}", m_base_directory);
+
+		namespace fs = std::filesystem;
+		fs::path configFile = fs::path(m_base_directory) / fs::path("radiant.ini");
+		m_config.SetDefaultPath(configFile.generic_string());
+		m_config.Read();
+
+		int version;
+		if (m_config.GetAttribute("Core", "Version", version)) {
+			RDT_CORE_TRACE("Config: Using version v.{}", version);
+		}
+		else {
+			RDT_CORE_TRACE("Config: No version specified");
+		}
 	}
 	DevLayer::~DevLayer()
 	{

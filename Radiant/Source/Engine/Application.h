@@ -12,7 +12,6 @@ namespace rdt {
 	private:
 		Timestep m_timestep;
 		Scene* m_current_scene;
-		std::string m_cwd;
 
 	public:
 		Application();
