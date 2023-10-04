@@ -8,6 +8,7 @@ namespace rdt::core {
 	private:
 		bool m_showTools;
 		std::string m_base_directory;
+		std::string m_projectName;
 
 		ConfigReader m_config;
 

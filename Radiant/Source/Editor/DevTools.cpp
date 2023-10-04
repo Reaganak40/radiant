@@ -20,12 +20,11 @@ namespace rdt::core {
 		m_config.SetDefaultPath(configFile.generic_string());
 		m_config.Read();
 
-		int version;
-		if (m_config.GetAttribute("Core", "Version", version)) {
-			RDT_CORE_TRACE("Config: Using version v.{}", version);
+		if (m_config.GetAttribute("Core", "ProjectName", m_projectName)) {
+			RDT_CORE_TRACE("DevTools enabled for '{}'", m_projectName);
 		}
 		else {
-			RDT_CORE_TRACE("Config: No version specified");
+			RDT_CORE_WARN("No project found!");
 		}
 	}
 	DevLayer::~DevLayer()
@@ -54,13 +53,11 @@ namespace rdt::core {
 		if (Input::CheckKeyboardState(controls_ShowTools1) && Input::CheckKeyboardState(controls_ShowTools2)) {
 			
 			if (m_showTools) {
-				RDT_CORE_TRACE("Hiding DevTools");
 				for (auto& gui : m_GUIs) {
 					Renderer::DetachGui(gui);
 				}
 			}
 			else {
-				RDT_CORE_TRACE("Showing DevTools");
 				for (auto& gui : m_GUIs) {
 					Renderer::AttachGui(gui);
 				}
