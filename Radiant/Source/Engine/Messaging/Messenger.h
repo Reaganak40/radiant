@@ -1,4 +1,5 @@
 #pragma once
+#include "Core.h"
 #include "Message.h"
 
 #ifdef SendMessage
@@ -6,7 +7,7 @@
 #endif
 
 namespace rdt {
-	class Messenger {
+	class RADIANT_API Messenger {
 	private:
 		MessageID m_messageID;
 		std::string m_name;

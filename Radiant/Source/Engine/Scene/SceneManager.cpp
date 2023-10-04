@@ -48,12 +48,12 @@ namespace rdt {
 	void SceneManager::RegisterScene(const std::string& sceneName, Scene* scene)
 	{
 		if (m_instance->m_scenes.find(sceneName) != m_instance->m_scenes.end()) {
-			printf("Warning: Scene duplicate found!\n");
+			RDT_CORE_WARN("SceneManager - Scene duplicate found!");
 			return;
 		}
 
 		if (sceneName == "") {
-			printf("Warning: Empty scene names not allowed!\n");
+			RDT_CORE_WARN("SceneManager - Empty scene names not allowed!");
 			return;
 		}
 

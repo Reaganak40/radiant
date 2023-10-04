@@ -21,6 +21,11 @@ namespace rdt {
 		FreeUniqueID(m_ID);
 	}
 
+	void Layer::SetAttached(bool attach)
+	{
+		m_attached = attach;
+	}
+
 	void Layer::RunProcessInputQueue(const float deltaTime)
 	{
 		for (auto& object : m_game_objects) {

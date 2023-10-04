@@ -15,21 +15,31 @@ namespace rdt {
 		: m_ID(GetUniqueID())
 	{
 		if (ADD_DEV_LAYER) {
-			m_layers.push_back(new core::DevLayer);
-			m_layers.back()->OnAttach();
-			RDT_CORE_WARN("Developer tools are enabled");
+			m_layers.push_back(core::DevLayer::GetInstance());
 		}
 	}
 
 	Scene::~Scene()
 	{
 		FreeUniqueID(m_ID);
+
+		for (int i = 0; i < m_layers.size() - 1; i++) {
+			delete m_layers[i];
+		}
+
+		if (!ADD_DEV_LAYER) {
+			delete m_layers.back();
+		}
 	}
 
 	void Scene::RunProcessInputQueue(const float deltaTime)
 	{
 		for (auto it = m_layers.rbegin(); it != m_layers.rend(); ++it)
 		{
+			if (!(*it)->IsAttached()) {
+				continue;
+			}
+
 			(*it)->OnProcessInput(deltaTime);
 		}
 	}
@@ -38,6 +48,10 @@ namespace rdt {
 	{
 		for (auto it = m_layers.rbegin(); it != m_layers.rend(); ++it)
 		{
+			if (!(*it)->IsAttached()) {
+				continue;
+			}
+
 			(*it)->OnFinalUpdate();
 		}
 	}
@@ -46,6 +60,10 @@ namespace rdt {
 	{
 		for (auto it = m_layers.rbegin(); it != m_layers.rend(); ++it)
 		{
+			if (!(*it)->IsAttached()) {
+				continue;
+			}
+
 			(*it)->OnRender();
 		}
 	}
@@ -55,7 +73,7 @@ namespace rdt {
 		SceneManager::SetScene(nScene);
 	}
 
-	void Scene::AttachLayer(Layer* nLayer)
+	void Scene::AddLayer(Layer* nLayer)
 	{
 		if (ADD_DEV_LAYER) {
 			m_layers.insert(m_layers.begin() + (m_layers.size() - 1), nLayer);
@@ -63,7 +81,19 @@ namespace rdt {
 		else {
 			m_layers.push_back(nLayer);
 		}
-
-		nLayer->OnAttach();
+	}
+	void Scene::OnBind()
+	{
+		for (auto& layer : m_layers) {
+			layer->OnAttach();
+			layer->SetAttached(true);
+		}
+	}
+	void Scene::OnRelease()
+	{
+		for (auto& layer : m_layers) {
+			layer->OnDetach();
+			layer->SetAttached(false);
+		}
 	}
 }

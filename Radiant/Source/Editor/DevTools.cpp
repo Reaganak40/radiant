@@ -6,8 +6,13 @@
 #include "Utils/Utils.h"
 
 namespace rdt::core {
+
+	DevLayer* DevLayer::m_instance = nullptr;
+
 	DevLayer::DevLayer()
 	{
+		RDT_CORE_WARN("Developer tools are enabled");
+
 		m_GUIs.push_back(new DiagnosticsGUI);
 		m_GUIs.push_back(new ScenePanel);
 		m_showTools = true;
@@ -29,6 +34,23 @@ namespace rdt::core {
 	}
 	DevLayer::~DevLayer()
 	{
+	}
+
+	void DevLayer::Destroy()
+	{
+		if (m_instance != nullptr) {
+			delete m_instance;
+			m_instance = nullptr;
+		}
+	}
+
+	DevLayer* DevLayer::GetInstance()
+	{
+		if (m_instance == nullptr) {
+			m_instance = new DevLayer;
+		}
+
+		return m_instance;
 	}
 
 	void DevLayer::OnAttach()
@@ -73,8 +95,6 @@ namespace rdt::core {
 		if (!m_showTools) {
 			return;
 		}
-
-		Renderer::DrawRect({ 300, 300 }, { 200, 200 }, BLUE, 0);
 
 		Layer::OnRender();
 	}

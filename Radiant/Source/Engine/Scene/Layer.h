@@ -1,4 +1,5 @@
 #pragma once
+#include "Core.h"
 #include "Messaging/Messenger.h"
 #include "Utils/UniqueID.h"
 #include "GameObject/GameObject.h"
@@ -15,9 +16,10 @@ namespace rdt {
 
 
 	*/
-	class Layer : public Messenger {
+	class RADIANT_API Layer : public Messenger {
 	private:
 		UniqueID m_ID;
+		bool m_attached;
 
 	protected:
 		std::vector<GameObject*> m_game_objects;
@@ -60,16 +62,6 @@ namespace rdt {
 		virtual void OnAttach() {}
 
 		/*
-			Function called when this layer is to be awakened and active.
-		*/
-		virtual void OnAwake() {}
-
-		/*
-			Function to be called when this layer is to go to sleep but no destroyed.
-		*/
-		virtual void OnSleep() {}
-
-		/*
 			Function called when a layer is about to be released, not active.
 		*/
 		virtual void OnDetach() {}
@@ -92,6 +84,17 @@ namespace rdt {
 		*/
 		virtual void OnRender() { RunRenderQueue(); }
 
+		/*
+			Returns true if the layer is attach flag is true.
+		*/
+		bool IsAttached() { return m_attached; }
+
+		friend class Scene;
 	private:
+
+		/*
+			Overhead function to set the attach flag for the layer.
+		*/
+		void SetAttached(bool attach);
 	};
 }

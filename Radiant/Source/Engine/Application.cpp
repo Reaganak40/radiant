@@ -11,6 +11,8 @@
 #include "Scene/SceneManager.h"
 #include "Physics/Ptag.h"
 
+#include "Editor/DevTools.h"
+
 namespace rdt {
 	Application::Application()
 		: m_current_scene(nullptr)
@@ -20,6 +22,9 @@ namespace rdt {
 
 	Application::~Application()
 	{
+#ifdef RDT_DEBUG
+		core::DevLayer::Destroy();
+#endif
 		GuiManager::Destroy();
 		Physics::Destroy();
 		core::PtagManager::Destroy();
@@ -40,9 +45,6 @@ namespace rdt {
 		Physics::Initialize();
 		GuiManager::Initialize();
 		SceneManager::Initialize();
-
-		// Get the currently bounded scene for preloop reasons.
-		m_current_scene = SceneManager::GetCurrentScene();
 	}
 
 	void Application::Run()

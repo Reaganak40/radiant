@@ -1,11 +1,12 @@
 #pragma once
+#include "Core.h"
 #include "Utils/UniqueID.h"
 #include "Messaging/Messenger.h"
 #include "Layer.h"
 
 namespace rdt {
 
-	class Scene : public Messenger {
+	class RADIANT_API Scene : public Messenger {
 	private:
 		UniqueID m_ID;
 		std::vector<Layer*> m_layers;
@@ -50,9 +51,10 @@ namespace rdt {
 
 		/*
 			Adds a layer to the top of the layer stack. The scene is
-			now responsible for freeing this layer.
+			now responsible for freeing this layer. This layer is not
+			attached.
 		*/
-		void AttachLayer(Layer* nLayer);
+		void AddLayer(Layer* nLayer);
 
 		/*
 			Function called prior to the host application registering
@@ -64,13 +66,13 @@ namespace rdt {
 			Function called prior to when the application switches to the
 			scene.
 		*/
-		virtual void OnBind() {}
+		virtual void OnBind();
 
 		/*
 			Function called when a scene is about to be released, changed
 			to another scene.
 		*/
-		virtual void OnRelease() {}
+		virtual void OnRelease();
 
 		/*
 			Function called when the scene is active and the host application

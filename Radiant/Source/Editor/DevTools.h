@@ -15,10 +15,14 @@ namespace rdt::core {
 		const std::vector<InputState> controls_ShowTools1{CTRL_KEY_DOWN};
 		const std::vector<InputState> controls_ShowTools2{T_KEY_PRESS};
 
-	public:
-
 		DevLayer();
 		~DevLayer();
+
+		static DevLayer* m_instance;
+
+	public:
+		static void Destroy();
+		static DevLayer* GetInstance();
 
 		void OnAttach() override final;
 		void OnDetach() override final;
