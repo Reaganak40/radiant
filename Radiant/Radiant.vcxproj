@@ -73,6 +73,9 @@
       <ImportLibrary>..\bin\Debug-windows-x86_64\Radiant\Radiant.lib</ImportLibrary>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
+    <PostBuildEvent>
+      <Command>IF EXIST ..\bin\Debug-windows-x86_64\Radiant\Radiant.dll\ (xcopy /Q /E /Y /I ..\bin\Debug-windows-x86_64\Radiant\Radiant.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Debug-windows-x86_64\Radiant\Radiant.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -97,9 +100,11 @@
       <ImportLibrary>..\bin\Release-windows-x86_64\Radiant\Radiant.lib</ImportLibrary>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
+    <PostBuildEvent>
+      <Command>IF EXIST ..\bin\Release-windows-x86_64\Radiant\Radiant.dll\ (xcopy /Q /E /Y /I ..\bin\Release-windows-x86_64\Radiant\Radiant.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Release-windows-x86_64\Radiant\Radiant.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Source\Engine\Utils\ConfigReader.h" />
     <ClInclude Include="Source\Editor\DevTools.h" />
     <ClInclude Include="Source\Editor\Editor.h" />
     <ClInclude Include="Source\Editor\Panels\Diagnostics.h" />
@@ -116,6 +121,7 @@
     <ClInclude Include="Source\Engine\EntryPoint.h" />
     <ClInclude Include="Source\Engine\GameObject\GameObject.h" />
     <ClInclude Include="Source\Engine\GameObject\GameState.h" />
+    <ClInclude Include="Source\Engine\Graphics\Camera.h" />
     <ClInclude Include="Source\Engine\Graphics\Mesh.h" />
     <ClInclude Include="Source\Engine\Graphics\OpenGL\ErrorHandling.h" />
     <ClInclude Include="Source\Engine\Graphics\OpenGL\GeoMode.h" />
@@ -154,6 +160,7 @@
     <ClInclude Include="Source\Engine\Scene\SceneManager.h" />
     <ClInclude Include="Source\Engine\Utils\BitSet.h" />
     <ClInclude Include="Source\Engine\Utils\Color.h" />
+    <ClInclude Include="Source\Engine\Utils\ConfigReader.h" />
     <ClInclude Include="Source\Engine\Utils\Input.h" />
     <ClInclude Include="Source\Engine\Utils\MathTypes.h" />
     <ClInclude Include="Source\Engine\Utils\Timestep.h" />
@@ -234,6 +241,7 @@
     <ClCompile Include="Source\Engine\Audio\SoundSource.cpp" />
     <ClCompile Include="Source\Engine\GameObject\GameObject.cpp" />
     <ClCompile Include="Source\Engine\GameObject\GameState.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\Camera.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\ErrorHandling.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\GeoMode.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\IndexBuffer.cpp" />

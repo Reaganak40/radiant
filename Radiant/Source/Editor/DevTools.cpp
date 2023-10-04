@@ -74,6 +74,8 @@ namespace rdt::core {
 			return;
 		}
 
+		Renderer::DrawRect({ 300, 300 }, { 200, 200 }, BLUE, 0);
+
 		Layer::OnRender();
 	}
 }

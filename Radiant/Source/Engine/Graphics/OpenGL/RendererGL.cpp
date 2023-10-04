@@ -20,9 +20,7 @@ namespace rdt::core {
             ASSERT(false);
         }
 
-        m_proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
-        m_view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-        m_model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+        m_camera = Camera(AR_16_9);
 
         m_polygon_color = BLACK;
         m_line_color = BLACK;
@@ -57,23 +55,33 @@ namespace rdt::core {
         return m_window_height;
     }
 
-    Vec2i RendererGL::CreateWindowImpl(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight, bool resizable)
+    bool RendererGL::CreateWindowImpl(const std::string& windowName)
 	{
         RDT_CORE_TRACE("Launching new window instance...");
-        Vec2i aspect_ratio = Utils::GetRatio(windowWidth, windowHeight);
 
         m_window_name = windowName;
-        m_window_width = windowWidth;
-        m_window_height = windowHeight;
+        
+        // Get monitor and mode for windowed fullscreen
+        GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+        const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+        glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+        glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+        glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+        glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 
         /* Create a windowed mode window and its OpenGL context */
-        m_window = glfwCreateWindow(m_window_width, m_window_height, m_window_name.c_str(), NULL, NULL);
+        m_window = glfwCreateWindow(mode->width, mode->height, m_window_name.c_str(), NULL, NULL);
         if (!m_window)
         {
             glfwTerminate();
             RDT_CORE_FATAL("Failed to create glfw window");
             ASSERT(false);
         }
+        
+        /* Start with maximized window */
+        glfwMaximizeWindow(m_window);
+        glfwGetWindowSize(m_window, &m_window_width, &m_window_height);
+        m_default_viewport = glViewportData(0, 0, m_window_width, m_window_height);
 
         /* Make the window's context current */
         glfwMakeContextCurrent(m_window);
@@ -88,8 +96,6 @@ namespace rdt::core {
         // glad populates global constants after loading to indicate,
         // if a certain extension/version is available.
         RDT_CORE_INFO("OpenGL {}.{}", GLVersion.major, GLVersion.minor);
-
-        glfwSetWindowAttrib(m_window, GLFW_RESIZABLE, resizable);
 
         // For opengl error handling
         EnableErrorCallback();
@@ -118,16 +124,8 @@ namespace rdt::core {
 
         // Setup Camera (model view project matrix)
         m_screen_origin = Vec3f(0.0f, 0.0f, 0.0f);
-
-        if (aspect_ratio.x == 16 && aspect_ratio.y == 9) {
-            m_proj = glm::ortho(0.0f, (float)1920, 0.0f, (float)1080, -1.0f, 1.0f);
-        }
-        else {
-            m_proj = glm::ortho(0.0f, (float)m_window_width, 0.0f, (float)m_window_height, -1.0f, 1.0f);
-        }
-
         SetShader(m_shaders[0]->GetID());
-        glm::mat4 mvp = m_proj * m_view * m_model;
+        glm::mat4 mvp = m_camera.GetMVP();
         m_shaders[0]->SetUniform<glm::mat4>("uMVP", mvp);
 
         glEnable(GL_BLEND);
@@ -136,7 +134,7 @@ namespace rdt::core {
         // Set to 60 FPS
         glfwSwapInterval(1);
 
-        return aspect_ratio;
+        return true;
 	}
 
     void* RendererGL::GetWindowInstanceImpl()
@@ -474,6 +472,18 @@ namespace rdt::core {
         if (m_current_mode != mode) {
             ActivateGeoMode(mode);
             m_current_mode = mode;
+        }
+    }
+
+    void RendererGL::SetViewport(glViewportData nViewport)
+    {
+        if (nViewport.posX != m_current_viewport.posX ||
+            nViewport.posY != m_current_viewport.posY ||
+            nViewport.width != m_current_viewport.width ||
+            nViewport.height != m_current_viewport.height) {
+
+            glViewport(nViewport.posX, nViewport.posY, nViewport.width, nViewport.height);
+            m_current_viewport = nViewport;
         }
     }
 

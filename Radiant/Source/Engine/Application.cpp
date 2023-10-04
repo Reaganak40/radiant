@@ -32,7 +32,7 @@ namespace rdt {
 	void Application::Start(std::string appName, unsigned int windowWidth, unsigned int windowHeight, bool resizable)
 	{
 		Utils::SetRandomSeed();
-		Renderer::CreateRadiantWindow(appName, windowWidth, windowHeight, resizable);
+		Renderer::CreateRadiantWindow(appName);
 		MessageBus::Initialize();
 		SoundEngine::Initialize();
 		Input::Initialize();

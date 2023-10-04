@@ -35,7 +35,7 @@ namespace rdt {
 		/*
 			Creates a new GLFW window with the provided specifications.
 		*/
-		static Vec2i CreateRadiantWindow(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight, bool resizable) { return m_instance->CreateWindowImpl(windowName, windowWidth, windowHeight, resizable); }
+		static bool CreateRadiantWindow(const std::string& windowName) { return m_instance->CreateWindowImpl(windowName); }
 
 		/*
 			Gets the platform window instance (currently just GLFW)
@@ -203,7 +203,7 @@ namespace rdt {
 		virtual bool ShouldWindowCloseImpl() = 0;
 		virtual unsigned int GetWindowWidthImpl() = 0;
 		virtual unsigned int GetWindowHeightImpl() = 0;
-		virtual Vec2i CreateWindowImpl(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight, bool resizable) = 0;
+		virtual bool CreateWindowImpl(const std::string& windowName) = 0;
 		virtual void* GetWindowInstanceImpl() = 0;
 		virtual Vec2d GetCameraCoordinates2DImpl() = 0;
 		virtual void SetBackgroundColorImpl(const Color& color) = 0;

@@ -1,6 +1,7 @@
 #pragma once
 #include "Core.h"
 #include "Graphics/Renderer.h"
+#include "Graphics/Camera.h"
 
 // For Opengl rendering
 #include "VertexArray.h"
@@ -23,14 +24,8 @@ namespace rdt::core {
 #pragma warning(disable: 4251)
 		std::string m_window_name;
 
-		unsigned int m_window_width;
-		unsigned int m_window_height;
-
-		// Camera depenables
-		glm::mat4 m_proj;
-		glm::mat4 m_view;
-		glm::mat4 m_model;
-		Vec3f m_screen_origin;
+		int m_window_width;
+		int m_window_height;
 
 		// *****************************************************
 		// 
@@ -62,6 +57,16 @@ namespace rdt::core {
 		//			  Opengl renderering dependables
 		// 
 		// *****************************************************
+		struct glViewportData {
+			int posX;
+			int posY;
+			int width;
+			int height;
+
+			glViewportData(int nPosX = 0, int nPosY = 0, int nWidth = 0, int nHeight = 0)
+				: posX(nPosX), posY(nPosY), width(nWidth), height(nHeight) {}
+		};
+		glViewportData m_default_viewport;
 
 		// Use only one VAO
 		core::VertexArray* m_vertex_array;
@@ -72,11 +77,16 @@ namespace rdt::core {
 		// Keep shaders independent from render units.
 		std::vector<core::Shader*> m_shaders;
 
+		// Camera depenables
+		Camera m_camera;
+		Vec3f m_screen_origin;
+
 		// Track currently bounded gl objects.
 		core::VBO_ID m_current_vbo;
 		core::IBO_ID m_current_ibo;
 		core::ShaderID m_current_shader;
 		core::GeoMode m_current_mode;
+		glViewportData m_current_viewport;
 
 		// For ImGui instances.
 		std::vector<GuiTemplate*> m_GUIs;
@@ -95,7 +105,7 @@ namespace rdt::core {
 		bool ShouldWindowCloseImpl() override final;
 		unsigned int GetWindowWidthImpl() override final;
 		unsigned int GetWindowHeightImpl() override final;
-		Vec2i CreateWindowImpl(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight, bool resizable) override final;
+		bool CreateWindowImpl(const std::string& windowName) override final;
 		void* GetWindowInstanceImpl() override final;
 		Vec2d GetCameraCoordinates2DImpl() override final;
 		void SetBackgroundColorImpl(const Color& color) override final;
@@ -130,6 +140,7 @@ namespace rdt::core {
 		void SetIBO(core::IBO_ID ibo);
 		void SetShader(core::ShaderID shader);
 		void SetMode(core::GeoMode mode);
+		void SetViewport(glViewportData nViewport);
 
 		void AddDefaultShader();
 		void UpdateTextureUniforms();

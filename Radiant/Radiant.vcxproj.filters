@@ -312,6 +312,9 @@
     <ClInclude Include="Source\Engine\Utils\Color.h">
       <Filter>Source\Engine\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Engine\Utils\ConfigReader.h">
+      <Filter>Source\Engine\Utils</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Engine\Utils\Input.h">
       <Filter>Source\Engine\Utils</Filter>
     </ClInclude>
@@ -507,7 +510,7 @@
     <ClInclude Include="Vendor\stb\stb_image.h">
       <Filter>Vendor\stb</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Engine\Utils\ConfigReader.h" />
+    <ClInclude Include="Source\Engine\Graphics\Camera.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Editor\DevTools.cpp">
@@ -654,6 +657,9 @@
     <ClCompile Include="Source\Engine\Utils\Color.cpp">
       <Filter>Source\Engine\Utils</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Engine\Utils\ConfigReader.cpp">
+      <Filter>Source\Engine\Utils</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Engine\Utils\Input.cpp">
       <Filter>Source\Engine\Utils</Filter>
     </ClCompile>
@@ -675,6 +681,6 @@
     <ClCompile Include="Vendor\stb\stb_image.cpp">
       <Filter>Vendor\stb</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Utils\ConfigReader.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\Camera.cpp" />
   </ItemGroup>
 </Project>
