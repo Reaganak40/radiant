@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Camera.h"
 
-namespace rdt::core {
+namespace rdt {
 	
 
 	Camera::Camera(AspectRatio aspectRatio)
@@ -38,7 +38,7 @@ namespace rdt::core {
 		return m_proj * m_view * m_model;
 	}
 
-	void Camera::SetViewport(const Vec2d& viewportPos, const Vec2d& viewportSize)
+	void Camera::SetViewport(const Vec2i& viewportPos, const Vec2i& viewportSize)
 	{
 		m_viewportPos = viewportPos;
 		m_viewportSize = viewportSize;
@@ -49,5 +49,13 @@ namespace rdt::core {
 		(*viewportPosY) = m_viewportPos.y;
 		(*viewportWidth) = m_viewportSize.x;
 		(*viewportHeight) = m_viewportSize.y;
+	}
+	void Camera::SetBackgroundColor(const Color& nColor)
+	{
+		m_background_color = nColor;
+	}
+	const Color& Camera::GetBackgroundColor()
+	{
+		return m_background_color;
 	}
 }

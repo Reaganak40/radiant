@@ -1,7 +1,6 @@
 #pragma once
 #include "Core.h"
 #include "Graphics/Renderer.h"
-#include "Graphics/Camera.h"
 
 // For Opengl rendering
 #include "VertexArray.h"
@@ -52,6 +51,7 @@ namespace rdt::core {
 
 		Color m_line_color;
 
+		Color m_clear_color;
 		// *****************************************************
 		// 
 		//			  Opengl renderering dependables
@@ -78,7 +78,6 @@ namespace rdt::core {
 		std::vector<core::Shader*> m_shaders;
 
 		// Camera depenables
-		Camera m_camera;
 		Vec3f m_screen_origin;
 
 		// Track currently bounded gl objects.
@@ -87,6 +86,8 @@ namespace rdt::core {
 		core::ShaderID m_current_shader;
 		core::GeoMode m_current_mode;
 		glViewportData m_current_viewport;
+
+		std::set<Camera*> m_selected_cameras;
 
 		// For ImGui instances.
 		std::vector<GuiTemplate*> m_GUIs;
@@ -129,6 +130,7 @@ namespace rdt::core {
 		void SetPolygonTextureImpl(const std::string& texName, unsigned int atlasX = 0, unsigned int atlasY = 0) override final;
 		void AttachGuiImpl(GuiTemplate* gui) override final;
 		void DetachGuiImpl(const GuiTemplate* gui) override final;
+		void UseCameraImpl(const std::string& alias) override final;
 
 		void _FlushPolygonImpl(const UniqueID UUID) override final;
 
@@ -140,10 +142,13 @@ namespace rdt::core {
 		void SetIBO(core::IBO_ID ibo);
 		void SetShader(core::ShaderID shader);
 		void SetMode(core::GeoMode mode);
-		void SetViewport(glViewportData nViewport);
+		void SetViewport(glViewportData& nViewport);
 
 		void AddDefaultShader();
 		void UpdateTextureUniforms();
 		void StartImGuiFrame();
+		void ClearViewportSpace(glViewportData& viewport);
+
+		void Clear(glViewportData& viewport, const Color& color);
 	};
 }

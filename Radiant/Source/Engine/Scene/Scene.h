@@ -2,6 +2,7 @@
 #include "Core.h"
 #include "Utils/UniqueID.h"
 #include "Messaging/Messenger.h"
+#include "Graphics/Camera.h"
 #include "Layer.h"
 
 namespace rdt {
@@ -10,6 +11,7 @@ namespace rdt {
 	private:
 		UniqueID m_ID;
 		std::vector<Layer*> m_layers;
+		bool m_use_default_camera;
 
 		/*
 			Runs OnProcssInput on all game objects and OnUpdate on all
@@ -35,19 +37,18 @@ namespace rdt {
 		void OnMessage(Message msg) override {}
 
 	protected:
-
-
+		
+		/*
+			When this function is called, the render call internals for this Scene instance will
+			not tell the renderer to use the default camera, thus it is up to the scene child
+			to choose the right camera manually.
+		*/
+		void DontUseDefaultCamera();
 	public:
 		Scene();
 		~Scene();
 
 		const UniqueID GetID() { return m_ID; }
-
-		/*
-			Changes the scene dynamically to a known scene. This change is delayed
-			until the start of the next game loop.
-		*/
-		void ChangeScene(const std::string& nScene);
 
 		/*
 			Adds a layer to the top of the layer stack. The scene is

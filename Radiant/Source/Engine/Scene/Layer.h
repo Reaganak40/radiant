@@ -4,6 +4,7 @@
 #include "Utils/UniqueID.h"
 #include "GameObject/GameObject.h"
 #include "Gui/Gui.h"
+#include "Graphics/Camera.h"
 
 
 namespace rdt {
@@ -13,8 +14,6 @@ namespace rdt {
 	/*
 		Scenes own game objects and GUIs that can be used by the application under
 		specified conditions.
-
-
 	*/
 	class RADIANT_API Layer : public Messenger {
 	private:

@@ -20,8 +20,6 @@ namespace rdt::core {
             ASSERT(false);
         }
 
-        m_camera = Camera(AR_16_9);
-
         m_polygon_color = BLACK;
         m_line_color = BLACK;
         m_imgui_newFrameCalled = false;
@@ -108,10 +106,6 @@ namespace rdt::core {
         ImGui_ImplGlfw_InitForOpenGL(m_window, true);
         ImGui_ImplOpenGL3_Init("#version 330");
 
-
-        // set default background color
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-
         // set default VAO
         m_vertex_array = new VertexArray;
         VertexArray::Bind(m_vertex_array->GetID());
@@ -124,8 +118,12 @@ namespace rdt::core {
 
         // Setup Camera (model view project matrix)
         m_screen_origin = Vec3f(0.0f, 0.0f, 0.0f);
+        
+        SetDefaultCamera(new Camera(AR_16_9));
+        GetCamera()->SetViewport({m_default_viewport.posX, m_default_viewport.posY}, {m_default_viewport.width, m_default_viewport.height});
+        
+        glm::mat4 mvp = GetCamera()->GetMVP();
         SetShader(m_shaders[0]->GetID());
-        glm::mat4 mvp = m_camera.GetMVP();
         m_shaders[0]->SetUniform<glm::mat4>("uMVP", mvp);
 
         glEnable(GL_BLEND);
@@ -149,8 +147,7 @@ namespace rdt::core {
 
     void RendererGL::SetBackgroundColorImpl(const Color& color)
     {
-        const Vec4f& colorBits = color.GetColor();
-        glClearColor(colorBits.x1, colorBits.x2, colorBits.x3, colorBits.x4);
+        m_clear_color = color;
     }
 
     Vec2i RendererGL::OnWindowResizeImpl()
@@ -164,7 +161,7 @@ namespace rdt::core {
 
     void RendererGL::ClearImpl()
     {
-        glClear(GL_COLOR_BUFFER_BIT);
+        Clear(m_default_viewport, m_clear_color);
     }
 
     void RendererGL::OnBeginFrameImpl()
@@ -195,35 +192,49 @@ namespace rdt::core {
         }
 
         /*
-            Step 2: Go layer by layer, draw batch by batch.
+            Step 2: Go layer by layer, draw batch by batch. (with all cameras)
         */
-        for (auto& layer : m_layers) {
-            layer.CompileBatches();
+        SetShader(m_shaders[0]->GetID());
+        for (auto& camera : m_selected_cameras) {
 
-            if (layer.TextureSlotsChanged()) {
-                UpdateTextureUniforms();
-            }
+            glm::mat4 mvp = GetCamera()->GetMVP();
+            m_shaders[0]->SetUniform<glm::mat4>("uMVP", mvp);
 
-            auto units = layer.GetRenderUnits();
-            for (int i = 0; i < layer.GetBatchCount(); i++) {
-                auto& unit = units.at(i);
+            glViewportData viewportData;
+            camera->GetViewport(&viewportData.posX, &viewportData.posY, &viewportData.width, &viewportData.height);
+            
+            SetViewport(viewportData);
+            Clear(viewportData, camera->GetBackgroundColor());
 
-                // Draw Call Procedure
-                SetVBO(unit.vboID);
-                SetIBO(unit.iboID);
-                SetShader(unit.shaderID);
-                SetMode(unit.type == DrawOutline ? OutlineMode : FillMode);
+            for (auto& layer : m_layers) {
+                layer.CompileBatches();
 
-                // Update buffers and notify the GPU
-                unit.m_VBO->Update();
-                unit.m_IBO->Update();
-                m_vertex_array->DefineVertexBufferLayout();
+                if (layer.TextureSlotsChanged()) {
+                    UpdateTextureUniforms();
+                }
 
-                glDrawElements(
-                    unit.type == RenderType::DrawLine ? GL_LINES : GL_TRIANGLES,
-                    unit.m_IBO->GetIndexCount(), GL_UNSIGNED_INT, nullptr);
+                auto units = layer.GetRenderUnits();
+                for (int i = 0; i < layer.GetBatchCount(); i++) {
+                    auto& unit = units.at(i);
+
+                    // Draw Call Procedure
+                    SetVBO(unit.vboID);
+                    SetIBO(unit.iboID);
+                    SetShader(unit.shaderID);
+                    SetMode(unit.type == DrawOutline ? OutlineMode : FillMode);
+
+                    // Update buffers and notify the GPU
+                    unit.m_VBO->Update();
+                    unit.m_IBO->Update();
+                    m_vertex_array->DefineVertexBufferLayout();
+
+                    glDrawElements(
+                        unit.type == RenderType::DrawLine ? GL_LINES : GL_TRIANGLES,
+                        unit.m_IBO->GetIndexCount(), GL_UNSIGNED_INT, nullptr);
+                }
             }
         }
+        SetViewport(m_default_viewport);
 
         /*
             Step 3: Run the GUI render queue.
@@ -255,6 +266,8 @@ namespace rdt::core {
         for (auto& layer : m_layers) {
             layer.Flush();
         }
+
+        m_selected_cameras.clear();
     }
 
     void RendererGL::DrawRectImpl(const Vec2d& origin, const Vec2d& size, const Color& color, unsigned int layer)
@@ -438,6 +451,16 @@ namespace rdt::core {
         }
     }
 
+    void RendererGL::UseCameraImpl(const std::string& alias)
+    {
+        Camera* camera = GetCamera(alias);
+
+        if (camera == nullptr) {
+            return;
+        }
+        m_selected_cameras.insert(camera);
+    }
+
     void RendererGL::_FlushPolygonImpl(const UniqueID UUID)
     {
         m_render_cache.Flush(UUID);
@@ -475,7 +498,7 @@ namespace rdt::core {
         }
     }
 
-    void RendererGL::SetViewport(glViewportData nViewport)
+    void RendererGL::SetViewport(glViewportData& nViewport)
     {
         if (nViewport.posX != m_current_viewport.posX ||
             nViewport.posY != m_current_viewport.posY ||
@@ -514,5 +537,20 @@ namespace rdt::core {
 
             m_imgui_newFrameCalled = true;
         }
+    }
+    void RendererGL::ClearViewportSpace(glViewportData& viewport)
+    {
+        SetViewport(viewport);
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
+
+    void RendererGL::Clear(glViewportData& viewport, const Color& color)
+    {
+        glScissor(viewport.posX, viewport.posY, viewport.width, viewport.height);
+        glEnable(GL_SCISSOR_TEST);
+
+        const Vec4f& colorBits = color.GetColor();
+        glClearColor(colorBits.x1, colorBits.x2, colorBits.x3, colorBits.x4);
+        glClear(GL_COLOR_BUFFER_BIT);
     }
 }

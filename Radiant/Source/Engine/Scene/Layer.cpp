@@ -5,7 +5,7 @@
 namespace rdt {
 
 	Layer::Layer()
-		: m_ID(GetUniqueID())
+		: m_ID(GetUniqueID()),  m_attached(false)
 	{
 	}
 	Layer::~Layer()

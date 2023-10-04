@@ -2,6 +2,7 @@
 #include "Scene.h"
 #include "SceneManager.h"
 #include "Editor/DevTools.h"
+#include "Graphics/Renderer.h"
 
 #ifdef RDT_DEBUG
 #define ADD_DEV_LAYER 1
@@ -10,13 +11,13 @@
 #endif
 
 namespace rdt {
-
 	Scene::Scene()
-		: m_ID(GetUniqueID())
+		: m_ID(GetUniqueID()), m_use_default_camera(true)
 	{
 		if (ADD_DEV_LAYER) {
 			m_layers.push_back(core::DevLayer::GetInstance());
 		}
+
 	}
 
 	Scene::~Scene()
@@ -58,6 +59,10 @@ namespace rdt {
 
 	void Scene::RunRenderQueue()
 	{
+		if (m_use_default_camera) {
+			Renderer::UseCamera(); // delcares using the default camera
+		}
+
 		for (auto it = m_layers.rbegin(); it != m_layers.rend(); ++it)
 		{
 			if (!(*it)->IsAttached()) {
@@ -68,9 +73,9 @@ namespace rdt {
 		}
 	}
 
-	void Scene::ChangeScene(const std::string& nScene)
+	void Scene::DontUseDefaultCamera()
 	{
-		SceneManager::SetScene(nScene);
+		m_use_default_camera = false;
 	}
 
 	void Scene::AddLayer(Layer* nLayer)
