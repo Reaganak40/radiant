@@ -18,5 +18,7 @@ namespace rdt::core {
 
 	private:
 		void SetScenePtr(Scene* ptr);
+
+		void AddLayerPanel(Layer* layer);
 	};
 }

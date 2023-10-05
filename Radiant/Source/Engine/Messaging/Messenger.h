@@ -6,6 +6,8 @@
 #undef SendMessage
 #endif
 
+#define ObjectToStr(x) #x
+
 namespace rdt {
 	class RADIANT_API Messenger {
 	private:

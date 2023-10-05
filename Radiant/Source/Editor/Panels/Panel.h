@@ -20,6 +20,8 @@ namespace rdt::core {
 	struct ThemeData {
 		ImVec4 Titlebackground;
 		ImVec4 TitlebackgroundActive;
+		ImVec4 TitleBackgroundCollapsed;
+		ImVec4 HeaderColor;
 		ImVec4 WindowBackground;
 		ImVec4 TextColor;
 	};

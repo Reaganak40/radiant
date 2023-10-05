@@ -101,4 +101,17 @@ namespace rdt {
 			layer->SetAttached(false);
 		}
 	}
+	
+	Layer** Scene::GetLayers(unsigned int* numLayers)
+	{
+		if (ADD_DEV_LAYER) {
+			*numLayers = m_layers.size() - 1;
+		}
+		else {
+			*numLayers = m_layers.size();
+		}
+
+		return m_layers.data();
+	}
+
 }

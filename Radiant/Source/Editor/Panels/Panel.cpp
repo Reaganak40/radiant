@@ -15,8 +15,10 @@ namespace rdt::core {
 	{
 		switch (nTheme) {
 		case Theme_Gray:
-			theme_data.Titlebackground = { 0.75f, 0.75f, 0.75f, 1.0f };
-			theme_data.TitlebackgroundActive = { 0.75f, 0.75f, 0.75f, 1.0f };
+			theme_data.Titlebackground =          { 0.75f, 0.75f, 0.75f, 1.0f };
+			theme_data.TitlebackgroundActive =    { 0.75f, 0.75f, 0.75f, 1.0f };
+			theme_data.TitleBackgroundCollapsed = { 0.75f, 0.75f, 0.75f, 1.0f };
+			theme_data.HeaderColor = { 0.75f, 0.75f, 0.75f, 1.0f };
 			theme_data.WindowBackground = { 0.96f, 0.96f,0.96f, 0.95f };
 			theme_data.TextColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 			break;
@@ -26,8 +28,11 @@ namespace rdt::core {
 	{
 		ImGui::PushStyleColor(ImGuiCol_TitleBg, theme_data.Titlebackground);
 		ImGui::PushStyleColor(ImGuiCol_TitleBgActive, theme_data.TitlebackgroundActive);
+		ImGui::PushStyleColor(ImGuiCol_TitleBgCollapsed, theme_data.TitleBackgroundCollapsed);
+		ImGui::PushStyleColor(ImGuiCol_Header, theme_data.HeaderColor);
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, theme_data.WindowBackground);
 		ImGui::PushStyleColor(ImGuiCol_Text, theme_data.TextColor);
+
 	}
 	void Panel::ThemeEnd()
 	{
@@ -35,5 +40,8 @@ namespace rdt::core {
 		ImGui::PopStyleColor();
 		ImGui::PopStyleColor();
 		ImGui::PopStyleColor();
+		ImGui::PopStyleColor();
+		ImGui::PopStyleColor();
+
 	}
 }

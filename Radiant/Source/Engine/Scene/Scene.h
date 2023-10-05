@@ -92,5 +92,10 @@ namespace rdt {
 			calls Render()
 		*/
 		virtual void OnRender() { RunRenderQueue(); }
+
+		/*
+			Returns a constant pointer to the array of layers
+		*/
+		Layer** GetLayers(unsigned int* numLayers);
 	};
 }
