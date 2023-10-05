@@ -2,8 +2,9 @@
 
 class TestQuad : public rdt::GameObject {
 private:
+	rdt::Vec2d m_spawnPos;
 public:
-	TestQuad(const std::string& alias);
+	TestQuad(const std::string& alias, rdt::Vec2d spawnPos);
 	~TestQuad();
 
 	/*

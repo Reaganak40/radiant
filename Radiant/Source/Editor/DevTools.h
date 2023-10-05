@@ -5,11 +5,16 @@
 
 namespace rdt::core {
 
+	enum DevMessages {
+		DM_LaunchTemplateWizard = 0xb33f,
+	};
+
 	class DevLayer : public Layer {
 	private:
 		bool m_showTools;
 		std::string m_base_directory;
 		std::string m_projectName;
+		std::string m_resources_filepath;
 
 		ConfigReader m_config;
 
@@ -28,6 +33,8 @@ namespace rdt::core {
 		void OnAttach() override final;
 		void OnDetach() override final;
 
+		void OnMessage(Message msg) override final;
+
 		/*
 			Function called when the layer is active and the host application
 			calls ProcessInput.
@@ -39,20 +46,25 @@ namespace rdt::core {
 			calls Render()
 		*/
 		void OnRender() override final;
+
+	private:
 	};
 	
 	// =====================================================================================
 	
 	/*
 		Panel Layout Macros
-	*/ 
+	*/
 	constexpr int PanelMargin = 10;
 
 	constexpr float DiagnosticGuiWidth = 290.0f;
-	constexpr float DiagnosticGuiHeight = 85.0f;
+	constexpr float DiagnosticGuiHeight = 105.0f;
 
 	constexpr float ScenePanelGuiWidth = 290.0f;
 	constexpr float ScenePanelGuiHeight = 400.0f;
+
+	constexpr float TemplateWizardGuiWidth = 750.0f;
+	constexpr float TemplateWizardGuiHeight= 750.0f;
 
 	// =====================================================================================
 
@@ -60,7 +72,11 @@ namespace rdt::core {
 		Editor Themes Implementation
 	*/
 	enum EditorTheme {
-		Theme_Gray
+		Theme_Codz,
+	};
+
+	enum EditorFonts {
+		NunitoSans = 1,
 	};
 
 	struct ThemeData {
@@ -68,9 +84,11 @@ namespace rdt::core {
 		ImVec4 TitlebackgroundActive;
 		ImVec4 TitleBackgroundCollapsed;
 		ImVec4 HeaderColor;
+		ImVec4 HeaderHoverColor;
 		ImVec4 WindowBackground;
 		ImVec4 TextColor;
 		ImVec4 MenuBarBackground;
+		ImVec4 PopupBackground;
 	};
 
 	class EditorLayout : public GuiTemplate, public Messenger {
@@ -80,6 +98,11 @@ namespace rdt::core {
 		*/
 		Scene* m_scene;
 		ThemeData theme_data;
+		bool first_render;
+		bool m_templateWizardLaunched;
+		int m_menu_bar_height;
+
+		std::unordered_map<unsigned int, ImFont*> m_fonts;
 
 		/*
 			Gui Layout data structures
@@ -103,6 +126,7 @@ namespace rdt::core {
 		*/
 		GuiConfig m_diagnostics_panel;
 		GuiConfig m_scene_panel;
+		GuiConfig m_template_wizard;
 
 	public:
 		EditorLayout();
@@ -114,11 +138,13 @@ namespace rdt::core {
 
 		void SetTheme(EditorTheme nTheme);
 
+		void InitResources(std::string& resourcePath);
+
 	private:
-		void ThemeBegin();
-		void ThemeEnd();
+		void OnFirstRender();
 		void ApplyGuiConfig(const GuiConfig& config);
 		void SetScenePtr(Scene* ptr);
+		void AddCenteredText(const std::string& text);
 
 		/*
 			Returns the docking x-position for the Gui to be docked in the
@@ -132,6 +158,9 @@ namespace rdt::core {
 		*/
 		int GetDockPosY(Dock docking, int guiHeight, int margin = 0);
 
+
+		// =======================================================
+		void RenderMenuBar();
 		// =======================================================
 		void RenderDiagnosticsPanel();
 		// =======================================================
@@ -139,7 +168,7 @@ namespace rdt::core {
 		void AddLayerPanel(Layer* layer);
 		void AddGameObjectPanel(GameObject* gobject);
 		// =======================================================
-		void RenderMenuBar();
+		void RenderTemplateWizard();
 		// =======================================================
 
 	};

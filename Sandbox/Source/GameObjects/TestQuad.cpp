@@ -2,9 +2,10 @@
 
 using namespace rdt;
 
-TestQuad::TestQuad(const std::string& alias)
+TestQuad::TestQuad(const std::string& alias, Vec2d spawnPos)
 {
 	RegisterToMessageBus(alias);
+	m_spawnPos = spawnPos;
 }
 
 TestQuad::~TestQuad()
@@ -13,7 +14,7 @@ TestQuad::~TestQuad()
 
 void TestQuad::OnBind()
 {
-	AddObjectToWorld(std::make_shared<Rect>(Vec2d(160, 160), 300, 300));
+	AddObjectToWorld(std::make_shared<Rect>(m_spawnPos, 300, 300));
 	Physics::SetObjectProperties(GetRealmID(), m_model_ID, DontResolve);
 	Physics::SetMaximumVelocity(GetRealmID(), m_model_ID, Vec2d::Zero());
 	Physics::SetAcceleration(GetRealmID(), m_model_ID, Vec2d::Zero());
