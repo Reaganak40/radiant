@@ -6,22 +6,16 @@
 namespace rdt {
 	class RADIANT_API GuiTemplate {
 	private:
-		int m_window_width;
-		int m_window_height;
-		
 		float m_gui_width;
 		float m_gui_height;
+
+	protected:
+		int m_window_width;
+		int m_window_height;
 
 		Vec2i m_gui_pos;
 
 	protected:
-
-		enum Dock {
-			DockLeft,
-			DockRight,
-			DockTop,
-			DockBottom
-		};
 
 		/*
 			Sets the width and height of the Gui
@@ -32,18 +26,6 @@ namespace rdt {
 			Sets the position of the Gui
 		*/
 		void SetGuiPosition(int nX, int nY);
-
-		/*
-			Returns the docking x-position for the Gui to be docked in the 
-			provided direction with the given margin.
-		*/
-		int GetDockPosX(Dock docking, int margin = 0);
-
-		/*
-			Returns the docking y-position for the Gui to be docked in the
-			provided direction with the given margin.
-		*/
-		int GetDockPosY(Dock docking, int margin = 0);
 
 		/*
 			Gui template internal procedures to be called before rendering.

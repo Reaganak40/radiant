@@ -1,5 +1,5 @@
 #pragma once
-#include "pch.h"
+#include "Core.h"
 #include "Utils/MathTypes.h"
 #include "Utils/UniqueID.h"
 
@@ -14,7 +14,7 @@ namespace rdt {
 		IsLine = 2,
 	};
 
-	class Polygon {
+	class RADIANT_API Polygon {
 	private:
 		UniqueID m_UUID;
 		double m_rotation;

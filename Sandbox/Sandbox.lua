@@ -16,6 +16,8 @@ project "Sandbox"
 
     includedirs
     {
+        "Source",
+        
         "../Radiant/Source",
         "../Radiant/Source/Engine",
 

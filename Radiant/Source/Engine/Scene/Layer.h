@@ -45,6 +45,12 @@ namespace rdt {
 		void RunRenderQueue();
 
 		/*
+			Initalized a new realm from the physics engine and appends it to the vector
+			of realms to be used by game objects.
+		*/
+		void CreateNewRealm();
+
+		/*
 			To implement function when the object receives a message from the Message Bus.
 		*/
 		void OnMessage(Message msg) override {}
@@ -56,7 +62,8 @@ namespace rdt {
 		const UniqueID GetID() { return m_ID; }
 
 		/*
-			Function called when this layer is first attached to a Scene.
+			Function called when this layer is binded to a Scene, entering
+			the game loop.
 		*/
 		virtual void OnAttach() {}
 
@@ -87,6 +94,11 @@ namespace rdt {
 			Returns true if the layer is attach flag is true.
 		*/
 		bool IsAttached() { return m_attached; }
+
+		/*
+			Returns a constant pointer to the array of game objects
+		*/
+		GameObject** GetGameObjects(unsigned int* numObjects);
 
 		friend class Scene;
 	private:

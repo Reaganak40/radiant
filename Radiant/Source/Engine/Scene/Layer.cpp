@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Layer.h"
 #include "SceneManager.h"
+#include "Physics/Physics.h"
 
 namespace rdt {
 
@@ -19,6 +20,12 @@ namespace rdt {
 		}
 
 		FreeUniqueID(m_ID);
+	}
+
+	GameObject** Layer::GetGameObjects(unsigned int* numObjects)
+	{
+		*numObjects = m_game_objects.size();
+		return m_game_objects.data();
 	}
 
 	void Layer::SetAttached(bool attach)
@@ -49,6 +56,11 @@ namespace rdt {
 		for (auto& object : m_game_objects) {
 			object->OnRender();
 		}
+	}
+
+	void Layer::CreateNewRealm()
+	{
+		m_realms.push_back(Physics::CreateRealm());
 	}
 
 }

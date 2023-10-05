@@ -156,15 +156,6 @@
     <ClInclude Include="Source\Editor\Editor.h">
       <Filter>Source\Editor</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Editor\Panels\Diagnostics.h">
-      <Filter>Source\Editor\Panels</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Editor\Panels\Panel.h">
-      <Filter>Source\Editor\Panels</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Editor\Panels\ScenePanel.h">
-      <Filter>Source\Editor\Panels</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Engine\Application.h">
       <Filter>Source\Engine</Filter>
     </ClInclude>
@@ -515,15 +506,6 @@
   <ItemGroup>
     <ClCompile Include="Source\Editor\DevTools.cpp">
       <Filter>Source\Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Editor\Panels\Diagnostics.cpp">
-      <Filter>Source\Editor\Panels</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Editor\Panels\Panel.cpp">
-      <Filter>Source\Editor\Panels</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Editor\Panels\ScenePanel.cpp">
-      <Filter>Source\Editor\Panels</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine\Application.cpp">
       <Filter>Source\Engine</Filter>

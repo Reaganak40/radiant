@@ -1,4 +1,5 @@
 #pragma once
+#include "Core.h"
 #include "Utils/UniqueID.h"
 #include "Messaging/MessageBus.h"
 #include "Utils/BitSet.h"
@@ -6,10 +7,10 @@
 #include "GameState.h"
 
 namespace rdt {
-	class GameObject : public Messenger {
+	class RADIANT_API GameObject : public Messenger {
 	private:
 		UniqueID m_ID;
-		UniqueID m_sceneID;
+		UniqueID m_layerID;
 		UniqueID m_realmID;
 
 	protected:
@@ -35,7 +36,7 @@ namespace rdt {
 			Binds this game object to an existing scene. This must be done
 			before calling OnBind()
 		*/
-		void RegisterToScene(const UniqueID nSceneID) { m_sceneID = nSceneID; }
+		void RegisterToLayer(const UniqueID nLayerID) { m_layerID = nLayerID; }
 
 		/*
 			Binds this game object to a realm, where it can communicate with the physics API
@@ -45,7 +46,7 @@ namespace rdt {
 		/*
 			Gets the scene this object belongs to.
 		*/
-		const UniqueID GetSceneID() { return m_sceneID; }
+		const UniqueID GetLayerID() { return m_layerID; }
 
 		/*
 			Gets the realm this object belongs to.
@@ -58,7 +59,7 @@ namespace rdt {
 		const UniqueID GetModelID() { return m_model_ID; }
 
 		/*
-			To implement function when the scene this object belongs to is
+			To implement function when the layer this object belongs to is
 			being binded.
 		*/
 		virtual void OnBind() {}

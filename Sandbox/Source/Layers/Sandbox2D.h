@@ -7,5 +7,6 @@ public:
 	Sandbox2D();
 	~Sandbox2D();
 
+	void OnAttach() override final;
 	void OnRender() override final;
 };
