@@ -1,0 +1,43 @@
+#include "TEMPLATENAME.h"
+
+using namespace rdt;
+
+TEMPLATENAME::TEMPLATENAME(const std::string& alias)
+{
+	RegisterToMessageBus(alias);
+}
+
+TEMPLATENAME::~TEMPLATENAME()
+{
+}
+
+void TEMPLATENAME::OnBind()
+{
+	// TODO: Add Object to physical world and define physics properties
+}
+
+void TEMPLATENAME::OnRelease()
+{
+	// TODO: Remove Object from physical world
+}
+
+void TEMPLATENAME::OnMessage(rdt::Message msg)
+{
+	switch (msg.type) {
+	default:
+		break;
+	}
+}
+
+void TEMPLATENAME::OnProcessInput(const float deltaTime)
+{
+}
+
+void TEMPLATENAME::OnFinalUpdate()
+{
+}
+
+void TEMPLATENAME::OnRender()
+{
+	// TODO: Call Render Pipeline
+}

@@ -1,14 +1,17 @@
 #pragma once
+#include "Core.h"
 #include "Utils/UniqueID.h"
 #include "Messaging/Messenger.h"
+#include "Graphics/Camera.h"
 #include "Layer.h"
 
 namespace rdt {
 
-	class Scene : public Messenger {
+	class RADIANT_API Scene : public Messenger {
 	private:
 		UniqueID m_ID;
 		std::vector<Layer*> m_layers;
+		bool m_use_default_camera;
 
 		/*
 			Runs OnProcssInput on all game objects and OnUpdate on all
@@ -34,8 +37,13 @@ namespace rdt {
 		void OnMessage(Message msg) override {}
 
 	protected:
-
-
+		
+		/*
+			When this function is called, the render call internals for this Scene instance will
+			not tell the renderer to use the default camera, thus it is up to the scene child
+			to choose the right camera manually.
+		*/
+		void DontUseDefaultCamera();
 	public:
 		Scene();
 		~Scene();
@@ -43,16 +51,11 @@ namespace rdt {
 		const UniqueID GetID() { return m_ID; }
 
 		/*
-			Changes the scene dynamically to a known scene. This change is delayed
-			until the start of the next game loop.
-		*/
-		void ChangeScene(const std::string& nScene);
-
-		/*
 			Adds a layer to the top of the layer stack. The scene is
-			now responsible for freeing this layer.
+			now responsible for freeing this layer. This layer is not
+			attached.
 		*/
-		void AttachLayer(Layer* nLayer);
+		void AddLayer(Layer* nLayer);
 
 		/*
 			Function called prior to the host application registering
@@ -64,13 +67,13 @@ namespace rdt {
 			Function called prior to when the application switches to the
 			scene.
 		*/
-		virtual void OnBind() {}
+		virtual void OnBind();
 
 		/*
 			Function called when a scene is about to be released, changed
 			to another scene.
 		*/
-		virtual void OnRelease() {}
+		virtual void OnRelease();
 
 		/*
 			Function called when the scene is active and the host application
@@ -89,5 +92,10 @@ namespace rdt {
 			calls Render()
 		*/
 		virtual void OnRender() { RunRenderQueue(); }
+
+		/*
+			Returns a constant pointer to the array of layers
+		*/
+		Layer** GetLayers(unsigned int* numLayers);
 	};
 }

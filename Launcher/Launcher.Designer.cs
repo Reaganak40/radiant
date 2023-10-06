@@ -115,6 +115,7 @@
             BackButton.TabIndex = 7;
             BackButton.Text = "Back";
             BackButton.UseVisualStyleBackColor = true;
+            BackButton.Visible = false;
             BackButton.Click += BackButton_Click;
             // 
             // CreateProjectButton
@@ -130,6 +131,7 @@
             CreateProjectButton.TabIndex = 6;
             CreateProjectButton.Text = "Create";
             CreateProjectButton.UseVisualStyleBackColor = true;
+            CreateProjectButton.Visible = false;
             CreateProjectButton.EnabledChanged += CreateProjectButton_EnabledChanged;
             CreateProjectButton.VisibleChanged += CreateProjectButton_VisibleChanged;
             CreateProjectButton.Click += CreateProjectButton_Click;
@@ -164,6 +166,7 @@
             DirectoryTextbox.PlaceholderText = "Project Directory";
             DirectoryTextbox.Size = new Size(571, 34);
             DirectoryTextbox.TabIndex = 0;
+            DirectoryTextbox.Visible = false;
             DirectoryTextbox.TextChanged += DirectoryTextbox_TextChanged;
             // 
             // BrowseCreateDirectoryButton
@@ -179,6 +182,7 @@
             BrowseCreateDirectoryButton.TabIndex = 0;
             BrowseCreateDirectoryButton.Text = "Browse";
             BrowseCreateDirectoryButton.UseVisualStyleBackColor = false;
+            BrowseCreateDirectoryButton.Visible = false;
             BrowseCreateDirectoryButton.Click += BrowseCreateDirectoryButton_Click;
             // 
             // CreateFolderCheckbox
@@ -195,6 +199,7 @@
             CreateFolderCheckbox.TabIndex = 5;
             CreateFolderCheckbox.Text = "Create folder for project";
             CreateFolderCheckbox.UseVisualStyleBackColor = true;
+            CreateFolderCheckbox.Visible = false;
             // 
             // NoLoadedProjectsLabel
             // 

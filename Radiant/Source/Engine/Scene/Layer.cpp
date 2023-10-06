@@ -1,11 +1,13 @@
 #include "pch.h"
 #include "Layer.h"
 #include "SceneManager.h"
+#include "Physics/Physics.h"
+#include "Graphics/Renderer.h"
 
 namespace rdt {
 
 	Layer::Layer()
-		: m_ID(GetUniqueID())
+		: m_ID(GetUniqueID()),  m_attached(false)
 	{
 	}
 	Layer::~Layer()
@@ -19,6 +21,28 @@ namespace rdt {
 		}
 
 		FreeUniqueID(m_ID);
+	}
+
+	GameObject** Layer::GetGameObjects(unsigned int* numObjects)
+	{
+		*numObjects = m_game_objects.size();
+		return m_game_objects.data();
+	}
+
+	void Layer::BindAll()
+	{
+		for (auto& object : m_game_objects) {
+			object->OnBind();
+		}
+
+		for (auto& gui : m_GUIs) {
+			Renderer::AttachGui(gui);
+		}
+	}
+
+	void Layer::SetAttached(bool attach)
+	{
+		m_attached = attach;
 	}
 
 	void Layer::RunProcessInputQueue(const float deltaTime)
@@ -44,6 +68,11 @@ namespace rdt {
 		for (auto& object : m_game_objects) {
 			object->OnRender();
 		}
+	}
+
+	void Layer::CreateNewRealm()
+	{
+		m_realms.push_back(Physics::CreateRealm());
 	}
 
 }

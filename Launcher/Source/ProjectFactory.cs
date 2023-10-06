@@ -132,17 +132,34 @@ namespace Launcher.Source
             configureFilename = resFilepathDest;
             ReplaceInFile(configureFilename, "RADIANTPROJECTNAME", baseClassName);
 
-            // Add bat project file
-            resFilepathSrc = Path.Combine(creationResourcePath, "build.bat");
-            resFilepathDest = Path.Combine(projectBaseDir, "build.bat");
+            // Copy radiant config file
+            resFilepathSrc = Path.Combine(creationResourcePath, "radiant.ini");
+            resFilepathDest = Path.Combine(projectContainerDir, "radiant.ini");
             worker.ReportProgress(70, "Copying " + resFilepathSrc + " to " + resFilepathDest);
             if (!CopyFile(resFilepathSrc, resFilepathDest))
             {
                 return;
             }
 
+            // Configure radiant config file
+            worker.ReportProgress(75, "Configuring radiant.ini ...");
+            string radiantResourceDir = Path.Combine(radiantSourcePath, "Radiant", "Resources");
+            radiantResourceDir = radiantResourceDir.Replace("/", "\\");
+            configureFilename = resFilepathDest;
+            ReplaceInFile(configureFilename, "RADIANTPROJECTNAME", projectName);
+            ReplaceInFile(configureFilename, "RADIANTRESOURCEDIR", radiantResourceDir);
+
+            // Add bat project file
+            resFilepathSrc = Path.Combine(creationResourcePath, "build.bat");
+            resFilepathDest = Path.Combine(projectBaseDir, "build.bat");
+            worker.ReportProgress(85, "Copying " + resFilepathSrc + " to " + resFilepathDest);
+            if (!CopyFile(resFilepathSrc, resFilepathDest))
+            {
+                return;
+            }
+
             // Configure build.bat
-            worker.ReportProgress(75, "Configuring build.bat...");
+            worker.ReportProgress(90, "Configuring build.bat...");
             string premakeExepath = Path.Combine(radiantSourcePath, "Vendor", "bin", "premake", "premake5.exe");
             if (!Path.Exists(premakeExepath))
             {
@@ -154,7 +171,7 @@ namespace Launcher.Source
             ReplaceInFile(configureFilename, "PROJECTBASEDIR", projectBaseDir);
 
             // Run premake5 to create visual studio solution and project files
-            worker.ReportProgress(85, "Running premake5...");
+            worker.ReportProgress(95, "Running premake5...");
             System.Diagnostics.Process.Start(configureFilename);
 
             worker.ReportProgress(100, "Opening project...");

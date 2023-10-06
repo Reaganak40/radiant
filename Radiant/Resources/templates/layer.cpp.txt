@@ -1,0 +1,59 @@
+#include "TEMPLATENAME.h"
+
+using namespace rdt;
+
+TEMPLATENAME::TEMPLATENAME(const std::string& alias)
+{
+	RegisterToMessageBus(alias);
+}
+
+TEMPLATENAME::~TEMPLATENAME()
+{
+}
+
+void TEMPLATENAME::OnAttach()
+{
+	// TODO: Bind GameObjects and GUIs
+
+}
+
+void TEMPLATENAME::OnDetach()
+{
+	// TODO: Unbind GameObjects and GUIs
+
+}
+
+void TEMPLATENAME::OnMessage(rdt::Message msg)
+{
+	switch (msg.type) {
+	default:
+		break;
+	}
+}
+
+void TEMPLATENAME::OnProcessInput(const float deltaTime)
+{
+
+	/* 
+		Calls ProcessInput on all binded game objects
+		and GUIs.
+	*/
+	Layer::OnProcessInput(deltaTime);
+}
+
+void TEMPLATENAME::OnFinalUpdate()
+{
+
+	/* Calls FinalUpdate on all binded game objects. */
+	Layer::OnFinalUpdate();
+}
+
+void TEMPLATENAME::OnRender()
+{
+
+	/* 
+		Calls OnRender on all binded game objects
+		and GUIs.
+	*/
+	Layer::OnRender();
+}

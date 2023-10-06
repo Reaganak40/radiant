@@ -1,8 +1,9 @@
 #pragma once
+#include "Core.h"
 
 namespace rdt {
 
-	struct Vec2d {
+	struct RADIANT_API Vec2d {
 		double x, y;
 
 		Vec2d(double nX = 0, double nY = 0)
@@ -62,7 +63,7 @@ namespace rdt {
 
 	
 
-	struct Vec3f {
+	struct RADIANT_API Vec3f {
 		float x, y, z;
 
 		Vec3f(float nX = 0, float nY = 0, float nZ = 0)
@@ -71,14 +72,14 @@ namespace rdt {
 		static Vec3f Zero();
 	};
 
-	struct Vec4f {
+	struct RADIANT_API Vec4f {
 		float x1, x2, x3, x4;
 
 		Vec4f(float nA = 0.0f, float nB = 0.0f, float nC = 0.0f, float nD = 0.0f)
 			: x1(nA), x2(nB), x3(nC), x4(nD) {}
 	};
 
-	struct Vec2i {
+	struct RADIANT_API Vec2i {
 		int x, y;
 		
 		Vec2i(int nX=0, int nY=0) 
@@ -117,7 +118,7 @@ namespace rdt {
 	Vec2i operator- (const Vec2i& vector1, const Vec2i& vector2);
 
 
-	struct Vec2f {
+	struct RADIANT_API Vec2f {
 		float x, y;
 
 		Vec2f(float nX = 0, float nY = 0)

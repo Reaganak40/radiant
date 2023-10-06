@@ -1,4 +1,5 @@
 #pragma once
+#include "Core.h"
 #include "MathTypes.h"
 
 namespace rdt {
@@ -13,7 +14,7 @@ namespace rdt {
 		YELLOW,
 	};
 
-	class Color {
+	class RADIANT_API Color {
 	private:
 		Vec4f m_color;
 

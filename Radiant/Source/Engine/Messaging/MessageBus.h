@@ -1,4 +1,5 @@
 #pragma once
+#include "Core.h"
 #include "Message.h"
 #include "Messenger.h"
 #include "Broadcast.h"
@@ -7,7 +8,7 @@ namespace rdt {
 
 	constexpr MessageID SoundMessengerID = 1;
 
-	class MessageBus {
+	class RADIANT_API MessageBus {
 	private:
 		MessageBus();
 		~MessageBus();

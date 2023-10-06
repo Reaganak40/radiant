@@ -1,4 +1,4 @@
+@echo off
 pushd PROJECTBASEDIR
 call RADIANTPREMAKE5EXE vs2022
 popd
-PAUSE

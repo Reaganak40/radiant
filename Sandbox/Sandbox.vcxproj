@@ -59,7 +59,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;RDT_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Radiant\Source;..\Radiant\Source\Engine;..\Radiant\Vendor\glfw\include;..\Radiant\Vendor\glad\include;..\Radiant\Vendor\imgui;..\Radiant\Vendor\imgui\backends;..\Radiant\Vendor\glm;..\Radiant\Vendor\stb;..\Radiant\Vendor\AL;..\Radiant\Vendor\AudioFile-1.1.1;..\Radiant\Vendor\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Source;..\Radiant\Source;..\Radiant\Source\Engine;..\Radiant\Vendor\glfw\include;..\Radiant\Vendor\glad\include;..\Radiant\Vendor\imgui;..\Radiant\Vendor\imgui\backends;..\Radiant\Vendor\glm;..\Radiant\Vendor\stb;..\Radiant\Vendor\AL;..\Radiant\Vendor\AudioFile-1.1.1;..\Radiant\Vendor\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -101,12 +101,30 @@ IF EXIST ..\bin\Release-windows-x86_64\Radiant\OpenAL32.dll\ (xcopy /Q /E /Y /I 
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Sandbox.cpp" />
+    <ClCompile Include="Source\GameObjects\GameObjectTemplate.cpp" />
+    <ClCompile Include="Source\GameObjects\MyBeautifulObject.cpp" />
+    <ClCompile Include="Source\GameObjects\TestQuad.cpp" />
+    <ClCompile Include="Source\Layers\LayerTemplate.cpp" />
+    <ClCompile Include="Source\Layers\TestLayer.cpp" />
+    <ClCompile Include="Source\SandboxApp.cpp" />
+    <ClCompile Include="Source\Layers\Sandbox2D.cpp" />
+    <ClCompile Include="Source\Scenes\Sandbox.cpp" />
+    <ClCompile Include="Source\Scenes\SceneTemplate.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Radiant\Radiant.vcxproj">
       <Project>{1FED84C6-8BA2-FDBB-1497-F792804BF4BF}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\GameObjects\GameObjectTemplate.h" />
+    <ClInclude Include="Source\GameObjects\MyBeautifulObject.h" />
+    <ClInclude Include="Source\GameObjects\TestQuad.h" />
+    <ClInclude Include="Source\Layers\LayerTemplate.h" />
+    <ClInclude Include="Source\Layers\Sandbox2D.h" />
+    <ClInclude Include="Source\Layers\TestLayer.h" />
+    <ClInclude Include="Source\Scenes\Sandbox.h" />
+    <ClInclude Include="Source\Scenes\SceneTemplate.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

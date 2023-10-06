@@ -11,17 +11,20 @@
 #include "Scene/SceneManager.h"
 #include "Physics/Ptag.h"
 
+#include "Editor/DevTools.h"
+
 namespace rdt {
 	Application::Application()
 		: m_current_scene(nullptr)
 	{
 		Renderer::Initialize();
-		m_cwd = Utils::GetCWD();
-		RDT_CORE_INFO("Current filepath: {}", m_cwd);
 	}
 
 	Application::~Application()
 	{
+#ifdef RDT_DEBUG
+		core::DevLayer::Destroy();
+#endif
 		GuiManager::Destroy();
 		Physics::Destroy();
 		core::PtagManager::Destroy();
@@ -34,7 +37,7 @@ namespace rdt {
 	void Application::Start(std::string appName, unsigned int windowWidth, unsigned int windowHeight, bool resizable)
 	{
 		Utils::SetRandomSeed();
-		Renderer::CreateRadiantWindow(appName, windowWidth, windowHeight, resizable);
+		Renderer::CreateRadiantWindow(appName);
 		MessageBus::Initialize();
 		SoundEngine::Initialize();
 		Input::Initialize();
@@ -42,9 +45,6 @@ namespace rdt {
 		Physics::Initialize();
 		GuiManager::Initialize();
 		SceneManager::Initialize();
-
-		// Get the currently bounded scene for preloop reasons.
-		m_current_scene = SceneManager::GetCurrentScene();
 	}
 
 	void Application::Run()

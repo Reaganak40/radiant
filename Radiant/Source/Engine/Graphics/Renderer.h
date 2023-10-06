@@ -11,13 +11,23 @@
 #include "RenderTypes.h"
 #include "Gui/Gui.h"
 
+#include "Camera.h"
 
 namespace rdt {
 
 	class RADIANT_API Renderer {
+	private:
+		std::unordered_map <std::string, Camera*> m_cameras;
+		Camera* m_default_camera;
 	protected:
 		Renderer();
 		virtual ~Renderer();
+
+		/*
+			Sets the default camera
+		*/
+		void SetDefaultCamera(Camera* defaultCamera);
+
 	private:
 		static Renderer* m_instance;
 	public:
@@ -35,7 +45,7 @@ namespace rdt {
 		/*
 			Creates a new GLFW window with the provided specifications.
 		*/
-		static Vec2i CreateRadiantWindow(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight, bool resizable) { return m_instance->CreateWindowImpl(windowName, windowWidth, windowHeight, resizable); }
+		static bool CreateRadiantWindow(const std::string& windowName) { return m_instance->CreateWindowImpl(windowName); }
 
 		/*
 			Gets the platform window instance (currently just GLFW)
@@ -186,6 +196,22 @@ namespace rdt {
 		*/
 		static void DetachGui(const GuiTemplate* gui) { m_instance->DetachGuiImpl(gui); }
 
+		/*
+			Adds a camera to the renderer instance, which can be used to create
+			multiple viewports and perspectives.
+		*/
+		static void AddCamera(const std::string& alias, Camera* nCamera);
+
+		/*
+			Gets a camera pointer from the camera map.
+		*/
+		static Camera* GetCamera(const std::string& cameraName = "");
+
+		/*
+			Called once per frame to declare a camera to be used. In most cases, only
+			one camera should be used.
+		*/
+		static void UseCamera(const std::string& alias = "") { m_instance->UseCameraImpl(alias); }
 
 		// *****************************************************
 		// 
@@ -203,7 +229,7 @@ namespace rdt {
 		virtual bool ShouldWindowCloseImpl() = 0;
 		virtual unsigned int GetWindowWidthImpl() = 0;
 		virtual unsigned int GetWindowHeightImpl() = 0;
-		virtual Vec2i CreateWindowImpl(const std::string& windowName, unsigned int windowWidth, unsigned int windowHeight, bool resizable) = 0;
+		virtual bool CreateWindowImpl(const std::string& windowName) = 0;
 		virtual void* GetWindowInstanceImpl() = 0;
 		virtual Vec2d GetCameraCoordinates2DImpl() = 0;
 		virtual void SetBackgroundColorImpl(const Color& color) = 0;
@@ -228,6 +254,8 @@ namespace rdt {
 		virtual void AttachGuiImpl(GuiTemplate* gui) = 0;
 		virtual void DetachGuiImpl(const GuiTemplate* gui) = 0;
 
+		virtual void UseCameraImpl(const std::string& alias) = 0;
 		virtual void _FlushPolygonImpl(const UniqueID UUID) = 0;
+		
 	};
 }

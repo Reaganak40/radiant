@@ -14,38 +14,6 @@ namespace rdt {
 		m_gui_pos.y = nY;
 	}
 
-	int GuiTemplate::GetDockPosX(Dock docking, int margin)
-	{
-		switch (docking) {
-		case DockLeft:
-			return margin;
-		case DockRight:
-			return m_window_width - m_gui_width - margin;
-		case DockTop:
-			return 0;
-		case DockBottom:
-			return 0;
-		}
-
-		return 0;
-	}
-
-	int GuiTemplate::GetDockPosY(Dock docking, int margin)
-	{
-		switch (docking) {
-		case DockLeft:
-			return 0;
-		case DockRight:
-			return 0;
-		case DockTop:
-			return margin;
-		case DockBottom:
-			return m_window_height - m_gui_height - margin;
-		}
-
-		return 0;
-	}
-
 	void GuiTemplate::PrepareRender()
 	{
 		// First render config

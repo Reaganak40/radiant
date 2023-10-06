@@ -1,8 +1,10 @@
 #pragma once
+#include "Core.h"
 #include "Messaging/Messenger.h"
 #include "Utils/UniqueID.h"
 #include "GameObject/GameObject.h"
 #include "Gui/Gui.h"
+#include "Graphics/Camera.h"
 
 
 namespace rdt {
@@ -12,18 +14,19 @@ namespace rdt {
 	/*
 		Scenes own game objects and GUIs that can be used by the application under
 		specified conditions.
-
-
 	*/
-	class Layer : public Messenger {
+	class RADIANT_API Layer : public Messenger {
 	private:
 		UniqueID m_ID;
+		bool m_attached;
 
 	protected:
 		std::vector<GameObject*> m_game_objects;
 		std::vector<GuiTemplate*> m_GUIs;
 		std::vector<UniqueID> m_realms;
 		GameState GState;
+
+	private:
 		
 		/*
 			Runs OnProcssInput on all game objects and OnUpdate on all
@@ -43,11 +46,6 @@ namespace rdt {
 		*/
 		void RunRenderQueue();
 
-		/*
-			To implement function when the object receives a message from the Message Bus.
-		*/
-		void OnMessage(Message msg) override {}
-
 	public:
 		Layer();
 		~Layer();
@@ -55,19 +53,10 @@ namespace rdt {
 		const UniqueID GetID() { return m_ID; }
 
 		/*
-			Function called when this layer is first attached to a Scene.
+			Function called when this layer is binded to a Scene, entering
+			the game loop.
 		*/
 		virtual void OnAttach() {}
-
-		/*
-			Function called when this layer is to be awakened and active.
-		*/
-		virtual void OnAwake() {}
-
-		/*
-			Function to be called when this layer is to go to sleep but no destroyed.
-		*/
-		virtual void OnSleep() {}
 
 		/*
 			Function called when a layer is about to be released, not active.
@@ -92,6 +81,41 @@ namespace rdt {
 		*/
 		virtual void OnRender() { RunRenderQueue(); }
 
+		/*
+			Returns true if the layer is attach flag is true.
+		*/
+		bool IsAttached() { return m_attached; }
+
+		/*
+			To implement function when the object receives a message from the Message Bus.
+		*/
+		void OnMessage(Message msg) override {}
+
+		/*
+			Returns a constant pointer to the array of game objects
+		*/
+		GameObject** GetGameObjects(unsigned int* numObjects);
+
+		friend class Scene;
+
+	protected:
+
+		/*
+			Helper function that binds all game objects and GUIs
+		*/
+		void BindAll();
+
+		/*
+			Initalized a new realm from the physics engine and appends it to the vector
+			of realms to be used by game objects.
+		*/
+		void CreateNewRealm();
+
 	private:
+
+		/*
+			Overhead function to set the attach flag for the layer.
+		*/
+		void SetAttached(bool attach);
 	};
 }

@@ -49,6 +49,11 @@ project "Radiant"
         "GLFW", "GLM", "GLAD", "ImGui"
     }
 
+    postbuildcommands
+    {
+        ("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox")
+    }
+
     pchheader "pch.h"
     pchsource "Source/pch.cpp"
     filter {"files:Vendor/**.cpp"}

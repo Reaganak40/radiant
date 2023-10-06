@@ -1,5 +1,5 @@
 #pragma once
-#include "pch.h"
+#include "Core.h"
 #include "Pobject.h"
 #include "Utils/UniqueID.h"
 #include "Realm.h"
@@ -7,7 +7,7 @@
 
 namespace rdt {
 
-	class Physics {
+	class RADIANT_API Physics {
 	private:
 		Physics();
 		~Physics();

@@ -50,6 +50,11 @@ namespace rdt {
         void ReadTextFile(const std::string& filepath, std::string& outContents);
 
         /*
+            Replaces all occurances of the target string in src with the replace string.
+        */
+        void ReplaceAll(std::string& src, const std::string& target, const std::string& replace);
+        
+        /*
             Returns the max between two unsigned integers
         */
         unsigned int Max(unsigned int x, unsigned int y);
@@ -109,5 +114,25 @@ namespace rdt {
             Returns the absolute path to the current working directory.
         */
         std::string GetCWD();
+
+        /*
+            Tokenizes a string by the provided delimeter and returns a vector of the tokenized strings
+        */
+        void Tokenize(const std::string& str, const std::string& delimeter, std::vector<std::string>& out);
+
+        /*
+            Returns the parent directory of the filepath
+        */
+        std::string ParentPath(const std::string& path);
+
+        /*
+            Copys a file to new destination
+        */
+        void CopyFileTo(const std::string& src, const std::string& dest);
+
+        /*
+            Writes the content to the file at filepath
+        */
+        void WriteFile(const std::string& filepath, const std::string& content);
     }
 }
