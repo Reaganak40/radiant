@@ -143,8 +143,11 @@ namespace Launcher.Source
 
             // Configure radiant config file
             worker.ReportProgress(75, "Configuring radiant.ini ...");
+            string radiantResourceDir = Path.Combine(radiantSourcePath, "Radiant", "Resources");
+            radiantResourceDir = radiantResourceDir.Replace("/", "\\");
             configureFilename = resFilepathDest;
             ReplaceInFile(configureFilename, "RADIANTPROJECTNAME", projectName);
+            ReplaceInFile(configureFilename, "RADIANTRESOURCEDIR", radiantResourceDir);
 
             // Add bat project file
             resFilepathSrc = Path.Combine(creationResourcePath, "build.bat");

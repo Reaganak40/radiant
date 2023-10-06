@@ -16,6 +16,8 @@ project "RADIANTPROJECTNAME"
 
     includedirs
     {
+        "Source",
+
         "RADIANTBASEDIR/Radiant/Source",
         "RADIANTBASEDIR/Radiant/Source/Engine",
 
