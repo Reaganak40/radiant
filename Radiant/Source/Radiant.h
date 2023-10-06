@@ -7,6 +7,7 @@
 
 // -- Radiant Engine APIs --------------------
 #include "Engine/Graphics/Renderer.h"
+#include "Engine/Messaging/MessageBus.h"
 #include "Engine/Physics/Physics.h"
 // -------------------------------------------
 

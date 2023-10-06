@@ -403,8 +403,19 @@ namespace rdt::core {
 			return;
 		}
 
-		Utils::CopyFileTo(template_h.generic_string(), headerFile);
-		Utils::CopyFileTo(template_cpp.generic_string(), srcFile);
+		std::string contents;
+		
+		// Write header file;
+		Utils::ReadTextFile(template_h.generic_string(), contents);
+		Utils::ReplaceAll(contents, "TEMPLATENAME", name);
+		Utils::WriteFile(headerFile, contents);
+		contents.clear();
+
+		// Write src file
+		Utils::ReadTextFile(template_cpp.generic_string(), contents);
+		Utils::ReplaceAll(contents, "TEMPLATENAME", name);
+		Utils::WriteFile(srcFile, contents);
+
 	}
 
 	bool EditorLayout::ValidTemplateName(const std::string& name, std::string& errorMsg)

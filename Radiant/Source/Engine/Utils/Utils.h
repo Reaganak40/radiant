@@ -50,6 +50,11 @@ namespace rdt {
         void ReadTextFile(const std::string& filepath, std::string& outContents);
 
         /*
+            Replaces all occurances of the target string in src with the replace string.
+        */
+        void ReplaceAll(std::string& src, const std::string& target, const std::string& replace);
+        
+        /*
             Returns the max between two unsigned integers
         */
         unsigned int Max(unsigned int x, unsigned int y);
@@ -124,5 +129,10 @@ namespace rdt {
             Copys a file to new destination
         */
         void CopyFileTo(const std::string& src, const std::string& dest);
+
+        /*
+            Writes the content to the file at filepath
+        */
+        void WriteFile(const std::string& filepath, const std::string& content);
     }
 }

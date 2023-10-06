@@ -82,7 +82,7 @@ namespace rdt {
             std::ifstream infile(filepath);
 
             if (!infile.is_open()) {
-                RDT_CORE_WARN("Warning: Could not open file: [{}]", filepath.c_str());
+                RDT_CORE_WARN("Warning: Could not open file: [{}]", filepath);
                 return;
             }
 
@@ -95,6 +95,20 @@ namespace rdt {
 
             // Close the file
             infile.close();
+        }
+
+        void ReplaceAll(std::string& src, const std::string& target, const std::string& nStr)
+        {
+            if (target == nStr) {
+                return;
+            }
+
+            std::string::size_type n = 0;
+            while ((n = src.find(target, n)) != std::string::npos)
+            {
+                src.replace(n, target.size(), nStr);
+                n += nStr.size();
+            }
         }
 
         unsigned int Max(unsigned int x, unsigned int y)
@@ -210,6 +224,13 @@ namespace rdt {
         void CopyFileTo(const std::string& src, const std::string& dest)
         {
             CopyFile(std::wstring(src.begin(), src.end()).c_str(), std::wstring(dest.begin(), dest.end()).c_str(), true);
+        }
+        void WriteFile(const std::string& filepath, const std::string& content)
+        {
+            std::ofstream ofile;
+            ofile.open(filepath, std::ofstream::binary);
+            ofile << content;
+            ofile.close();
         }
     }
 }

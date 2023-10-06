@@ -1,29 +1,29 @@
-#include "TEMPLATENAME.h"
+#include "LayerTemplate.h"
 
 using namespace rdt;
 
-TEMPLATENAME::TEMPLATENAME(const std::string& alias)
+TEMPLATENAME_LAYER::TEMPLATENAME_LAYER(const std::string& alias)
 {
 	RegisterToMessageBus(alias);
 }
 
-TEMPLATENAME::~TEMPLATENAME()
+TEMPLATENAME_LAYER::~TEMPLATENAME_LAYER()
 {
 }
 
-void TEMPLATENAME::OnAttach()
+void TEMPLATENAME_LAYER::OnAttach()
 {
 	// TODO: Bind GameObjects and GUIs
 
 }
 
-void TEMPLATENAME::OnDetach()
+void TEMPLATENAME_LAYER::OnDetach()
 {
 	// TODO: Unbind GameObjects and GUIs
 
 }
 
-void TEMPLATENAME::OnMessage(rdt::Message msg)
+void TEMPLATENAME_LAYER::OnMessage(rdt::Message msg)
 {
 	switch (msg.type) {
 	default:
@@ -31,7 +31,7 @@ void TEMPLATENAME::OnMessage(rdt::Message msg)
 	}
 }
 
-void TEMPLATENAME::OnProcessInput(const float deltaTime)
+void TEMPLATENAME_LAYER::OnProcessInput(const float deltaTime)
 {
 
 	/* 
@@ -41,14 +41,14 @@ void TEMPLATENAME::OnProcessInput(const float deltaTime)
 	Layer::OnProcessInput(deltaTime);
 }
 
-void TEMPLATENAME::OnFinalUpdate()
+void TEMPLATENAME_LAYER::OnFinalUpdate()
 {
 
 	/* Calls FinalUpdate on all binded game objects. */
 	Layer::OnFinalUpdate();
 }
 
-void TEMPLATENAME::OnRender()
+void TEMPLATENAME_LAYER::OnRender()
 {
 
 	/* 

@@ -1,12 +1,12 @@
 #pragma once
 #include <Radiant.h>
 
-class TEMPLATENAME : public rdt::Layer {
+class TestLayer : public rdt::Layer {
 private:
 public:
 
-	TEMPLATENAME(const std::string& alias = "TEMPLATENAME");
-	~TEMPLATENAME();
+	TestLayer(const std::string& alias = "TestLayer");
+	~TestLayer();
 
 	/*
 		Function called when this layer is binded to a Scene, entering
@@ -18,12 +18,6 @@ public:
 		Function called when a layer is about to be released, not active.
 	*/
 	void OnDetach() override;
-
-	/*
-		Callback function when the MessageBus is delivering a message to
-		this object.
-	*/
-	void OnMessage(rdt::Message msg) override;
 
 	/*
 		Function called when the layer is active and the host scene

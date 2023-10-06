@@ -25,6 +25,8 @@ namespace rdt {
 		std::vector<GuiTemplate*> m_GUIs;
 		std::vector<UniqueID> m_realms;
 		GameState GState;
+
+	private:
 		
 		/*
 			Runs OnProcssInput on all game objects and OnUpdate on all
@@ -43,17 +45,6 @@ namespace rdt {
 			of OnRender().
 		*/
 		void RunRenderQueue();
-
-		/*
-			Initalized a new realm from the physics engine and appends it to the vector
-			of realms to be used by game objects.
-		*/
-		void CreateNewRealm();
-
-		/*
-			To implement function when the object receives a message from the Message Bus.
-		*/
-		void OnMessage(Message msg) override {}
 
 	public:
 		Layer();
@@ -96,11 +87,30 @@ namespace rdt {
 		bool IsAttached() { return m_attached; }
 
 		/*
+			To implement function when the object receives a message from the Message Bus.
+		*/
+		void OnMessage(Message msg) override {}
+
+		/*
 			Returns a constant pointer to the array of game objects
 		*/
 		GameObject** GetGameObjects(unsigned int* numObjects);
 
 		friend class Scene;
+
+	protected:
+
+		/*
+			Helper function that binds all game objects and GUIs
+		*/
+		void BindAll();
+
+		/*
+			Initalized a new realm from the physics engine and appends it to the vector
+			of realms to be used by game objects.
+		*/
+		void CreateNewRealm();
+
 	private:
 
 		/*

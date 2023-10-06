@@ -2,6 +2,7 @@
 #include "Layer.h"
 #include "SceneManager.h"
 #include "Physics/Physics.h"
+#include "Graphics/Renderer.h"
 
 namespace rdt {
 
@@ -26,6 +27,17 @@ namespace rdt {
 	{
 		*numObjects = m_game_objects.size();
 		return m_game_objects.data();
+	}
+
+	void Layer::BindAll()
+	{
+		for (auto& object : m_game_objects) {
+			object->OnBind();
+		}
+
+		for (auto& gui : m_GUIs) {
+			Renderer::AttachGui(gui);
+		}
 	}
 
 	void Layer::SetAttached(bool attach)

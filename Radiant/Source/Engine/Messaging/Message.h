@@ -1,10 +1,11 @@
 #pragma once
+#include "Core.h"
 
 namespace rdt {
-	typedef unsigned int MessageID;
-	typedef unsigned int MessageType;
+	typedef RADIANT_API unsigned int MessageID;
+	typedef RADIANT_API unsigned int MessageType;
 
-	struct Message {
+	struct RADIANT_API Message {
 		MessageID from;
 		MessageID to;
 		MessageType type;

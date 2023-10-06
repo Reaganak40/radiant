@@ -1,12 +1,12 @@
 #pragma once
 #include <Radiant.h>
 
-class TEMPLATENAME : public rdt::Layer {
+class TEMPLATENAME_LAYER : public rdt::Layer {
 private:
 public:
 
-	TEMPLATENAME(const std::string& alias = "TEMPLATENAME");
-	~TEMPLATENAME();
+	TEMPLATENAME_LAYER(const std::string& alias = "TEMPLATENAME_LAYER");
+	~TEMPLATENAME_LAYER();
 
 	/*
 		Function called when this layer is binded to a Scene, entering

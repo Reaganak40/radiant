@@ -33,5 +33,5 @@ void Sandbox2D::OnAttach()
 
 void Sandbox2D::OnRender()
 {
-	RunRenderQueue();
+	Layer::OnRender();
 }

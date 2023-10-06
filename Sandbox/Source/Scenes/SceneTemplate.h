@@ -1,11 +1,11 @@
 #include <Radiant.h>
 
-class TEMPLATENAME : public rdt::Scene {
+class TEMPLATENAME_SCENE : public rdt::Scene {
 private:
 
 public:
-	TEMPLATENAME(const std::string& alias = "TEMPLATENAME");
-	~TEMPLATENAME();
+	TEMPLATENAME_SCENE(const std::string& alias = "TEMPLATENAME");
+	~TEMPLATENAME_SCENE();
 
 	/*
 		Function called prior to the host application registering
@@ -26,6 +26,12 @@ public:
 	void OnRelease() override;
 
 	/*
+		Callback function when the MessageBus is delivering a message to
+		this object.
+	*/
+	void OnMessage(rdt::Message msg) override;
+
+	/*
 		Function called when the scene is active and the host application
 		calls ProcessInput.
 	*/
@@ -42,5 +48,4 @@ public:
 		calls Render()
 	*/
 	void OnRender() override;
-
 };

@@ -1,4 +1,4 @@
-#include "SceneTemplate.h"
+#include "TEMPLATENAME.h"
 
 using namespace rdt;
 
@@ -27,6 +27,14 @@ void TEMPLATENAME::OnRelease()
 
 	/* Detaches all layers belonging to this scene. */
 	Scene::OnRelease();
+}
+
+void TEMPLATENAME::OnMessage(Message msg)
+{
+	switch (msg.type) {
+	default:
+		break;
+	}
 }
 
 void TEMPLATENAME::OnProcessInput(const float deltaTime)
