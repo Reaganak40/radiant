@@ -14,7 +14,7 @@ namespace rdt::core {
 		/*
 			Sets a filepath that can be used for default reading and writing to files.
 		*/
-		void SetDefaultPath(std::string defaultFilepath);
+		void SetTargetFile(std::string defaultFilepath);
 
 		/*
 			Reads a config file and updates the config state internals of this

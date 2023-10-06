@@ -12,7 +12,7 @@ namespace rdt::core {
 	{
 	}
 
-	void ConfigReader::SetDefaultPath(std::string defaultFilepath)
+	void ConfigReader::SetTargetFile(std::string defaultFilepath)
 	{
 		filepath = defaultFilepath;
 	}

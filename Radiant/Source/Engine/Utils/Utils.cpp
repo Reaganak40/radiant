@@ -207,5 +207,9 @@ namespace rdt {
             size_t pos = path.find_last_of("\\/");
             return (std::string::npos == pos) ? "" : path.substr(0, pos);
         }
+        void CopyFileTo(const std::string& src, const std::string& dest)
+        {
+            CopyFile(std::wstring(src.begin(), src.end()).c_str(), std::wstring(dest.begin(), dest.end()).c_str(), true);
+        }
     }
 }

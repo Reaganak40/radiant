@@ -1,0 +1,46 @@
+#include <Radiant.h>
+
+class TEMPLATENAME : public rdt::Scene {
+private:
+
+public:
+	TEMPLATENAME(const std::string& alias = "TEMPLATENAME");
+	~TEMPLATENAME();
+
+	/*
+		Function called prior to the host application registering
+		the scene with the SceneManager for the first time.
+	*/
+	void OnRegister() override;
+
+	/*
+		Function called when the host application switches to this
+		scene.
+	*/
+	void OnBind() override;
+
+	/*
+		Function called when a scene is about to be released, changed
+		to another scene.
+	*/
+	void OnRelease() override;
+
+	/*
+		Function called when the scene is active and the host application
+		calls ProcessInput.
+	*/
+	void OnProcessInput(const float deltaTime) override;
+
+	/*
+		Function called when the scene is active and the host application
+		calls FinalUpdate()
+	*/
+	void OnFinalUpdate() override;
+
+	/*
+		Function called when the scene is active and the host application
+		calls Render()
+	*/
+	void OnRender() override;
+
+};

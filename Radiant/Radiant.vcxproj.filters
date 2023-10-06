@@ -665,4 +665,12 @@
     </ClCompile>
     <ClCompile Include="Source\Engine\Graphics\Camera.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="Resouces\templates\gameObject.h.txt" />
+    <Text Include="Resouces\templates\layer.h.txt" />
+    <Text Include="Resouces\templates\scene.h.txt" />
+    <Text Include="Resouces\templates\scene.cpp.txt" />
+    <Text Include="Resouces\templates\layer.cpp.txt" />
+    <Text Include="Resouces\templates\gameObject.cpp.txt" />
+  </ItemGroup>
 </Project>

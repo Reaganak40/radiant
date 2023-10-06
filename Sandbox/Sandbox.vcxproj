@@ -105,6 +105,7 @@ IF EXIST ..\bin\Release-windows-x86_64\Radiant\OpenAL32.dll\ (xcopy /Q /E /Y /I 
     <ClCompile Include="Source\SandboxApp.cpp" />
     <ClCompile Include="Source\Layers\Sandbox2D.cpp" />
     <ClCompile Include="Source\Scenes\Sandbox.cpp" />
+    <ClCompile Include="Source\Scenes\SceneTemplate.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Radiant\Radiant.vcxproj">
@@ -115,6 +116,7 @@ IF EXIST ..\bin\Release-windows-x86_64\Radiant\OpenAL32.dll\ (xcopy /Q /E /Y /I 
     <ClInclude Include="Source\GameObjects\TestQuad.h" />
     <ClInclude Include="Source\Layers\Sandbox2D.h" />
     <ClInclude Include="Source\Scenes\Sandbox.h" />
+    <ClInclude Include="Source\Scenes\SceneTemplate.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

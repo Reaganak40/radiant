@@ -1,0 +1,51 @@
+#include "SceneTemplate.h"
+
+using namespace rdt;
+
+TEMPLATENAME::TEMPLATENAME(const std::string& alias)
+{
+	RegisterToMessageBus(alias);
+}
+
+TEMPLATENAME::~TEMPLATENAME()
+{
+}
+
+void TEMPLATENAME::OnRegister()
+{
+}
+
+void TEMPLATENAME::OnBind()
+{
+
+	/* Attaches all layers belonging to this scene. */
+	Scene::OnBind();
+}
+
+void TEMPLATENAME::OnRelease()
+{
+
+	/* Detaches all layers belonging to this scene. */
+	Scene::OnRelease();
+}
+
+void TEMPLATENAME::OnProcessInput(const float deltaTime)
+{
+
+	/* Calls OnProcessInput on all attached layers. */
+	Scene::OnProcessInput(deltaTime);
+}
+
+void TEMPLATENAME::OnFinalUpdate()
+{
+
+	/* Calls OnFinalUpdate on all attached layers. */
+	Scene::OnFinalUpdate();
+}
+
+void TEMPLATENAME::OnRender()
+{
+
+	/* Calls OnRender om all attached layers. */
+	Scene::OnRender();
+}

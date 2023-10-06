@@ -50,21 +50,6 @@ namespace rdt::core {
 	private:
 	};
 	
-	// =====================================================================================
-	
-	/*
-		Panel Layout Macros
-	*/
-	constexpr int PanelMargin = 10;
-
-	constexpr float DiagnosticGuiWidth = 290.0f;
-	constexpr float DiagnosticGuiHeight = 105.0f;
-
-	constexpr float ScenePanelGuiWidth = 290.0f;
-	constexpr float ScenePanelGuiHeight = 400.0f;
-
-	constexpr float TemplateWizardGuiWidth = 750.0f;
-	constexpr float TemplateWizardGuiHeight= 750.0f;
 
 	// =====================================================================================
 
@@ -98,9 +83,15 @@ namespace rdt::core {
 		*/
 		Scene* m_scene;
 		ThemeData theme_data;
+		std::string sourcePath;
+		std::string templatePath;
 		bool first_render;
-		bool m_templateWizardLaunched;
 		int m_menu_bar_height;
+
+		bool m_templateWizardLaunched;
+		int m_template_selection_index;
+		char m_template_name[60];
+		bool m_template_name_edited;
 
 		std::unordered_map<unsigned int, ImFont*> m_fonts;
 
@@ -121,6 +112,13 @@ namespace rdt::core {
 			float height = 0;
 		};
 
+		enum TemplateType {
+			T_GameObject,
+			T_Layer,
+			T_Scene,
+		};
+
+
 		/*
 			Panels
 		*/
@@ -137,6 +135,7 @@ namespace rdt::core {
 		void OnRender() override;
 
 		void SetTheme(EditorTheme nTheme);
+		void SetSourcePath(const std::string& path);
 
 		void InitResources(std::string& resourcePath);
 
@@ -145,6 +144,14 @@ namespace rdt::core {
 		void ApplyGuiConfig(const GuiConfig& config);
 		void SetScenePtr(Scene* ptr);
 		void AddCenteredText(const std::string& text);
+		void InactiveButtonBegin();
+		void InactiveButtonEnd();
+		void InactiveTextBoxBegin();
+		void InactiveTextBoxEnd();
+		void CreateFileFromTemplate(TemplateType type, const std::string& name);
+
+		bool ValidTemplateName(const std::string& name, std::string& errorMsg);
+		static int MyTextCallback(ImGuiInputTextCallbackData* data);
 
 		/*
 			Returns the docking x-position for the Gui to be docked in the

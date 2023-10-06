@@ -298,6 +298,14 @@
       <Project>{37EF8E33-A359-43AA-EC97-F44F584121FF}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="Resouces\templates\gameObject.cpp.txt" />
+    <Text Include="Resouces\templates\gameObject.h.txt" />
+    <Text Include="Resouces\templates\layer.cpp.txt" />
+    <Text Include="Resouces\templates\layer.h.txt" />
+    <Text Include="Resouces\templates\scene.cpp.txt" />
+    <Text Include="Resouces\templates\scene.h.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -119,5 +119,10 @@ namespace rdt {
             Returns the parent directory of the filepath
         */
         std::string ParentPath(const std::string& path);
+
+        /*
+            Copys a file to new destination
+        */
+        void CopyFileTo(const std::string& src, const std::string& dest);
     }
 }
