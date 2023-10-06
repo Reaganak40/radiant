@@ -1,4 +1,4 @@
-#include "TEMPLATENAME.h"
+#include "GameObjectTemplate.h"
 
 using namespace rdt;
 

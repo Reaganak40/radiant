@@ -1,12 +1,12 @@
 #pragma once
 #include <Radiant.h>
 
-class TEMPLATENAME : public rdt::GameObject {
+class MyBeautifulObject : public rdt::GameObject {
 private:
 public:
 
-	TEMPLATENAME(const std::string& alias = "TEMPLATENAME");
-	~TEMPLATENAME();
+	MyBeautifulObject(const std::string& alias = "MyBeautifulObject");
+	~MyBeautifulObject();
 
 	/*
 		Function called when the host layer binds this game object to

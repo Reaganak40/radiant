@@ -32,16 +32,7 @@ namespace rdt {
 		*/
 		const UniqueID GetID() { return m_ID; }
 
-		/*
-			Binds this game object to an existing scene. This must be done
-			before calling OnBind()
-		*/
-		void RegisterToLayer(const UniqueID nLayerID) { m_layerID = nLayerID; }
-
-		/*
-			Binds this game object to a realm, where it can communicate with the physics API
-		*/
-		void RegisterToRealm(const UniqueID nRealmID) { m_realmID = nRealmID; }
+		
 
 		/*
 			Gets the scene this object belongs to.
@@ -73,7 +64,7 @@ namespace rdt {
 		/*
 			To implement function when object needs to perform update procedures.
 		*/
-		virtual void OnProcessInput(const float deltaTIme) {}
+		virtual void OnProcessInput(const float deltaTime) {}
 
 		/*
 			To implement function when object needs to perform final update procedures.
@@ -90,5 +81,18 @@ namespace rdt {
 		*/
 		virtual void OnMessage(Message msg) override;
 
+
+		// Functions to be called by Layer
+
+		/*
+			Binds this game object to an existing scene. This must be done
+			before calling OnBind()
+		*/
+		void RegisterToLayer(const UniqueID nLayerID) { m_layerID = nLayerID; }
+
+		/*
+			Binds this game object to a realm, where it can communicate with the physics API
+		*/
+		void RegisterToRealm(const UniqueID nRealmID) { m_realmID = nRealmID; }
 	};
 }

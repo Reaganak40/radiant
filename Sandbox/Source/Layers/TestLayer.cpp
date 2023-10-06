@@ -1,5 +1,6 @@
 #include "TestLayer.h"
 #include "GameObjects/TestQuad.h"
+#include "GameObjects/MyBeautifulObject.h"
 
 using namespace rdt;
 
@@ -13,6 +14,8 @@ TestLayer::TestLayer(const std::string& alias)
 	m_game_objects.push_back(quad1 = new TestQuad("quad3", { 160, 500 }));
 	quad1->RegisterToRealm(m_realms[0]);
 	quad1->RegisterToLayer(GetID());
+
+	m_game_objects.push_back(new MyBeautifulObject("Object1"));
 }
 
 TestLayer::~TestLayer()

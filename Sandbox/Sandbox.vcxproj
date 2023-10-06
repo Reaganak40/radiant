@@ -101,6 +101,8 @@ IF EXIST ..\bin\Release-windows-x86_64\Radiant\OpenAL32.dll\ (xcopy /Q /E /Y /I 
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\GameObjects\GameObjectTemplate.cpp" />
+    <ClCompile Include="Source\GameObjects\MyBeautifulObject.cpp" />
     <ClCompile Include="Source\GameObjects\TestQuad.cpp" />
     <ClCompile Include="Source\Layers\LayerTemplate.cpp" />
     <ClCompile Include="Source\Layers\TestLayer.cpp" />
@@ -115,6 +117,8 @@ IF EXIST ..\bin\Release-windows-x86_64\Radiant\OpenAL32.dll\ (xcopy /Q /E /Y /I 
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\GameObjects\GameObjectTemplate.h" />
+    <ClInclude Include="Source\GameObjects\MyBeautifulObject.h" />
     <ClInclude Include="Source\GameObjects\TestQuad.h" />
     <ClInclude Include="Source\Layers\LayerTemplate.h" />
     <ClInclude Include="Source\Layers\Sandbox2D.h" />
