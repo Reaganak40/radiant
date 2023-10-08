@@ -217,7 +217,7 @@ namespace rdt::core {
                 }
 
                 auto units = layer.GetRenderUnits();
-                for (int i = 0; i < layer.GetBatchCount(); i++) {
+                for (unsigned int i = 0; i < layer.GetBatchCount(); i++) {
                     auto& unit = units.at(i);
 
                     // Draw Call Procedure

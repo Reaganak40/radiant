@@ -14,20 +14,36 @@
 
 namespace rdt {
 
+	struct Renderer::Impl {
+		std::unordered_map <std::string, Camera*> m_cameras;
+		Camera* m_default_camera;
+
+		Impl()
+		{
+			m_default_camera = nullptr;
+		}
+
+		~Impl()
+		{
+
+		}
+	};
+
 	Renderer* Renderer::m_instance = nullptr;
 
 	Renderer::Renderer()
+		: m_impl(new Renderer::Impl)
 	{
-		m_default_camera = nullptr;
 	}
 
 	Renderer::~Renderer()
 	{
+		delete m_impl;
 	}
 
 	void Renderer::SetDefaultCamera(Camera* defaultCamera)
 	{
-		m_default_camera = defaultCamera;
+		m_impl->m_default_camera = defaultCamera;
 	}
 
 	void Renderer::Initialize()
@@ -46,7 +62,7 @@ namespace rdt {
 	}
 	void Renderer::AddCamera(const std::string& alias, Camera* nCamera)
 	{
-		if (m_instance->m_cameras.find(alias) != m_instance->m_cameras.end()) {
+		if (m_instance->m_impl->m_cameras.find(alias) != m_instance->m_impl->m_cameras.end()) {
 			RDT_CORE_WARN("Renderer: Duplicate Camera '{}', AddCamera() ignored...", alias);
 			return;
 		}
@@ -56,18 +72,18 @@ namespace rdt {
 			return;
 		}
 
-		m_instance->m_cameras[alias] = nCamera;
+		m_instance->m_impl->m_cameras[alias] = nCamera;
 	}
 	Camera* Renderer::GetCamera(const std::string& cameraName)
 	{
 		if (cameraName.empty()) {
-			return m_instance->m_default_camera;
+			return m_instance->m_impl->m_default_camera;
 		}
 
-		if (m_instance->m_cameras.find(cameraName) == m_instance->m_cameras.end()) {
+		if (m_instance->m_impl->m_cameras.find(cameraName) == m_instance->m_impl->m_cameras.end()) {
 			RDT_CORE_WARN("Renderer - Camera '{}' does not exist.", cameraName);
 			return nullptr;
 		}
-		return m_instance->m_cameras.at(cameraName);
+		return m_instance->m_impl->m_cameras.at(cameraName);
 	}
 }

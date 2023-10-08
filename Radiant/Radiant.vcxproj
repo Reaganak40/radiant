@@ -150,6 +150,7 @@
     <ClInclude Include="Source\Engine\Polygon\Circle.h" />
     <ClInclude Include="Source\Engine\Polygon\Line.h" />
     <ClInclude Include="Source\Engine\Polygon\Polygon.h" />
+    <ClInclude Include="Source\Engine\Polygon\PolygonImpl.h" />
     <ClInclude Include="Source\Engine\Polygon\Rect.h" />
     <ClInclude Include="Source\Engine\Polygon\Triangle.h" />
     <ClInclude Include="Source\Engine\Scene\Layer.h" />
@@ -264,6 +265,7 @@
     <ClCompile Include="Source\Engine\Polygon\Circle.cpp" />
     <ClCompile Include="Source\Engine\Polygon\Line.cpp" />
     <ClCompile Include="Source\Engine\Polygon\Polygon.cpp" />
+    <ClCompile Include="Source\Engine\Polygon\PolygonImpl.cpp" />
     <ClCompile Include="Source\Engine\Polygon\Rect.cpp" />
     <ClCompile Include="Source\Engine\Polygon\Triangle.cpp" />
     <ClCompile Include="Source\Engine\Scene\Layer.cpp" />

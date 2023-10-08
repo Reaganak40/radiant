@@ -17,8 +17,9 @@ namespace rdt {
 
 	class RADIANT_API Renderer {
 	private:
-		std::unordered_map <std::string, Camera*> m_cameras;
-		Camera* m_default_camera;
+		struct Impl;
+		Impl* m_impl;
+
 	protected:
 		Renderer();
 		virtual ~Renderer();

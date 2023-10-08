@@ -10,18 +10,9 @@ namespace rdt {
 
 	class RADIANT_API Camera {
 	private:
-		glm::mat4 m_proj;
-		glm::mat4 m_view;
-		glm::mat4 m_model;
+		struct Impl;
+		Impl* m_impl;
 
-		Vec2i m_viewportPos;
-		Vec2i m_viewportSize;
-
-		Vec2d m_aspectRatio;
-
-		Vec2d m_worldCoords;
-
-		Color m_background_color;
 	public:
 
 		Camera(AspectRatio aspectRatio = AR_16_9);

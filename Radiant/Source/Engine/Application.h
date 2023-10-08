@@ -10,8 +10,10 @@ namespace rdt {
 	class RADIANT_API Application
 	{
 	private:
-		Timestep m_timestep;
-		Scene* m_current_scene;
+		struct Impl;
+		Impl* m_impl;
+
+		
 
 	public:
 		Application();
@@ -31,7 +33,7 @@ namespace rdt {
 		/*
 			Gets this frame's deltaTime.
 		*/
-		const float GetDeltaTime() { return m_timestep.deltaTime; }
+		const float GetDeltaTime();
 
 		/*
 			Get the width in pixels of the window.
@@ -77,7 +79,6 @@ namespace rdt {
 		virtual void OnGameBegin() {}
 
 	private:
-		ApplicationConfig m_config;
 	private:
 		/*
 			Returns true if the application is running and the window is launched.

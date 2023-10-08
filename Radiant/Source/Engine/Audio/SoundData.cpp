@@ -31,7 +31,7 @@ namespace rdt::core {
 		return true;
 	}
 
-	unsigned int SoundData::GetSize()
+	size_t SoundData::GetSize()
 	{
 		return m_soundData.size();
 	}
@@ -46,7 +46,7 @@ namespace rdt::core {
 		return m_sampleRate;
 	}
 
-	uint8_t* SoundData::GetDataAt(unsigned int index)
+	uint8_t* SoundData::GetDataAt(size_t index)
 	{
 		return &m_soundData[index];
 	}

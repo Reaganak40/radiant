@@ -14,8 +14,24 @@
 #include "Editor/DevTools.h"
 
 namespace rdt {
+
+	struct Application::Impl {
+		Timestep m_timestep;
+		Scene* m_current_scene;
+		ApplicationConfig m_config;
+
+		Impl()
+			: m_current_scene(nullptr)
+		{
+		}
+
+		~Impl()
+		{
+		}
+	};
+
 	Application::Application()
-		: m_current_scene(nullptr)
+		: m_impl(new Application::Impl)
 	{
 		Renderer::Initialize();
 		MessageBus::Initialize();
@@ -27,6 +43,8 @@ namespace rdt {
 
 	Application::~Application()
 	{
+		delete m_impl;
+
 #ifdef RDT_DEBUG
 		core::DevLayer::Destroy();
 #endif
@@ -41,7 +59,7 @@ namespace rdt {
 	void Application::OnStart()
 	{
 		Utils::SetRandomSeed();
-		Renderer::CreateRadiantWindow(m_config.appName);
+		Renderer::CreateRadiantWindow(m_impl->m_config.appName);
 		Input::Initialize();
 	}
 
@@ -83,9 +101,14 @@ namespace rdt {
 		audioThread.join();
 	}
 
+	const float Application::GetDeltaTime()
+	{
+		return m_impl->m_timestep.deltaTime;
+	}
+
 	void Application::SetApplicationConfig(const ApplicationConfig& config)
 	{
-		m_config = config;
+		m_impl->m_config = config;
 	}
 
 	bool Application::IsRunning()
@@ -96,10 +119,10 @@ namespace rdt {
 	void Application::BeginFrame()
 	{
 		// Get the new deltaTime for this frame.
-		m_timestep.Update();
+		m_impl->m_timestep.Update();
 
 		// Get the currently bounded scene for next game loop procedures.
-		m_current_scene = SceneManager::GetCurrentScene();
+		m_impl->m_current_scene = SceneManager::GetCurrentScene();
 
 		// Update renderer if the window size has changed.
 		if (Input::CheckWindowResize()) {
@@ -121,15 +144,15 @@ namespace rdt {
 	void Application::ProcessInput()
 	{
 		// All game objects in the bounded scene run their OnProcessInput()
-		if (m_current_scene != nullptr) {
-			m_current_scene->OnProcessInput(m_timestep.deltaTime);
+		if (m_impl->m_current_scene != nullptr) {
+			m_impl->m_current_scene->OnProcessInput(m_impl->m_timestep.deltaTime);
 		}
 	}
 
 	void Application::UpdateWorld()
 	{
 		// Updates all active physical objects.
-		Physics::OnUpdate(m_timestep.deltaTime);
+		Physics::OnUpdate(m_impl->m_timestep.deltaTime);
 	}
 
 	void Application::PollMessages2()
@@ -140,19 +163,19 @@ namespace rdt {
 	void Application::FinalUpdate()
 	{
 		// Runs the procedures for the final update of the currently bounded scene.
-		if (m_current_scene != nullptr) {
-			m_current_scene->OnFinalUpdate();
+		if (m_impl->m_current_scene != nullptr) {
+			m_impl->m_current_scene->OnFinalUpdate();
 		}
 
 		// Renderer does its update procedure.
-		Renderer::OnUpdate(m_timestep.deltaTime);
+		Renderer::OnUpdate(m_impl->m_timestep.deltaTime);
 	}
 
 	void Application::Render()
 	{
 		// Creates the render command queue for the currently bounded scene.
-		if (m_current_scene != nullptr) {
-			m_current_scene->OnRender();
+		if (m_impl->m_current_scene != nullptr) {
+			m_impl->m_current_scene->OnRender();
 		}
 
 		// RUn the render queue and display the new frame.
@@ -162,7 +185,7 @@ namespace rdt {
 	void Application::EndFrame()
 	{
 		Renderer::OnEndFrame();
-		Input::UpdateTime(m_timestep.deltaTime);
+		Input::UpdateTime(m_impl->m_timestep.deltaTime);
 		Input::PollInputs();
 		MessageBus::ResetBroadcasts();
 	}

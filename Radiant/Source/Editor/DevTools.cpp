@@ -20,7 +20,7 @@ namespace rdt::core {
 		RegisterToMessageBus("DevLayer");
 
 		EditorLayout* layout;
-		m_GUIs.push_back(layout = new EditorLayout);
+		RegisterGUI(layout = new EditorLayout);
 		layout->SetTheme(Theme_Codz);
 
 		m_showTools = true;
@@ -51,7 +51,7 @@ namespace rdt::core {
 		}
 
 
-		Renderer::SetBackgroundColor(Color(0.1f, 0.1, 0.1f, 1.0f));
+		Renderer::SetBackgroundColor(Color(0.1f, 0.1f, 0.1f, 1.0f));
 
 		// Set world camera to a shrunked window
 		Camera* defaultCamera = Renderer::GetCamera();
@@ -86,7 +86,7 @@ namespace rdt::core {
 	void DevLayer::OnAttach()
 	{
 		if (m_showTools) {
-			for (auto& gui : m_GUIs) {
+			for (auto& gui : GetGUIs()) {
 				Renderer::AttachGui(gui);
 			}
 		}
@@ -95,7 +95,7 @@ namespace rdt::core {
 	void DevLayer::OnDetach()
 	{
 		if (m_showTools) {
-			for (auto& gui : m_GUIs) {
+			for (auto& gui : GetGUIs()) {
 				Renderer::DetachGui(gui);
 			}
 		}
@@ -109,12 +109,12 @@ namespace rdt::core {
 		if (Input::CheckKeyboardState(controls_ShowTools1) && Input::CheckKeyboardState(controls_ShowTools2)) {
 			
 			if (m_showTools) {
-				for (auto& gui : m_GUIs) {
+				for (auto& gui : GetGUIs()) {
 					Renderer::DetachGui(gui);
 				}
 			}
 			else {
-				for (auto& gui : m_GUIs) {
+				for (auto& gui : GetGUIs()) {
 					Renderer::AttachGui(gui);
 				}
 			}
@@ -468,13 +468,13 @@ namespace rdt::core {
 		return 0;
 	}
 
-	int EditorLayout::GetDockPosX(Dock docking, int guiWidth, int margin)
+	float EditorLayout::GetDockPosX(Dock docking, float guiWidth, float margin)
 	{
 		switch (docking) {
 		case DockLeft:
 			return margin;
 		case DockRight:
-			return m_window_width - guiWidth - margin;
+			return (float)m_window_width - guiWidth - margin;
 		case DockTop:
 			return 0;
 		case DockBottom:
@@ -484,7 +484,7 @@ namespace rdt::core {
 		return 0;
 	}
 
-	int EditorLayout::GetDockPosY(Dock docking, int guiHeight, int margin)
+	float EditorLayout::GetDockPosY(Dock docking, float guiHeight, float margin)
 	{
 		switch (docking) {
 		case DockLeft:
@@ -494,7 +494,7 @@ namespace rdt::core {
 		case DockTop:
 			return margin;
 		case DockBottom:
-			return m_window_height - guiHeight - margin;
+			return (float)m_window_height - guiHeight - margin;
 		}
 
 		return 0;
@@ -565,9 +565,9 @@ namespace rdt::core {
 			else {
 				ImGui::Text("Scene: %s", m_scene->GetName().c_str());
 
-				unsigned int count;
+				size_t count;
 				Layer** layers = m_scene->GetLayers(&count);
-				for (int i = 0; i < count; i++) {
+				for (size_t i = 0; i < count; i++) {
 					AddLayerPanel(layers[i]);
 				}
 			}
@@ -583,9 +583,9 @@ namespace rdt::core {
 
 		if (ImGui::CollapsingHeader(panel_header.c_str())) {
 
-			unsigned int count;
+			size_t count;
 			GameObject** objects = layer->GetGameObjects(&count);
-			for (int i = 0; i < count; i++) {
+			for (size_t i = 0; i < count; i++) {
 				AddGameObjectPanel(objects[i]);
 			}
 		}

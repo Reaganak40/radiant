@@ -6,84 +6,166 @@
 
 namespace rdt {
 
+	struct Layer::Impl {
+		UniqueID m_ID;
+		bool m_attached;
+
+		std::vector<GameObject*> m_game_objects;
+		std::vector<GuiTemplate*> m_GUIs;
+		std::vector<UniqueID> m_realms;
+		GameState GState;
+
+		Impl()
+			: m_ID(GetUniqueID()), m_attached(false)
+		{
+		}
+
+		~Impl()
+		{
+			for (auto& object : m_game_objects) {
+				delete object;
+			}
+
+			for (auto& gui : m_GUIs) {
+				delete gui;
+			}
+
+			FreeUniqueID(m_ID);
+		}
+
+		GameObject** GetGameObjects(size_t* numObjects)
+		{
+			*numObjects = m_game_objects.size();
+			return m_game_objects.data();
+		}
+
+		void BindAll()
+		{
+			for (auto& object : m_game_objects) {
+				object->OnBind();
+			}
+
+			for (auto& gui : m_GUIs) {
+				Renderer::AttachGui(gui);
+			}
+		}
+
+		void ReleaseAll()
+		{
+			for (auto& object : m_game_objects) {
+				object->OnRelease();
+			}
+
+			for (auto& gui : m_GUIs) {
+				Renderer::DetachGui(gui);
+			}
+		}
+
+		void RunProcessInputQueue(const float deltaTime)
+		{
+			for (auto& object : m_game_objects) {
+				object->OnProcessInput(deltaTime);
+			}
+
+			for (auto& gui : m_GUIs) {
+				gui->OnUpdate(deltaTime);
+			}
+		}
+
+		void RunFinalUpdateQueue()
+		{
+			for (auto& object : m_game_objects) {
+				object->OnFinalUpdate();
+			}
+		}
+
+		void RunRenderQueue()
+		{
+			for (auto& object : m_game_objects) {
+				object->OnRender();
+			}
+		}
+	};
+
+	// ==================================================================
+
+	std::vector<GameObject*>& Layer::GetGameObjects()
+	{
+		return m_impl->m_game_objects;
+	}
+
+	std::vector<GuiTemplate*>& Layer::GetGUIs()
+	{
+		return m_impl->m_GUIs;
+	}
+
+	void Layer::RegisterGameObject(GameObject* nGameObject)
+	{
+		m_impl->m_game_objects.push_back(nGameObject);
+	}
+
+	void Layer::RegisterGUI(GuiTemplate* nGUI)
+	{
+		m_impl->m_GUIs.push_back(nGUI);
+	}
+
 	Layer::Layer()
-		: m_ID(GetUniqueID()),  m_attached(false)
+		: m_impl(new Layer::Impl)
 	{
 	}
 	Layer::~Layer()
 	{
-		for (auto& object : m_game_objects) {
-			delete object;
-		}
-
-		for (auto& gui: m_GUIs) {
-			delete gui;
-		}
-
-		FreeUniqueID(m_ID);
+		delete m_impl;
 	}
 
-	GameObject** Layer::GetGameObjects(unsigned int* numObjects)
+	const UniqueID Layer::GetID()
 	{
-		*numObjects = m_game_objects.size();
-		return m_game_objects.data();
+		return m_impl->m_ID;
+	}
+
+	void Layer::OnProcessInput(const float deltaTime)
+	{
+		m_impl->RunProcessInputQueue(deltaTime);
+	}
+
+	void Layer::OnFinalUpdate()
+	{
+		m_impl->RunFinalUpdateQueue();
+	}
+
+	void Layer::OnRender()
+	{
+		m_impl->RunRenderQueue();
+	}
+
+	bool Layer::IsAttached()
+	{
+		return m_impl->m_attached;
+	}
+
+	GameObject** Layer::GetGameObjects(size_t* numObjects)
+	{
+		return m_impl->GetGameObjects(numObjects);
 	}
 
 	void Layer::BindAll()
 	{
-		for (auto& object : m_game_objects) {
-			object->OnBind();
-		}
-
-		for (auto& gui : m_GUIs) {
-			Renderer::AttachGui(gui);
-		}
+		m_impl->BindAll();
 	}
 
 	void Layer::ReleaseAll()
 	{
-		for (auto& object : m_game_objects) {
-			object->OnRelease();
-		}
-
-		for (auto& gui : m_GUIs) {
-			Renderer::DetachGui(gui);
-		}
+		m_impl->ReleaseAll();
 	}
 
 	void Layer::SetAttached(bool attach)
 	{
-		m_attached = attach;
-	}
-
-	void Layer::RunProcessInputQueue(const float deltaTime)
-	{
-		for (auto& object : m_game_objects) {
-			object->OnProcessInput(deltaTime);
-		}
-
-		for (auto& gui : m_GUIs) {
-			gui->OnUpdate(deltaTime);
-		}
-	}
-	
-	void Layer::RunFinalUpdateQueue()
-	{
-		for (auto& object : m_game_objects) {
-			object->OnFinalUpdate();
-		}
-	}
-
-	void Layer::RunRenderQueue()
-	{
-		for (auto& object : m_game_objects) {
-			object->OnRender();
-		}
+		m_impl->m_attached = attach;
 	}
 
 	void Layer::CreateNewRealm()
 	{
-		m_realms.push_back(Physics::CreateRealm());
+		m_impl->m_realms.push_back(Physics::CreateRealm());
 	}
 
 }

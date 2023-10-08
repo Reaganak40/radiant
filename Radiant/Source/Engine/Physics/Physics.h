@@ -9,14 +9,14 @@ namespace rdt {
 
 	class RADIANT_API Physics {
 	private:
+		/* Singleton Implementation*/
 		Physics();
 		~Physics();
 		static Physics* m_instance;
 
-		std::unordered_map<UniqueID, core::Realm*> m_realms;
-		std::set<UniqueID> m_active_realms;
-
-		Polygon m_bad_poly;
+		/* Pimpl Implementation */
+		struct Impl;
+		Impl* m_impl;
 
 	public:
 		static Physics* GetInstance();

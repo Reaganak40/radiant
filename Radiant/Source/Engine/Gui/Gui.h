@@ -13,7 +13,7 @@ namespace rdt {
 		int m_window_width;
 		int m_window_height;
 
-		Vec2i m_gui_pos;
+		Vec2f m_gui_pos;
 
 	protected:
 
@@ -25,7 +25,7 @@ namespace rdt {
 		/*
 			Sets the position of the Gui
 		*/
-		void SetGuiPosition(int nX, int nY);
+		void SetGuiPosition(float nX, float nY);
 
 		/*
 			Gui template internal procedures to be called before rendering.

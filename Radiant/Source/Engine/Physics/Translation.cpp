@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Translation.h"
 #include "Utils/Utils.h"
+#include "Polygon/PolygonImpl.h"
 
 namespace rdt::core {
 	
@@ -85,8 +86,8 @@ namespace rdt::core {
 		if (m_current_velocity == Vec2d::Zero()) {
 			return;
 		}
-		Translate(polygon.m_vertices, deltaTime);
-		Translate(polygon.m_origin, deltaTime);
+		Translate(polygon.m_impl->m_vertices, deltaTime);
+		Translate(polygon.m_impl->m_origin, deltaTime);
 	}
 
 	Vec2d Translation::GetChangeInPosition(const float deltaTime)

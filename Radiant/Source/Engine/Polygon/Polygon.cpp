@@ -1,106 +1,112 @@
 #include "pch.h"
 #include "Polygon.h"
-#include "Graphics/Renderer.h"
+#include "PolygonImpl.h"
+
 #include "Utils/Utils.h"
 
 namespace rdt {
     Polygon::Polygon()
-        : m_UUID(GetUniqueID()), m_width(0), m_height(0), m_properties(0), m_rotation(0)
+        : m_impl(new core::PolygonImpl)
     {
     }
+
     Polygon::~Polygon()
     {
-        FreeUniqueID(m_UUID);
-        Renderer::_FlushPolygon(m_UUID);
+        delete m_impl;
+    }
+
+    core::PolygonImpl* Polygon::BaseImpl()
+    {
+        return m_impl;
     }
 
     void Polygon::AddProperties(unsigned int nProperties)
     {
-        m_properties |= nProperties;
+        m_impl->m_properties |= nProperties;
     }
 
     const std::vector<Vec2d>& Polygon::GetVertices() const
     {
-        return m_vertices;
+        return m_impl->m_vertices;
     }
 
     bool Polygon::CheckProperties(unsigned int propertyQuery)
     {
-        return (bool)(m_properties & propertyQuery);
+        return (bool)(m_impl->m_properties & propertyQuery);
     }
 
     const std::vector<unsigned int> Polygon::GetIndices() const
     {
-        return m_indices;
+        return m_impl->m_indices;
     }
 
     Vec2d Polygon::GetOrigin() const
     {
-        return m_origin;
+        return m_impl->m_origin;
     }
 
     double Polygon::GetWidth() const
     {
-        return m_width;
+        return m_impl->m_width;
     }
 
     double Polygon::GetHeight() const
     {
-        return m_height;
+        return m_impl->m_height;
     }
 
     double Polygon::GetRotation() const
     {
-        return m_rotation;
+        return m_impl->m_rotation;
     }
 
     const UniqueID Polygon::GetUUID() const
     {
-        return m_UUID;
+        return m_impl->m_UUID;
     }
 
     void Polygon::Move(double dx, double dy)
     {
-        for (auto& vertex : m_vertices) {
+        for (auto& vertex : m_impl->m_vertices) {
             vertex.x += dx;
             vertex.y += dy;
         }
 
-        m_origin.x += dx;
-        m_origin.y += dy;
+        m_impl->m_origin.x += dx;
+        m_impl->m_origin.y += dy;
     }
 
     void Polygon::SetPosition(const Vec2d& nPosition)
     {
         std::vector<Vec2d> offsets;
-        offsets.reserve(m_vertices.size());
+        offsets.reserve(m_impl->m_vertices.size());
 
-        for (const auto& vertex : m_vertices) {
-            offsets.push_back(Utils::GetManhattanDistance(m_origin, vertex));
+        for (const auto& vertex : m_impl->m_vertices) {
+            offsets.push_back(Utils::GetManhattanDistance(m_impl->m_origin, vertex));
         }
 
-        m_origin = nPosition;
+        m_impl->m_origin = nPosition;
 
-        for (unsigned int i = 0; i < m_vertices.size(); i++) {
-            m_vertices[i] = m_origin + offsets[i];
+        for (unsigned int i = 0; i < m_impl->m_vertices.size(); i++) {
+            m_impl->m_vertices[i] = m_impl->m_origin + offsets[i];
         }
     }
 
     void Polygon::ApplyRotationOffset(const double oRadians)
     {
         SetRotation(oRadians);
-        m_rotation = 0;
+        m_impl->m_rotation = 0;
     }
 
     void Polygon::SetRotation(const double nRadians)
     {
-        double dr = nRadians - m_rotation;
+        double dr = nRadians - m_impl->m_rotation;
 
-        for (auto& vertex : m_vertices) {
-            Utils::RotatePoint(m_origin, vertex, dr);
+        for (auto& vertex : m_impl->m_vertices) {
+            Utils::RotatePoint(m_impl->m_origin, vertex, dr);
         }
 
-        m_rotation = nRadians;
+        m_impl->m_rotation = nRadians;
     }
 
 }

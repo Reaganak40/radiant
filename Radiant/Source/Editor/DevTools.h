@@ -86,7 +86,7 @@ namespace rdt::core {
 		std::string sourcePath;
 		std::string templatePath;
 		bool first_render;
-		int m_menu_bar_height;
+		float m_menu_bar_height;
 
 		bool m_templateWizardLaunched;
 		int m_template_selection_index;
@@ -157,13 +157,13 @@ namespace rdt::core {
 			Returns the docking x-position for the Gui to be docked in the
 			provided direction with the given margin.
 		*/
-		int GetDockPosX(Dock docking, int guiWidth, int margin = 0);
+		float GetDockPosX(Dock docking, float guiWidth, float margin = 0);
 
 		/*
 			Returns the docking y-position for the Gui to be docked in the
 			provided direction with the given margin.
 		*/
-		int GetDockPosY(Dock docking, int guiHeight, int margin = 0);
+		float GetDockPosY(Dock docking, float guiHeight, float margin = 0);
 
 
 		// =======================================================

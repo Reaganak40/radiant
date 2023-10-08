@@ -48,6 +48,7 @@ namespace rdt::core {
 			}
 		}
 
+		return true;
 	}
 
 	void ConfigReader::Write(const std::string& configFile)

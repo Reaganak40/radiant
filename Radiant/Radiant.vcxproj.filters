@@ -502,6 +502,7 @@
       <Filter>Vendor\stb</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Graphics\Camera.h" />
+    <ClInclude Include="Source\Engine\Polygon\PolygonImpl.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Editor\DevTools.cpp">
@@ -664,6 +665,7 @@
       <Filter>Vendor\stb</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine\Graphics\Camera.cpp" />
+    <ClCompile Include="Source\Engine\Polygon\PolygonImpl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Resources\templates\gameObject.h.txt" />
