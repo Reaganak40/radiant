@@ -106,6 +106,11 @@ namespace rdt {
 		void BindAll();
 
 		/*
+			Helper function that unbinds all game objects and detaches all GUIs.
+		*/
+		void ReleaseAll();
+
+		/*
 			Initalized a new realm from the physics engine and appends it to the vector
 			of realms to be used by game objects.
 		*/

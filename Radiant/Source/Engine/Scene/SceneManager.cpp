@@ -8,9 +8,6 @@ namespace rdt {
 	SceneManager::SceneManager()
 		: m_current_scene(nullptr), m_currentSceneName("")
 	{
-		m_scenes[""] = new Scene;
-		m_scenes.at("")->OnRegister();
-
 		RegisterToMessageBus("SceneManager");
 		m_broadcast = MessageBus::CreateBroadcast("SceneManager", new Broadcast);
 	}
@@ -77,6 +74,11 @@ namespace rdt {
 
 	Scene* SceneManager::GetCurrentSceneImpl()
 	{
+		if (m_currentSceneName == "" && m_scenes.find("") == m_scenes.end()) {
+			m_scenes[""] = new Scene;
+			m_scenes.at("")->OnRegister();
+		}
+
 		if (m_current_scene != m_scenes[m_currentSceneName]) {
 			if (m_current_scene != nullptr) {
 				m_current_scene->OnRelease();

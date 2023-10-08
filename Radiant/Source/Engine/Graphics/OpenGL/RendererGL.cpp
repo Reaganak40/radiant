@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "RendererGL.h"
+#include "Gui/GuiManager.h"
 
 #include "Logging/Log.h"
 #include "Utils/Utils.h"
@@ -34,6 +35,7 @@ namespace rdt::core {
         delete m_vertex_array;
 
         TextureManager::Destroy();
+        GuiManager::Destroy();
 
         glfwTerminate();
 	}
@@ -105,6 +107,7 @@ namespace rdt::core {
         ImGui::StyleColorsDark();
         ImGui_ImplGlfw_InitForOpenGL(m_window, true);
         ImGui_ImplOpenGL3_Init("#version 330");
+        GuiManager::Initialize();
 
         // set default VAO
         m_vertex_array = new VertexArray;

@@ -18,6 +18,11 @@ namespace rdt {
 		: m_current_scene(nullptr)
 	{
 		Renderer::Initialize();
+		MessageBus::Initialize();
+		SoundEngine::Initialize();
+		core::PtagManager::Initialize();
+		Physics::Initialize();
+		SceneManager::Initialize();
 	}
 
 	Application::~Application()
@@ -25,7 +30,6 @@ namespace rdt {
 #ifdef RDT_DEBUG
 		core::DevLayer::Destroy();
 #endif
-		GuiManager::Destroy();
 		Physics::Destroy();
 		core::PtagManager::Destroy();
 		Input::Destroy();
@@ -34,21 +38,17 @@ namespace rdt {
 		Renderer::Destroy();
 	}
 
-	void Application::Start(std::string appName, unsigned int windowWidth, unsigned int windowHeight, bool resizable)
+	void Application::OnStart()
 	{
 		Utils::SetRandomSeed();
-		Renderer::CreateRadiantWindow(appName);
-		MessageBus::Initialize();
-		SoundEngine::Initialize();
+		Renderer::CreateRadiantWindow(m_config.appName);
 		Input::Initialize();
-		core::PtagManager::Initialize();
-		Physics::Initialize();
-		GuiManager::Initialize();
-		SceneManager::Initialize();
 	}
 
 	void Application::Run()
 	{
+		OnGameBegin();
+
 		std::thread audioThread(SoundEngine::StartAudioLoop);
 
 		/* Loop until the user closes the window */
@@ -83,6 +83,11 @@ namespace rdt {
 		audioThread.join();
 	}
 
+	void Application::SetApplicationConfig(const ApplicationConfig& config)
+	{
+		m_config = config;
+	}
+
 	bool Application::IsRunning()
 	{
 		return !(Renderer::ShouldWindowClose());
@@ -106,7 +111,6 @@ namespace rdt {
 
 		// Run renderer's begin frame procedures.
 		Renderer::OnBeginFrame();
-
 	}
 
 	void Application::PollMessages1()

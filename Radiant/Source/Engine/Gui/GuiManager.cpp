@@ -2,7 +2,7 @@
 #include "GuiManager.h"
 #include "Utils/Utils.h"
 
-namespace rdt {
+namespace rdt::core {
 	
 	GuiManager* GuiManager::m_instance = nullptr;
 

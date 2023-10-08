@@ -21,7 +21,7 @@ namespace rdt {
 			Starts a new Radiant application, launching the window instance. Aspect ratio is 16:9 by default.
 			Window is resizable by default.
 		*/
-		void Start(std::string appName, unsigned int windowWidth = 1280, unsigned int windowHeight = 720, bool resizable = true);
+		void OnStart();
 
 		/*
 			Runs and manages the game loop, and will continue to run until the application is closed.
@@ -56,6 +56,28 @@ namespace rdt {
 		*/
 		void SetScene(const std::string& sceneName);
 
+	protected:
+
+		struct ApplicationConfig {
+			std::string appName = "Radiant App";
+			unsigned int windowWidth = 1280;
+			unsigned int windowHeight = 720;
+			Color backgroundColor = WHITE;
+		};
+
+		/*
+			Uses the struct to provide all application configuration
+			that is used when the Application calls OnStart().
+		*/
+		void SetApplicationConfig(const ApplicationConfig& config);
+
+		/*
+			Called right before the game loop begins to define and setup scenes.
+		*/
+		virtual void OnGameBegin() {}
+
+	private:
+		ApplicationConfig m_config;
 	private:
 		/*
 			Returns true if the application is running and the window is launched.

@@ -1,5 +1,5 @@
 
-namespace rdt {
+namespace rdt::core {
 
 #define GUI_DEFAULT_FONT 0
 #define GUI_DEFAULT_FONT_SIZE 12
@@ -23,7 +23,7 @@ namespace rdt {
 
 		static void Initialize();
 		static void Destroy();
-
+		
 		static void LoadFont(int magicWord, const std::string& filepath) { m_instance->LoadFontImpl(magicWord, filepath); }
 
 		static ImFont* GetFont(const int magicWord, const unsigned int fontSize) { return m_instance->GetFontImpl(magicWord, fontSize); }

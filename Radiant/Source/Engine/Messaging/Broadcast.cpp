@@ -11,13 +11,13 @@ namespace rdt {
 		SwapBuffers();
 		SwapBuffers();
 	}
-	const std::vector<Message>& Broadcast::GetMessages()
+	const std::vector<Message>* Broadcast::GetMessages()
 	{
 		m_mutex.lock();
 		unsigned int index = m_current_buffer == 0 ? 1 : 0;
 		m_mutex.unlock();
 
-		return m_messages[index];
+		return &m_messages[index];
 
 	}
 	void Broadcast::AddToBroadcast(const Message& nMessage)

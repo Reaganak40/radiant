@@ -184,10 +184,10 @@ namespace rdt {
 		return nID;
 	}
 
-	const std::vector<Message>& MessageBus::GetBroadcastImpl(const std::string& alias)
+	const std::vector<Message>* MessageBus::GetBroadcastImpl(const std::string& alias)
 	{
 		if (m_broadcasts_AliasToId.find(alias) == m_broadcasts_AliasToId.end()) {
-			return {};
+			return nullptr;
 		}
 		return m_broadcasts.at(m_broadcasts_AliasToId.at(alias))->GetMessages();
 	}

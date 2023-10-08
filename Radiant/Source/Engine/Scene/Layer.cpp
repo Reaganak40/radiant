@@ -40,6 +40,17 @@ namespace rdt {
 		}
 	}
 
+	void Layer::ReleaseAll()
+	{
+		for (auto& object : m_game_objects) {
+			object->OnRelease();
+		}
+
+		for (auto& gui : m_GUIs) {
+			Renderer::DetachGui(gui);
+		}
+	}
+
 	void Layer::SetAttached(bool attach)
 	{
 		m_attached = attach;

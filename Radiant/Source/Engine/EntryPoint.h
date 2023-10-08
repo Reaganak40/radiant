@@ -8,6 +8,8 @@ int main(int argc, char** argv)
 	rdt::Log::Init();
 
 	auto app = rdt::CreateApplication();
+
+	app->OnStart();
 	app->Run();
 	delete app;
 }

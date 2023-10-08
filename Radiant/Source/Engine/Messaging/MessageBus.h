@@ -117,13 +117,13 @@ namespace rdt {
 		/*
 			Returns the current display of messages from a registered broadcast.
 		*/
-		static const std::vector<Message>& GetBroadcast(const std::string& alias) { return m_instance->GetBroadcastImpl(alias); }
+		static const std::vector<Message>* GetBroadcast(const std::string& alias) { return m_instance->GetBroadcastImpl(alias); }
 
 	private:
 		static MessageID GetNextMessageID();
 		void SendMessagesImpl();
 		MessageID CreateBroadcastImpl(const std::string& alias, Broadcast* broadcast);
-		const std::vector<Message>& GetBroadcastImpl(const std::string& alias);
+		const std::vector<Message>* GetBroadcastImpl(const std::string& alias);
 		void AddToBroadcastImpl(const MessageID broadcastID, MessageType type, void* data);
 		void ResetBroadcastsImpl();
 	};

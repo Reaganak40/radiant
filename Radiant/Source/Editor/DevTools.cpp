@@ -168,10 +168,15 @@ namespace rdt::core {
 
 	void EditorLayout::OnUpdate(const float deltaTime)
 	{
-		for (auto& msg : MessageBus::GetBroadcast("SceneManager")) {
-			switch (msg.type) {
+		auto broadcast = MessageBus::GetBroadcast("SceneManager");
+		if (broadcast == nullptr) {
+			return;
+		}
+
+		for (auto it = begin(*broadcast); it != end(*broadcast); ++it) {
+			switch (it->type) {
 			case MT_SceneChanged:
-				SetScenePtr(((SceneChangedData*)msg.data)->ptr);
+				SetScenePtr(((SceneChangedData*)it->data)->ptr);
 				break;
 			}
 		}
