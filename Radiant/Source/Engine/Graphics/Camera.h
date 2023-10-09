@@ -5,7 +5,7 @@
 
 namespace rdt {
 	enum AspectRatio {
-		AR_16_9
+		AR_16_9 // Window Projection = (1920px, 1080px)
 	};
 
 	class RADIANT_API Camera {
@@ -23,17 +23,6 @@ namespace rdt {
 		const glm::mat4& GetModelMatrix();
 
 		glm::mat4 GetMVP();
-
-		/*
-			Sets the viewport dimensions for this camera, which defines
-			the window view of the application.
-		*/
-		void SetViewport(const Vec2i& viewportPos, const Vec2i& viewportSize);
-
-		/*
-			Gets the viewport from the camera.
-		*/
-		void GetViewport(int* viewportPosX, int* viewportPosY, int* viewportWidth, int* viewportHeight);
 
 		/*
 			Sets the background draw color that is used on clear.

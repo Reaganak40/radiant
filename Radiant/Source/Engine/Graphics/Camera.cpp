@@ -8,9 +8,6 @@ namespace rdt {
 		glm::mat4 m_view;
 		glm::mat4 m_model;
 
-		Vec2i m_viewportPos;
-		Vec2i m_viewportSize;
-
 		Vec2d m_aspectRatio;
 		Vec2d m_worldCoords;
 
@@ -37,14 +34,6 @@ namespace rdt {
 		glm::mat4 GetMVP()
 		{
 			return m_proj * m_view * m_model;
-		}
-
-		void GetViewport(int* viewportPosX, int* viewportPosY, int* viewportWidth, int* viewportHeight)
-		{
-			(*viewportPosX) = m_viewportPos.x;
-			(*viewportPosY) = m_viewportPos.y;
-			(*viewportWidth) = m_viewportSize.x;
-			(*viewportHeight) = m_viewportSize.y;
 		}
 	};
 
@@ -74,15 +63,6 @@ namespace rdt {
 		return m_impl->GetMVP();
 	}
 
-	void Camera::SetViewport(const Vec2i& viewportPos, const Vec2i& viewportSize)
-	{
-		m_impl->m_viewportPos = viewportPos;
-		m_impl->m_viewportSize = viewportSize;
-	}
-	void Camera::GetViewport(int* viewportPosX, int* viewportPosY, int* viewportWidth, int* viewportHeight)
-	{
-		m_impl->GetViewport(viewportPosX, viewportPosY, viewportWidth, viewportHeight);
-	}
 	void Camera::SetBackgroundColor(const Color& nColor)
 	{
 		m_impl->m_background_color = nColor;

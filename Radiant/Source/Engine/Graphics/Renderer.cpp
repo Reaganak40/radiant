@@ -18,6 +18,9 @@ namespace rdt {
 		std::unordered_map <std::string, Camera*> m_cameras;
 		Camera* m_default_camera;
 
+		std::unordered_map<int, RenderWindow*> m_render_windows;
+		static int RenderWindowID;
+
 		Impl()
 		{
 			m_default_camera = nullptr;
@@ -25,10 +28,14 @@ namespace rdt {
 
 		~Impl()
 		{
+		}
 
+		int GetNextRenderWindowID() {
+			return ++RenderWindowID;
 		}
 	};
 
+	int Renderer::Impl::RenderWindowID = 0;
 	Renderer* Renderer::m_instance = nullptr;
 
 	Renderer::Renderer()
@@ -46,6 +53,11 @@ namespace rdt {
 		m_impl->m_default_camera = defaultCamera;
 	}
 
+	std::unordered_map<int, RenderWindow*>& Renderer::GetRenderWindows()
+	{
+		return m_impl->m_render_windows;
+	}
+
 	void Renderer::Initialize()
 	{
 		if (m_instance != nullptr) {
@@ -60,6 +72,15 @@ namespace rdt {
 		delete m_instance;
 		m_instance = nullptr;
 	}
+	int Renderer::AddRenderWindow(RenderWindow* nRenderWindow)
+	{
+		int id = m_instance->m_impl->GetNextRenderWindowID();
+		m_instance->m_impl->m_render_windows[id] = nRenderWindow;
+		m_instance->OnNewRenderWindow(id, nRenderWindow);
+
+		return id;
+	}
+
 	void Renderer::AddCamera(const std::string& alias, Camera* nCamera)
 	{
 		if (m_instance->m_impl->m_cameras.find(alias) != m_instance->m_impl->m_cameras.end()) {

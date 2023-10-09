@@ -10,6 +10,7 @@
 #include "Texture/TextureManager.h"
 #include "RenderTypes.h"
 #include "Gui/Gui.h"
+#include "RenderWindow.h"
 
 #include "Camera.h"
 
@@ -28,6 +29,11 @@ namespace rdt {
 			Sets the default camera
 		*/
 		void SetDefaultCamera(Camera* defaultCamera);
+
+		/*
+			Gets the binded render windows
+		*/
+		std::unordered_map<int, RenderWindow*>& GetRenderWindows();
 
 	private:
 		static Renderer* m_instance;
@@ -89,6 +95,14 @@ namespace rdt {
 			the aspect ratio.
 		*/
 		static Vec2i OnWindowResize() { return m_instance->OnWindowResizeImpl(); }
+
+
+		/*
+			Adds a new render window to the rendering context. The renderer will draw
+			frames in the render window. Returns the location of it, to be removed
+			later.
+		*/
+		static int AddRenderWindow(RenderWindow* nRenderWindow);
 
 		/*
 			Clears the screen with the defined background color.
@@ -235,7 +249,8 @@ namespace rdt {
 		virtual Vec2d GetCameraCoordinates2DImpl() = 0;
 		virtual void SetBackgroundColorImpl(const Color& color) = 0;
 		virtual Vec2i OnWindowResizeImpl() = 0;
-		
+		virtual void OnNewRenderWindow(int id, RenderWindow* nRenderWindow) = 0;
+
 		virtual void ClearImpl() = 0;
 		virtual void OnBeginFrameImpl() = 0;
 		virtual void OnUpdateImpl(const float deltaTime) = 0;

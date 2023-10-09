@@ -52,15 +52,10 @@ namespace rdt::core {
 		}
 
 
-		Renderer::SetBackgroundColor(Color(0.1f, 0.1f, 0.1f, 1.0f));
+		Renderer::SetBackgroundColor({0.2f, 0.2f, 0.2f, 1.0f});
 
-		// Set world camera to a shrunked window
-		Camera* defaultCamera = Renderer::GetCamera();
-		int viewportWidth = 1280;
-		int viewportHeight = 720;
-		int cameraPosX = (((int)Renderer::GetWindowWidth()) / 2) - (viewportWidth / 2);
-		int cameraPosY = (((int)Renderer::GetWindowHeight())) - (viewportHeight)- 120;
-		defaultCamera->SetViewport({ cameraPosX, cameraPosY }, { viewportWidth, viewportHeight });
+		Renderer::AddRenderWindow(new RenderWindow);
+
 	}
 	DevLayer::~DevLayer()
 	{

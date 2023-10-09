@@ -122,6 +122,7 @@
     <ClInclude Include="Source\Engine\Graphics\Camera.h" />
     <ClInclude Include="Source\Engine\Graphics\Mesh.h" />
     <ClInclude Include="Source\Engine\Graphics\OpenGL\ErrorHandling.h" />
+    <ClInclude Include="Source\Engine\Graphics\OpenGL\FrameBuffer.h" />
     <ClInclude Include="Source\Engine\Graphics\OpenGL\GeoMode.h" />
     <ClInclude Include="Source\Engine\Graphics\OpenGL\IndexBuffer.h" />
     <ClInclude Include="Source\Engine\Graphics\OpenGL\RenderCache.h" />
@@ -132,6 +133,7 @@
     <ClInclude Include="Source\Engine\Graphics\OpenGL\VertexBuffer.h" />
     <ClInclude Include="Source\Engine\Graphics\RenderTypes.h" />
     <ClInclude Include="Source\Engine\Graphics\Renderer.h" />
+    <ClInclude Include="Source\Engine\Graphics\RenderWindow.h" />
     <ClInclude Include="Source\Engine\Graphics\Texture\Texture.h" />
     <ClInclude Include="Source\Engine\Graphics\Texture\TextureManager.h" />
     <ClInclude Include="Source\Engine\Gui\Gui.h" />
@@ -239,6 +241,7 @@
     <ClCompile Include="Source\Engine\GameObject\GameState.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Camera.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\ErrorHandling.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\OpenGL\FrameBuffer.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\GeoMode.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\IndexBuffer.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\RenderCache.cpp" />
@@ -248,6 +251,7 @@
     <ClCompile Include="Source\Engine\Graphics\OpenGL\VertexArray.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\VertexBuffer.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Renderer.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\RenderWindow.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Texture\Texture.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Texture\TextureManager.cpp" />
     <ClCompile Include="Source\Engine\Gui\Gui.cpp" />

@@ -6,6 +6,7 @@
 #include "VertexArray.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "FrameBuffer.h"
 #include "Shader.h"
 #include "RenderLayer.h"
 #include "GeoMode.h"
@@ -52,6 +53,8 @@ namespace rdt::core {
 		Color m_line_color;
 
 		Color m_clear_color;
+
+		bool m_draw_default_viewport;
 		// *****************************************************
 		// 
 		//			  Opengl renderering dependables
@@ -72,19 +75,23 @@ namespace rdt::core {
 		core::VertexArray* m_vertex_array;
 
 		// Each layer contains render units (specified draw calls).
-		std::vector<core::RenderLayer> m_layers;
+		std::vector<RenderLayer> m_layers;
 
 		// Keep shaders independent from render units.
-		std::vector<core::Shader*> m_shaders;
+		std::vector<Shader*> m_shaders;
+
+		// Framebuffers
+		std::unordered_map<int, FrameBuffer> m_frame_buffers;
 
 		// Camera depenables
 		Vec3f m_screen_origin;
 
 		// Track currently bounded gl objects.
-		core::VBO_ID m_current_vbo;
-		core::IBO_ID m_current_ibo;
-		core::ShaderID m_current_shader;
-		core::GeoMode m_current_mode;
+		FBO_ID m_current_fbo;
+		VBO_ID m_current_vbo;
+		IBO_ID m_current_ibo;
+		ShaderID m_current_shader;
+		GeoMode m_current_mode;
 		glViewportData m_current_viewport;
 
 		std::set<Camera*> m_selected_cameras;
@@ -111,11 +118,16 @@ namespace rdt::core {
 		Vec2d GetCameraCoordinates2DImpl() override final;
 		void SetBackgroundColorImpl(const Color& color) override final;
 		Vec2i OnWindowResizeImpl() override final;
+		void OnNewRenderWindow(int id, RenderWindow* nRenderWindow) override final;
 
 		void ClearImpl() override final;
 		void OnBeginFrameImpl() override final;
 		void OnUpdateImpl(const float deltaTime) override final;
+		
+		/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 		void RenderImpl() override final;
+		/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
 		void OnEndFrameImpl() override final;
 		void DrawRectImpl(const Vec2d& origin, const Vec2d& size, const Color& color, unsigned int layer = 0) override final;
 		void DrawLineImpl(const Vec2d& start, const Vec2d& end, const Color& color, unsigned int layer = 0) override final;
@@ -137,12 +149,14 @@ namespace rdt::core {
 		/* ***********************************************
 			    OpenGL Rendering Helper Functions
 		** ***********************************************/
+		void DrawContext();
 
-		void SetVBO(core::VBO_ID vbo);
-		void SetIBO(core::IBO_ID ibo);
-		void SetShader(core::ShaderID shader);
-		void SetMode(core::GeoMode mode);
-		void SetViewport(glViewportData& nViewport);
+		void SetFBO(FBO_ID fbo);
+		void SetVBO(VBO_ID vbo);
+		void SetIBO(IBO_ID ibo);
+		void SetShader(ShaderID shader);
+		void SetMode(GeoMode mode);
+		void SetViewport(const glViewportData& nViewport);
 
 		void AddDefaultShader();
 		void UpdateTextureUniforms();

@@ -16,6 +16,7 @@ public:
 		appConfig.windowWidth = 1280;
 		appConfig.windowHeight = 720;
 		appConfig.backgroundColor = WHITE;
+		appConfig.cameraAspectRatio = AR_16_9;
 		SetApplicationConfig(appConfig);
 	}
 

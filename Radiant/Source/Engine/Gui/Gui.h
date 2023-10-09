@@ -5,11 +5,9 @@
 
 namespace rdt {
 	class RADIANT_API GuiTemplate {
-	private:
+	protected:
 		float m_gui_width;
 		float m_gui_height;
-
-	protected:
 		int m_window_width;
 		int m_window_height;
 
