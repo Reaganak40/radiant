@@ -151,6 +151,8 @@ namespace rdt::core {
 		void InactiveTextBoxBegin();
 		void InactiveTextBoxEnd();
 		void CreateFileFromTemplate(TemplateType type, const std::string& name);
+		float GetButtonWidth(const char* label);
+		float GetButtonHeight(const char* label);
 
 		bool ValidTemplateName(const std::string& name, std::string& errorMsg);
 		static int MyTextCallback(ImGuiInputTextCallbackData* data);

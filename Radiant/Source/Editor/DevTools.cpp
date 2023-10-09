@@ -153,8 +153,7 @@ namespace rdt::core {
 	constexpr float TemplateWizardGuiWidth = 500.0f;
 	constexpr float TemplateWizardGuiHeight = 575.0f;
 
-	constexpr float GameWindowPanelWidth = 300.0f;
-	constexpr float GameWindowPanelHeight = 75.0f;
+	constexpr float GameWindowPanelWidth = 200.0f;
 
 	EditorLayout::EditorLayout()
 		: m_scene(nullptr), first_render(true), m_templateWizardLaunched(false)
@@ -300,10 +299,12 @@ namespace rdt::core {
 		m_template_wizard.xPos = (m_window_width / 2) - (m_template_wizard.width / 2);
 		m_template_wizard.yPos = (m_window_height / 2) - (m_template_wizard.height / 2);
 
+		ImGui::PushFont(m_fonts[ForkAwesome][18]);
 		m_game_window_panel.width = GameWindowPanelWidth;
-		m_game_window_panel.height = GameWindowPanelHeight;
+		m_game_window_panel.height = GetButtonHeight(ICON_FK_PAUSE) + 20;
 		m_game_window_panel.xPos = GetDockPosX(DockRight, m_game_window_panel.width + m_diagnostics_panel.width + PanelMargin, PanelMargin);
 		m_game_window_panel.yPos = GetDockPosY(DockTop, m_game_window_panel.height, PanelMargin) + m_menu_bar_height;
+		ImGui::PopFont();
 	}
 
 	void EditorLayout::AddFont(EditorFont name, std::string& ttfFile, const std::vector<unsigned int>& sizes)
@@ -445,6 +446,18 @@ namespace rdt::core {
 		Utils::ReplaceAll(contents, "TEMPLATENAME", name);
 		Utils::WriteFile(srcFile, contents);
 
+	}
+
+	float EditorLayout::GetButtonWidth(const char* label)
+	{
+		ImGuiStyle& style = ImGui::GetStyle();
+		return ImGui::CalcTextSize(label).x + (style.FramePadding.x * 2);
+	}
+
+	float EditorLayout::GetButtonHeight(const char* label)
+	{
+		ImGuiStyle& style = ImGui::GetStyle();
+		return ImGui::CalcTextSize(label).y + (style.FramePadding.y * 2);
 	}
 
 	bool EditorLayout::ValidTemplateName(const std::string& name, std::string& errorMsg)
@@ -632,12 +645,62 @@ namespace rdt::core {
 		ImGuiWindowFlags windowConfig = 0;
 		windowConfig |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar;
 		
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.7f, 0.7f, 0.7f, 0.9f });
 		ImGui::Begin("##GameWindowPanel", (bool*)0, windowConfig);
 
-		ImGui::PushFont(m_fonts[ForkAwesome][36]);
-		ImGui::Text(ICON_FK_POWER_OFF);
+		ImGui::PushFont(m_fonts[ForkAwesome][18]);
+		ImGui::PushStyleColor(ImGuiCol_Button, { 1.0f, 1.0f, 1.0f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.8f, 0.8f, 0.8f, 1.0f });
+
+		/* Play Button */
+		ImGui::PushStyleColor(ImGuiCol_Text, { 0.2, 0.8, 0.2, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.2f, 0.9f, 0.2f, 0.2f });
+		ImGui::SetCursorPos({ 10, 10 });
+		if (ImGui::Button(ICON_FK_PLAY)) {
+
+		}
+		ImGui::PopStyleColor();
+		ImGui::PopStyleColor();
+		ImGui::SameLine();
+
+		/* Pause Button */
+		ImGui::PushStyleColor(ImGuiCol_Text, { 0.8f, 0.2f, 0.2f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.9f, 0.2f, 0.2f, 0.2f });
+		if (ImGui::Button(ICON_FK_PAUSE)) {
+
+		}
+		ImGui::PopStyleColor();
+		ImGui::PopStyleColor();
+		ImGui::SameLine();
+
+		/* Restart Button */
+		ImGui::PushStyleColor(ImGuiCol_Text, { 0.1f, 0.1f, 0.1f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.7f, 0.7f, 0.7f, 0.2f });
+		if (ImGui::Button(ICON_FK_REFRESH)) {
+
+		}
+		ImGui::PopStyleColor();
+		ImGui::PopStyleColor();
+		ImGui::SameLine();
+
+		/* Expand Window Button*/
+		ImGui::PushStyleColor(ImGuiCol_Text, { 0.1f, 0.1f, 0.1f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.7f, 0.7f, 0.7f, 0.2f });
+		ImGui::SetCursorPosX(ImGui::GetWindowWidth() - GetButtonWidth(ICON_FK_PAUSE) - 10);
+		if (ImGui::Button(ICON_FK_EXPAND)) {
+
+		}
+		ImGui::PopStyleColor();
+		ImGui::PopStyleColor();
+
+
+		ImGui::PopStyleColor();
+		ImGui::PopStyleColor();
+
 		ImGui::PopFont();
+		
 		ImGui::End();
+		ImGui::PopStyleColor();
 	}
 	void EditorLayout::RenderTemplateWizard()
 	{
