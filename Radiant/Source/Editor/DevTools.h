@@ -60,8 +60,9 @@ namespace rdt::core {
 		Theme_Codz,
 	};
 
-	enum EditorFonts {
+	enum EditorFont {
 		NunitoSans = 1,
+		ForkAwesome,
 	};
 
 	struct ThemeData {
@@ -93,7 +94,7 @@ namespace rdt::core {
 		char m_template_name[60];
 		bool m_template_name_edited;
 
-		std::unordered_map<unsigned int, ImFont*> m_fonts;
+		std::unordered_map<EditorFont, std::unordered_map<unsigned int, ImFont*>> m_fonts;
 
 		/*
 			Gui Layout data structures
@@ -118,13 +119,13 @@ namespace rdt::core {
 			T_Scene,
 		};
 
-
 		/*
 			Panels
 		*/
 		GuiConfig m_diagnostics_panel;
 		GuiConfig m_scene_panel;
 		GuiConfig m_template_wizard;
+		GuiConfig m_game_window_panel;
 
 	public:
 		EditorLayout();
@@ -141,6 +142,7 @@ namespace rdt::core {
 
 	private:
 		void OnFirstRender();
+		void AddFont(EditorFont name, std::string& ttfFile, const std::vector<unsigned int>& sizes);
 		void ApplyGuiConfig(const GuiConfig& config);
 		void SetScenePtr(Scene* ptr);
 		void AddCenteredText(const std::string& text);
@@ -174,6 +176,8 @@ namespace rdt::core {
 		void RenderScenePanel();
 		void AddLayerPanel(Layer* layer);
 		void AddGameObjectPanel(GameObject* gobject);
+		// =======================================================
+		void RenderGameWindowPanel();
 		// =======================================================
 		void RenderTemplateWizard();
 		// =======================================================

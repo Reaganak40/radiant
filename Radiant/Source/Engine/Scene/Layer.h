@@ -32,6 +32,11 @@ namespace rdt {
 		std::vector<GuiTemplate*>& GetGUIs();
 
 		/*
+			Gets the realms registered by this layer.
+		*/
+		std::vector<UniqueID>& GetRealms();
+
+		/*
 			Registers a game object to this layer. The layer is now
 			responsible for freeing this game object instance.
 		*/

@@ -503,6 +503,7 @@
     </ClInclude>
     <ClInclude Include="Source\Engine\Graphics\Camera.h" />
     <ClInclude Include="Source\Engine\Polygon\PolygonImpl.h" />
+    <ClInclude Include="Source\Editor\IconsForkAwesome.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Editor\DevTools.cpp">

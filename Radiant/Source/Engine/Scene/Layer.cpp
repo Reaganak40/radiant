@@ -99,6 +99,11 @@ namespace rdt {
 		return m_impl->m_GUIs;
 	}
 
+	std::vector<UniqueID>& Layer::GetRealms()
+	{
+		return m_impl->m_realms;
+	}
+
 	void Layer::RegisterGameObject(GameObject* nGameObject)
 	{
 		m_impl->m_game_objects.push_back(nGameObject);

@@ -64,6 +64,7 @@ namespace rdt {
 			std::string appName = "Radiant App";
 			unsigned int windowWidth = 1280;
 			unsigned int windowHeight = 720;
+			AspectRatio cameraAspectRatio = AR_16_9;
 			Color backgroundColor = WHITE;
 		};
 

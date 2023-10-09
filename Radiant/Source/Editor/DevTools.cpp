@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "DevTools.h"
+#include "IconsForkAwesome.h"
 
 #include "Messaging/MessageTypes.h"
 #include "Graphics/Renderer.h"
@@ -58,9 +59,8 @@ namespace rdt::core {
 		int viewportWidth = 1280;
 		int viewportHeight = 720;
 		int cameraPosX = (((int)Renderer::GetWindowWidth()) / 2) - (viewportWidth / 2);
-		int cameraPosY = (((int)Renderer::GetWindowHeight())) - (viewportHeight) - 30;
+		int cameraPosY = (((int)Renderer::GetWindowHeight())) - (viewportHeight)- 120;
 		defaultCamera->SetViewport({ cameraPosX, cameraPosY }, { viewportWidth, viewportHeight });
-		defaultCamera->SetBackgroundColor(Color(173, 216, 230, 255, false));
 	}
 	DevLayer::~DevLayer()
 	{
@@ -144,14 +144,17 @@ namespace rdt::core {
 	*/
 	constexpr int PanelMargin = 10;
 
-	constexpr float DiagnosticGuiWidth = 290.0f;
+	constexpr float DiagnosticGuiWidth = 300.0f;
 	constexpr float DiagnosticGuiHeight = 105.0f;
 
-	constexpr float ScenePanelGuiWidth = 290.0f;
+	constexpr float ScenePanelGuiWidth = 300.0f;
 	constexpr float ScenePanelGuiHeight = 400.0f;
 
 	constexpr float TemplateWizardGuiWidth = 500.0f;
 	constexpr float TemplateWizardGuiHeight = 575.0f;
+
+	constexpr float GameWindowPanelWidth = 300.0f;
+	constexpr float GameWindowPanelHeight = 75.0f;
 
 	EditorLayout::EditorLayout()
 		: m_scene(nullptr), first_render(true), m_templateWizardLaunched(false)
@@ -185,11 +188,12 @@ namespace rdt::core {
 	void EditorLayout::OnRender()
 	{
 		
-		ImGui::PushFont(m_fonts[18]);
+		ImGui::PushFont(m_fonts[NunitoSans][18]);
 
 		RenderMenuBar();
 		RenderDiagnosticsPanel();
 		RenderScenePanel();
+		RenderGameWindowPanel();
 		RenderTemplateWizard();
 
 		ImGui::PopFont();
@@ -255,20 +259,20 @@ namespace rdt::core {
 
 	void EditorLayout::InitResources(std::string& resourcePath)
 	{
-		std::string ttfFile = (fs::path(resourcePath) / fs::path("NunitoSans_7pt_Condensed-Medium.ttf")).generic_string();
+		fs::path fontFolder = fs::path(resourcePath) / fs::path("fonts");
+		std::string ttfFile;
+		
+		ttfFile = (fontFolder / fs::path("NunitoSans_7pt_Condensed-Medium.ttf")).generic_string();
+		AddFont(NunitoSans, ttfFile, std::vector<unsigned int>{18, 24, 36});
 
-		if (Utils::PathExists(ttfFile)) {
-			GuiManager::LoadFont(NunitoSans, ttfFile);
+		// Load Icons from ForkAwesome
+		ttfFile = (fontFolder / fs::path(FONT_ICON_FILE_NAME_FK)).generic_string();
+		static const ImWchar icons_ranges[] = { ICON_MIN_FK, ICON_MAX_16_FK, 0 };
 
-			m_fonts[18] = GuiManager::GetFont(NunitoSans, 18);
-			m_fonts[24] = GuiManager::GetFont(NunitoSans, 24);
-			m_fonts[36] = GuiManager::GetFont(NunitoSans, 36);
-
-		}
-		else {
-			RDT_CORE_WARN("Could not find file '{}'", ttfFile);
-			return;
-		}
+		GuiManager::LoadIcons(ForkAwesome, ttfFile, icons_ranges);
+		m_fonts[ForkAwesome][36] = GuiManager::GetFont(ForkAwesome, 36);
+		m_fonts[ForkAwesome][13] = GuiManager::GetFont(ForkAwesome, 13);
+		m_fonts[ForkAwesome][18] = GuiManager::GetFont(ForkAwesome, 18);
 
 		fs::path templateFolder = fs::path(resourcePath) / fs::path("templates");
 		if (!fs::is_directory(templateFolder) || !fs::exists(templateFolder)) { 
@@ -295,6 +299,26 @@ namespace rdt::core {
 		m_template_wizard.height = TemplateWizardGuiHeight;
 		m_template_wizard.xPos = (m_window_width / 2) - (m_template_wizard.width / 2);
 		m_template_wizard.yPos = (m_window_height / 2) - (m_template_wizard.height / 2);
+
+		m_game_window_panel.width = GameWindowPanelWidth;
+		m_game_window_panel.height = GameWindowPanelHeight;
+		m_game_window_panel.xPos = GetDockPosX(DockRight, m_game_window_panel.width + m_diagnostics_panel.width + PanelMargin, PanelMargin);
+		m_game_window_panel.yPos = GetDockPosY(DockTop, m_game_window_panel.height, PanelMargin) + m_menu_bar_height;
+	}
+
+	void EditorLayout::AddFont(EditorFont name, std::string& ttfFile, const std::vector<unsigned int>& sizes)
+	{
+		if (Utils::PathExists(ttfFile)) {
+			GuiManager::LoadFont(name, ttfFile);
+
+			for (auto size : sizes) {
+				m_fonts[name][size] = GuiManager::GetFont(name, size);
+			}
+		}
+		else {
+			RDT_CORE_WARN("Could not find file '{}'", ttfFile);
+			return;
+		}
 	}
 
 	void EditorLayout::ApplyGuiConfig(const GuiConfig& config)
@@ -500,7 +524,6 @@ namespace rdt::core {
 		return 0;
 	}
 
-
 	void EditorLayout::RenderMenuBar()
 	{
 		if (ImGui::BeginMainMenuBar()) {
@@ -602,6 +625,20 @@ namespace rdt::core {
 		}
 		ImGui::Unindent(10);
 	}
+	void EditorLayout::RenderGameWindowPanel()
+	{
+		ApplyGuiConfig(m_game_window_panel);
+
+		ImGuiWindowFlags windowConfig = 0;
+		windowConfig |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar;
+		
+		ImGui::Begin("##GameWindowPanel", (bool*)0, windowConfig);
+
+		ImGui::PushFont(m_fonts[ForkAwesome][36]);
+		ImGui::Text(ICON_FK_POWER_OFF);
+		ImGui::PopFont();
+		ImGui::End();
+	}
 	void EditorLayout::RenderTemplateWizard()
 	{
 		if (!m_templateWizardLaunched) {
@@ -618,10 +655,10 @@ namespace rdt::core {
 			
 			bool createRequested = false;
 
-			ImGui::PushFont(m_fonts[36]);
+			ImGui::PushFont(m_fonts[NunitoSans][36]);
 			AddCenteredText("Template Wizard");
 			ImGui::PopFont();
-			ImGui::PushFont(m_fonts[24]);
+			ImGui::PushFont(m_fonts[NunitoSans][24]);
 			AddCenteredText("-- Create New File -- ");
 			ImGui::NewLine();
 

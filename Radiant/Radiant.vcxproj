@@ -107,6 +107,7 @@
   <ItemGroup>
     <ClInclude Include="Source\Editor\DevTools.h" />
     <ClInclude Include="Source\Editor\Editor.h" />
+    <ClInclude Include="Source\Editor\IconsForkAwesome.h" />
     <ClInclude Include="Source\Engine\Application.h" />
     <ClInclude Include="Source\Engine\Audio\AudioError.h" />
     <ClInclude Include="Source\Engine\Audio\Sound\Sound.h" />

@@ -61,6 +61,9 @@ namespace rdt {
 		Utils::SetRandomSeed();
 		Renderer::CreateRadiantWindow(m_impl->m_config.appName);
 		Input::Initialize();
+
+		Camera* defaultCamera = Renderer::GetCamera();
+		defaultCamera->SetBackgroundColor(m_impl->m_config.backgroundColor);
 	}
 
 	void Application::Run()
