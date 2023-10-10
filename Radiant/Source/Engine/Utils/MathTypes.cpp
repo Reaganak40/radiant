@@ -125,4 +125,9 @@ namespace rdt {
         return Vec3f(0.0f, 0.0f, 0.0f);
     }
 
+    Vec2f Vec2f::Zero()
+    {
+        return { 0.0f, 0.0f };
+    }
+
 }

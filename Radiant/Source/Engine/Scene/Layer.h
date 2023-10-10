@@ -17,40 +17,43 @@ namespace rdt {
 	*/
 	class RADIANT_API Layer : public Messenger {
 	private:
-		UniqueID m_ID;
-		bool m_attached;
+		struct Impl;
+		Impl* m_impl;
 
 	protected:
-		std::vector<GameObject*> m_game_objects;
-		std::vector<GuiTemplate*> m_GUIs;
-		std::vector<UniqueID> m_realms;
-		GameState GState;
-
-	private:
-		
 		/*
-			Runs OnProcssInput on all game objects and OnUpdate on all
-			GUIs. This should be called at the end of OnProcessInput().
+			Get the game objects registered at this layer.
 		*/
-		void RunProcessInputQueue(const float deltaTime);
+		std::vector<GameObject*>& GetGameObjects();
 
 		/*
-			Runs OnFinalUpdate() on all game objects. This should be called
-			at the end of OnFinalUpdate().
+			Get the GUIs registered at this layer.
 		*/
-		void RunFinalUpdateQueue();
+		std::vector<GuiTemplate*>& GetGUIs();
 
 		/*
-			Runs OnRender() on all game objects. This should be called at the end
-			of OnRender().
+			Gets the realms registered by this layer.
 		*/
-		void RunRenderQueue();
+		std::vector<UniqueID>& GetRealms();
+
+		/*
+			Registers a game object to this layer. The layer is now
+			responsible for freeing this game object instance.
+		*/
+		void RegisterGameObject(GameObject* nGameObject);
+
+		/*
+			Registers a GUI to this layer. The layer is now
+			responsible for freeing this pointer.
+		*/
+		void RegisterGUI(GuiTemplate* nGUI);
+
 
 	public:
 		Layer();
 		~Layer();
 
-		const UniqueID GetID() { return m_ID; }
+		const UniqueID GetID();
 
 		/*
 			Function called when this layer is binded to a Scene, entering
@@ -67,24 +70,24 @@ namespace rdt {
 			Function called when the layer is active and the host application
 			calls ProcessInput.
 		*/
-		virtual void OnProcessInput(const float deltaTime) { RunProcessInputQueue(deltaTime); }
+		virtual void OnProcessInput(const float deltaTime);
 
 		/*
 			Function called when the layer is active and the host application
 			calls FinalUpdate()
 		*/
-		virtual void OnFinalUpdate() { RunFinalUpdateQueue(); }
+		virtual void OnFinalUpdate();
 
 		/*
 			Function called when the layer is active and the host application
 			calls Render()
 		*/
-		virtual void OnRender() { RunRenderQueue(); }
+		virtual void OnRender();
 
 		/*
 			Returns true if the layer is attach flag is true.
 		*/
-		bool IsAttached() { return m_attached; }
+		bool IsAttached();
 
 		/*
 			To implement function when the object receives a message from the Message Bus.
@@ -94,7 +97,7 @@ namespace rdt {
 		/*
 			Returns a constant pointer to the array of game objects
 		*/
-		GameObject** GetGameObjects(unsigned int* numObjects);
+		GameObject** GetGameObjects(size_t* numObjects);
 
 		friend class Scene;
 
@@ -104,6 +107,11 @@ namespace rdt {
 			Helper function that binds all game objects and GUIs
 		*/
 		void BindAll();
+
+		/*
+			Helper function that unbinds all game objects and detaches all GUIs.
+		*/
+		void ReleaseAll();
 
 		/*
 			Initalized a new realm from the physics engine and appends it to the vector

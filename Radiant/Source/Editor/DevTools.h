@@ -2,6 +2,7 @@
 #include "Scene/Layer.h"
 #include "Utils/Input.h"
 #include "Utils/ConfigReader.h"
+#include "Graphics/RenderWindow.h"
 
 namespace rdt::core {
 
@@ -11,15 +12,11 @@ namespace rdt::core {
 
 	class DevLayer : public Layer {
 	private:
-		bool m_showTools;
 		std::string m_base_directory;
 		std::string m_projectName;
 		std::string m_resources_filepath;
 
 		ConfigReader m_config;
-
-		const std::vector<InputState> controls_ShowTools1{CTRL_KEY_DOWN};
-		const std::vector<InputState> controls_ShowTools2{T_KEY_PRESS};
 
 		DevLayer();
 		~DevLayer();
@@ -49,10 +46,22 @@ namespace rdt::core {
 
 	private:
 	};
-	
 
 	// =====================================================================================
 
+	class GameWindowPanel : public RenderWindow {
+	private:
+		bool update_pos;
+	public:
+		GameWindowPanel();
+		~GameWindowPanel();
+
+		void OnBegin() override final;
+		void OnEnd() override final;
+		void TriggerUpdatePos();
+	};
+
+	// =====================================================================================
 	/*
 		Editor Themes Implementation
 	*/
@@ -60,8 +69,9 @@ namespace rdt::core {
 		Theme_Codz,
 	};
 
-	enum EditorFonts {
+	enum EditorFont {
 		NunitoSans = 1,
+		ForkAwesome,
 	};
 
 	struct ThemeData {
@@ -76,6 +86,10 @@ namespace rdt::core {
 		ImVec4 PopupBackground;
 	};
 
+	// =====================================================================================
+	/*
+		Editor Layout Implementation
+	*/
 	class EditorLayout : public GuiTemplate, public Messenger {
 	private:
 		/*
@@ -86,14 +100,18 @@ namespace rdt::core {
 		std::string sourcePath;
 		std::string templatePath;
 		bool first_render;
-		int m_menu_bar_height;
+		float m_menu_bar_height;
 
 		bool m_templateWizardLaunched;
 		int m_template_selection_index;
 		char m_template_name[60];
 		bool m_template_name_edited;
 
-		std::unordered_map<unsigned int, ImFont*> m_fonts;
+		bool m_showTools;
+		const std::vector<InputState> controls_ShowTools1{ CTRL_KEY_DOWN };
+		const std::vector<InputState> controls_ShowTools2{ T_KEY_PRESS };
+
+		std::unordered_map<EditorFont, std::unordered_map<unsigned int, ImFont*>> m_fonts;
 
 		/*
 			Gui Layout data structures
@@ -110,6 +128,7 @@ namespace rdt::core {
 			float yPos = 0;
 			float width = 0;
 			float height = 0;
+			bool update = false;
 		};
 
 		enum TemplateType {
@@ -118,13 +137,15 @@ namespace rdt::core {
 			T_Scene,
 		};
 
-
 		/*
 			Panels
 		*/
+		GameWindowPanel* m_game_window_panel;
+
 		GuiConfig m_diagnostics_panel;
 		GuiConfig m_scene_panel;
 		GuiConfig m_template_wizard;
+		GuiConfig m_game_window_settings_panel;
 
 	public:
 		EditorLayout();
@@ -141,7 +162,8 @@ namespace rdt::core {
 
 	private:
 		void OnFirstRender();
-		void ApplyGuiConfig(const GuiConfig& config);
+		void AddFont(EditorFont name, std::string& ttfFile, const std::vector<unsigned int>& sizes);
+		void ApplyGuiConfig(GuiConfig& config);
 		void SetScenePtr(Scene* ptr);
 		void AddCenteredText(const std::string& text);
 		void InactiveButtonBegin();
@@ -149,6 +171,8 @@ namespace rdt::core {
 		void InactiveTextBoxBegin();
 		void InactiveTextBoxEnd();
 		void CreateFileFromTemplate(TemplateType type, const std::string& name);
+		float GetButtonWidth(const char* label);
+		float GetButtonHeight(const char* label);
 
 		bool ValidTemplateName(const std::string& name, std::string& errorMsg);
 		static int MyTextCallback(ImGuiInputTextCallbackData* data);
@@ -157,13 +181,13 @@ namespace rdt::core {
 			Returns the docking x-position for the Gui to be docked in the
 			provided direction with the given margin.
 		*/
-		int GetDockPosX(Dock docking, int guiWidth, int margin = 0);
+		float GetDockPosX(Dock docking, float guiWidth, float margin = 0);
 
 		/*
 			Returns the docking y-position for the Gui to be docked in the
 			provided direction with the given margin.
 		*/
-		int GetDockPosY(Dock docking, int guiHeight, int margin = 0);
+		float GetDockPosY(Dock docking, float guiHeight, float margin = 0);
 
 
 		// =======================================================
@@ -174,6 +198,8 @@ namespace rdt::core {
 		void RenderScenePanel();
 		void AddLayerPanel(Layer* layer);
 		void AddGameObjectPanel(GameObject* gobject);
+		// =======================================================
+		void RenderGameWindowSettingsPanel();
 		// =======================================================
 		void RenderTemplateWizard();
 		// =======================================================

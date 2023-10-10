@@ -14,20 +14,44 @@
 
 namespace rdt {
 
+	struct Renderer::Impl {
+		Camera m_camera;
+
+		std::unordered_map<int, RenderWindow*> m_render_windows;
+		static int RenderWindowID;
+
+		bool m_use_default_viewport;
+
+		Impl()
+			: m_use_default_viewport(true)
+		{
+		}
+
+		~Impl()
+		{
+		}
+
+		int GetNextRenderWindowID() {
+			return ++RenderWindowID;
+		}
+	};
+
+	int Renderer::Impl::RenderWindowID = 0;
 	Renderer* Renderer::m_instance = nullptr;
 
 	Renderer::Renderer()
+		: m_impl(new Renderer::Impl)
 	{
-		m_default_camera = nullptr;
 	}
 
 	Renderer::~Renderer()
 	{
+		delete m_impl;
 	}
 
-	void Renderer::SetDefaultCamera(Camera* defaultCamera)
+	std::unordered_map<int, RenderWindow*>& Renderer::GetRenderWindows()
 	{
-		m_default_camera = defaultCamera;
+		return m_impl->m_render_windows;
 	}
 
 	void Renderer::Initialize()
@@ -44,30 +68,27 @@ namespace rdt {
 		delete m_instance;
 		m_instance = nullptr;
 	}
-	void Renderer::AddCamera(const std::string& alias, Camera* nCamera)
+	int Renderer::AddRenderWindow(RenderWindow* nRenderWindow)
 	{
-		if (m_instance->m_cameras.find(alias) != m_instance->m_cameras.end()) {
-			RDT_CORE_WARN("Renderer: Duplicate Camera '{}', AddCamera() ignored...", alias);
-			return;
-		}
+		int id = m_instance->m_impl->GetNextRenderWindowID();
+		m_instance->m_impl->m_render_windows[id] = nRenderWindow;
+		m_instance->OnNewRenderWindow(id, nRenderWindow);
 
-		if (alias.empty()) {
-			RDT_CORE_WARN("Renderer: Empty camera names are not allowed!");
-			return;
-		}
-
-		m_instance->m_cameras[alias] = nCamera;
+		return id;
 	}
-	Camera* Renderer::GetCamera(const std::string& cameraName)
-	{
-		if (cameraName.empty()) {
-			return m_instance->m_default_camera;
-		}
 
-		if (m_instance->m_cameras.find(cameraName) == m_instance->m_cameras.end()) {
-			RDT_CORE_WARN("Renderer - Camera '{}' does not exist.", cameraName);
-			return nullptr;
-		}
-		return m_instance->m_cameras.at(cameraName);
+	Camera& Renderer::GetCamera()
+	{
+		return m_instance->m_impl->m_camera;
+	}
+
+	void Renderer::SetDefaultViewport(bool use)
+	{
+		m_instance->m_impl->m_use_default_viewport = use;
+	}
+
+	bool Renderer::UsingDefaultViewport()
+	{
+		return m_instance->m_impl->m_use_default_viewport;
 	}
 }

@@ -9,9 +9,8 @@ namespace rdt {
 
 	class RADIANT_API Scene : public Messenger {
 	private:
-		UniqueID m_ID;
-		std::vector<Layer*> m_layers;
-		bool m_use_default_camera;
+		struct Impl;
+		Impl* m_impl;
 
 		/*
 			Runs OnProcssInput on all game objects and OnUpdate on all
@@ -36,19 +35,11 @@ namespace rdt {
 		*/
 		void OnMessage(Message msg) override {}
 
-	protected:
-		
-		/*
-			When this function is called, the render call internals for this Scene instance will
-			not tell the renderer to use the default camera, thus it is up to the scene child
-			to choose the right camera manually.
-		*/
-		void DontUseDefaultCamera();
 	public:
 		Scene();
 		~Scene();
 
-		const UniqueID GetID() { return m_ID; }
+		const UniqueID GetID();
 
 		/*
 			Adds a layer to the top of the layer stack. The scene is
@@ -96,6 +87,6 @@ namespace rdt {
 		/*
 			Returns a constant pointer to the array of layers
 		*/
-		Layer** GetLayers(unsigned int* numLayers);
+		Layer** GetLayers(size_t* numLayers);
 	};
 }

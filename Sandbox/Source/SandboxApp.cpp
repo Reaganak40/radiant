@@ -10,8 +10,18 @@ class SandboxApp : public Application
 public:
 	SandboxApp()
 	{
-		Start("Sandbox", 1280, 720);
+		// Snake Application Configurations
+		ApplicationConfig appConfig;
+		appConfig.appName = "Sandbox";
+		appConfig.windowWidth = 1280;
+		appConfig.windowHeight = 720;
+		appConfig.backgroundColor = WHITE;
+		appConfig.cameraAspectRatio = AR_16_9;
+		SetApplicationConfig(appConfig);
+	}
 
+	void OnGameBegin() override final
+	{
 		AddScene("Sandbox Scene", new Sandbox);
 		SetScene("Sandbox Scene");
 	}

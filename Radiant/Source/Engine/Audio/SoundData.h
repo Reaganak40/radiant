@@ -19,7 +19,7 @@ namespace rdt::core {
 		/*
 			Gets the audio file data size.
 		*/
-		unsigned int GetSize();
+		size_t GetSize();
 
 		/*
 			Returns the audio file's format.
@@ -35,7 +35,7 @@ namespace rdt::core {
 		/*
 			Returns a pointer to the PCM data of the audio file.
 		*/
-		uint8_t* GetDataAt(unsigned int index);
+		uint8_t* GetDataAt(size_t index);
 
 	private:
 		/*

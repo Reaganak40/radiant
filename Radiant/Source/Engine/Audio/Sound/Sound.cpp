@@ -31,6 +31,7 @@ namespace rdt {
 		m_state = NO_BINDING;
 		m_shouldLoop = false;
 		m_data = nullptr;
+		m_justStopped = false;
 
 		for (int i = 0; i < NUM_AUDIO_BUFFERS; i++) {
 			m_buffers[i] = 0;
@@ -59,7 +60,7 @@ namespace rdt {
 			UseUnusedBuffers();
 		}
 		else {
-			numBuffers -= m_unused_buffers.size();
+			numBuffers -= (ALsizei)m_unused_buffers.size();
 		}
 
 		alSourceQueueBuffers(m_source.GetID(), numBuffers, m_buffers);
@@ -114,7 +115,7 @@ namespace rdt {
 				dataSizeToCopy = dataSize - m_cursor;
 			}
 
-			alBufferData(m_buffers[i], m_data->GetFormat(), m_data->GetDataAt(m_cursor), dataSizeToCopy, m_data->GetSampleRate());
+			alBufferData(m_buffers[i], m_data->GetFormat(), m_data->GetDataAt(m_cursor), (ALsizei)dataSizeToCopy, m_data->GetSampleRate());
 			m_cursor += dataSizeToCopy;
 		}
 
@@ -137,7 +138,7 @@ namespace rdt {
 		std::size_t dataSize = m_data->GetSize();
 		for (auto& buffer : m_unused_buffers) {
 
-			unsigned int dataIndex = 0;
+			size_t dataIndex = 0;
 			
 			while (dataIndex != AUDIO_BUFFER_SIZE) {
 				
@@ -180,7 +181,7 @@ namespace rdt {
 				continue;
 			}
 
-			unsigned int dataIndex = 0;
+			size_t dataIndex = 0;
 			while (dataIndex != AUDIO_BUFFER_SIZE) {
 
 				std::size_t dataSizeToCopy = AUDIO_BUFFER_SIZE - dataIndex;
@@ -202,7 +203,7 @@ namespace rdt {
 				}
 			}
 
-			alBufferData(buffer, m_data->GetFormat(), data, dataIndex, m_data->GetSampleRate());
+			alBufferData(buffer, m_data->GetFormat(), data, (ALsizei)dataIndex, m_data->GetSampleRate());
 			alSourceQueueBuffers(source, 1, &buffer);
 		}
 

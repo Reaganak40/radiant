@@ -13,27 +13,9 @@ namespace rdt {
 		MessageBus();
 		~MessageBus();
 		static MessageBus* m_instance;
-		static MessageID idCounter;
 
-		std::queue<Message> m_message_queue;
-
-		/***********************************************************
-		*
-		*    	  Messenger Dictionary and Register Tables
-		*
-		************************************************************/
-		std::unordered_map<std::string, MessageID> m_messengers_AliasToId;
-		std::unordered_map<MessageID, std::string> m_messengers_IdToAlias;
-		std::unordered_map<MessageID, Messenger*> m_messengers;
-
-		/***********************************************************
-		*
-		*    	  Broadcast Dictionary and Register Tables
-		*
-		************************************************************/
-		std::unordered_map<std::string, MessageID> m_broadcasts_AliasToId;
-		std::unordered_map<MessageID, std::string> m_broadcasts_IdToAlias;
-		std::unordered_map<MessageID, Broadcast*> m_broadcasts;
+		struct Impl;
+		Impl* m_impl;
 
 	public:
 		/*
@@ -117,13 +99,13 @@ namespace rdt {
 		/*
 			Returns the current display of messages from a registered broadcast.
 		*/
-		static const std::vector<Message>& GetBroadcast(const std::string& alias) { return m_instance->GetBroadcastImpl(alias); }
+		static const std::vector<Message>* GetBroadcast(const std::string& alias) { return m_instance->GetBroadcastImpl(alias); }
 
 	private:
 		static MessageID GetNextMessageID();
 		void SendMessagesImpl();
 		MessageID CreateBroadcastImpl(const std::string& alias, Broadcast* broadcast);
-		const std::vector<Message>& GetBroadcastImpl(const std::string& alias);
+		const std::vector<Message>* GetBroadcastImpl(const std::string& alias);
 		void AddToBroadcastImpl(const MessageID broadcastID, MessageType type, void* data);
 		void ResetBroadcastsImpl();
 	};

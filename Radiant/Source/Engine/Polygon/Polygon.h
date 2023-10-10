@@ -5,6 +5,7 @@
 
 namespace rdt::core {
 	class Translation;
+	struct PolygonImpl;
 }
 
 namespace rdt {
@@ -16,16 +17,10 @@ namespace rdt {
 
 	class RADIANT_API Polygon {
 	private:
-		UniqueID m_UUID;
-		double m_rotation;
-	protected:
-		unsigned int m_properties;
-		std::vector<Vec2d> m_vertices;
-		std::vector<unsigned int> m_indices;
+		core::PolygonImpl* m_impl;
 
-		Vec2d m_origin;
-		double m_width;
-		double m_height;
+	protected:
+		core::PolygonImpl* BaseImpl();
 
 		void AddProperties(unsigned int nProperties);
 	public:

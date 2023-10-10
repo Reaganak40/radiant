@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "RendererGL.h"
+#include "Gui/GuiManager.h"
 
 #include "Logging/Log.h"
 #include "Utils/Utils.h"
@@ -34,6 +35,7 @@ namespace rdt::core {
         delete m_vertex_array;
 
         TextureManager::Destroy();
+        GuiManager::Destroy();
 
         glfwTerminate();
 	}
@@ -105,6 +107,7 @@ namespace rdt::core {
         ImGui::StyleColorsDark();
         ImGui_ImplGlfw_InitForOpenGL(m_window, true);
         ImGui_ImplOpenGL3_Init("#version 330");
+        GuiManager::Initialize();
 
         // set default VAO
         m_vertex_array = new VertexArray;
@@ -119,10 +122,7 @@ namespace rdt::core {
         // Setup Camera (model view project matrix)
         m_screen_origin = Vec3f(0.0f, 0.0f, 0.0f);
         
-        SetDefaultCamera(new Camera(AR_16_9));
-        GetCamera()->SetViewport({m_default_viewport.posX, m_default_viewport.posY}, {m_default_viewport.width, m_default_viewport.height});
-        
-        glm::mat4 mvp = GetCamera()->GetMVP();
+        glm::mat4 mvp = GetCamera().GetMVP();
         SetShader(m_shaders[0]->GetID());
         m_shaders[0]->SetUniform<glm::mat4>("uMVP", mvp);
 
@@ -159,6 +159,14 @@ namespace rdt::core {
         return Utils::GetRatio(m_window_width, m_window_height);
     }
 
+    void RendererGL::OnNewRenderWindow(int id, RenderWindow* nRenderWindow)
+    {
+        m_frame_buffers[id];
+        auto& fbo = m_frame_buffers.at(id);
+        fbo.Init();
+        nRenderWindow->AssignTexture((void*)fbo.GetTexture());
+    }
+
     void RendererGL::ClearImpl()
     {
         Clear(m_default_viewport, m_clear_color);
@@ -171,9 +179,6 @@ namespace rdt::core {
 
     void RendererGL::OnUpdateImpl(const float deltaTime)
     {
-        for (const auto& gui : m_GUIs) {
-            gui->OnUpdate(deltaTime);
-        }
     }
 
     void RendererGL::RenderImpl()
@@ -192,49 +197,38 @@ namespace rdt::core {
         }
 
         /*
-            Step 2: Go layer by layer, draw batch by batch. (with all cameras)
+            Step 2: DrawContext for default viewport or render windows.
         */
-        SetShader(m_shaders[0]->GetID());
-        for (auto& camera : m_selected_cameras) {
 
-            glm::mat4 mvp = GetCamera()->GetMVP();
-            m_shaders[0]->SetUniform<glm::mat4>("uMVP", mvp);
-
-            glViewportData viewportData;
-            camera->GetViewport(&viewportData.posX, &viewportData.posY, &viewportData.width, &viewportData.height);
-            
-            SetViewport(viewportData);
-            Clear(viewportData, camera->GetBackgroundColor());
-
-            for (auto& layer : m_layers) {
-                layer.CompileBatches();
-
-                if (layer.TextureSlotsChanged()) {
-                    UpdateTextureUniforms();
-                }
-
-                auto units = layer.GetRenderUnits();
-                for (int i = 0; i < layer.GetBatchCount(); i++) {
-                    auto& unit = units.at(i);
-
-                    // Draw Call Procedure
-                    SetVBO(unit.vboID);
-                    SetIBO(unit.iboID);
-                    SetShader(unit.shaderID);
-                    SetMode(unit.type == DrawOutline ? OutlineMode : FillMode);
-
-                    // Update buffers and notify the GPU
-                    unit.m_VBO->Update();
-                    unit.m_IBO->Update();
-                    m_vertex_array->DefineVertexBufferLayout();
-
-                    glDrawElements(
-                        unit.type == RenderType::DrawLine ? GL_LINES : GL_TRIANGLES,
-                        unit.m_IBO->GetIndexCount(), GL_UNSIGNED_INT, nullptr);
-                }
-            }
+        if (UsingDefaultViewport()) {
+            SetViewport(m_default_viewport);
+            DrawContext();
         }
-        SetViewport(m_default_viewport);
+        else {
+            for (auto& [id, window] : GetRenderWindows()) {
+
+                auto& fbo = m_frame_buffers.at(id);
+                window->OnBegin();
+            
+                /* Update window dimensions and setup viewport */
+                Vec2d windowDimensions = window->UpdateAndGetWindowSize();
+                Vec2f cameraDimensions = GetCamera().GetCameraDimensionsFromViewport(windowDimensions.x, windowDimensions.y);
+                fbo.Rescale(windowDimensions.x, windowDimensions.y);
+                int midX = (windowDimensions.x / 2) - (cameraDimensions.x / 2);
+                int midY = (windowDimensions.y / 2) - (cameraDimensions.y / 2);
+                SetViewport({ midX, midY, (int)cameraDimensions.x, (int)cameraDimensions.y });
+
+                /* Attach framebuffer texture to ImGui window context. */
+                window->OnRender();
+                window->OnEnd();
+
+                /* Use framebuffer to draw in window. */
+                SetFBO(fbo.GetID());
+                DrawContext();
+            }
+            SetFBO(0);
+        }
+
 
         /*
             Step 3: Run the GUI render queue.
@@ -451,22 +445,57 @@ namespace rdt::core {
         }
     }
 
-    void RendererGL::UseCameraImpl(const std::string& alias)
-    {
-        Camera* camera = GetCamera(alias);
-
-        if (camera == nullptr) {
-            return;
-        }
-        m_selected_cameras.insert(camera);
-    }
-
     void RendererGL::_FlushPolygonImpl(const UniqueID UUID)
     {
         m_render_cache.Flush(UUID);
     }
 
-    void RendererGL::SetVBO(core::VBO_ID vbo)
+    void RendererGL::DrawContext()
+    {
+        SetShader(m_shaders[0]->GetID());
+        glm::mat4 mvp = GetCamera().GetMVP();
+        m_shaders[0]->SetUniform<glm::mat4>("uMVP", mvp);
+        Clear(m_current_viewport, GetCamera().GetBackgroundColor());
+        
+        for (auto& layer : m_layers) {
+            layer.CompileBatches();
+
+            if (layer.TextureSlotsChanged()) {
+                UpdateTextureUniforms();
+            }
+
+            auto units = layer.GetRenderUnits();
+            for (unsigned int i = 0; i < layer.GetBatchCount(); i++) {
+                auto& unit = units.at(i);
+
+                // Draw Call Procedure
+                SetVBO(unit.vboID);
+                SetIBO(unit.iboID);
+                SetShader(unit.shaderID);
+                SetMode(unit.type == DrawOutline ? OutlineMode : FillMode);
+
+                // Update buffers and notify the GPU
+                unit.m_VBO->Update();
+                unit.m_IBO->Update();
+                m_vertex_array->DefineVertexBufferLayout();
+
+                glDrawElements(
+                    unit.type == RenderType::DrawLine ? GL_LINES : GL_TRIANGLES,
+                    unit.m_IBO->GetIndexCount(), GL_UNSIGNED_INT, nullptr);
+            }
+        }
+
+    }
+
+    void RendererGL::SetFBO(FBO_ID fbo)
+    {
+        if (fbo != m_current_fbo) {
+            FrameBuffer::Bind(fbo);
+            m_current_fbo = fbo;
+        }
+    }
+
+    void RendererGL::SetVBO(VBO_ID vbo)
     {
         if (vbo != m_current_vbo) {
             VertexBuffer::Bind(vbo);
@@ -474,7 +503,7 @@ namespace rdt::core {
         }
     }
 
-    void RendererGL::SetIBO(core::IBO_ID ibo)
+    void RendererGL::SetIBO(IBO_ID ibo)
     {
         if (ibo != m_current_ibo) {
             IndexBuffer::Bind(ibo);
@@ -482,7 +511,7 @@ namespace rdt::core {
         }
     }
 
-    void RendererGL::SetShader(core::ShaderID shader)
+    void RendererGL::SetShader(ShaderID shader)
     {
         if (shader != m_current_shader) {
             Shader::Bind(shader);
@@ -490,7 +519,7 @@ namespace rdt::core {
         }
     }
 
-    void RendererGL::SetMode(core::GeoMode mode)
+    void RendererGL::SetMode(GeoMode mode)
     {
         if (m_current_mode != mode) {
             ActivateGeoMode(mode);
@@ -498,7 +527,7 @@ namespace rdt::core {
         }
     }
 
-    void RendererGL::SetViewport(glViewportData& nViewport)
+    void RendererGL::SetViewport(const glViewportData& nViewport)
     {
         if (nViewport.posX != m_current_viewport.posX ||
             nViewport.posY != m_current_viewport.posY ||

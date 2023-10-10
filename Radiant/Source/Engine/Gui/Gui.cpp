@@ -5,12 +5,22 @@
 namespace rdt {
 	void GuiTemplate::SetGuiDimensions(int nGuiWidth, int nGuiHeight)
 	{
-		m_gui_width = nGuiWidth;
-		m_gui_height = nGuiHeight;
+		m_gui_width = (float)nGuiWidth;
+		m_gui_height = (float)nGuiHeight;
 	}
-	void GuiTemplate::SetGuiPosition(int nX, int nY)
+	void GuiTemplate::SetGuiPosition(float nX, float nY)
 	{
 		m_gui_pos.x = nX;
+		m_gui_pos.y = nY;
+	}
+
+	void GuiTemplate::SetGuiPositionX(float nX)
+	{
+		m_gui_pos.x = nX;
+	}
+
+	void GuiTemplate::SetGuiPositionY(float nY)
+	{
 		m_gui_pos.y = nY;
 	}
 

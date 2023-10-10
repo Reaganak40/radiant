@@ -16,7 +16,7 @@ namespace rdt {
 		/*
 			Returns a list of all messages being displayed by this broadcast.
 		*/
-		const std::vector<Message>& GetMessages();
+		const std::vector<Message>* GetMessages();
 
 		friend class MessageBus;
 	private:

@@ -4,7 +4,9 @@
 namespace rdt {
 	class Circle : public Polygon {
 	private:
-		double m_radius;
+		struct Impl;
+		Impl* m_impl;
+
 	public:
 		Circle(Vec2d spawnLocation, double radius);
 		~Circle();

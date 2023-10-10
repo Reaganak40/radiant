@@ -10,6 +10,7 @@
 #include "Texture/TextureManager.h"
 #include "RenderTypes.h"
 #include "Gui/Gui.h"
+#include "RenderWindow.h"
 
 #include "Camera.h"
 
@@ -17,16 +18,17 @@ namespace rdt {
 
 	class RADIANT_API Renderer {
 	private:
-		std::unordered_map <std::string, Camera*> m_cameras;
-		Camera* m_default_camera;
+		struct Impl;
+		Impl* m_impl;
+
 	protected:
 		Renderer();
 		virtual ~Renderer();
 
 		/*
-			Sets the default camera
+			Gets the binded render windows
 		*/
-		void SetDefaultCamera(Camera* defaultCamera);
+		std::unordered_map<int, RenderWindow*>& GetRenderWindows();
 
 	private:
 		static Renderer* m_instance;
@@ -88,6 +90,14 @@ namespace rdt {
 			the aspect ratio.
 		*/
 		static Vec2i OnWindowResize() { return m_instance->OnWindowResizeImpl(); }
+
+
+		/*
+			Adds a new render window to the rendering context. The renderer will draw
+			frames in the render window. Returns the location of it, to be removed
+			later.
+		*/
+		static int AddRenderWindow(RenderWindow* nRenderWindow);
 
 		/*
 			Clears the screen with the defined background color.
@@ -197,21 +207,21 @@ namespace rdt {
 		static void DetachGui(const GuiTemplate* gui) { m_instance->DetachGuiImpl(gui); }
 
 		/*
-			Adds a camera to the renderer instance, which can be used to create
-			multiple viewports and perspectives.
-		*/
-		static void AddCamera(const std::string& alias, Camera* nCamera);
-
-		/*
 			Gets a camera pointer from the camera map.
 		*/
-		static Camera* GetCamera(const std::string& cameraName = "");
+		static Camera& GetCamera();
 
 		/*
-			Called once per frame to declare a camera to be used. In most cases, only
-			one camera should be used.
+			Sets the default viewport to be used or not. When it is used, the game window
+			will fill to the dimensions of the application window. If false, the game window
+			will be rendered within registered RenderWindows.
 		*/
-		static void UseCamera(const std::string& alias = "") { m_instance->UseCameraImpl(alias); }
+		static void SetDefaultViewport(bool use);
+
+		/*
+			Returns true if the default viewport should be used for render windows.
+		*/
+		static bool UsingDefaultViewport();
 
 		// *****************************************************
 		// 
@@ -234,7 +244,8 @@ namespace rdt {
 		virtual Vec2d GetCameraCoordinates2DImpl() = 0;
 		virtual void SetBackgroundColorImpl(const Color& color) = 0;
 		virtual Vec2i OnWindowResizeImpl() = 0;
-		
+		virtual void OnNewRenderWindow(int id, RenderWindow* nRenderWindow) = 0;
+
 		virtual void ClearImpl() = 0;
 		virtual void OnBeginFrameImpl() = 0;
 		virtual void OnUpdateImpl(const float deltaTime) = 0;
@@ -254,7 +265,6 @@ namespace rdt {
 		virtual void AttachGuiImpl(GuiTemplate* gui) = 0;
 		virtual void DetachGuiImpl(const GuiTemplate* gui) = 0;
 
-		virtual void UseCameraImpl(const std::string& alias) = 0;
 		virtual void _FlushPolygonImpl(const UniqueID UUID) = 0;
 		
 	};

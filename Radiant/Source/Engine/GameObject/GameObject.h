@@ -9,13 +9,10 @@
 namespace rdt {
 	class RADIANT_API GameObject : public Messenger {
 	private:
-		UniqueID m_ID;
-		UniqueID m_layerID;
-		UniqueID m_realmID;
-
+		struct Impl;
+		Impl* m_impl;
+		
 	protected:
-		UniqueID m_model_ID;
-		GameState GState;
 
 		/*
 			Helper function for child game object classes to add a polygon
@@ -25,29 +22,27 @@ namespace rdt {
 
 	public:
 		GameObject();
-		~GameObject() {}
+		~GameObject();
 
 		/*
 			Gets the Unique ID for this game object.
 		*/
-		const UniqueID GetID() { return m_ID; }
-
-		
+		const UniqueID GetID();
 
 		/*
 			Gets the scene this object belongs to.
 		*/
-		const UniqueID GetLayerID() { return m_layerID; }
+		const UniqueID GetLayerID();
 
 		/*
 			Gets the realm this object belongs to.
 		*/
-		const UniqueID GetRealmID() { return m_realmID; }
+		const UniqueID GetRealmID();
 
 		/*
 			Gets the ID to identify the physics object in the realm.
 		*/
-		const UniqueID GetModelID() { return m_model_ID; }
+		const UniqueID GetModelID();
 
 		/*
 			To implement function when the layer this object belongs to is
@@ -88,11 +83,11 @@ namespace rdt {
 			Binds this game object to an existing scene. This must be done
 			before calling OnBind()
 		*/
-		void RegisterToLayer(const UniqueID nLayerID) { m_layerID = nLayerID; }
+		void RegisterToLayer(const UniqueID nLayerID);
 
 		/*
 			Binds this game object to a realm, where it can communicate with the physics API
 		*/
-		void RegisterToRealm(const UniqueID nRealmID) { m_realmID = nRealmID; }
+		void RegisterToRealm(const UniqueID nRealmID);
 	};
 }

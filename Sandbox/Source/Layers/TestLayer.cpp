@@ -10,12 +10,12 @@ TestLayer::TestLayer(const std::string& alias)
 
 	CreateNewRealm();
 
-	TestQuad* quad1;
-	m_game_objects.push_back(quad1 = new TestQuad("quad3", { 160, 500 }));
-	quad1->RegisterToRealm(m_realms[0]);
-	quad1->RegisterToLayer(GetID());
+	TestQuad* quad3;
+	RegisterGameObject(quad3 = new TestQuad("quad3", { 160, 500 }));
+	quad3->RegisterToRealm(GetRealms()[0]);
+	quad3->RegisterToLayer(GetID());
 
-	m_game_objects.push_back(new MyBeautifulObject("Object1"));
+	RegisterGameObject(new MyBeautifulObject("Object1"));
 }
 
 TestLayer::~TestLayer()

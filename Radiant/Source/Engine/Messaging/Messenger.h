@@ -11,8 +11,9 @@
 namespace rdt {
 	class RADIANT_API Messenger {
 	private:
-		MessageID m_messageID;
-		std::string m_name;
+		struct Impl;
+		Impl* m_impl;
+
 	protected:
 
 		/*
@@ -29,12 +30,12 @@ namespace rdt {
 		/*
 			Gets the MessageID for this object, which can be used to send and receive messages.
 		*/
-		const MessageID GetMessageID() { return m_messageID; }
+		const MessageID GetMessageID();
 
 		/*
 			Gets the registered name for this object (i.e., alias)
 		*/
-		std::string GetName() { return m_name; }
+		std::string GetName();
 
 		/*
 			Send a message through the message bus.
@@ -63,6 +64,6 @@ namespace rdt {
 
 		friend class MessageBus;
 	private:
-		void SetMessageID(MessageID nID) { m_messageID = nID; }
+		void SetMessageID(MessageID nID);
 	};
 }

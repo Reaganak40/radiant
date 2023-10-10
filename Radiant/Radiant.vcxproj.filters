@@ -502,6 +502,10 @@
       <Filter>Vendor\stb</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Graphics\Camera.h" />
+    <ClInclude Include="Source\Engine\Polygon\PolygonImpl.h" />
+    <ClInclude Include="Source\Editor\IconsForkAwesome.h" />
+    <ClInclude Include="Source\Engine\Graphics\OpenGL\FrameBuffer.h" />
+    <ClInclude Include="Source\Engine\Graphics\RenderWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Editor\DevTools.cpp">
@@ -664,6 +668,9 @@
       <Filter>Vendor\stb</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine\Graphics\Camera.cpp" />
+    <ClCompile Include="Source\Engine\Polygon\PolygonImpl.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\OpenGL\FrameBuffer.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\RenderWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Resources\templates\gameObject.h.txt" />

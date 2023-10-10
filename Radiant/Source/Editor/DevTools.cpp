@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "DevTools.h"
+#include "IconsForkAwesome.h"
 
 #include "Messaging/MessageTypes.h"
 #include "Graphics/Renderer.h"
@@ -20,10 +21,8 @@ namespace rdt::core {
 		RegisterToMessageBus("DevLayer");
 
 		EditorLayout* layout;
-		m_GUIs.push_back(layout = new EditorLayout);
+		RegisterGUI(layout = new EditorLayout);
 		layout->SetTheme(Theme_Codz);
-
-		m_showTools = true;
 
 		m_base_directory = Utils::GetCWD();
 		RDT_CORE_INFO("DevTools base directory: {}", m_base_directory);
@@ -51,16 +50,7 @@ namespace rdt::core {
 		}
 
 
-		Renderer::SetBackgroundColor(Color(0.1f, 0.1, 0.1f, 1.0f));
-
-		// Set world camera to a shrunked window
-		Camera* defaultCamera = Renderer::GetCamera();
-		int viewportWidth = 1280;
-		int viewportHeight = 720;
-		int cameraPosX = (((int)Renderer::GetWindowWidth()) / 2) - (viewportWidth / 2);
-		int cameraPosY = (((int)Renderer::GetWindowHeight())) - (viewportHeight) - 30;
-		defaultCamera->SetViewport({ cameraPosX, cameraPosY }, { viewportWidth, viewportHeight });
-		defaultCamera->SetBackgroundColor(Color(173, 216, 230, 255, false));
+		Renderer::SetBackgroundColor({0.2f, 0.2f, 0.2f, 1.0f});
 	}
 	DevLayer::~DevLayer()
 	{
@@ -85,19 +75,15 @@ namespace rdt::core {
 
 	void DevLayer::OnAttach()
 	{
-		if (m_showTools) {
-			for (auto& gui : m_GUIs) {
-				Renderer::AttachGui(gui);
-			}
+		for (auto& gui : GetGUIs()) {
+			Renderer::AttachGui(gui);
 		}
 	}
 
 	void DevLayer::OnDetach()
 	{
-		if (m_showTools) {
-			for (auto& gui : m_GUIs) {
-				Renderer::DetachGui(gui);
-			}
+		for (auto& gui : GetGUIs()) {
+			Renderer::DetachGui(gui);
 		}
 	}
 	void DevLayer::OnMessage(Message msg)
@@ -106,31 +92,63 @@ namespace rdt::core {
 	}
 	void DevLayer::OnProcessInput(const float deltaTime)
 	{
-		if (Input::CheckKeyboardState(controls_ShowTools1) && Input::CheckKeyboardState(controls_ShowTools2)) {
-			
-			if (m_showTools) {
-				for (auto& gui : m_GUIs) {
-					Renderer::DetachGui(gui);
-				}
-			}
-			else {
-				for (auto& gui : m_GUIs) {
-					Renderer::AttachGui(gui);
-				}
-			}
-			m_showTools = !m_showTools;
-		}
-
 		Layer::OnProcessInput(deltaTime);
 	}
 
 	void DevLayer::OnRender()
 	{
-		if (!m_showTools) {
-			return;
-		}
-
 		Layer::OnRender();
+	}
+
+	// ==============================================================================
+
+	constexpr float GameWindowPanelGuiWidth = 1280.0f;
+	constexpr float GameWindowPanelGuiHeight = 741.0f;
+
+	GameWindowPanel::GameWindowPanel()
+	{
+		m_gui_width = GameWindowPanelGuiWidth;
+		m_gui_height = GameWindowPanelGuiHeight;
+		update_pos = true;
+	}
+
+	GameWindowPanel::~GameWindowPanel()
+	{
+	}
+
+	void GameWindowPanel::OnBegin()
+	{
+		// First render config
+		ImGui::SetNextWindowSize(ImVec2(m_gui_width, m_gui_height), ImGuiCond_Appearing);
+		
+		if (update_pos) {
+			ImGui::SetNextWindowPos(ImVec2(m_gui_pos.x, m_gui_pos.y), ImGuiCond_Always);
+			update_pos = false;
+		}
+		
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(1.0f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_ResizeGrip, 0);
+
+		ImGuiWindowFlags flags = 0;
+
+		ImGui::Begin("##GameWindowPanel", (bool*)0, flags);
+		if (ImGui::GetMouseCursor() == ImGuiMouseCursor_ResizeNWSE) {
+			ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
+		}
+	}
+
+	void GameWindowPanel::OnEnd()
+	{
+		ImGui::End();
+		ImGui::PopStyleColor();
+		ImGui::PopStyleVar();
+		ImGui::PopStyleVar();
+	}
+
+	void GameWindowPanel::TriggerUpdatePos()
+	{
+		update_pos = true;
 	}
 
 	// ==============================================================================
@@ -144,20 +162,30 @@ namespace rdt::core {
 	*/
 	constexpr int PanelMargin = 10;
 
-	constexpr float DiagnosticGuiWidth = 290.0f;
+	constexpr float DiagnosticGuiWidth = 300.0f;
 	constexpr float DiagnosticGuiHeight = 105.0f;
 
-	constexpr float ScenePanelGuiWidth = 290.0f;
+	constexpr float ScenePanelGuiWidth = 300.0f;
 	constexpr float ScenePanelGuiHeight = 400.0f;
 
 	constexpr float TemplateWizardGuiWidth = 500.0f;
 	constexpr float TemplateWizardGuiHeight = 575.0f;
+
+	constexpr float GameWindowSettingsPanelWidth = 200.0f;
 
 	EditorLayout::EditorLayout()
 		: m_scene(nullptr), first_render(true), m_templateWizardLaunched(false)
 	{
 		RegisterToMessageBus("EditorLayout");
 		SetTheme(Theme_Codz);
+
+		Renderer::AddRenderWindow(m_game_window_panel = new GameWindowPanel);
+		Renderer::SetDefaultViewport(false);
+		m_showTools = true;
+
+		m_game_window_panel->SetGuiPositionY(88);
+
+		ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
 	}
 	EditorLayout::~EditorLayout()
 	{
@@ -168,24 +196,47 @@ namespace rdt::core {
 
 	void EditorLayout::OnUpdate(const float deltaTime)
 	{
-		for (auto& msg : MessageBus::GetBroadcast("SceneManager")) {
-			switch (msg.type) {
+		auto broadcast = MessageBus::GetBroadcast("SceneManager");
+		if (broadcast == nullptr) {
+			return;
+		}
+
+		for (auto it = begin(*broadcast); it != end(*broadcast); ++it) {
+			switch (it->type) {
 			case MT_SceneChanged:
-				SetScenePtr(((SceneChangedData*)msg.data)->ptr);
+				SetScenePtr(((SceneChangedData*)it->data)->ptr);
 				break;
+			}
+		}
+
+		if (Input::CheckKeyboardState(controls_ShowTools1) && Input::CheckKeyboardState(controls_ShowTools2)) {
+			if (Renderer::UsingDefaultViewport()) {
+				m_showTools = !m_showTools;
 			}
 		}
 	}
 
 	void EditorLayout::OnRender()
 	{
-		
-		ImGui::PushFont(m_fonts[18]);
+		if (!m_showTools) {
+			return;
+		}
 
-		RenderMenuBar();
+		bool isFullscreen = Renderer::UsingDefaultViewport();
+
+		ImGui::PushFont(m_fonts[NunitoSans][18]);
+
+		if (!isFullscreen) {
+			RenderMenuBar();
+		}
+
 		RenderDiagnosticsPanel();
-		RenderScenePanel();
-		RenderTemplateWizard();
+		RenderGameWindowSettingsPanel();
+
+		if (!isFullscreen) {
+			RenderScenePanel();
+			RenderTemplateWizard();
+		}
 
 		ImGui::PopFont();
 	}
@@ -250,20 +301,20 @@ namespace rdt::core {
 
 	void EditorLayout::InitResources(std::string& resourcePath)
 	{
-		std::string ttfFile = (fs::path(resourcePath) / fs::path("NunitoSans_7pt_Condensed-Medium.ttf")).generic_string();
+		fs::path fontFolder = fs::path(resourcePath) / fs::path("fonts");
+		std::string ttfFile;
+		
+		ttfFile = (fontFolder / fs::path("NunitoSans_7pt_Condensed-Medium.ttf")).generic_string();
+		AddFont(NunitoSans, ttfFile, std::vector<unsigned int>{18, 24, 36});
 
-		if (Utils::PathExists(ttfFile)) {
-			GuiManager::LoadFont(NunitoSans, ttfFile);
+		// Load Icons from ForkAwesome
+		ttfFile = (fontFolder / fs::path(FONT_ICON_FILE_NAME_FK)).generic_string();
+		static const ImWchar icons_ranges[] = { ICON_MIN_FK, ICON_MAX_16_FK, 0 };
 
-			m_fonts[18] = GuiManager::GetFont(NunitoSans, 18);
-			m_fonts[24] = GuiManager::GetFont(NunitoSans, 24);
-			m_fonts[36] = GuiManager::GetFont(NunitoSans, 36);
-
-		}
-		else {
-			RDT_CORE_WARN("Could not find file '{}'", ttfFile);
-			return;
-		}
+		GuiManager::LoadIcons(ForkAwesome, ttfFile, icons_ranges);
+		m_fonts[ForkAwesome][36] = GuiManager::GetFont(ForkAwesome, 36);
+		m_fonts[ForkAwesome][13] = GuiManager::GetFont(ForkAwesome, 13);
+		m_fonts[ForkAwesome][18] = GuiManager::GetFont(ForkAwesome, 18);
 
 		fs::path templateFolder = fs::path(resourcePath) / fs::path("templates");
 		if (!fs::is_directory(templateFolder) || !fs::exists(templateFolder)) { 
@@ -290,13 +341,44 @@ namespace rdt::core {
 		m_template_wizard.height = TemplateWizardGuiHeight;
 		m_template_wizard.xPos = (m_window_width / 2) - (m_template_wizard.width / 2);
 		m_template_wizard.yPos = (m_window_height / 2) - (m_template_wizard.height / 2);
+
+		ImGui::PushFont(m_fonts[ForkAwesome][18]);
+		m_game_window_settings_panel.width = GameWindowSettingsPanelWidth;
+		m_game_window_settings_panel.height = GetButtonHeight(ICON_FK_PAUSE) + 20;
+		m_game_window_settings_panel.xPos = GetDockPosX(DockRight, m_game_window_settings_panel.width + m_diagnostics_panel.width + PanelMargin, PanelMargin);
+		m_game_window_settings_panel.yPos = GetDockPosY(DockTop, m_game_window_settings_panel.height, PanelMargin) + m_menu_bar_height;
+		ImGui::PopFont();
+
+		m_game_window_panel->SetGuiPositionY(m_game_window_settings_panel.yPos + m_game_window_settings_panel.height + PanelMargin);
+		m_game_window_panel->TriggerUpdatePos();
 	}
 
-	void EditorLayout::ApplyGuiConfig(const GuiConfig& config)
+	void EditorLayout::AddFont(EditorFont name, std::string& ttfFile, const std::vector<unsigned int>& sizes)
 	{
-		// First render config
-		ImGui::SetNextWindowSize(ImVec2(config.width, config.height), ImGuiCond_Appearing);
-		ImGui::SetNextWindowPos(ImVec2(config.xPos, config.yPos), ImGuiCond_Appearing);
+		if (Utils::PathExists(ttfFile)) {
+			GuiManager::LoadFont(name, ttfFile);
+
+			for (auto size : sizes) {
+				m_fonts[name][size] = GuiManager::GetFont(name, size);
+			}
+		}
+		else {
+			RDT_CORE_WARN("Could not find file '{}'", ttfFile);
+			return;
+		}
+	}
+
+	void EditorLayout::ApplyGuiConfig(GuiConfig& config)
+	{
+		if (config.update) {
+			ImGui::SetNextWindowSize(ImVec2(config.width, config.height), ImGuiCond_Always);
+			ImGui::SetNextWindowPos(ImVec2(config.xPos, config.yPos), ImGuiCond_Always);
+			config.update = false;
+		}
+		else {
+			ImGui::SetNextWindowSize(ImVec2(config.width, config.height), ImGuiCond_Appearing);
+			ImGui::SetNextWindowPos(ImVec2(config.xPos, config.yPos), ImGuiCond_Appearing);
+		}
 	}
 
 	void EditorLayout::SetScenePtr(Scene* ptr)
@@ -418,6 +500,18 @@ namespace rdt::core {
 
 	}
 
+	float EditorLayout::GetButtonWidth(const char* label)
+	{
+		ImGuiStyle& style = ImGui::GetStyle();
+		return ImGui::CalcTextSize(label).x + (style.FramePadding.x * 2);
+	}
+
+	float EditorLayout::GetButtonHeight(const char* label)
+	{
+		ImGuiStyle& style = ImGui::GetStyle();
+		return ImGui::CalcTextSize(label).y + (style.FramePadding.y * 2);
+	}
+
 	bool EditorLayout::ValidTemplateName(const std::string& name, std::string& errorMsg)
 	{
 		if (name.length() == 0) {
@@ -463,13 +557,13 @@ namespace rdt::core {
 		return 0;
 	}
 
-	int EditorLayout::GetDockPosX(Dock docking, int guiWidth, int margin)
+	float EditorLayout::GetDockPosX(Dock docking, float guiWidth, float margin)
 	{
 		switch (docking) {
 		case DockLeft:
 			return margin;
 		case DockRight:
-			return m_window_width - guiWidth - margin;
+			return (float)m_window_width - guiWidth - margin;
 		case DockTop:
 			return 0;
 		case DockBottom:
@@ -479,7 +573,7 @@ namespace rdt::core {
 		return 0;
 	}
 
-	int EditorLayout::GetDockPosY(Dock docking, int guiHeight, int margin)
+	float EditorLayout::GetDockPosY(Dock docking, float guiHeight, float margin)
 	{
 		switch (docking) {
 		case DockLeft:
@@ -489,12 +583,11 @@ namespace rdt::core {
 		case DockTop:
 			return margin;
 		case DockBottom:
-			return m_window_height - guiHeight - margin;
+			return (float)m_window_height - guiHeight - margin;
 		}
 
 		return 0;
 	}
-
 
 	void EditorLayout::RenderMenuBar()
 	{
@@ -560,9 +653,9 @@ namespace rdt::core {
 			else {
 				ImGui::Text("Scene: %s", m_scene->GetName().c_str());
 
-				unsigned int count;
+				size_t count;
 				Layer** layers = m_scene->GetLayers(&count);
-				for (int i = 0; i < count; i++) {
+				for (size_t i = 0; i < count; i++) {
 					AddLayerPanel(layers[i]);
 				}
 			}
@@ -578,9 +671,9 @@ namespace rdt::core {
 
 		if (ImGui::CollapsingHeader(panel_header.c_str())) {
 
-			unsigned int count;
+			size_t count;
 			GameObject** objects = layer->GetGameObjects(&count);
-			for (int i = 0; i < count; i++) {
+			for (size_t i = 0; i < count; i++) {
 				AddGameObjectPanel(objects[i]);
 			}
 		}
@@ -596,6 +689,86 @@ namespace rdt::core {
 			ImGui::Text("This is info about this game object!");
 		}
 		ImGui::Unindent(10);
+	}
+	void EditorLayout::RenderGameWindowSettingsPanel()
+	{
+		ApplyGuiConfig(m_game_window_settings_panel);
+
+		ImGuiWindowFlags windowConfig = 0;
+		windowConfig |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar;
+		
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.7f, 0.7f, 0.7f, 0.9f });
+		ImGui::Begin("##GameWindowSettingsPanel", (bool*)0, windowConfig);
+
+		ImGui::PushFont(m_fonts[ForkAwesome][18]);
+		ImGui::PushStyleColor(ImGuiCol_Button, { 1.0f, 1.0f, 1.0f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.8f, 0.8f, 0.8f, 1.0f });
+
+		/* Play Button */
+		ImGui::PushStyleColor(ImGuiCol_Text, { 0.2, 0.8, 0.2, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.2f, 0.9f, 0.2f, 0.2f });
+		ImGui::SetCursorPos({ 10, 10 });
+		if (ImGui::Button(ICON_FK_PLAY)) {
+
+		}
+		ImGui::PopStyleColor();
+		ImGui::PopStyleColor();
+		ImGui::SameLine();
+
+		/* Pause Button */
+		ImGui::PushStyleColor(ImGuiCol_Text, { 0.8f, 0.2f, 0.2f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.9f, 0.2f, 0.2f, 0.2f });
+		if (ImGui::Button(ICON_FK_PAUSE)) {
+
+		}
+		ImGui::PopStyleColor();
+		ImGui::PopStyleColor();
+		ImGui::SameLine();
+
+		/* Restart Button */
+		ImGui::PushStyleColor(ImGuiCol_Text, { 0.1f, 0.1f, 0.1f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.7f, 0.7f, 0.7f, 0.2f });
+		if (ImGui::Button(ICON_FK_REFRESH)) {
+
+		}
+		ImGui::PopStyleColor();
+		ImGui::PopStyleColor();
+		ImGui::SameLine();
+
+		/* Expand Window Button*/
+		ImGui::PushStyleColor(ImGuiCol_Text, { 0.1f, 0.1f, 0.1f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.7f, 0.7f, 0.7f, 0.2f });
+		ImGui::SetCursorPosX(ImGui::GetWindowWidth() - GetButtonWidth(ICON_FK_PAUSE) - 10);
+		if (Renderer::UsingDefaultViewport()) {
+			if (ImGui::Button(ICON_FK_COMPRESS)) {
+				Renderer::SetDefaultViewport(false);
+				m_diagnostics_panel.yPos = GetDockPosY(DockTop, m_diagnostics_panel.height, PanelMargin) + m_menu_bar_height;
+				m_game_window_settings_panel.xPos = GetDockPosX(DockRight, m_game_window_settings_panel.width + m_diagnostics_panel.width + PanelMargin, PanelMargin);
+				m_game_window_settings_panel.yPos = GetDockPosY(DockTop, m_game_window_settings_panel.height, PanelMargin) + m_menu_bar_height;
+				m_diagnostics_panel.update = true;
+				m_game_window_settings_panel.update = true;
+			}
+		}
+		else {
+			if (ImGui::Button(ICON_FK_EXPAND)) {
+				Renderer::SetDefaultViewport(true);
+				m_showTools = false;
+				m_game_window_settings_panel.yPos = PanelMargin;
+				m_game_window_settings_panel.xPos = GetDockPosX(DockRight, m_game_window_settings_panel.width, PanelMargin);
+				m_diagnostics_panel.yPos = m_game_window_settings_panel.yPos + m_game_window_settings_panel.height + PanelMargin;
+			}
+		}
+		ImGui::PopStyleColor();
+		ImGui::PopStyleColor();
+
+
+		ImGui::PopStyleColor();
+		ImGui::PopStyleColor();
+
+		ImGui::PopFont();
+		
+		ImGui::End();
+		ImGui::PopStyleColor();
 	}
 	void EditorLayout::RenderTemplateWizard()
 	{
@@ -613,10 +786,10 @@ namespace rdt::core {
 			
 			bool createRequested = false;
 
-			ImGui::PushFont(m_fonts[36]);
+			ImGui::PushFont(m_fonts[NunitoSans][36]);
 			AddCenteredText("Template Wizard");
 			ImGui::PopFont();
-			ImGui::PushFont(m_fonts[24]);
+			ImGui::PushFont(m_fonts[NunitoSans][24]);
 			AddCenteredText("-- Create New File -- ");
 			ImGui::NewLine();
 
@@ -695,4 +868,5 @@ namespace rdt::core {
 	
 		ImGui::End();
 	}
+	
 }

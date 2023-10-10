@@ -5,23 +5,14 @@
 
 namespace rdt {
 	enum AspectRatio {
-		AR_16_9
+		AR_16_9 // Window Projection = (1920px, 1080px)
 	};
 
 	class RADIANT_API Camera {
 	private:
-		glm::mat4 m_proj;
-		glm::mat4 m_view;
-		glm::mat4 m_model;
+		struct Impl;
+		Impl* m_impl;
 
-		Vec2i m_viewportPos;
-		Vec2i m_viewportSize;
-
-		Vec2d m_aspectRatio;
-
-		Vec2d m_worldCoords;
-
-		Color m_background_color;
 	public:
 
 		Camera(AspectRatio aspectRatio = AR_16_9);
@@ -31,18 +22,10 @@ namespace rdt {
 		const glm::mat4& GetViewMatrix();
 		const glm::mat4& GetModelMatrix();
 
+		/*
+			Returns the cameras model view projection matrix
+		*/
 		glm::mat4 GetMVP();
-
-		/*
-			Sets the viewport dimensions for this camera, which defines
-			the window view of the application.
-		*/
-		void SetViewport(const Vec2i& viewportPos, const Vec2i& viewportSize);
-
-		/*
-			Gets the viewport from the camera.
-		*/
-		void GetViewport(int* viewportPosX, int* viewportPosY, int* viewportWidth, int* viewportHeight);
 
 		/*
 			Sets the background draw color that is used on clear.
@@ -53,5 +36,16 @@ namespace rdt {
 			Returns the currently bounded background color for this camera.
 		*/
 		const Color& GetBackgroundColor();
+
+		/*
+			Sets the aspect ratio of the camera
+		*/
+		void SetAspectRatio(AspectRatio nAspectRatio);
+
+		/*
+			Returns the pixel dimensions for this camera if it was encapsulated by a viewport or
+			lesser window and we want to maximize the camera view size while maintaining its aspect ratio.
+		*/
+		Vec2f GetCameraDimensionsFromViewport(float viewportWidth, float viewportHeight);
 	};
 }

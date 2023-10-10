@@ -107,6 +107,7 @@
   <ItemGroup>
     <ClInclude Include="Source\Editor\DevTools.h" />
     <ClInclude Include="Source\Editor\Editor.h" />
+    <ClInclude Include="Source\Editor\IconsForkAwesome.h" />
     <ClInclude Include="Source\Engine\Application.h" />
     <ClInclude Include="Source\Engine\Audio\AudioError.h" />
     <ClInclude Include="Source\Engine\Audio\Sound\Sound.h" />
@@ -121,6 +122,7 @@
     <ClInclude Include="Source\Engine\Graphics\Camera.h" />
     <ClInclude Include="Source\Engine\Graphics\Mesh.h" />
     <ClInclude Include="Source\Engine\Graphics\OpenGL\ErrorHandling.h" />
+    <ClInclude Include="Source\Engine\Graphics\OpenGL\FrameBuffer.h" />
     <ClInclude Include="Source\Engine\Graphics\OpenGL\GeoMode.h" />
     <ClInclude Include="Source\Engine\Graphics\OpenGL\IndexBuffer.h" />
     <ClInclude Include="Source\Engine\Graphics\OpenGL\RenderCache.h" />
@@ -131,6 +133,7 @@
     <ClInclude Include="Source\Engine\Graphics\OpenGL\VertexBuffer.h" />
     <ClInclude Include="Source\Engine\Graphics\RenderTypes.h" />
     <ClInclude Include="Source\Engine\Graphics\Renderer.h" />
+    <ClInclude Include="Source\Engine\Graphics\RenderWindow.h" />
     <ClInclude Include="Source\Engine\Graphics\Texture\Texture.h" />
     <ClInclude Include="Source\Engine\Graphics\Texture\TextureManager.h" />
     <ClInclude Include="Source\Engine\Gui\Gui.h" />
@@ -150,6 +153,7 @@
     <ClInclude Include="Source\Engine\Polygon\Circle.h" />
     <ClInclude Include="Source\Engine\Polygon\Line.h" />
     <ClInclude Include="Source\Engine\Polygon\Polygon.h" />
+    <ClInclude Include="Source\Engine\Polygon\PolygonImpl.h" />
     <ClInclude Include="Source\Engine\Polygon\Rect.h" />
     <ClInclude Include="Source\Engine\Polygon\Triangle.h" />
     <ClInclude Include="Source\Engine\Scene\Layer.h" />
@@ -237,6 +241,7 @@
     <ClCompile Include="Source\Engine\GameObject\GameState.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Camera.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\ErrorHandling.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\OpenGL\FrameBuffer.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\GeoMode.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\IndexBuffer.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\RenderCache.cpp" />
@@ -246,6 +251,7 @@
     <ClCompile Include="Source\Engine\Graphics\OpenGL\VertexArray.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\VertexBuffer.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Renderer.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\RenderWindow.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Texture\Texture.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Texture\TextureManager.cpp" />
     <ClCompile Include="Source\Engine\Gui\Gui.cpp" />
@@ -264,6 +270,7 @@
     <ClCompile Include="Source\Engine\Polygon\Circle.cpp" />
     <ClCompile Include="Source\Engine\Polygon\Line.cpp" />
     <ClCompile Include="Source\Engine\Polygon\Polygon.cpp" />
+    <ClCompile Include="Source\Engine\Polygon\PolygonImpl.cpp" />
     <ClCompile Include="Source\Engine\Polygon\Rect.cpp" />
     <ClCompile Include="Source\Engine\Polygon\Triangle.cpp" />
     <ClCompile Include="Source\Engine\Scene\Layer.cpp" />
