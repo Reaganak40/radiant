@@ -15,10 +15,9 @@ namespace rdt {
 	struct Scene::Impl {
 		UniqueID m_ID;
 		std::vector<Layer*> m_layers;
-		bool m_use_default_camera;
 
 		Impl()
-			: m_ID(0), m_use_default_camera(true)
+			: m_ID(0)
 		{
 			if (ADD_DEV_LAYER) {
 				m_layers.push_back(core::DevLayer::GetInstance());
@@ -80,9 +79,6 @@ namespace rdt {
 
 	void Scene::RunRenderQueue()
 	{
-		if (m_impl->m_use_default_camera) {
-			Renderer::UseCamera(); // delcares using the default camera
-		}
 
 		for (auto it = m_impl->m_layers.rbegin(); it != m_impl->m_layers.rend(); ++it)
 		{
@@ -92,11 +88,6 @@ namespace rdt {
 
 			(*it)->OnRender();
 		}
-	}
-
-	void Scene::DontUseDefaultCamera()
-	{
-		m_impl->m_use_default_camera = false;
 	}
 
 	void Scene::AddLayer(Layer* nLayer)

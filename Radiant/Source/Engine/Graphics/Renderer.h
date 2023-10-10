@@ -26,11 +26,6 @@ namespace rdt {
 		virtual ~Renderer();
 
 		/*
-			Sets the default camera
-		*/
-		void SetDefaultCamera(Camera* defaultCamera);
-
-		/*
 			Gets the binded render windows
 		*/
 		std::unordered_map<int, RenderWindow*>& GetRenderWindows();
@@ -212,21 +207,9 @@ namespace rdt {
 		static void DetachGui(const GuiTemplate* gui) { m_instance->DetachGuiImpl(gui); }
 
 		/*
-			Adds a camera to the renderer instance, which can be used to create
-			multiple viewports and perspectives.
-		*/
-		static void AddCamera(const std::string& alias, Camera* nCamera);
-
-		/*
 			Gets a camera pointer from the camera map.
 		*/
-		static Camera* GetCamera(const std::string& cameraName = "");
-
-		/*
-			Called once per frame to declare a camera to be used. In most cases, only
-			one camera should be used.
-		*/
-		static void UseCamera(const std::string& alias = "") { m_instance->UseCameraImpl(alias); }
+		static Camera& GetCamera();
 
 		// *****************************************************
 		// 
@@ -270,7 +253,6 @@ namespace rdt {
 		virtual void AttachGuiImpl(GuiTemplate* gui) = 0;
 		virtual void DetachGuiImpl(const GuiTemplate* gui) = 0;
 
-		virtual void UseCameraImpl(const std::string& alias) = 0;
 		virtual void _FlushPolygonImpl(const UniqueID UUID) = 0;
 		
 	};

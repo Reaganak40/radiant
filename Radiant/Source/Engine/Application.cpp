@@ -62,8 +62,8 @@ namespace rdt {
 		Renderer::CreateRadiantWindow(m_impl->m_config.appName);
 		Input::Initialize();
 
-		Camera* defaultCamera = Renderer::GetCamera();
-		defaultCamera->SetBackgroundColor(m_impl->m_config.backgroundColor);
+		Renderer::GetCamera().SetAspectRatio(m_impl->m_config.cameraAspectRatio);
+		Renderer::GetCamera().SetBackgroundColor(m_impl->m_config.backgroundColor);
 	}
 
 	void Application::Run()

@@ -124,6 +124,10 @@ namespace rdt {
 		Vec2f(float nX = 0, float nY = 0)
 			: x(nX), y(nY) {}
 		
+		/*
+				Returns a zero vector.
+			*/
+		static Vec2f Zero();
 	};
 
 

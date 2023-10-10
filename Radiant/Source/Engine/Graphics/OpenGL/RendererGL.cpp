@@ -123,9 +123,7 @@ namespace rdt::core {
         // Setup Camera (model view project matrix)
         m_screen_origin = Vec3f(0.0f, 0.0f, 0.0f);
         
-        SetDefaultCamera(new Camera(AR_16_9));
-        
-        glm::mat4 mvp = GetCamera()->GetMVP();
+        glm::mat4 mvp = GetCamera().GetMVP();
         SetShader(m_shaders[0]->GetID());
         m_shaders[0]->SetUniform<glm::mat4>("uMVP", mvp);
 
@@ -218,8 +216,11 @@ namespace rdt::core {
             
             /* Update window dimensions and setup viewport */
             Vec2d windowDimensions = window->UpdateAndGetWindowSize();
+            Vec2f cameraDimensions = GetCamera().GetCameraDimensionsFromViewport(windowDimensions.x, windowDimensions.y);
             fbo.Rescale(windowDimensions.x, windowDimensions.y);
-            SetViewport({ 0, 0, (int)windowDimensions.x, (int)windowDimensions.y });
+            int midX = (windowDimensions.x / 2) - (cameraDimensions.x / 2);
+            int midY = (windowDimensions.y / 2) - (cameraDimensions.y / 2);
+            SetViewport({ midX, midY, (int)cameraDimensions.x, (int)cameraDimensions.y });
 
             /* Attach framebuffer texture to ImGui window context. */
             window->OnRender();
@@ -446,16 +447,6 @@ namespace rdt::core {
         }
     }
 
-    void RendererGL::UseCameraImpl(const std::string& alias)
-    {
-        Camera* camera = GetCamera(alias);
-
-        if (camera == nullptr) {
-            return;
-        }
-        m_selected_cameras.insert(camera);
-    }
-
     void RendererGL::_FlushPolygonImpl(const UniqueID UUID)
     {
         m_render_cache.Flush(UUID);
@@ -464,9 +455,9 @@ namespace rdt::core {
     void RendererGL::DrawContext()
     {
         SetShader(m_shaders[0]->GetID());
-        glm::mat4 mvp = GetCamera()->GetMVP();
+        glm::mat4 mvp = GetCamera().GetMVP();
         m_shaders[0]->SetUniform<glm::mat4>("uMVP", mvp);
-        Clear(m_current_viewport, GetCamera()->GetBackgroundColor());
+        Clear(m_current_viewport, GetCamera().GetBackgroundColor());
         
         for (auto& layer : m_layers) {
             layer.CompileBatches();

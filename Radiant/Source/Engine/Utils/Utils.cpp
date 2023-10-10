@@ -17,27 +17,7 @@ namespace rdt {
 
 
     namespace Utils {
-        double ApplyEpsilon(double d)
-        {
-            if (d > 0) {
-                if (abs(d) - abs(floor(d)) < FLOAT_EPSILON) {
-                    return floor(d);
-                }
-                else if ((abs(ceil(d)) - abs(d)) < FLOAT_EPSILON) {
-                    return ceil(d);
-                }
-            }
-            else if (d < 0) {
-                if (abs(d) - abs(ceil(d)) < FLOAT_EPSILON) {
-                    return ceil(d);
-                }
-                else if ((abs(floor(d)) - abs(d)) < FLOAT_EPSILON) {
-                    return floor(d);
-                }
-            }
-
-            return d;
-        }
+        
         Vec2i GetRatio(unsigned int x, unsigned int y)
         {
             int gcd = GCD(x, y);

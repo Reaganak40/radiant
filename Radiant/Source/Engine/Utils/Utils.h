@@ -15,9 +15,32 @@ namespace rdt {
         static double Radians_Right = 0;
 
         /*
-            Rounds the double to resolve inprecision in float math.
+            Rounds the floating point number to resolve inprecision in float math.
         */
-        double ApplyEpsilon(double d);
+        template<typename T>
+        T ApplyEpsilon(T d)
+        {
+            {
+                if (d > 0) {
+                    if (abs(d) - abs(floor(d)) < (T)FLOAT_EPSILON) {
+                        return floor(d);
+                    }
+                    else if ((abs(ceil(d)) - abs(d)) < (T)FLOAT_EPSILON) {
+                        return ceil(d);
+                    }
+                }
+                else if (d < 0) {
+                    if (abs(d) - abs(ceil(d)) < (T)FLOAT_EPSILON) {
+                        return ceil(d);
+                    }
+                    else if ((abs(floor(d)) - abs(d)) < (T)FLOAT_EPSILON) {
+                        return floor(d);
+                    }
+                }
+
+                return d;
+            }
+        }
 
         /*
             Returns the integer ratio of x and y.

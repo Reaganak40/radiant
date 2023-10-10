@@ -35,14 +35,6 @@ namespace rdt {
 		*/
 		void OnMessage(Message msg) override {}
 
-	protected:
-		
-		/*
-			When this function is called, the render call internals for this Scene instance will
-			not tell the renderer to use the default camera, thus it is up to the scene child
-			to choose the right camera manually.
-		*/
-		void DontUseDefaultCamera();
 	public:
 		Scene();
 		~Scene();

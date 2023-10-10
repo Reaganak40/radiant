@@ -22,6 +22,9 @@ namespace rdt {
 		const glm::mat4& GetViewMatrix();
 		const glm::mat4& GetModelMatrix();
 
+		/*
+			Returns the cameras model view projection matrix
+		*/
 		glm::mat4 GetMVP();
 
 		/*
@@ -33,5 +36,16 @@ namespace rdt {
 			Returns the currently bounded background color for this camera.
 		*/
 		const Color& GetBackgroundColor();
+
+		/*
+			Sets the aspect ratio of the camera
+		*/
+		void SetAspectRatio(AspectRatio nAspectRatio);
+
+		/*
+			Returns the pixel dimensions for this camera if it was encapsulated by a viewport or
+			lesser window and we want to maximize the camera view size while maintaining its aspect ratio.
+		*/
+		Vec2f GetCameraDimensionsFromViewport(float viewportWidth, float viewportHeight);
 	};
 }

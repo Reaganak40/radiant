@@ -142,7 +142,6 @@ namespace rdt::core {
 		void SetPolygonTextureImpl(const std::string& texName, unsigned int atlasX = 0, unsigned int atlasY = 0) override final;
 		void AttachGuiImpl(GuiTemplate* gui) override final;
 		void DetachGuiImpl(const GuiTemplate* gui) override final;
-		void UseCameraImpl(const std::string& alias) override final;
 
 		void _FlushPolygonImpl(const UniqueID UUID) override final;
 
