@@ -6,6 +6,7 @@ namespace rdt {
 	class RenderWindow : public GuiTemplate {
 	private:
 		void* m_texture;
+		Vec2d m_textureSize;
 	public:
 		RenderWindow();
 		~RenderWindow();

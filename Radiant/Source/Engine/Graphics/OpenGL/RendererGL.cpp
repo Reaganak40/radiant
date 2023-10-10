@@ -82,7 +82,6 @@ namespace rdt::core {
         glfwMaximizeWindow(m_window);
         glfwGetWindowSize(m_window, &m_window_width, &m_window_height);
         m_default_viewport = glViewportData(0, 0, m_window_width, m_window_height);
-        m_draw_default_viewport = false;
 
         /* Make the window's context current */
         glfwMakeContextCurrent(m_window);
@@ -180,9 +179,6 @@ namespace rdt::core {
 
     void RendererGL::OnUpdateImpl(const float deltaTime)
     {
-        for (const auto& gui : m_GUIs) {
-            gui->OnUpdate(deltaTime);
-        }
     }
 
     void RendererGL::RenderImpl()
@@ -201,36 +197,38 @@ namespace rdt::core {
         }
 
         /*
-            Step 2: DrawContext for default viewport and render windows.
+            Step 2: DrawContext for default viewport or render windows.
         */
 
-        if (m_draw_default_viewport) {
+        if (UsingDefaultViewport()) {
             SetViewport(m_default_viewport);
             DrawContext();
         }
+        else {
+            for (auto& [id, window] : GetRenderWindows()) {
 
-        for (auto& [id, window] : GetRenderWindows()) {
-
-            auto& fbo = m_frame_buffers.at(id);
-            window->OnBegin();
+                auto& fbo = m_frame_buffers.at(id);
+                window->OnBegin();
             
-            /* Update window dimensions and setup viewport */
-            Vec2d windowDimensions = window->UpdateAndGetWindowSize();
-            Vec2f cameraDimensions = GetCamera().GetCameraDimensionsFromViewport(windowDimensions.x, windowDimensions.y);
-            fbo.Rescale(windowDimensions.x, windowDimensions.y);
-            int midX = (windowDimensions.x / 2) - (cameraDimensions.x / 2);
-            int midY = (windowDimensions.y / 2) - (cameraDimensions.y / 2);
-            SetViewport({ midX, midY, (int)cameraDimensions.x, (int)cameraDimensions.y });
+                /* Update window dimensions and setup viewport */
+                Vec2d windowDimensions = window->UpdateAndGetWindowSize();
+                Vec2f cameraDimensions = GetCamera().GetCameraDimensionsFromViewport(windowDimensions.x, windowDimensions.y);
+                fbo.Rescale(windowDimensions.x, windowDimensions.y);
+                int midX = (windowDimensions.x / 2) - (cameraDimensions.x / 2);
+                int midY = (windowDimensions.y / 2) - (cameraDimensions.y / 2);
+                SetViewport({ midX, midY, (int)cameraDimensions.x, (int)cameraDimensions.y });
 
-            /* Attach framebuffer texture to ImGui window context. */
-            window->OnRender();
-            window->OnEnd();
+                /* Attach framebuffer texture to ImGui window context. */
+                window->OnRender();
+                window->OnEnd();
 
-            /* Use framebuffer to draw in window. */
-            SetFBO(fbo.GetID());
-            DrawContext();
+                /* Use framebuffer to draw in window. */
+                SetFBO(fbo.GetID());
+                DrawContext();
+            }
+            SetFBO(0);
         }
-        SetFBO(0);
+
 
         /*
             Step 3: Run the GUI render queue.

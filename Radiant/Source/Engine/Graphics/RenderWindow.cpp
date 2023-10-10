@@ -28,15 +28,13 @@ namespace rdt {
 	Vec2d RenderWindow::UpdateAndGetWindowSize()
 	{
         // we access the ImGui window size
-        m_gui_width = ImGui::GetContentRegionAvail().x;
-        m_gui_height = ImGui::GetContentRegionAvail().y;
+        m_textureSize = ImGui::GetContentRegionAvail();
 		
-		return { m_gui_width, m_gui_height };
+		return m_textureSize;
 	}
 
 	void RenderWindow::OnRender()
 	{
-
         // we get the screen position of the window
         ImVec2 pos = ImGui::GetCursorScreenPos();
 
@@ -45,11 +43,10 @@ namespace rdt {
         ImGui::GetWindowDrawList()->AddImage(
 			m_texture,
             ImVec2(pos.x, pos.y),
-            ImVec2(pos.x + m_gui_width, pos.y + m_gui_height),
+            ImVec2(pos.x + m_textureSize.x, pos.y + m_textureSize.y),
             ImVec2(0, 1),
             ImVec2(1, 0)
         );
-
 	}
 
 	void RenderWindow::OnEnd()

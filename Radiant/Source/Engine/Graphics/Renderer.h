@@ -211,6 +211,18 @@ namespace rdt {
 		*/
 		static Camera& GetCamera();
 
+		/*
+			Sets the default viewport to be used or not. When it is used, the game window
+			will fill to the dimensions of the application window. If false, the game window
+			will be rendered within registered RenderWindows.
+		*/
+		static void SetDefaultViewport(bool use);
+
+		/*
+			Returns true if the default viewport should be used for render windows.
+		*/
+		static bool UsingDefaultViewport();
+
 		// *****************************************************
 		// 
 		//			     Renderer Core Engine Calls

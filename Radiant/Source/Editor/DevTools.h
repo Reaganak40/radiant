@@ -12,15 +12,11 @@ namespace rdt::core {
 
 	class DevLayer : public Layer {
 	private:
-		bool m_showTools;
 		std::string m_base_directory;
 		std::string m_projectName;
 		std::string m_resources_filepath;
 
 		ConfigReader m_config;
-
-		const std::vector<InputState> controls_ShowTools1{CTRL_KEY_DOWN};
-		const std::vector<InputState> controls_ShowTools2{T_KEY_PRESS};
 
 		DevLayer();
 		~DevLayer();
@@ -50,10 +46,22 @@ namespace rdt::core {
 
 	private:
 	};
-	
 
 	// =====================================================================================
 
+	class GameWindowPanel : public RenderWindow {
+	private:
+		bool update_pos;
+	public:
+		GameWindowPanel();
+		~GameWindowPanel();
+
+		void OnBegin() override final;
+		void OnEnd() override final;
+		void TriggerUpdatePos();
+	};
+
+	// =====================================================================================
 	/*
 		Editor Themes Implementation
 	*/
@@ -78,18 +86,10 @@ namespace rdt::core {
 		ImVec4 PopupBackground;
 	};
 
-	class GameWindowPanel : public RenderWindow {
-	private:
-		bool update_pos;
-	public:
-		GameWindowPanel();
-		~GameWindowPanel();
-
-		void OnBegin() override final;
-		void OnEnd() override final;
-		void TriggerUpdatePos();
-	};
-
+	// =====================================================================================
+	/*
+		Editor Layout Implementation
+	*/
 	class EditorLayout : public GuiTemplate, public Messenger {
 	private:
 		/*
@@ -106,6 +106,10 @@ namespace rdt::core {
 		int m_template_selection_index;
 		char m_template_name[60];
 		bool m_template_name_edited;
+
+		bool m_showTools;
+		const std::vector<InputState> controls_ShowTools1{ CTRL_KEY_DOWN };
+		const std::vector<InputState> controls_ShowTools2{ T_KEY_PRESS };
 
 		std::unordered_map<EditorFont, std::unordered_map<unsigned int, ImFont*>> m_fonts;
 
@@ -124,6 +128,7 @@ namespace rdt::core {
 			float yPos = 0;
 			float width = 0;
 			float height = 0;
+			bool update = false;
 		};
 
 		enum TemplateType {
@@ -158,7 +163,7 @@ namespace rdt::core {
 	private:
 		void OnFirstRender();
 		void AddFont(EditorFont name, std::string& ttfFile, const std::vector<unsigned int>& sizes);
-		void ApplyGuiConfig(const GuiConfig& config);
+		void ApplyGuiConfig(GuiConfig& config);
 		void SetScenePtr(Scene* ptr);
 		void AddCenteredText(const std::string& text);
 		void InactiveButtonBegin();

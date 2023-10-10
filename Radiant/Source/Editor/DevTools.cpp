@@ -24,8 +24,6 @@ namespace rdt::core {
 		RegisterGUI(layout = new EditorLayout);
 		layout->SetTheme(Theme_Codz);
 
-		m_showTools = true;
-
 		m_base_directory = Utils::GetCWD();
 		RDT_CORE_INFO("DevTools base directory: {}", m_base_directory);
 
@@ -77,19 +75,15 @@ namespace rdt::core {
 
 	void DevLayer::OnAttach()
 	{
-		if (m_showTools) {
-			for (auto& gui : GetGUIs()) {
-				Renderer::AttachGui(gui);
-			}
+		for (auto& gui : GetGUIs()) {
+			Renderer::AttachGui(gui);
 		}
 	}
 
 	void DevLayer::OnDetach()
 	{
-		if (m_showTools) {
-			for (auto& gui : GetGUIs()) {
-				Renderer::DetachGui(gui);
-			}
+		for (auto& gui : GetGUIs()) {
+			Renderer::DetachGui(gui);
 		}
 	}
 	void DevLayer::OnMessage(Message msg)
@@ -98,37 +92,23 @@ namespace rdt::core {
 	}
 	void DevLayer::OnProcessInput(const float deltaTime)
 	{
-		if (Input::CheckKeyboardState(controls_ShowTools1) && Input::CheckKeyboardState(controls_ShowTools2)) {
-			
-			if (m_showTools) {
-				for (auto& gui : GetGUIs()) {
-					Renderer::DetachGui(gui);
-				}
-			}
-			else {
-				for (auto& gui : GetGUIs()) {
-					Renderer::AttachGui(gui);
-				}
-			}
-			m_showTools = !m_showTools;
-		}
-
 		Layer::OnProcessInput(deltaTime);
 	}
 
 	void DevLayer::OnRender()
 	{
-		if (!m_showTools) {
-			return;
-		}
-
 		Layer::OnRender();
 	}
 
 	// ==============================================================================
 
+	constexpr float GameWindowPanelGuiWidth = 1280.0f;
+	constexpr float GameWindowPanelGuiHeight = 741.0f;
+
 	GameWindowPanel::GameWindowPanel()
 	{
+		m_gui_width = GameWindowPanelGuiWidth;
+		m_gui_height = GameWindowPanelGuiHeight;
 		update_pos = true;
 	}
 
@@ -200,6 +180,9 @@ namespace rdt::core {
 		SetTheme(Theme_Codz);
 
 		Renderer::AddRenderWindow(m_game_window_panel = new GameWindowPanel);
+		Renderer::SetDefaultViewport(false);
+		m_showTools = true;
+
 		m_game_window_panel->SetGuiPositionY(88);
 
 		ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
@@ -225,18 +208,35 @@ namespace rdt::core {
 				break;
 			}
 		}
+
+		if (Input::CheckKeyboardState(controls_ShowTools1) && Input::CheckKeyboardState(controls_ShowTools2)) {
+			if (Renderer::UsingDefaultViewport()) {
+				m_showTools = !m_showTools;
+			}
+		}
 	}
 
 	void EditorLayout::OnRender()
 	{
-		
+		if (!m_showTools) {
+			return;
+		}
+
+		bool isFullscreen = Renderer::UsingDefaultViewport();
+
 		ImGui::PushFont(m_fonts[NunitoSans][18]);
 
-		RenderMenuBar();
+		if (!isFullscreen) {
+			RenderMenuBar();
+		}
+
 		RenderDiagnosticsPanel();
-		RenderScenePanel();
 		RenderGameWindowSettingsPanel();
-		RenderTemplateWizard();
+
+		if (!isFullscreen) {
+			RenderScenePanel();
+			RenderTemplateWizard();
+		}
 
 		ImGui::PopFont();
 	}
@@ -368,11 +368,17 @@ namespace rdt::core {
 		}
 	}
 
-	void EditorLayout::ApplyGuiConfig(const GuiConfig& config)
+	void EditorLayout::ApplyGuiConfig(GuiConfig& config)
 	{
-		// First render config
-		ImGui::SetNextWindowSize(ImVec2(config.width, config.height), ImGuiCond_Appearing);
-		ImGui::SetNextWindowPos(ImVec2(config.xPos, config.yPos), ImGuiCond_Appearing);
+		if (config.update) {
+			ImGui::SetNextWindowSize(ImVec2(config.width, config.height), ImGuiCond_Always);
+			ImGui::SetNextWindowPos(ImVec2(config.xPos, config.yPos), ImGuiCond_Always);
+			config.update = false;
+		}
+		else {
+			ImGui::SetNextWindowSize(ImVec2(config.width, config.height), ImGuiCond_Appearing);
+			ImGui::SetNextWindowPos(ImVec2(config.xPos, config.yPos), ImGuiCond_Appearing);
+		}
 	}
 
 	void EditorLayout::SetScenePtr(Scene* ptr)
@@ -733,8 +739,24 @@ namespace rdt::core {
 		ImGui::PushStyleColor(ImGuiCol_Text, { 0.1f, 0.1f, 0.1f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.7f, 0.7f, 0.7f, 0.2f });
 		ImGui::SetCursorPosX(ImGui::GetWindowWidth() - GetButtonWidth(ICON_FK_PAUSE) - 10);
-		if (ImGui::Button(ICON_FK_EXPAND)) {
-
+		if (Renderer::UsingDefaultViewport()) {
+			if (ImGui::Button(ICON_FK_COMPRESS)) {
+				Renderer::SetDefaultViewport(false);
+				m_diagnostics_panel.yPos = GetDockPosY(DockTop, m_diagnostics_panel.height, PanelMargin) + m_menu_bar_height;
+				m_game_window_settings_panel.xPos = GetDockPosX(DockRight, m_game_window_settings_panel.width + m_diagnostics_panel.width + PanelMargin, PanelMargin);
+				m_game_window_settings_panel.yPos = GetDockPosY(DockTop, m_game_window_settings_panel.height, PanelMargin) + m_menu_bar_height;
+				m_diagnostics_panel.update = true;
+				m_game_window_settings_panel.update = true;
+			}
+		}
+		else {
+			if (ImGui::Button(ICON_FK_EXPAND)) {
+				Renderer::SetDefaultViewport(true);
+				m_showTools = false;
+				m_game_window_settings_panel.yPos = PanelMargin;
+				m_game_window_settings_panel.xPos = GetDockPosX(DockRight, m_game_window_settings_panel.width, PanelMargin);
+				m_diagnostics_panel.yPos = m_game_window_settings_panel.yPos + m_game_window_settings_panel.height + PanelMargin;
+			}
 		}
 		ImGui::PopStyleColor();
 		ImGui::PopStyleColor();

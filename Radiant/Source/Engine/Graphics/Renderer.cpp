@@ -20,7 +20,10 @@ namespace rdt {
 		std::unordered_map<int, RenderWindow*> m_render_windows;
 		static int RenderWindowID;
 
+		bool m_use_default_viewport;
+
 		Impl()
+			: m_use_default_viewport(true)
 		{
 		}
 
@@ -77,5 +80,15 @@ namespace rdt {
 	Camera& Renderer::GetCamera()
 	{
 		return m_instance->m_impl->m_camera;
+	}
+
+	void Renderer::SetDefaultViewport(bool use)
+	{
+		m_instance->m_impl->m_use_default_viewport = use;
+	}
+
+	bool Renderer::UsingDefaultViewport()
+	{
+		return m_instance->m_impl->m_use_default_viewport;
 	}
 }

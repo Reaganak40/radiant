@@ -54,7 +54,6 @@ namespace rdt::core {
 
 		Color m_clear_color;
 
-		bool m_draw_default_viewport;
 		// *****************************************************
 		// 
 		//			  Opengl renderering dependables
