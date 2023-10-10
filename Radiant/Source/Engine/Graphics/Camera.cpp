@@ -25,6 +25,10 @@ namespace rdt {
 				cameraWindowWidth = 1920.0f;
 				cameraWindowHeight = 1080.0f;
 				break;
+			case AR_1_1:
+				cameraWindowWidth = 1000.0f;
+				cameraWindowHeight = 1000.0f;
+				break;
 			}
 			m_worldCoords = { 0, 0 };
 
@@ -53,6 +57,10 @@ namespace rdt {
 				cameraWindowWidth = 1920.0f;
 				cameraWindowHeight = 1080.0f;
 				break;
+			case AR_1_1:
+				cameraWindowWidth = 1000.0f;
+				cameraWindowHeight = 1000.0f;
+				break;
 			}
 
 			m_proj = glm::ortho(0.0f, cameraWindowWidth, 0.0f, cameraWindowHeight, -1.0f, 1.0f);
@@ -67,6 +75,9 @@ namespace rdt {
 			case AR_16_9:
 				dimensions.x = (16.0f / 9.0f) * dimensions.y;
 				break;
+			case AR_1_1:
+				dimensions.x = dimensions.y;
+				break;
 			}
 			dimensions.x = Utils::ApplyEpsilon(dimensions.x);
 			dimensions.y = Utils::ApplyEpsilon(dimensions.y);
@@ -76,6 +87,9 @@ namespace rdt {
 				switch (m_aspectRatio) {
 				case AR_16_9:
 					dimensions.y = (9 / 16.0f) * dimensions.x;
+					break;
+				case AR_1_1:
+					dimensions.y = dimensions.x;
 					break;
 				}
 				dimensions.x = Utils::ApplyEpsilon(dimensions.x);

@@ -5,7 +5,8 @@
 
 namespace rdt {
 	enum AspectRatio {
-		AR_16_9 // Window Projection = (1920px, 1080px)
+		AR_16_9, // Window Projection = (1920px, 1080px)
+		AR_1_1,  // Window Projection = (1000px, 1000px)
 	};
 
 	class RADIANT_API Camera {

@@ -95,7 +95,11 @@ namespace rdt {
         /*
             Returns the minimum between two doubles
         */
-        double Min(double x, double y);
+        template<typename T>
+        T Min(T x, T y)
+        {
+            return (x > y ? y : x);
+        }
 
         /*
             Swaps the contents of the two values.

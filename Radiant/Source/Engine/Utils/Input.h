@@ -1,5 +1,5 @@
 #pragma once
-#include "pch.h"
+#include "Core.h"
 #include "MathTypes.h"
 #include "BitSet.h"
 
@@ -165,7 +165,7 @@ namespace rdt {
 // 120 frames = ~2 seconds of stored input
 #define STATE_CACHE_SIZE 120
 
-    class Input {
+    class RADIANT_API Input {
     private:
         Input();
         ~Input();

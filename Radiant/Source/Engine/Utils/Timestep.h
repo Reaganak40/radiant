@@ -1,4 +1,5 @@
 #pragma once
+#include "Core.h"
 #include "pch.h"
 
 namespace rdt {
@@ -25,7 +26,7 @@ namespace rdt {
 		}
 	};
 
-	class Timer {
+	class RADIANT_API Timer {
 	private:
 		float m_maxTime;
 		float m_timeLeft;

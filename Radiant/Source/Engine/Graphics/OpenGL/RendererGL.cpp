@@ -201,7 +201,13 @@ namespace rdt::core {
         */
 
         if (UsingDefaultViewport()) {
-            SetViewport(m_default_viewport);
+            Clear(m_default_viewport, BLACK);
+
+            Vec2d windowDimensions = { (double)m_default_viewport.width, (double)m_default_viewport.height };
+            Vec2f cameraDimensions = GetCamera().GetCameraDimensionsFromViewport(windowDimensions.x, windowDimensions.y);
+            int midX = (windowDimensions.x / 2) - (cameraDimensions.x / 2);
+            int midY = (windowDimensions.y / 2) - (cameraDimensions.y / 2);
+            SetViewport({ midX, midY, (int)cameraDimensions.x, (int)cameraDimensions.y });
             DrawContext();
         }
         else {

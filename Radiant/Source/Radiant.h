@@ -9,6 +9,7 @@
 #include "Engine/Graphics/Renderer.h"
 #include "Engine/Messaging/MessageBus.h"
 #include "Engine/Physics/Physics.h"
+#include "Engine/Utils/Utils.h"
 // -------------------------------------------
 
 // -- Game Developer APIs --------------------
