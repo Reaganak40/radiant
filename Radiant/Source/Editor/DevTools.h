@@ -2,6 +2,7 @@
 #include "Scene/Layer.h"
 #include "Utils/Input.h"
 #include "Utils/ConfigReader.h"
+#include "Graphics/RenderWindow.h"
 
 namespace rdt::core {
 
@@ -77,6 +78,18 @@ namespace rdt::core {
 		ImVec4 PopupBackground;
 	};
 
+	class GameWindowPanel : public RenderWindow {
+	private:
+		bool update_pos;
+	public:
+		GameWindowPanel();
+		~GameWindowPanel();
+
+		void OnBegin() override final;
+		void OnEnd() override final;
+		void TriggerUpdatePos();
+	};
+
 	class EditorLayout : public GuiTemplate, public Messenger {
 	private:
 		/*
@@ -122,10 +135,12 @@ namespace rdt::core {
 		/*
 			Panels
 		*/
+		GameWindowPanel* m_game_window_panel;
+
 		GuiConfig m_diagnostics_panel;
 		GuiConfig m_scene_panel;
 		GuiConfig m_template_wizard;
-		GuiConfig m_game_window_panel;
+		GuiConfig m_game_window_settings_panel;
 
 	public:
 		EditorLayout();
@@ -179,7 +194,7 @@ namespace rdt::core {
 		void AddLayerPanel(Layer* layer);
 		void AddGameObjectPanel(GameObject* gobject);
 		// =======================================================
-		void RenderGameWindowPanel();
+		void RenderGameWindowSettingsPanel();
 		// =======================================================
 		void RenderTemplateWizard();
 		// =======================================================

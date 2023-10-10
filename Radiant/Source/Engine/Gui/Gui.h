@@ -20,10 +20,6 @@ namespace rdt {
 		*/
 		void SetGuiDimensions(int nGuiWidth, int nGuiHeight);
 
-		/*
-			Sets the position of the Gui
-		*/
-		void SetGuiPosition(float nX, float nY);
 
 		/*
 			Gui template internal procedures to be called before rendering.
@@ -31,6 +27,13 @@ namespace rdt {
 		void PrepareRender();
 
 	public:
+		/*
+			Sets the position of the Gui
+		*/
+		void SetGuiPosition(float nX, float nY);
+		void SetGuiPositionX(float nX);
+		void SetGuiPositionY(float nY);
+
 		GuiTemplate();
 		~GuiTemplate();
 

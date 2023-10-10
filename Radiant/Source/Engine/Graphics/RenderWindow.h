@@ -27,6 +27,11 @@ namespace rdt {
 
 		void OnRender() override final;
 
+		/*
+			Called before OnRender to customize RenderWindows. This MUST call ImGui::End()
+		*/
+		virtual void OnEnd();
+
 	private:
 	};
 }

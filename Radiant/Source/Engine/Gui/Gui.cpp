@@ -14,6 +14,16 @@ namespace rdt {
 		m_gui_pos.y = nY;
 	}
 
+	void GuiTemplate::SetGuiPositionX(float nX)
+	{
+		m_gui_pos.x = nX;
+	}
+
+	void GuiTemplate::SetGuiPositionY(float nY)
+	{
+		m_gui_pos.y = nY;
+	}
+
 	void GuiTemplate::PrepareRender()
 	{
 		// First render config

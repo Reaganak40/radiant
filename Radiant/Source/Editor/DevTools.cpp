@@ -53,9 +53,6 @@ namespace rdt::core {
 
 
 		Renderer::SetBackgroundColor({0.2f, 0.2f, 0.2f, 1.0f});
-
-		Renderer::AddRenderWindow(new RenderWindow);
-
 	}
 	DevLayer::~DevLayer()
 	{
@@ -130,6 +127,52 @@ namespace rdt::core {
 
 	// ==============================================================================
 
+	GameWindowPanel::GameWindowPanel()
+	{
+		update_pos = true;
+	}
+
+	GameWindowPanel::~GameWindowPanel()
+	{
+	}
+
+	void GameWindowPanel::OnBegin()
+	{
+		// First render config
+		ImGui::SetNextWindowSize(ImVec2(m_gui_width, m_gui_height), ImGuiCond_Appearing);
+		
+		if (update_pos) {
+			ImGui::SetNextWindowPos(ImVec2(m_gui_pos.x, m_gui_pos.y), ImGuiCond_Always);
+			update_pos = false;
+		}
+		
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(1.0f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_ResizeGrip, 0);
+
+		ImGuiWindowFlags flags = 0;
+
+		ImGui::Begin("##GameWindowPanel", (bool*)0, flags);
+		if (ImGui::GetMouseCursor() == ImGuiMouseCursor_ResizeNWSE) {
+			ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
+		}
+	}
+
+	void GameWindowPanel::OnEnd()
+	{
+		ImGui::End();
+		ImGui::PopStyleColor();
+		ImGui::PopStyleVar();
+		ImGui::PopStyleVar();
+	}
+
+	void GameWindowPanel::TriggerUpdatePos()
+	{
+		update_pos = true;
+	}
+
+	// ==============================================================================
+
 	/*
 		Editor Gui Implementation
 	*/
@@ -148,13 +191,18 @@ namespace rdt::core {
 	constexpr float TemplateWizardGuiWidth = 500.0f;
 	constexpr float TemplateWizardGuiHeight = 575.0f;
 
-	constexpr float GameWindowPanelWidth = 200.0f;
+	constexpr float GameWindowSettingsPanelWidth = 200.0f;
 
 	EditorLayout::EditorLayout()
 		: m_scene(nullptr), first_render(true), m_templateWizardLaunched(false)
 	{
 		RegisterToMessageBus("EditorLayout");
 		SetTheme(Theme_Codz);
+
+		Renderer::AddRenderWindow(m_game_window_panel = new GameWindowPanel);
+		m_game_window_panel->SetGuiPositionY(88);
+
+		ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
 	}
 	EditorLayout::~EditorLayout()
 	{
@@ -187,7 +235,7 @@ namespace rdt::core {
 		RenderMenuBar();
 		RenderDiagnosticsPanel();
 		RenderScenePanel();
-		RenderGameWindowPanel();
+		RenderGameWindowSettingsPanel();
 		RenderTemplateWizard();
 
 		ImGui::PopFont();
@@ -295,11 +343,14 @@ namespace rdt::core {
 		m_template_wizard.yPos = (m_window_height / 2) - (m_template_wizard.height / 2);
 
 		ImGui::PushFont(m_fonts[ForkAwesome][18]);
-		m_game_window_panel.width = GameWindowPanelWidth;
-		m_game_window_panel.height = GetButtonHeight(ICON_FK_PAUSE) + 20;
-		m_game_window_panel.xPos = GetDockPosX(DockRight, m_game_window_panel.width + m_diagnostics_panel.width + PanelMargin, PanelMargin);
-		m_game_window_panel.yPos = GetDockPosY(DockTop, m_game_window_panel.height, PanelMargin) + m_menu_bar_height;
+		m_game_window_settings_panel.width = GameWindowSettingsPanelWidth;
+		m_game_window_settings_panel.height = GetButtonHeight(ICON_FK_PAUSE) + 20;
+		m_game_window_settings_panel.xPos = GetDockPosX(DockRight, m_game_window_settings_panel.width + m_diagnostics_panel.width + PanelMargin, PanelMargin);
+		m_game_window_settings_panel.yPos = GetDockPosY(DockTop, m_game_window_settings_panel.height, PanelMargin) + m_menu_bar_height;
 		ImGui::PopFont();
+
+		m_game_window_panel->SetGuiPositionY(m_game_window_settings_panel.yPos + m_game_window_settings_panel.height + PanelMargin);
+		m_game_window_panel->TriggerUpdatePos();
 	}
 
 	void EditorLayout::AddFont(EditorFont name, std::string& ttfFile, const std::vector<unsigned int>& sizes)
@@ -633,15 +684,15 @@ namespace rdt::core {
 		}
 		ImGui::Unindent(10);
 	}
-	void EditorLayout::RenderGameWindowPanel()
+	void EditorLayout::RenderGameWindowSettingsPanel()
 	{
-		ApplyGuiConfig(m_game_window_panel);
+		ApplyGuiConfig(m_game_window_settings_panel);
 
 		ImGuiWindowFlags windowConfig = 0;
 		windowConfig |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar;
 		
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.7f, 0.7f, 0.7f, 0.9f });
-		ImGui::Begin("##GameWindowPanel", (bool*)0, windowConfig);
+		ImGui::Begin("##GameWindowSettingsPanel", (bool*)0, windowConfig);
 
 		ImGui::PushFont(m_fonts[ForkAwesome][18]);
 		ImGui::PushStyleColor(ImGuiCol_Button, { 1.0f, 1.0f, 1.0f, 1.0f });
@@ -795,4 +846,5 @@ namespace rdt::core {
 	
 		ImGui::End();
 	}
+	
 }

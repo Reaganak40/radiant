@@ -50,6 +50,10 @@ namespace rdt {
             ImVec2(1, 0)
         );
 
+	}
+
+	void RenderWindow::OnEnd()
+	{
         ImGui::End();
 	}
 

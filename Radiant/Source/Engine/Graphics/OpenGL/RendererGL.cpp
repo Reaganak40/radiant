@@ -223,6 +223,7 @@ namespace rdt::core {
 
             /* Attach framebuffer texture to ImGui window context. */
             window->OnRender();
+            window->OnEnd();
 
             /* Use framebuffer to draw in window. */
             SetFBO(fbo.GetID());
