@@ -69,21 +69,21 @@ namespace rdt {
 		/*
 			Sets an existing objects properties in the physical world.
 		*/
-		static void SetObjectProperties(const UniqueID realmID, const UniqueID objectID, const unsigned int nProperties) {
+		static void SetObjectProperties(const UniqueID realmID, const UniqueID objectID, PhysicalProperties nProperties) {
 			m_instance->SetObjectPropertiesImpl(realmID, objectID, nProperties);
 		}
 
 		/*
 			Removes an existing objects properties in the physical world.
 		*/
-		static void RemoveObjectProperties(const UniqueID realmID, const UniqueID objectID, const unsigned int rProperties) {
+		static void RemoveObjectProperties(const UniqueID realmID, const UniqueID objectID, PhysicalProperties rProperties) {
 			m_instance->RemoveObjectPropertiesImpl(realmID, objectID, rProperties);
 		}
 
 		/*
 			Returns true if the queried object has any of the specified properties.
 		*/
-		static bool QueryObjectProperties(const UniqueID realmID, const UniqueID objectID, const unsigned int propertyQuery) {
+		static bool QueryObjectProperties(const UniqueID realmID, const UniqueID objectID, PhysicalProperties propertyQuery) {
 			return m_instance->QueryObjectPropertiesImpl(realmID, objectID, propertyQuery);
 		}
 
@@ -91,6 +91,9 @@ namespace rdt {
 			Gets a const reference to the polygon indiciated by the Unique identifier.
 		*/
 		static const Polygon& GetPolygon(const UniqueID realmID, const UniqueID objectID) { return m_instance->GetPolygonImpl(realmID, objectID); }
+
+
+		static void CreatePtag(const std::string& tagName, PhysicalProperties tagProperties = NoProperties) { m_instance->CreatePtagImpl(tagName, tagProperties); }
 
 		/*
 			Adds a tag to the physics object, which will be used to interact with other objects.
@@ -165,12 +168,13 @@ private:
 
 		const Polygon& GetPolygonImpl(const UniqueID realmID, const UniqueID objectID);
 
-		void SetObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, const unsigned int nProperties);
-		void RemoveObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, const unsigned int nProperties);
-		bool QueryObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, const unsigned int propertyQuery);
+		void SetObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, PhysicalProperties nProperties);
+		void RemoveObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, PhysicalProperties nProperties);
+		bool QueryObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, PhysicalProperties propertyQuery);
 
 		UniqueID CreateObjectImpl(const UniqueID realmID, const MessageID messageID, std::shared_ptr<Polygon> polygon);
 		
+		void CreatePtagImpl(const std::string& tagName, PhysicalProperties tagProperties);
 		void AddPTagImpl(const std::string& tagName, const UniqueID realmID, const UniqueID objectID);
 		void SetAccelerationImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nAcceleration);
 		void SetAccelerationXImpl(const UniqueID realmID, const UniqueID objectID, const double nX);

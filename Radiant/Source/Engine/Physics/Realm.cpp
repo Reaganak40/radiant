@@ -26,9 +26,24 @@ namespace rdt::core {
             if (!object1.HasProperties(NoCollision)) {
 
                 for (auto& [id2, object2] : m_objects) {
-                    if (id1 == id2 || !object1.ShareTags(object2)) {
+                    if (id1 == id2) {
                         continue;
                     }
+
+                    std::vector<UniqueID> sharedTags;
+                    if (object1.GetSharedTags(object2, sharedTags)) {
+                        bool skip = false;
+                        for (auto tagID : sharedTags) {
+                            if (PtagManager::GetTag(tagID).HasProperties(NoCollision)) {
+                                skip = true;
+                                break;
+                            }
+                        }
+                        if (skip) {
+                            continue;
+                        }
+                    }
+                    
 
                     if (Collision::CheckCollision(object1, object2, deltaTime)) {
                         MessageBus::AddToQueue(m_object_mIDs[id2], m_object_mIDs[id1], MT_Collision, new CollisionData(id2));
@@ -55,7 +70,7 @@ namespace rdt::core {
         m_objects[objectID] = Pobject(polygon);
         m_object_mIDs[objectID] = messageID;
         
-        m_objects.at(objectID).translation.SetGravity(m_gravity);
+        m_objects.at(objectID).SetGravity(m_gravity);
         return objectID;
     }
 
@@ -72,7 +87,7 @@ namespace rdt::core {
     {
         m_gravity = mps2;
         for (auto& [id, object] : m_objects) {
-            object.translation.SetGravity(m_gravity);
+            object.SetGravity(m_gravity);
         }
     }
 }

@@ -89,5 +89,7 @@ namespace rdt {
 			Binds this game object to a realm, where it can communicate with the physics API
 		*/
 		void RegisterToRealm(const UniqueID nRealmID);
+
+
 	};
 }

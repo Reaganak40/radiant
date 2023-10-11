@@ -172,6 +172,9 @@ namespace rdt {
         else if (key >= GLFW_KEY_RIGHT && key <= GLFW_KEY_UP) {
             flag = RIGHT_KEY_PRESS + (key - GLFW_KEY_RIGHT) * 3;
         }
+        else if (key == GLFW_KEY_SPACE) {
+            flag = SPACE_KEY_PRESS;
+        }
         else if (key == GLFW_KEY_LEFT_CONTROL) {
             flag = CTRL_KEY_PRESS;
         }

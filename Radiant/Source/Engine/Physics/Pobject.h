@@ -4,11 +4,6 @@
 #include "Ptag.h"
 
 namespace rdt {
-	enum PhysicalProperties {
-		NoCollision = 1,
-		ppBouncy = 2,
-		DontResolve = 4,
-	};
 
 	class Physics;
 }
@@ -20,9 +15,9 @@ namespace rdt::core {
 	private:
 		std::shared_ptr<Polygon> m_polygon;
 		Translation translation;
-		unsigned int m_properties;
+		PhysicalProperties m_properties;
 
-		std::set<Ptag> m_tags;
+		std::set<UniqueID> m_tags;
 		Vec2d m_hitbox_size;
 	public:
 		
@@ -34,15 +29,17 @@ namespace rdt::core {
 
 		void GetHitBox(std::vector<Vec2d>& vertices) const;
 
-		void SetProperties(const unsigned int nProperties);
-		void RemoveProperties(const unsigned int rProperties);
-		bool HasProperties(const unsigned int propertyQuery);
+		void SetProperties(PhysicalProperties nProperties);
+		void RemoveProperties(PhysicalProperties rProperties);
+		bool HasProperties(PhysicalProperties propertyQuery);
 
-		void AddTag(Ptag ntag);
+		void AddTag(UniqueID ntag);
 
-		bool ShareTags(const Pobject& oObject);
+		bool GetSharedTags(const Pobject& oObject, std::vector<UniqueID>& tags);
 
 		void SetHitBoxSize(const Vec2d& nSize);
+
+		void SetGravity(double mps2);
 
 
 		friend class Realm;

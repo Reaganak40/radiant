@@ -36,7 +36,7 @@ namespace rdt {
             return *object->m_polygon;
         }
 
-        void SetObjectProperties(const UniqueID realmID, const UniqueID objectID, const unsigned int nProperties)
+        void SetObjectProperties(const UniqueID realmID, const UniqueID objectID, PhysicalProperties nProperties)
         {
             if (m_realms.find(realmID) == m_realms.end()) {
                 return;
@@ -50,7 +50,7 @@ namespace rdt {
             object->SetProperties(nProperties);
         }
 
-        void RemoveObjectProperties(const UniqueID realmID, const UniqueID objectID, const unsigned int rProperties)
+        void RemoveObjectProperties(const UniqueID realmID, const UniqueID objectID, PhysicalProperties rProperties)
         {
             if (m_realms.find(realmID) == m_realms.end()) {
                 return;
@@ -64,7 +64,7 @@ namespace rdt {
             object->RemoveProperties(rProperties);
         }
 
-        bool QueryObjectProperties(const UniqueID realmID, const UniqueID objectID, const unsigned int propertyQuery)
+        bool QueryObjectProperties(const UniqueID realmID, const UniqueID objectID, PhysicalProperties propertyQuery)
         {
             if (m_realms.find(realmID) == m_realms.end()) {
                 return false;
@@ -97,12 +97,12 @@ namespace rdt {
                 return;
             }
 
-            Ptag ntag;
-            if ((ntag = PtagManager::GetTag(tagName)) == 0) {
-                ntag = PtagManager::CreateTag(tagName);
+            UniqueID nPtag;
+            if ((nPtag = PtagManager::GetTagID(tagName)) == 0) {
+                nPtag = PtagManager::CreateTag(tagName);
             }
 
-            object->AddTag(ntag);
+            object->AddTag(nPtag);
         }
 
         void SetAcceleration(const UniqueID realmID, const UniqueID objectID, const Vec2d& nAcceleration)
@@ -328,17 +328,17 @@ namespace rdt {
         return m_impl->GetPolygon(realmID, objectID);
     }
 
-    void Physics::SetObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, const unsigned int nProperties)
+    void Physics::SetObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, PhysicalProperties nProperties)
     {
         m_impl->SetObjectProperties(realmID, objectID, nProperties);
     }
 
-    void Physics::RemoveObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, const unsigned int rProperties)
+    void Physics::RemoveObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, PhysicalProperties rProperties)
     {
         m_impl->RemoveObjectProperties(realmID, objectID, rProperties);
     }
 
-    bool Physics::QueryObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, const unsigned int propertyQuery)
+    bool Physics::QueryObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, PhysicalProperties propertyQuery)
     {
         return m_impl->QueryObjectProperties(realmID, objectID, propertyQuery);
     }
@@ -346,6 +346,11 @@ namespace rdt {
     UniqueID Physics::CreateObjectImpl(const UniqueID realmID, const MessageID messageID, std::shared_ptr<Polygon> polygon)
     {
         return m_impl->CreateObject(realmID, messageID, polygon);
+    }
+
+    void Physics::CreatePtagImpl(const std::string& tagName, PhysicalProperties tagProperties)
+    {
+        PtagManager::GetTag(PtagManager::CreateTag(tagName)).SetProperties(tagProperties);
     }
 
     void Physics::AddPTagImpl(const std::string& tagName, const UniqueID realmID, const UniqueID objectID)

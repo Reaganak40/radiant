@@ -3,7 +3,7 @@
 
 namespace rdt::core {
 	Pobject::Pobject(std::shared_ptr<Polygon> polygon)
-		: m_polygon(polygon), translation(Vec2d(0, 0), Vec2d(0, 0)), m_properties(0), m_hitbox_size(1, 1)
+		: m_polygon(polygon), translation(Vec2d(0, 0), Vec2d(0, 0)), m_properties(NoProperties), m_hitbox_size(1, 1)
 	{
 	}
 
@@ -37,25 +37,29 @@ namespace rdt::core {
 		}
 	}
 
-	void Pobject::SetProperties(const unsigned int nProperties)
+	void Pobject::SetProperties(PhysicalProperties nProperties)
 	{
 		m_properties |= nProperties;
+
+		if (bool(nProperties & ppNoGravity)) {
+			translation.SetGravity(0);
+		}
 	}
 
-	void Pobject::RemoveProperties(const unsigned int rProperties)
+	void Pobject::RemoveProperties(PhysicalProperties rProperties)
 	{
 		m_properties ^= rProperties;
 	}
-	bool Pobject::HasProperties(const unsigned int propertyQuery)
+	bool Pobject::HasProperties(PhysicalProperties propertyQuery)
 	{
 		return bool(m_properties & propertyQuery);
 	}
 
-	void Pobject::AddTag(Ptag ntag)
+	void Pobject::AddTag(UniqueID ntag)
 	{
 		m_tags.insert(ntag);
 	}
-	bool Pobject::ShareTags(const Pobject& oObject)
+	bool Pobject::GetSharedTags(const Pobject& oObject, std::vector<UniqueID>& tags)
 	{
 		const Pobject* lesser;
 		const Pobject* bigger;
@@ -69,17 +73,26 @@ namespace rdt::core {
 			bigger = &oObject;
 		}
 
+		bool hasSharedTag = false;
 		for (const auto& tag : lesser->m_tags) {
 			if (bigger->m_tags.contains(tag)) {
-				return true;
+				
+				tags.push_back(tag);
+				hasSharedTag = true;
 			}
 		}
 
-		return false;
+		return hasSharedTag;
 	}
 
 	void Pobject::SetHitBoxSize(const Vec2d& nSize)
 	{
 		m_hitbox_size = nSize;
+	}
+	void Pobject::SetGravity(double mps2)
+	{
+		if (!HasProperties(ppNoGravity)) {
+			translation.SetGravity(mps2);
+		}
 	}
 }

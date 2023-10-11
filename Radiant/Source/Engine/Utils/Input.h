@@ -128,6 +128,10 @@ namespace rdt {
         UP_KEY_DOWN,
         UP_KEY_UP,
 
+        SPACE_KEY_PRESS,
+        SPACE_KEY_DOWN,
+        SPACE_KEY_UP,
+
         CTRL_KEY_PRESS,
         CTRL_KEY_DOWN,
         CTRL_KEY_UP,
