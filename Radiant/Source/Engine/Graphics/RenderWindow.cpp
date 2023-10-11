@@ -43,7 +43,7 @@ namespace rdt {
         ImGui::GetWindowDrawList()->AddImage(
 			m_texture,
             ImVec2(pos.x, pos.y),
-            ImVec2(pos.x + m_textureSize.x, pos.y + m_textureSize.y),
+            ImVec2(pos.x + (float)m_textureSize.x, pos.y + (float)m_textureSize.y),
             ImVec2(0, 1),
             ImVec2(1, 0)
         );

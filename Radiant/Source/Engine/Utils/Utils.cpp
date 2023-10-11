@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "Core.h"
 #include "Utils.h"
 #include "Engine/Logging/Log.h"
 

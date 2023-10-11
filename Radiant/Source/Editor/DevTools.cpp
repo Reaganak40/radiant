@@ -705,7 +705,7 @@ namespace rdt::core {
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.8f, 0.8f, 0.8f, 1.0f });
 
 		/* Play Button */
-		ImGui::PushStyleColor(ImGuiCol_Text, { 0.2, 0.8, 0.2, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_Text, { 0.2f, 0.8f, 0.2f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.2f, 0.9f, 0.2f, 0.2f });
 		ImGui::SetCursorPos({ 10, 10 });
 		if (ImGui::Button(ICON_FK_PLAY)) {

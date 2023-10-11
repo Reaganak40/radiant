@@ -167,31 +167,14 @@ namespace rdt {
 
     class RADIANT_API Input {
     private:
+        struct Impl;
+        Impl* m_impl;
+
         Input();
         ~Input();
         static Input* m_instance;
-        float m_timestep;
-
-        GLFWwindow* m_window;
-        
-        // the buffer index where new input is being added.
-        // The last polled input will be m_current_state-1.
-        int m_state_index; 
-
-        float m_timestamps[STATE_CACHE_SIZE];
-        BitSet m_keyboard_state[STATE_CACHE_SIZE];
-        MouseState m_mouse_state[STATE_CACHE_SIZE];
-        WindowState m_window_state[STATE_CACHE_SIZE];
-        bool m_mouse_changed;
 
     public:
-        static Input* GetInstance() {
-            if (m_instance == nullptr) {
-                m_instance = new Input;
-            }
-            return m_instance;
-        }
-
         /* Sets up the input handling with the given glfw window. */
         static void Initialize();
         static void Destroy();

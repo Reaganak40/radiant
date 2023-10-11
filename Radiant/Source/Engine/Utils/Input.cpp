@@ -4,33 +4,148 @@
 #include "Engine/Graphics/Renderer.h"
 
 namespace rdt {
+
+    struct Input::Impl {
+        float m_timestep;
+
+        GLFWwindow* m_window;
+
+        // the buffer index where new input is being added.
+        // The last polled input will be m_current_state-1.
+        int m_state_index;
+
+        float m_timestamps[STATE_CACHE_SIZE];
+        BitSet m_keyboard_state[STATE_CACHE_SIZE];
+        MouseState m_mouse_state[STATE_CACHE_SIZE];
+        WindowState m_window_state[STATE_CACHE_SIZE];
+        bool m_mouse_changed;
+
+        Impl()
+            : m_window(nullptr), m_mouse_changed(false)
+        {
+            m_state_index = 0;
+            m_timestep = 0;
+            for (int i = 0; i < STATE_CACHE_SIZE; i++) {
+                m_keyboard_state[i].SetNewFlagMax(NAIS);
+                m_timestamps[i] = 0.0f;
+            }
+        }
+
+        ~Impl()
+        {
+        }
+
+        bool CheckState(unsigned int* stateQuery, size_t count, unsigned int target)
+        {
+            return m_keyboard_state[(m_state_index - target + STATE_CACHE_SIZE) % STATE_CACHE_SIZE].CheckFlags(stateQuery, count);
+        }
+
+        MouseState GetMouseState()
+        {
+            return m_mouse_state[(m_state_index - 1 + STATE_CACHE_SIZE) % STATE_CACHE_SIZE];
+        }
+
+
+        void PollInputs()
+        {
+            // InputStates follow this order
+            // Key Press = offset 0
+            // Key Down  = offset 1
+            // Key Up    = offset 3
+
+            unsigned int stateQuery[2];
+
+            for (unsigned int stateCode = A_KEY_PRESS; stateCode < (NAIS - 2); stateCode += 3) {
+
+                // if key has not been released
+                if (!m_keyboard_state[m_state_index].CheckFlag(stateCode + 2)) {
+                    stateQuery[0] = stateCode;
+                    stateQuery[1] = stateCode + 1;
+
+                    // if not a key press event
+                    if (CheckState(stateQuery, 2, 1)) {
+
+                        // add key down state
+                        m_keyboard_state[m_state_index].ActivateFlag(stateCode + 1);
+                    }
+                }
+            }
+
+            m_timestamps[m_state_index] = m_timestep;
+
+            // Go to the next buffer in cache arrays
+            m_state_index = (m_state_index + 1) % STATE_CACHE_SIZE;
+            m_keyboard_state[m_state_index].Clear();
+
+            if (!m_mouse_changed) {
+                m_mouse_state[m_state_index] = GetMouseState();
+            }
+            m_mouse_changed = false;
+
+            m_window_state[m_state_index].windowResize = false;
+        }
+
+        bool CheckWindowResize()
+        {
+            return m_window_state[(m_state_index - 1 + STATE_CACHE_SIZE) % STATE_CACHE_SIZE].windowResize;
+        }
+
+        float GetTimeSinceKeyState(unsigned int* stateQuery, size_t count, const float maxTime)
+        {
+            int index = (m_state_index - 1 + STATE_CACHE_SIZE) % STATE_CACHE_SIZE;
+            float current = 0.0f;
+            float limit = Utils::Max(0, m_timestamps[index] - maxTime);
+
+            do {
+                if (m_keyboard_state[index].CheckFlags(stateQuery, count)) {
+                    return current;
+                }
+                float timeLapsed = m_timestamps[index];
+                index = (index - 1 + STATE_CACHE_SIZE) % STATE_CACHE_SIZE;
+                current += timeLapsed - m_timestamps[index];
+            } while (m_timestamps[index] > limit && index != m_state_index);
+
+            return maxTime;
+        }
+
+        Vec2d GetMouseCoords(MouseCond cond) {
+            MouseState ms = GetMouseState();
+
+            if (cond == SCREEN_COORDS) {
+                return ms.position;
+            }
+
+            ms.position.y = Renderer::GetWindowHeight() - ms.position.y;
+            return ms.position + Renderer::GetCameraCoordinates2D();
+        }
+    };
+
+    // =============================================================================
+
     Input* Input::m_instance = nullptr;
 
     Input::Input()
-        : m_window(nullptr), m_mouse_changed(false)
+        : m_impl(new Input::Impl)
     {
-        m_state_index = 0;
-        m_timestep = 0;
-        for (int i = 0; i < STATE_CACHE_SIZE; i++) {
-            m_keyboard_state[i].SetNewFlagMax(NAIS);
-        }
+       
     }
 
     Input::~Input()
     {
+        delete m_impl;
     }
 
 
     void Input::Initialize()
     {
         Destroy();
-        GetInstance();
-        m_instance->m_window = (GLFWwindow*)Renderer::GetWindowInstance();
-
-        glfwSetKeyCallback(m_instance->m_window, Input::KeyCallback);
-        glfwSetCursorPosCallback(m_instance->m_window, Input::CursorPositionCallback);
-        glfwSetMouseButtonCallback(m_instance->m_window, Input::MouseButtonCallback);
-        glfwSetWindowSizeCallback(m_instance->m_window, Input::WindowSizeCallback);
+        m_instance = new Input;
+        
+        m_instance->m_impl->m_window = (GLFWwindow*)Renderer::GetWindowInstance();
+        glfwSetKeyCallback(m_instance->m_impl->m_window, Input::KeyCallback);
+        glfwSetCursorPosCallback(m_instance->m_impl->m_window, Input::CursorPositionCallback);
+        glfwSetMouseButtonCallback(m_instance->m_impl->m_window, Input::MouseButtonCallback);
+        glfwSetWindowSizeCallback(m_instance->m_impl->m_window, Input::WindowSizeCallback);
     }
 
     void Input::Destroy()
@@ -75,16 +190,16 @@ namespace rdt {
             return;
         }
 
-        m_instance->m_keyboard_state[m_instance->m_state_index].ActivateFlag(flag);
+        m_instance->m_impl->m_keyboard_state[m_instance->m_impl->m_state_index].ActivateFlag(flag);
 
     }
 
     void Input::CursorPositionCallback(GLFWwindow* window, double xpos, double ypos)
     {
         ImGui_ImplGlfw_CursorPosCallback(window, xpos, ypos);
-        m_instance->m_mouse_state[m_instance->m_state_index].position.x = xpos;
-        m_instance->m_mouse_state[m_instance->m_state_index].position.y = ypos;
-        m_instance->m_mouse_changed = true;
+        m_instance->m_impl->m_mouse_state[m_instance->m_impl->m_state_index].position.x = xpos;
+        m_instance->m_impl->m_mouse_state[m_instance->m_impl->m_state_index].position.y = ypos;
+        m_instance->m_impl->m_mouse_changed = true;
     }
 
     void Input::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
@@ -95,7 +210,7 @@ namespace rdt {
     void Input::WindowSizeCallback(GLFWwindow* window, int width, int height)
     {
         glViewport(0, 0, width, height);
-        m_instance->m_window_state[m_instance->m_state_index].windowResize = true;
+        m_instance->m_impl->m_window_state[m_instance->m_impl->m_state_index].windowResize = true;
     }
 
     bool Input::CheckKeyboardState(const std::vector<InputState>& stateQuery, unsigned int targetFrame)
@@ -105,91 +220,35 @@ namespace rdt {
 
     void Input::UpdateTimeImpl(const float deltaTime)
     {
-        m_timestep += deltaTime;
+        m_impl->m_timestep += deltaTime;
     }
 
     void Input::PollInputsImpl()
     {
-        // InputStates follow this order
-        // Key Press = offset 0
-        // Key Down  = offset 1
-        // Key Up    = offset 3
-
-        unsigned int stateQuery[2];
-
-        for (unsigned int stateCode = A_KEY_PRESS; stateCode < (NAIS-2); stateCode += 3) {
-
-            // if key has not been released
-            if (!m_keyboard_state[m_state_index].CheckFlag(stateCode + 2)) {
-                stateQuery[0] = stateCode;
-                stateQuery[1] = stateCode + 1;
-
-                // if not a key press event
-                if (CheckStateImpl(stateQuery, 2, 1)) {
-                    
-                    // add key down state
-                    m_keyboard_state[m_state_index].ActivateFlag(stateCode + 1);
-                }
-            }
-        }
-
-        m_timestamps[m_state_index] = m_timestep;
-
-        // Go to the next buffer in cache arrays
-        m_state_index = (m_state_index + 1) % STATE_CACHE_SIZE;
-        m_keyboard_state[m_state_index].Clear();
-
-        if (!m_mouse_changed) {
-            m_mouse_state[m_state_index] = GetMouseStateImpl();
-        }
-        m_mouse_changed = false;
-
-        m_window_state[m_state_index].windowResize = false;
-
+        m_impl->PollInputs();
     }
 
     bool Input::CheckStateImpl(unsigned int* stateQuery, size_t count, unsigned int target)
     {
-        return m_keyboard_state[(m_state_index - target + STATE_CACHE_SIZE) % STATE_CACHE_SIZE].CheckFlags(stateQuery, count);
+        return m_impl->CheckState(stateQuery, count, target);
     }
 
     MouseState Input::GetMouseStateImpl()
     {
-        return m_mouse_state[(m_state_index - 1 + STATE_CACHE_SIZE) % STATE_CACHE_SIZE];
+        return m_impl->GetMouseState();
     }
 
     bool Input::CheckWindowResizeImpl()
     {
-        return m_window_state[(m_state_index - 1 + STATE_CACHE_SIZE) % STATE_CACHE_SIZE].windowResize;
+        return m_impl->CheckWindowResize();
     }
 
     float Input::GetTimeSinceKeyStateImpl(unsigned int* stateQuery, size_t count, const float maxTime)
     {
-        int index = (m_state_index - 1 + STATE_CACHE_SIZE) % STATE_CACHE_SIZE;
-        float current = 0.0f;
-        float limit =  Utils::Max(0, m_timestamps[index] - maxTime);
-
-        do {
-            if (m_keyboard_state[index].CheckFlags(stateQuery, count)) {
-                return current;
-            }
-            float timeLapsed = m_timestamps[index];
-            index = (index - 1 + STATE_CACHE_SIZE) % STATE_CACHE_SIZE;
-            current += timeLapsed - m_timestamps[index];
-        } while (m_timestamps[index] > limit && index != m_state_index);
-
-        return maxTime;
+        return m_impl->GetTimeSinceKeyState(stateQuery, count, maxTime);
     }
 
     Vec2d Input::GetMouseCoordsImpl(MouseCond cond) {
-        MouseState ms = GetMouseStateImpl();
-
-        if (cond == SCREEN_COORDS) {
-            return ms.position;
-        }
-
-        ms.position.y = Renderer::GetWindowHeight() - ms.position.y;
-        return ms.position + Renderer::GetCameraCoordinates2D();
+        return m_impl->GetMouseCoords(cond);
     }
-
 }

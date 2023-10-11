@@ -13,10 +13,10 @@ namespace rdt::core {
 		Vec2d m_current_velocity;
 		bool m_has_max_velocity;
 		Vec2d m_max_velocity;
-
 		Vec2d m_acceleration;
-
 		double m_friction;
+		
+		Vec2d m_gravity;
 	public:
 
 		Translation(Vec2d initial_velocity = Vec2d(), Vec2d initial_acceleration = Vec2d());
@@ -37,6 +37,11 @@ namespace rdt::core {
 			Sets the current velocity to the provided vector.
 		*/
 		void SetVelocity(const Vec2d nVelocity);
+
+		/*
+			Sets the gravitational force (in accleration per second squared).
+		*/
+		void SetGravity(double nGravity);
 
 		/*
 			Gets the current velocity vector.

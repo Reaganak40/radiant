@@ -98,6 +98,10 @@ namespace rdt {
 		static void AddPTag(const UniqueID realmID, const UniqueID objectID, const std::string& tagName) { m_instance->AddPTagImpl(tagName, realmID, objectID); }
 		
 		/*
+			Adds a graviational force to the realm, measured by its accelration ("meters" per second squared)
+		*/
+		static void SetGravity(const UniqueID realmID, double mps2) { m_instance->SetGravityImpl(realmID, mps2); }
+		/*
 			Sets the friction magnitude of the specified object. [0 to 1], where 0 is
 			no friction, and 1 is maximum friction.
 		*/
@@ -173,6 +177,7 @@ private:
 		void SetAccelerationYImpl(const UniqueID realmID, const UniqueID objectID, const double nY);
 		void SetVelocityImpl(const UniqueID realmID, const UniqueID objectID, Vec2d& nVelocity);
 		void SetMaximumVelocityImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nMaxVelocity);
+		void SetGravityImpl(const UniqueID realmID, double mps2);
 		void SetFrictionImpl(const UniqueID realmID, const UniqueID objectID, const double friction);
 		void SetPositionImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nPosition);
 		void SetRotationImpl(const UniqueID realmID, const UniqueID objectID, const double nRadians);

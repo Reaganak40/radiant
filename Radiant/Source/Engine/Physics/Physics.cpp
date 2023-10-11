@@ -175,6 +175,15 @@ namespace rdt {
             object->translation.SetMaxVelocity(nMaxVelocity);
         }
 
+        void SetGravity(const UniqueID realmID, double mps2)
+        {
+            if (m_realms.find(realmID) == m_realms.end()) {
+                return;
+            }
+
+            m_realms.at(realmID)->SetGravity(mps2);
+        }
+
         void SetFriction(const UniqueID realmID, const UniqueID objectID, const double friction)
         {
             if (m_realms.find(realmID) == m_realms.end()) {
@@ -367,6 +376,11 @@ namespace rdt {
     void Physics::SetMaximumVelocityImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nMaxVelocity)
     {
         m_impl->SetMaximumVelocity(realmID, objectID, nMaxVelocity);
+    }
+
+    void Physics::SetGravityImpl(const UniqueID realmID, double mps2)
+    {
+        m_impl->SetGravity(realmID, mps2);
     }
 
     void Physics::SetFrictionImpl(const UniqueID realmID, const UniqueID objectID, const double friction)

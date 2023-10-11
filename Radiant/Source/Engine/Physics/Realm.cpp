@@ -6,7 +6,7 @@
 namespace rdt::core {
 
     Realm::Realm()
-        : m_ID(GetUniqueID())
+        : m_ID(GetUniqueID()), m_gravity(0)
     {
     }
 
@@ -54,6 +54,8 @@ namespace rdt::core {
         UniqueID objectID = GetUniqueID();
         m_objects[objectID] = Pobject(polygon);
         m_object_mIDs[objectID] = messageID;
+        
+        m_objects.at(objectID).translation.SetGravity(m_gravity);
         return objectID;
     }
 
@@ -64,5 +66,13 @@ namespace rdt::core {
         }
 
         return &m_objects.at(UUID);
+    }
+
+    void Realm::SetGravity(double mps2)
+    {
+        m_gravity = mps2;
+        for (auto& [id, object] : m_objects) {
+            object.translation.SetGravity(m_gravity);
+        }
     }
 }

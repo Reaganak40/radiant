@@ -13,17 +13,21 @@ namespace rdt::core {
 		std::unordered_map<UniqueID, Pobject> m_objects;
 		std::unordered_map<MessageID, UniqueID> m_object_mIDs;
 
+		double m_gravity;
 	public:
 		Realm();
 		~Realm();
 
 		void OnUpdate(const float deltaTime);
 		void OnEndFrame();
+		
 		const UniqueID GetUUID() { return m_ID; }
 
 		const UniqueID CreatePhysicsObject(std::shared_ptr<Polygon> polygon, const MessageID messageID);
 		Pobject* GetPhysicsObject(const UniqueID UUID);
 
+		void SetGravity(double mps2);
+		
 		friend class Physics;
 	};
 }

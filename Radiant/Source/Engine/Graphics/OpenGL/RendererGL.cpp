@@ -164,7 +164,12 @@ namespace rdt::core {
         m_frame_buffers[id];
         auto& fbo = m_frame_buffers.at(id);
         fbo.Init();
+
+#pragma warning( push )
+#pragma warning( disable : 4312)
         nRenderWindow->AssignTexture((void*)fbo.GetTexture());
+#pragma warning( pop ) 
+
     }
 
     void RendererGL::ClearImpl()
@@ -204,10 +209,10 @@ namespace rdt::core {
             Clear(m_default_viewport, BLACK);
 
             Vec2d windowDimensions = { (double)m_default_viewport.width, (double)m_default_viewport.height };
-            Vec2f cameraDimensions = GetCamera().GetCameraDimensionsFromViewport(windowDimensions.x, windowDimensions.y);
-            int midX = (windowDimensions.x / 2) - (cameraDimensions.x / 2);
-            int midY = (windowDimensions.y / 2) - (cameraDimensions.y / 2);
-            SetViewport({ midX, midY, (int)cameraDimensions.x, (int)cameraDimensions.y });
+            Vec2f cameraDimensions = GetCamera().GetCameraDimensionsFromViewport((float)windowDimensions.x, (float)windowDimensions.y);
+            double midX = (windowDimensions.x / 2) - (cameraDimensions.x / 2);
+            double midY = (windowDimensions.y / 2) - (cameraDimensions.y / 2);
+            SetViewport({ (int)midX, (int)midY, (int)cameraDimensions.x, (int)cameraDimensions.y });
             DrawContext();
         }
         else {
@@ -219,7 +224,7 @@ namespace rdt::core {
                 /* Update window dimensions and setup viewport */
                 Vec2d windowDimensions = window->UpdateAndGetWindowSize();
                 Vec2f cameraDimensions = GetCamera().GetCameraDimensionsFromViewport(windowDimensions.x, windowDimensions.y);
-                fbo.Rescale(windowDimensions.x, windowDimensions.y);
+                fbo.Rescale((int)windowDimensions.x, (int)windowDimensions.y);
                 int midX = (windowDimensions.x / 2) - (cameraDimensions.x / 2);
                 int midY = (windowDimensions.y / 2) - (cameraDimensions.y / 2);
                 SetViewport({ midX, midY, (int)cameraDimensions.x, (int)cameraDimensions.y });

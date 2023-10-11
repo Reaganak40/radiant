@@ -1,6 +1,5 @@
 #pragma once
-
-#include "pch.h"
+#include "Core.h"
 #include "MathTypes.h"
 
 namespace rdt {
@@ -65,7 +64,7 @@ namespace rdt {
         /*
             Returns a random int in the range [min, max].
         */
-        int RandInt(const int min, const int max);
+        int RADIANT_API RandInt(const int min, const int max);
 
         /*
             Reads an ASCII text file and returns the contents to the passed reference.
