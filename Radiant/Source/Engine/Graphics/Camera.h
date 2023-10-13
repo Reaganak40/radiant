@@ -48,5 +48,20 @@ namespace rdt {
 			lesser window and we want to maximize the camera view size while maintaining its aspect ratio.
 		*/
 		Vec2f GetCameraDimensionsFromViewport(float viewportWidth, float viewportHeight);
+		
+		/*
+			Centers the camera to focus on the provided coordinates
+		*/
+		void FocusOn(const Vec2d& coords);
+
+		/*
+			Returns the world coordinates of the camera from the bottom left corner.
+		*/
+		Vec2d GetPosition();
+
+		/*
+			Returns the width and height of the camera view window.
+		*/
+		Vec2f GetCameraDimensions();
 	};
 }

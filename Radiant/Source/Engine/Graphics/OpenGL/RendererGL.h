@@ -134,7 +134,7 @@ namespace rdt::core {
 		void EndImpl() override final;
 
 		void SetRenderTypeImpl(core::RenderType type) override final;
-		void AddPolygonImpl(const Polygon& polygon) override final;
+		void AddPolygonImpl(const Polygon& polygon, const Vec2f& offset) override final;
 		void AddLineImpl(const Line& line) override final;
 		void SetLineColorImpl(const Color& color) override final;
 		void SetPolygonColorImpl(const Color& color) override final;

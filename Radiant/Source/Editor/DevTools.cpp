@@ -687,9 +687,17 @@ namespace rdt::core {
 		ImGui::Indent(10);
 		if (ImGui::CollapsingHeader(panel_header.c_str())) {
 
+			ImGui::Text("GameObjectID: %d", gobject->GetID());
 			if (gobject->GetModelID() != 0 && gobject->GetRealmID() != 0) {
+				ImGui::Text("RealmID: %d", gobject->GetRealmID());
+				ImGui::Text("ModelID: %d", gobject->GetModelID());
+
+				Vec2d pos = Physics::GetPosition(gobject->GetRealmID(), gobject->GetModelID());
+				ImGui::Text("Position: (%.2f, %.2f)", pos.x, pos.y);
+
 				Vec2d vel = Physics::GetVelocity(gobject->GetRealmID(), gobject->GetModelID());
 				ImGui::Text("Velocity: (%.2f, %.2f)", vel.x, vel.y);
+
 			}
 			else {
 				ImGui::Text("Not Registered to any realms.");

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "GameObject.h"
 #include "Physics/Physics.h"
+#include "Logging/Log.h"
 
 namespace rdt {
 
@@ -12,15 +13,32 @@ namespace rdt {
 		UniqueID m_model_ID;
 		GameState GState;
 
+		std::shared_ptr<Polygon> m_cached_polygon;
+
 		Impl()
 			: m_ID(GetUniqueID()), m_layerID(0), m_model_ID(0), m_realmID(0)
 		{
+			m_cached_polygon.reset();
 		}
 
 		~Impl()
 		{
 		}
 	};
+
+	void GameObject::RemoveObjectFromWorld()
+	{
+		if (m_impl->m_realmID == 0) {
+			RDT_CORE_WARN("GameObject - Could not remove object with RealmID: 0");
+			return;
+		} else if (m_impl->m_model_ID == 0) {
+			RDT_CORE_WARN("GameObject - Could not remove object with ModelID: 0");
+			return;
+		}
+
+		m_impl->m_cached_polygon = Physics::RemoveObject(m_impl->m_realmID, m_impl->m_model_ID);
+		m_impl->m_model_ID = 0;
+	}
 
 	GameObject::GameObject()
 		: m_impl(new GameObject::Impl)
@@ -54,12 +72,30 @@ namespace rdt {
 
 	void GameObject::AddObjectToWorld(std::shared_ptr<Polygon> polygon)
 	{
+		if (m_impl->m_realmID == 0) {
+			RDT_CORE_WARN("GameObject - Could not add object with RealmID: 0");
+			return;
+		}
+
+		if (m_impl->m_model_ID != 0) {
+			RDT_CORE_WARN("GameObject - Could not add object with in-use ModelID: {}", m_impl->m_model_ID);
+			return;
+		}
+
+		if (polygon == nullptr) {
+			if (m_impl->m_cached_polygon == nullptr) {
+				RDT_CORE_WARN("GameObject - Tried to use cached polygon, but nothing is cached!");
+				return;
+			}
+			polygon = m_impl->m_cached_polygon;
+		}
+
 		m_impl->m_model_ID = Physics::CreateObject(m_impl->m_realmID, GetMessageID(), polygon);
 	}
 
 	void GameObject::OnMessage(Message msg)
 	{
-		printf("Warning: Using Base Class OnMessage!\n");
+		RDT_CORE_WARN("GameObject - Using Base Class OnMessage!");
 	}
 	void GameObject::RegisterToLayer(const UniqueID nLayerID)
 	{

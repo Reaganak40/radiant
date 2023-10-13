@@ -156,9 +156,11 @@ namespace rdt {
 		static void SetRenderType(core::RenderType type) { m_instance->SetRenderTypeImpl(type); }
 
 		/*
-			Adds a polygon to the render queue to be drawn next frame.
+			Adds a polygon to the render queue to be drawn next frame. Use optional
+			offset to move the origin of the polygon an arbitary distance from its
+			current location.
 		*/
-		static void AddPolygon(const Polygon& polygon) { m_instance->AddPolygonImpl(polygon); }
+		static void AddPolygon(const Polygon& polygon, const Vec2f& offset = Vec2f::Zero()) { m_instance->AddPolygonImpl(polygon, offset); }
 
 		/*
 			Adds a line to the render queue to be drawn next frame.
@@ -257,7 +259,7 @@ namespace rdt {
 		virtual void EndImpl() = 0;
 
 		virtual void SetRenderTypeImpl(core::RenderType type) = 0;
-		virtual void AddPolygonImpl(const Polygon& polygon) = 0;
+		virtual void AddPolygonImpl(const Polygon& polygon, const Vec2f& offset) = 0;
 		virtual void AddLineImpl(const Line& line) = 0;
 		virtual void SetLineColorImpl(const Color& color) = 0;
 		virtual void SetPolygonColorImpl(const Color& color) = 0;

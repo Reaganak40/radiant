@@ -67,6 +67,11 @@ namespace rdt {
 		static UniqueID CreateObject(const UniqueID realmID, const MessageID messageID, std::shared_ptr<Polygon> polygon) { return m_instance->CreateObjectImpl(realmID, messageID, polygon); }
 
 		/*
+			Removes an object from the physical world. Returns its polygon for easy reintroduction if desired.
+		*/
+		static std::shared_ptr<Polygon> RemoveObject(const UniqueID realmID, const UniqueID objectID) { return m_instance->RemoveObjectImpl(realmID, objectID); }
+
+		/*
 			Sets an existing objects properties in the physical world.
 		*/
 		static void SetObjectProperties(const UniqueID realmID, const UniqueID objectID, PhysicalProperties nProperties) {
@@ -156,6 +161,11 @@ namespace rdt {
 			Gets the current velocity of the queried object.
 		*/
 		static Vec2d GetVelocity(const UniqueID realmID, const UniqueID objectID) { return m_instance->GetVelocityImpl(realmID, objectID); }
+
+		/*
+			Gets the current position of the queried object
+		*/
+		static Vec2d GetPosition(const UniqueID realmID, const UniqueID objectID) { return m_instance->GetPositionImpl(realmID, objectID); }
 private:
 
 		void OnUpdateImpl(const float deltaTime);
@@ -173,7 +183,8 @@ private:
 		bool QueryObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, PhysicalProperties propertyQuery);
 
 		UniqueID CreateObjectImpl(const UniqueID realmID, const MessageID messageID, std::shared_ptr<Polygon> polygon);
-		
+		std::shared_ptr<Polygon> RemoveObjectImpl(const UniqueID realmID, const UniqueID objectID);
+
 		void CreatePtagImpl(const std::string& tagName, PhysicalProperties tagProperties);
 		void AddPTagImpl(const std::string& tagName, const UniqueID realmID, const UniqueID objectID);
 		void SetAccelerationImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nAcceleration);
@@ -188,5 +199,6 @@ private:
 		void SetHitBoxSizeImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nSize);
 
 		Vec2d GetVelocityImpl(const UniqueID realmID, const UniqueID objectID);
+		Vec2d GetPositionImpl(const UniqueID realmID, const UniqueID objectID);
 	};
 }

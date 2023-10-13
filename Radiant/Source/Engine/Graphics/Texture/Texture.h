@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core.h"
 #include "Utils/UniqueID.h"
 #include "Utils/MathTypes.h"
 
@@ -11,7 +12,7 @@ typedef unsigned int TextureID;
 #define NONE_TEXTURE 1
 
 namespace rdt {
-	class Texture {
+	class RADIANT_API Texture {
 	private:
 		TextureID m_textureID;
 		TextureSlot m_texture_slot;

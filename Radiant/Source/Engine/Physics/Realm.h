@@ -24,6 +24,8 @@ namespace rdt::core {
 		const UniqueID GetUUID() { return m_ID; }
 
 		const UniqueID CreatePhysicsObject(std::shared_ptr<Polygon> polygon, const MessageID messageID);
+		std::shared_ptr<Polygon> DestroyPhysicsObject(const UniqueID UUID);
+
 		Pobject* GetPhysicsObject(const UniqueID UUID);
 
 		void SetGravity(double mps2);

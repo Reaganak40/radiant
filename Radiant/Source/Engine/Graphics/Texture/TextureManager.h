@@ -1,5 +1,5 @@
 #pragma once
-#include "pch.h"
+#include "Core.h"
 #include "Texture.h"
 #include "../Mesh.h"
 
@@ -10,7 +10,7 @@ namespace rdt::core {
 
 namespace rdt {
 
-	class TextureManager {
+	class RADIANT_API TextureManager {
 	private:
 		TextureManager();
 		~TextureManager();

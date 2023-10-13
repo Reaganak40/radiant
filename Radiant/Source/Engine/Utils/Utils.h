@@ -79,17 +79,17 @@ namespace rdt {
         /*
             Returns the max between two unsigned integers
         */
-        unsigned int Max(unsigned int x, unsigned int y);
+        unsigned int RADIANT_API Max(unsigned int x, unsigned int y);
 
         /*
             Returns the max between two doubles
         */
-        double Max(double x, double y);
+        double RADIANT_API Max(double x, double y);
 
         /*
             Returns the max between two floats.
         */
-        float Max(float x, float y);
+        float RADIANT_API Max(float x, float y);
 
         /*
             Returns the minimum between two doubles
@@ -114,7 +114,7 @@ namespace rdt {
         /*
             Returns the distance between two points.
         */
-        double GetDistance(const Vec2d& pointA, const Vec2d& pointB);
+        double RADIANT_API GetDistance(const Vec2d& pointA, const Vec2d& pointB);
 
         /*
             Returns the manhattan distance between two points.

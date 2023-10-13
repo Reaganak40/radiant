@@ -74,6 +74,17 @@ namespace rdt::core {
         return objectID;
     }
 
+    std::shared_ptr<Polygon> Realm::DestroyPhysicsObject(const UniqueID UUID)
+    {
+        if (m_objects.find(UUID) == m_objects.end()) {
+            return std::shared_ptr<Polygon>();
+        }
+
+        std::shared_ptr<Polygon> polygon = m_objects.at(UUID).m_polygon;
+        m_objects.erase(UUID);
+        return polygon;
+    }
+
     Pobject* Realm::GetPhysicsObject(const UniqueID UUID)
     {
         if (m_objects.find(UUID) == m_objects.end()) {

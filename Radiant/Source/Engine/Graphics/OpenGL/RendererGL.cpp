@@ -295,7 +295,7 @@ namespace rdt::core {
         BeginImpl(layer);
         SetPolygonColorImpl(color);
         SetRenderTypeImpl(DrawFilled);
-        AddPolygonImpl(*rect);
+        AddPolygonImpl(*rect, Vec2f::Zero());
         EndImpl();
 
         // Go back to saved settings
@@ -351,7 +351,7 @@ namespace rdt::core {
         m_current_render_type = type;
     }
 
-    void RendererGL::AddPolygonImpl(const Polygon& polygon)
+    void RendererGL::AddPolygonImpl(const Polygon& polygon, const Vec2f& offset)
     {
         Mesh& pMesh = m_render_cache.GetMesh(polygon.GetUUID());
 
@@ -384,6 +384,13 @@ namespace rdt::core {
         pMesh.layer = m_current_layer;
         pMesh.texture = m_polygon_texture;
         pMesh.texAtlasCoords = m_polygon_texture_coords;
+
+        if (offset.x != 0.0f || offset.y != 0.0f) {
+            for (auto& vertex : pMesh.vertices) {
+                vertex.position.x += offset.x;
+                vertex.position.y += offset.y;
+            }
+        }
 
         m_command_queue.push(DrawCommand(polygon.GetUUID(), m_current_render_type));
     }

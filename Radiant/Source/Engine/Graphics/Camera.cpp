@@ -10,31 +10,33 @@ namespace rdt {
 		glm::mat4 m_model;
 
 		AspectRatio m_aspectRatio;
+		
+		Vec2f m_cameraDimensions;
 		Vec2d m_worldCoords;
 
 		Color m_background_color;
 
 		Impl(AspectRatio aspectRatio)
 		{
-			float cameraWindowWidth = 0.0f;
-			float cameraWindowHeight = 0.0f;
+			m_cameraDimensions.x = 0.0f;
+			m_cameraDimensions.y = 0.0f;
 
 			m_aspectRatio = aspectRatio;
 			switch (aspectRatio) {
 			case AR_16_9:
-				cameraWindowWidth = 1920.0f;
-				cameraWindowHeight = 1080.0f;
+				m_cameraDimensions.x = 1920.0f;
+				m_cameraDimensions.y = 1080.0f;
 				break;
 			case AR_1_1:
-				cameraWindowWidth = 1000.0f;
-				cameraWindowHeight = 1000.0f;
+				m_cameraDimensions.x = 1000.0f;
+				m_cameraDimensions.y = 1000.0f;
 				break;
 			}
 			m_worldCoords = { 0, 0 };
 
 			m_view = glm::translate(glm::mat4(1.0f), glm::vec3(-m_worldCoords.x, -m_worldCoords.y, 0));
 			m_model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-			m_proj = glm::ortho(0.0f, cameraWindowWidth, 0.0f, cameraWindowHeight, -1.0f, 1.0f);
+			m_proj = glm::ortho(0.0f, m_cameraDimensions.x, 0.0f, m_cameraDimensions.y, -1.0f, 1.0f);
 		}
 
 		~Impl()
@@ -48,22 +50,22 @@ namespace rdt {
 
 		void SetAspectRatio(AspectRatio nAspectRatio)
 		{
-			float cameraWindowWidth = 0.0f;
-			float cameraWindowHeight = 0.0f;
+			m_cameraDimensions.x = 0.0f;
+			m_cameraDimensions.y = 0.0f;
 
 			m_aspectRatio = nAspectRatio;
 			switch (nAspectRatio) {
 			case AR_16_9:
-				cameraWindowWidth = 1920.0f;
-				cameraWindowHeight = 1080.0f;
+				m_cameraDimensions.x = 1920.0f;
+				m_cameraDimensions.y = 1080.0f;
 				break;
 			case AR_1_1:
-				cameraWindowWidth = 1000.0f;
-				cameraWindowHeight = 1000.0f;
+				m_cameraDimensions.x = 1000.0f;
+				m_cameraDimensions.y = 1000.0f;
 				break;
 			}
 
-			m_proj = glm::ortho(0.0f, cameraWindowWidth, 0.0f, cameraWindowHeight, -1.0f, 1.0f);
+			m_proj = glm::ortho(0.0f, m_cameraDimensions.x, 0.0f, m_cameraDimensions.y, -1.0f, 1.0f);
 		}
 
 		Vec2f GetCameraDimensionsFromViewport(float viewportWidth, float viewportHeight)
@@ -97,6 +99,13 @@ namespace rdt {
 			}
 
 			return dimensions;
+		}
+
+		void FocusOn(const Vec2d& coords)
+		{
+			m_worldCoords.x = coords.x - (m_cameraDimensions.x / 2);
+			m_worldCoords.y = coords.y - (m_cameraDimensions.y / 2);
+			m_view = glm::translate(glm::mat4(1.0f), glm::vec3(-m_worldCoords.x, -m_worldCoords.y, 0));
 		}
 	};
 
@@ -142,5 +151,18 @@ namespace rdt {
 	Vec2f Camera::GetCameraDimensionsFromViewport(float viewportWidth, float viewportHeight)
 	{
 		return m_impl->GetCameraDimensionsFromViewport(viewportWidth, viewportHeight);
+	}
+
+	void Camera::FocusOn(const Vec2d& coords)
+	{
+		m_impl->FocusOn(coords);
+	}
+	Vec2d Camera::GetPosition()
+	{
+		return m_impl->m_worldCoords;
+	}
+	Vec2f Camera::GetCameraDimensions()
+	{
+		return m_impl->m_cameraDimensions;
 	}
 }

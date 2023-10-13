@@ -50,16 +50,16 @@ namespace rdt {
 		static double Dot(const Vec2d& A, const Vec2d& B);
 	};
 
-	bool operator==(const Vec2d& vector1, const Vec2d& vector2);
-	Vec2d operator* (float multiplier, const Vec2d& vector);
-	Vec2d operator* (const Vec2d& vector, float multiplier);
-	Vec2d operator* (double multiplier, const Vec2d& vector);
-	Vec2d operator* (const Vec2d& vector1, const Vec2d& vector2);
-	Vec2d operator* (const Vec2d& vector, double multiplier);
-	Vec2d operator+ (const Vec2d& vector1, const Vec2d& vector2);
-	Vec2d operator- (const Vec2d& vector1, const Vec2d& vector2);
-	Vec2d operator/ (const Vec2d& vector, const double divider);
-	Vec2d operator/ (const Vec2d& vector1, const Vec2d& vector2);
+	bool  RADIANT_API operator==(const Vec2d& vector1, const Vec2d& vector2);
+	Vec2d RADIANT_API operator* (float multiplier, const Vec2d& vector);
+	Vec2d RADIANT_API operator* (const Vec2d& vector, float multiplier);
+	Vec2d RADIANT_API operator* (double multiplier, const Vec2d& vector);
+	Vec2d RADIANT_API operator* (const Vec2d& vector1, const Vec2d& vector2);
+	Vec2d RADIANT_API operator* (const Vec2d& vector, double multiplier);
+	Vec2d RADIANT_API operator+ (const Vec2d& vector1, const Vec2d& vector2);
+	Vec2d RADIANT_API operator- (const Vec2d& vector1, const Vec2d& vector2);
+	Vec2d RADIANT_API operator/ (const Vec2d& vector, const double divider);
+	Vec2d RADIANT_API operator/ (const Vec2d& vector1, const Vec2d& vector2);
 
 	
 

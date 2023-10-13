@@ -178,6 +178,9 @@ namespace rdt {
         else if (key == GLFW_KEY_LEFT_CONTROL) {
             flag = CTRL_KEY_PRESS;
         }
+        else {
+            return;
+        }
 
         switch (action) {
         case GLFW_PRESS:

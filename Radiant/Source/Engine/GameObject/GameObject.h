@@ -16,9 +16,16 @@ namespace rdt {
 
 		/*
 			Helper function for child game object classes to add a polygon
-			to the physical world.
+			to the physical world. When passing a null polygon, will try to
+			use the cached (previously removed) object. 
 		*/
-		void AddObjectToWorld(std::shared_ptr<Polygon> polygon);
+		void AddObjectToWorld(std::shared_ptr<Polygon> polygon = nullptr);
+
+		/*
+			Helper function for child game object classes to remove a poylgon from the
+			physical world. Also caches the polygon for re-introduction.
+		*/
+		void RemoveObjectFromWorld();
 
 	public:
 		GameObject();

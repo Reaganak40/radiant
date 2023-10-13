@@ -253,6 +253,34 @@ namespace rdt {
 
             return object->translation.GetVelocity();
         }
+
+        Vec2d GetPosition(const UniqueID realmID, const UniqueID objectID)
+        {
+            if (m_realms.find(realmID) == m_realms.end()) {
+                return Vec2d::Zero();
+            }
+
+            Pobject* object = m_realms.at(realmID)->GetPhysicsObject(objectID);
+            if (object == nullptr) {
+                return Vec2d::Zero();
+            }
+
+            return object->m_polygon->GetOrigin();
+        }
+
+        std::shared_ptr<Polygon> RemoveObject(const UniqueID realmID, const UniqueID objectID)
+        {
+            if (m_realms.find(realmID) == m_realms.end()) {
+                return std::shared_ptr<Polygon>();
+            }
+
+            Pobject* object = m_realms.at(realmID)->GetPhysicsObject(objectID);
+            if (object == nullptr) {
+                return std::shared_ptr<Polygon>();
+            }
+
+            return m_realms.at(realmID)->DestroyPhysicsObject(objectID);
+        }
     };
 
     // ================================================================================
@@ -348,6 +376,11 @@ namespace rdt {
         return m_impl->CreateObject(realmID, messageID, polygon);
     }
 
+    std::shared_ptr<Polygon> Physics::RemoveObjectImpl(const UniqueID realmID, const UniqueID objectID)
+    {
+        return m_impl->RemoveObject(realmID, objectID);
+    }
+
     void Physics::CreatePtagImpl(const std::string& tagName, PhysicalProperties tagProperties)
     {
         PtagManager::GetTag(PtagManager::CreateTag(tagName)).SetProperties(tagProperties);
@@ -411,5 +444,9 @@ namespace rdt {
     Vec2d Physics::GetVelocityImpl(const UniqueID realmID, const UniqueID objectID)
     {
         return m_impl->GetVelocity(realmID, objectID);
+    }
+    Vec2d Physics::GetPositionImpl(const UniqueID realmID, const UniqueID objectID)
+    {
+        return m_impl->GetPosition(realmID, objectID);
     }
 }
