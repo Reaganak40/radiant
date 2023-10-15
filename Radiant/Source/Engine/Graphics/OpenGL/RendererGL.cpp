@@ -140,11 +140,6 @@ namespace rdt::core {
         return m_window;
     }
 
-    Vec2d RendererGL::GetCameraCoordinates2DImpl()
-    {
-        return Vec2d(m_screen_origin.x, m_screen_origin.y);
-    }
-
     void RendererGL::SetBackgroundColorImpl(const Color& color)
     {
         m_clear_color = color;
@@ -493,6 +488,22 @@ namespace rdt::core {
     void RendererGL::_FlushPolygonImpl(const UniqueID UUID)
     {
         m_render_cache.Flush(UUID);
+    }
+
+    Vec2d RendererGL::_TranslateMouseCoordsToViewportImpl(const Vec2d& mouseCoords, int renderWindowIndex)
+    {
+        if (UsingDefaultViewport() || renderWindowIndex < 0) {
+            return { mouseCoords.x - m_current_viewport.posX, mouseCoords.y - m_current_viewport.posY };
+        }
+        
+        auto& renderWindows = GetRenderWindows();
+        if (renderWindows.find(renderWindowIndex) == renderWindows.end()) {
+            return Vec2d::Zero();
+        }
+        Vec2d offset = renderWindows.at(renderWindowIndex)->GetLastPosition();
+        offset.y = m_window_height - offset.y;
+        offset.y -= renderWindows.at(renderWindowIndex)->GetLastSize().y;
+        return { mouseCoords.x - offset.x, mouseCoords.y - offset.y };
     }
 
     void RendererGL::DrawContext()

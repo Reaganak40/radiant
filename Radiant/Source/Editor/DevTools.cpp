@@ -180,8 +180,9 @@ namespace rdt::core {
 		RegisterToMessageBus("EditorLayout");
 		SetTheme(Theme_Codz);
 
-		Renderer::AddRenderWindow(m_game_window_panel = new GameWindowPanel);
+		m_gameWindowId = Renderer::AddRenderWindow(m_game_window_panel = new GameWindowPanel);
 		Renderer::SetDefaultViewport(false);
+		Input::SetTargetRenderWindow(m_gameWindowId);
 		m_showTools = true;
 
 		m_game_window_panel->SetGuiPositionY(88);
@@ -635,8 +636,10 @@ namespace rdt::core {
 		ImGui::Begin("Diagnostic Tools");
 
 		// Show framerate
-		ImGui::NewLine();
-		ImGui::NewLine();
+		Vec2d screenCoords = Input::GetMouseCoords(MouseCond::SCREEN_COORDS);
+		Vec2d worldCoords = Input::GetMouseCoords(MouseCond::WORLD_COORDS);
+		ImGui::Text("Mouse screen-coordinates: (%.2f %2.f)", screenCoords.x, screenCoords.y);
+		ImGui::Text("Mouse world-coordinates: (%.2f %2.f)", worldCoords.x, worldCoords.y);
 		ImGui::Text("Performance: %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
 		ImGui::End();
@@ -758,6 +761,7 @@ namespace rdt::core {
 		if (Renderer::UsingDefaultViewport()) {
 			if (ImGui::Button(ICON_FK_COMPRESS)) {
 				Renderer::SetDefaultViewport(false);
+				Input::SetTargetRenderWindow(m_gameWindowId);
 				m_diagnostics_panel.yPos = GetDockPosY(DockTop, m_diagnostics_panel.height, PanelMargin) + m_menu_bar_height;
 				m_game_window_settings_panel.xPos = GetDockPosX(DockRight, m_game_window_settings_panel.width + m_diagnostics_panel.width + PanelMargin, PanelMargin);
 				m_game_window_settings_panel.yPos = GetDockPosY(DockTop, m_game_window_settings_panel.height, PanelMargin) + m_menu_bar_height;
@@ -768,6 +772,7 @@ namespace rdt::core {
 		else {
 			if (ImGui::Button(ICON_FK_EXPAND)) {
 				Renderer::SetDefaultViewport(true);
+				Input::SetTargetRenderWindow(-1);
 				m_showTools = false;
 				m_game_window_settings_panel.yPos = PanelMargin;
 				m_game_window_settings_panel.xPos = GetDockPosX(DockRight, m_game_window_settings_panel.width, PanelMargin);

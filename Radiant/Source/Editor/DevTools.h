@@ -141,6 +141,7 @@ namespace rdt::core {
 			Panels
 		*/
 		GameWindowPanel* m_game_window_panel;
+		int m_gameWindowId;
 
 		GuiConfig m_diagnostics_panel;
 		GuiConfig m_scene_panel;

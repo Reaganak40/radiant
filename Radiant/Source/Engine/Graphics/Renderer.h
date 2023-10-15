@@ -76,11 +76,6 @@ namespace rdt {
 		static unsigned int GetWindowHeight() { return m_instance->GetWindowHeightImpl(); }
 
 		/*
-			Gets the 2D camera coordinates based in the bottom left corner.
-		*/
-		static Vec2d GetCameraCoordinates2D() { return m_instance->GetCameraCoordinates2DImpl(); }
-
-		/*
 			Sets the background color used on clear.
 		*/
 		static void SetBackgroundColor(const Color& color) { m_instance->SetBackgroundColorImpl(color); }
@@ -247,6 +242,13 @@ namespace rdt {
 		*/
 		static void _FlushPolygon(const UniqueID UUID) { m_instance->_FlushPolygonImpl(UUID); }
 
+		/*
+			Takes in mouse coordinates and returns them scopes relative to the game window viewport.
+			If not using default viewport, specify the render window by its id/index to get the 
+			coordinate offset from that window.
+		*/
+		static Vec2d _TranslateMouseCoordsToViewport(const Vec2d& mouseCoords, int renderWindowIndex = -1) { return m_instance->_TranslateMouseCoordsToViewportImpl(mouseCoords, renderWindowIndex); }
+
 	protected:
 		// Implementation Functions to be implemented by the proper platform.
 
@@ -255,7 +257,6 @@ namespace rdt {
 		virtual unsigned int GetWindowHeightImpl() = 0;
 		virtual bool CreateWindowImpl(const std::string& windowName) = 0;
 		virtual void* GetWindowInstanceImpl() = 0;
-		virtual Vec2d GetCameraCoordinates2DImpl() = 0;
 		virtual void SetBackgroundColorImpl(const Color& color) = 0;
 		virtual Vec2i OnWindowResizeImpl() = 0;
 		virtual void OnNewRenderWindow(int id, RenderWindow* nRenderWindow) = 0;
@@ -282,6 +283,6 @@ namespace rdt {
 		virtual void DetachGuiImpl(const GuiTemplate* gui) = 0;
 
 		virtual void _FlushPolygonImpl(const UniqueID UUID) = 0;
-		
+		virtual Vec2d _TranslateMouseCoordsToViewportImpl(const Vec2d& mouseCoords, int renderWindowIndex) = 0;
 	};
 }

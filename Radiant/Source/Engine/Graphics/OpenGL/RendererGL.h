@@ -116,7 +116,6 @@ namespace rdt::core {
 		unsigned int GetWindowHeightImpl() override final;
 		bool CreateWindowImpl(const std::string& windowName) override final;
 		void* GetWindowInstanceImpl() override final;
-		Vec2d GetCameraCoordinates2DImpl() override final;
 		void SetBackgroundColorImpl(const Color& color) override final;
 		Vec2i OnWindowResizeImpl() override final;
 		void OnNewRenderWindow(int id, RenderWindow* nRenderWindow) override final;
@@ -148,6 +147,8 @@ namespace rdt::core {
 		void DetachGuiImpl(const GuiTemplate* gui) override final;
 
 		void _FlushPolygonImpl(const UniqueID UUID) override final;
+		Vec2d _TranslateMouseCoordsToViewportImpl(const Vec2d& mouseCoords, int renderWindowIndex) override final;
+
 
 		/* ***********************************************
 			    OpenGL Rendering Helper Functions

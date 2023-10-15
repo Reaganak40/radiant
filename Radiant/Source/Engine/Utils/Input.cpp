@@ -18,10 +18,12 @@ namespace rdt {
         BitSet m_keyboard_state[STATE_CACHE_SIZE];
         MouseState m_mouse_state[STATE_CACHE_SIZE];
         WindowState m_window_state[STATE_CACHE_SIZE];
-        bool m_mouse_changed;
+
+        // The render window to poll mouse coordinates from
+        int m_targetRenderWindow;
 
         Impl()
-            : m_window(nullptr), m_mouse_changed(false)
+            : m_window(nullptr)
         {
             m_state_index = 0;
             m_timestep = 0;
@@ -29,6 +31,8 @@ namespace rdt {
                 m_keyboard_state[i].SetNewFlagMax(NAIS);
                 m_timestamps[i] = 0.0f;
             }
+
+            m_targetRenderWindow = -1; // use default viwewport
         }
 
         ~Impl()
@@ -77,10 +81,8 @@ namespace rdt {
             m_state_index = (m_state_index + 1) % STATE_CACHE_SIZE;
             m_keyboard_state[m_state_index].Clear();
 
-            if (!m_mouse_changed) {
-                m_mouse_state[m_state_index] = GetMouseState();
-            }
-            m_mouse_changed = false;
+            // Continue where last mouse state left off
+            m_mouse_state[m_state_index] = GetMouseState();
 
             m_window_state[m_state_index].windowResize = false;
         }
@@ -110,13 +112,14 @@ namespace rdt {
 
         Vec2d GetMouseCoords(MouseCond cond) {
             MouseState ms = GetMouseState();
+            ms.position.y = Renderer::GetWindowHeight() - ms.position.y;
+            ms.position = Renderer::_TranslateMouseCoordsToViewport(ms.position, m_targetRenderWindow);
 
             if (cond == SCREEN_COORDS) {
                 return ms.position;
             }
 
-            ms.position.y = Renderer::GetWindowHeight() - ms.position.y;
-            return ms.position + Renderer::GetCameraCoordinates2D();
+            return ms.position;
         }
     };
 
@@ -178,6 +181,9 @@ namespace rdt {
         else if (key == GLFW_KEY_LEFT_CONTROL) {
             flag = CTRL_KEY_PRESS;
         }
+        else if (key >= GLFW_KEY_0 && key <= GLFW_KEY_9) {
+            flag = ZERO_KEY_PRESS + (key - GLFW_KEY_0) * 3;
+        }
         else {
             return;
         }
@@ -205,7 +211,6 @@ namespace rdt {
         ImGui_ImplGlfw_CursorPosCallback(window, xpos, ypos);
         m_instance->m_impl->m_mouse_state[m_instance->m_impl->m_state_index].position.x = xpos;
         m_instance->m_impl->m_mouse_state[m_instance->m_impl->m_state_index].position.y = ypos;
-        m_instance->m_impl->m_mouse_changed = true;
     }
 
     void Input::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
@@ -222,6 +227,11 @@ namespace rdt {
     bool Input::CheckKeyboardState(const std::vector<InputState>& stateQuery, unsigned int targetFrame)
     {
         return m_instance->CheckStateImpl((unsigned int*)stateQuery.data(), stateQuery.size(), targetFrame);
+    }
+
+    void Input::SetTargetRenderWindow(int renderWindowIndex)
+    {
+        m_instance->m_impl->m_targetRenderWindow = renderWindowIndex;
     }
 
     void Input::UpdateTimeImpl(const float deltaTime)

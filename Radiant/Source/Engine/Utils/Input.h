@@ -136,6 +136,46 @@ namespace rdt {
         CTRL_KEY_DOWN,
         CTRL_KEY_UP,
 
+        ZERO_KEY_PRESS,
+        ZERO_KEY_DOWN,
+        ZERO_KEY_UP,
+
+        ONE_KEY_PRESS,
+        ONE_KEY_DOWN,
+        ONE_KEY_UP,
+
+        TWO_KEY_PRESS,
+        TWO_KEY_DOWN,
+        TWO_KEY_UP,
+
+        THREE_KEY_PRESS,
+        THREE_KEY_DOWN,
+        THREE_KEY_UP,
+
+        FOUR_KEY_PRESS,
+        FOUR_KEY_DOWN,
+        FOUR_KEY_UP,
+
+        FIVE_KEY_PRESS,
+        FIVE_KEY_DOWN,
+        FIVE_KEY_UP,
+
+        SIX_KEY_PRESS,
+        SIX_KEY_DOWN,
+        SIX_KEY_UP,
+
+        SEVEN_KEY_PRESS,
+        SEVEN_KEY_DOWN,
+        SEVEN_KEY_UP,
+
+        EIGHT_KEY_PRESS,
+        EIGHT_KEY_DOWN,
+        EIGHT_KEY_UP,
+
+        NINE_KEY_PRESS,
+        NINE_KEY_DOWN,
+        NINE_KEY_UP,
+
         NAIS // Not an input state
     };
 
@@ -214,6 +254,10 @@ namespace rdt {
 
         static inline MouseState GetMouseState() { return m_instance->GetMouseStateImpl(); }
 
+        /*
+            Returns the xy coordinates of the mouse either in screen coordinates (relative to the window),
+            or world coordnates (relative to the camera position).
+        */
         static Vec2d GetMouseCoords(const MouseCond cond) { return m_instance->GetMouseCoordsImpl(cond); }
 
         static bool CheckWindowResize() { return m_instance->CheckWindowResizeImpl(); }
@@ -221,6 +265,12 @@ namespace rdt {
         static float GetTimeSinceKeyState(const std::vector<InputState>& stateQuery, const float maxTime = 1.0f) {
             return m_instance->GetTimeSinceKeyStateImpl((unsigned int*)stateQuery.data(), stateQuery.size(), maxTime);
         }
+
+        /*
+            Sets the render window that shoud be used to offset the mouse coordinates. By default
+            is -1, which means to use the default viewport.
+        */
+        static void SetTargetRenderWindow(int renderWindowIndex);
 
     private:
         void UpdateTimeImpl(const float deltaTime);

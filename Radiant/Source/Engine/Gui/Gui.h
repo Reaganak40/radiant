@@ -11,7 +11,7 @@ namespace rdt {
 		int m_window_width;
 		int m_window_height;
 
-		Vec2f m_gui_pos;
+		Vec2d m_gui_pos;
 
 	protected:
 
