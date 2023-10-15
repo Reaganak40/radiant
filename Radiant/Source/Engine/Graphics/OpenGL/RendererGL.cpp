@@ -338,6 +338,7 @@ namespace rdt::core {
         m_current_layer = layer;
         m_current_render_type = DrawFilled;
         m_polygon_texture = TextureManager::GetTexture("None");
+        m_should_flip_texture = false;
         m_polygon_color = WHITE;
     }
 
@@ -383,6 +384,7 @@ namespace rdt::core {
 
         pMesh.layer = m_current_layer;
         pMesh.texture = m_polygon_texture;
+        pMesh.flipTexture = m_should_flip_texture;
         pMesh.texAtlasCoords = m_polygon_texture_coords;
 
         if (offset.x != 0.0f || offset.y != 0.0f) {
@@ -393,6 +395,26 @@ namespace rdt::core {
         }
 
         m_command_queue.push(DrawCommand(polygon.GetUUID(), m_current_render_type));
+    }
+
+    void RendererGL::AddRectImpl(const Vec2d& origin, const Vec2d& size, const Vec2f& offset)
+    {
+        // Use the rect cache for efficiency
+        std::shared_ptr<Rect> rect;
+
+        if ((rect = m_render_cache.GetFreeRect()) == nullptr) {
+            m_render_cache.AddRectToCache(std::shared_ptr<Rect>(new Rect(origin, size.x, size.y)));
+            rect = m_render_cache.GetFreeRect();
+        }
+        else {
+            rect->SetPosition(origin);
+            rect->SetSize(size);
+        }
+
+        Color old_color = m_polygon_color;
+
+        // Use draw API
+        AddPolygonImpl(*rect, offset);
     }
 
     void RendererGL::AddLineImpl(const Line& line)
@@ -445,6 +467,11 @@ namespace rdt::core {
         m_polygon_texture = TextureManager::GetTexture(texName);
         m_polygon_texture_coords.x = atlasX;
         m_polygon_texture_coords.y = atlasY;
+    }
+
+    void RendererGL::FlipPolygonTextureHorizontalImpl(bool flip)
+    {
+        m_should_flip_texture = flip;
     }
 
     void RendererGL::AttachGuiImpl(GuiTemplate* gui)

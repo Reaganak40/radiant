@@ -101,12 +101,6 @@ namespace rdt {
         }
 
         /*
-            Swaps the contents of the two values.
-        */
-        void Swap(double& A, double& B);
-        void Swap(unsigned int& A, unsigned int& B);
-
-        /*
             Returns the vertex in the list that is closest to the provided point.
         */
         Vec2d GetClosestVertex(const std::vector<Vec2d>& vertices, const Vec2d& point);

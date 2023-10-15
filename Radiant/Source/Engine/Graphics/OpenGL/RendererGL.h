@@ -48,7 +48,9 @@ namespace rdt::core {
 
 		Color m_polygon_color;
 		Texture* m_polygon_texture;
+		bool m_should_flip_texture;
 		Vec2i m_polygon_texture_coords;
+
 
 		Color m_line_color;
 
@@ -135,10 +137,13 @@ namespace rdt::core {
 
 		void SetRenderTypeImpl(core::RenderType type) override final;
 		void AddPolygonImpl(const Polygon& polygon, const Vec2f& offset) override final;
+		void AddRectImpl(const Vec2d& origin, const Vec2d& size, const Vec2f& offset) override final;
+
 		void AddLineImpl(const Line& line) override final;
 		void SetLineColorImpl(const Color& color) override final;
 		void SetPolygonColorImpl(const Color& color) override final;
 		void SetPolygonTextureImpl(const std::string& texName, unsigned int atlasX = 0, unsigned int atlasY = 0) override final;
+		void FlipPolygonTextureHorizontalImpl(bool flip) override final;
 		void AttachGuiImpl(GuiTemplate* gui) override final;
 		void DetachGuiImpl(const GuiTemplate* gui) override final;
 

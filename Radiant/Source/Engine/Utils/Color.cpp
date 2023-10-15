@@ -56,6 +56,9 @@ namespace rdt {
 		case ColorType::YELLOW:
 			m_color = Vec4f(1.0f, 1.0f, 0.0f, 1.0f);
 			break;
+		case ColorType::PINK:
+			m_color = Vec4f(0.89f, 0.23f, 0.58f, 1.0f);
+			break;
 		default:
 			m_color = Vec4f(0.0f, 0.0f, 0.0f, 1.0f);
 			break;

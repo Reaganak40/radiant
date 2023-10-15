@@ -12,6 +12,7 @@ namespace rdt {
 		WHITE,
 		POWERSHELL_BLUE,
 		YELLOW,
+		PINK
 	};
 
 	class RADIANT_API Color {

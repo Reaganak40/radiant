@@ -32,7 +32,7 @@ namespace rdt {
 		}
 	}
 
-	bool TextureManager::ApplyTextureAtlas(Texture* texture, const Vec2i& atlasCoords, std::vector<Vertex>& rectVertices)
+	bool TextureManager::ApplyTextureAtlas(Texture* texture, const Vec2i& atlasCoords, std::vector<Vertex>& rectVertices, bool flipHorizontal)
 	{
 		bool slots_changed = false;
 		if (texture->CurrentTextureSlot() == UNASSIGNED_TEXTURE) {
@@ -75,6 +75,14 @@ namespace rdt {
 
 		for (int i = 0; i < 4; i++) {
 			rectVertices[i].texIndex = texIndex;
+		}
+
+		if (flipHorizontal) {
+			std::swap(rectVertices[0].texCoords.x, rectVertices[1].texCoords.x);
+			std::swap(rectVertices[0].texCoords.y, rectVertices[1].texCoords.y);
+
+			std::swap(rectVertices[2].texCoords.x, rectVertices[3].texCoords.x);
+			std::swap(rectVertices[2].texCoords.y, rectVertices[3].texCoords.y);
 		}
 
 		return slots_changed;

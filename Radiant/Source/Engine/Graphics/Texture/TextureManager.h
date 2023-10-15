@@ -55,7 +55,7 @@ namespace rdt {
 			tile map.
 			Returns true if the texture slots changed.
 		*/
-		static bool ApplyTextureAtlas(Texture* texture, const Vec2i& atlasCoords, std::vector<core::Vertex>& rectVertices);
+		static bool ApplyTextureAtlas(Texture* texture, const Vec2i& atlasCoords, std::vector<core::Vertex>& rectVertices, bool flipHorizontal = false);
 		static std::array<unsigned int, MAX_TEXTURES>& GetTextureSlots();
 
 		void AddNoneTexture();

@@ -33,7 +33,7 @@ namespace rdt {
                 return x;
             }
 
-            if (y > x) { Swap(x, y); }
+            if (y > x) { std::swap(x, y); }
 
             return GCD(y, x % y);
         }
@@ -104,18 +104,6 @@ namespace rdt {
             return (x > y ? x : y);
         }
 
-        void Swap(double& A, double& B)
-        {
-            double temp = A;
-            A = B;
-            B = temp;
-        }
-        void Swap(unsigned int& A, unsigned int& B)
-        {
-            int temp = A;
-            A = B;
-            B = temp;
-        }
         Vec2d GetClosestVertex(const std::vector<Vec2d>& vertices, const Vec2d& point)
         {
             constexpr double minDistance = std::numeric_limits<double>::max();

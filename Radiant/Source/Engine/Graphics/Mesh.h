@@ -22,6 +22,7 @@ namespace rdt::core {
 		unsigned int layer;
 		Texture* texture;
 		Vec2i texAtlasCoords;
+		bool flipTexture = false;
 
 		Mesh() : m_UUID(GetUniqueID()), layer(0), texture(nullptr), texAtlasCoords(Vec2i::Zero()) {}
 	};

@@ -163,6 +163,12 @@ namespace rdt {
 		static void AddPolygon(const Polygon& polygon, const Vec2f& offset = Vec2f::Zero()) { m_instance->AddPolygonImpl(polygon, offset); }
 
 		/*
+			Adds a rect polygon to the next draw frame. This effectively calls
+			AddPolygon but without the need for a stored polygon reference.
+		*/
+		static void AddRect(const Vec2d& origin, const Vec2d& size, const Vec2f& offset = Vec2f::Zero()) { m_instance->AddRectImpl(origin, size, offset); }
+
+		/*
 			Adds a line to the render queue to be drawn next frame.
 		*/
 		static void AddLine(const Line& line) { m_instance->AddLineImpl(line); }
@@ -195,6 +201,12 @@ namespace rdt {
 			This currently only works for Rects.
 		*/
 		static void SetPolygonTexture(const std::string& texName, unsigned int atlasX = 0, unsigned int atlasY = 0) { m_instance->SetPolygonTextureImpl(texName, atlasX, atlasY); }
+
+
+		/*
+			Flips the texture coordinates for the next polygon, horizontally.
+		*/
+		static void FlipPolygonTextureHorizontal(bool flip = true) { m_instance->FlipPolygonTextureHorizontalImpl(flip); }
 
 		/*
 			Attaches a Gui instance, which will be drawn at the end of the draw command queue.
@@ -260,10 +272,12 @@ namespace rdt {
 
 		virtual void SetRenderTypeImpl(core::RenderType type) = 0;
 		virtual void AddPolygonImpl(const Polygon& polygon, const Vec2f& offset) = 0;
+		virtual void AddRectImpl(const Vec2d& origin, const Vec2d& size, const Vec2f& offset) = 0;
 		virtual void AddLineImpl(const Line& line) = 0;
 		virtual void SetLineColorImpl(const Color& color) = 0;
 		virtual void SetPolygonColorImpl(const Color& color) = 0;
 		virtual void SetPolygonTextureImpl(const std::string& texName, unsigned int atlasX = 0, unsigned int atlasY = 0) = 0;
+		virtual void FlipPolygonTextureHorizontalImpl(bool flip) = 0;
 		virtual void AttachGuiImpl(GuiTemplate* gui) = 0;
 		virtual void DetachGuiImpl(const GuiTemplate* gui) = 0;
 
