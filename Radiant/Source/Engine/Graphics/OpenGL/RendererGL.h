@@ -146,6 +146,8 @@ namespace rdt::core {
 		void AttachGuiImpl(GuiTemplate* gui) override final;
 		void DetachGuiImpl(const GuiTemplate* gui) override final;
 
+		Vec2d ScreenToWorldCoordinatesImpl(const Vec2d& ScreenCoords, int renderWindowIndex) override final;
+
 		void _FlushPolygonImpl(const UniqueID UUID) override final;
 		Vec2d _TranslateMouseCoordsToViewportImpl(const Vec2d& mouseCoords, int renderWindowIndex) override final;
 

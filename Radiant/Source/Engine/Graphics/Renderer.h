@@ -232,6 +232,11 @@ namespace rdt {
 		*/
 		static bool UsingDefaultViewport();
 
+		/*
+		Returns the world coordinates from provided screen coordinates on the camera.
+		*/
+		static Vec2d ScreenToWorldCoordinates(const Vec2d& ScreenCoords, int renderWindowIndex = -1) { return m_instance->ScreenToWorldCoordinatesImpl(ScreenCoords, renderWindowIndex); }
+
 		// *****************************************************
 		// 
 		//			     Renderer Core Engine Calls
@@ -281,6 +286,8 @@ namespace rdt {
 		virtual void FlipPolygonTextureHorizontalImpl(bool flip) = 0;
 		virtual void AttachGuiImpl(GuiTemplate* gui) = 0;
 		virtual void DetachGuiImpl(const GuiTemplate* gui) = 0;
+
+		virtual Vec2d ScreenToWorldCoordinatesImpl(const Vec2d& ScreenCoords, int renderWindowIndex) = 0;
 
 		virtual void _FlushPolygonImpl(const UniqueID UUID) = 0;
 		virtual Vec2d _TranslateMouseCoordsToViewportImpl(const Vec2d& mouseCoords, int renderWindowIndex) = 0;

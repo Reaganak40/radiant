@@ -189,6 +189,7 @@ namespace rdt {
 
     struct MouseState {
         Vec2d position;
+        bool mouse_moved = false;
 
         MouseState()
             : position(Vec2d(0, 0)) {}

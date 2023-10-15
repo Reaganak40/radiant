@@ -485,6 +485,30 @@ namespace rdt::core {
         }
     }
 
+    Vec2d RendererGL::ScreenToWorldCoordinatesImpl(const Vec2d& ScreenCoords, int renderWindowIndex)
+    {
+        auto& camera = GetCamera();
+        Vec2d res = Vec2d::Zero();
+
+        if (UsingDefaultViewport() || renderWindowIndex < 0) {
+            res.x = camera.GetCameraDimensions().x * ScreenCoords.x / m_current_viewport.width;
+            res.y = camera.GetCameraDimensions().y * ScreenCoords.y / m_current_viewport.height;
+        }
+        else {
+
+            auto& renderWindows = GetRenderWindows();
+            if (renderWindows.find(renderWindowIndex) == renderWindows.end()) {
+                return Vec2d::Zero();
+            }
+            Vec2d size = renderWindows.at(renderWindowIndex)->GetLastSize();
+            res.x = camera.GetCameraDimensions().x * ScreenCoords.x / size.x;
+            res.y = camera.GetCameraDimensions().y * ScreenCoords.y / size.y;
+        };
+
+        res += camera.GetPosition();
+        return res;
+    }
+
     void RendererGL::_FlushPolygonImpl(const UniqueID UUID)
     {
         m_render_cache.Flush(UUID);

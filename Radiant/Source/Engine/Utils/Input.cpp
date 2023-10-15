@@ -30,6 +30,8 @@ namespace rdt {
             for (int i = 0; i < STATE_CACHE_SIZE; i++) {
                 m_keyboard_state[i].SetNewFlagMax(NAIS);
                 m_timestamps[i] = 0.0f;
+                m_mouse_state[i].position = Vec2d::Zero();
+                m_mouse_state[i].mouse_moved = false;
             }
 
             m_targetRenderWindow = -1; // use default viwewport
@@ -76,6 +78,11 @@ namespace rdt {
             }
 
             m_timestamps[m_state_index] = m_timestep;
+            
+            if (m_mouse_state[m_state_index].mouse_moved) {
+                m_mouse_state[m_state_index].position.y = Renderer::GetWindowHeight() - m_mouse_state[m_state_index].position.y;
+                m_mouse_state[m_state_index].position = Renderer::_TranslateMouseCoordsToViewport(m_mouse_state[m_state_index].position, m_targetRenderWindow);
+            }
 
             // Go to the next buffer in cache arrays
             m_state_index = (m_state_index + 1) % STATE_CACHE_SIZE;
@@ -83,6 +90,7 @@ namespace rdt {
 
             // Continue where last mouse state left off
             m_mouse_state[m_state_index] = GetMouseState();
+            m_mouse_state[m_state_index].mouse_moved = false;
 
             m_window_state[m_state_index].windowResize = false;
         }
@@ -112,13 +120,12 @@ namespace rdt {
 
         Vec2d GetMouseCoords(MouseCond cond) {
             MouseState ms = GetMouseState();
-            ms.position.y = Renderer::GetWindowHeight() - ms.position.y;
-            ms.position = Renderer::_TranslateMouseCoordsToViewport(ms.position, m_targetRenderWindow);
 
             if (cond == SCREEN_COORDS) {
                 return ms.position;
             }
 
+            ms.position = Renderer::ScreenToWorldCoordinates(ms.position, m_targetRenderWindow);
             return ms.position;
         }
     };
@@ -211,6 +218,7 @@ namespace rdt {
         ImGui_ImplGlfw_CursorPosCallback(window, xpos, ypos);
         m_instance->m_impl->m_mouse_state[m_instance->m_impl->m_state_index].position.x = xpos;
         m_instance->m_impl->m_mouse_state[m_instance->m_impl->m_state_index].position.y = ypos;
+        m_instance->m_impl->m_mouse_state[m_instance->m_impl->m_state_index].mouse_moved = true;
     }
 
     void Input::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
