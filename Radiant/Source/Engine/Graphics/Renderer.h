@@ -86,7 +86,6 @@ namespace rdt {
 		*/
 		static Vec2i OnWindowResize() { return m_instance->OnWindowResizeImpl(); }
 
-
 		/*
 			Adds a new render window to the rendering context. The renderer will draw
 			frames in the render window. Returns the location of it, to be removed
@@ -177,6 +176,11 @@ namespace rdt {
 			Sets the draw color for lines, which will be used on the next line.
 		*/
 		static void SetLineColor(ColorType color) { m_instance->SetLineColorImpl(color); }
+
+		/*
+			Applies a post (applied later) rotation to the next polygon when it is drawn.
+		*/
+		static void SetPolygonRotation(const float radians) { m_instance->SetPolygonRotationImpl(radians); }
 
 		/*
 			Sets the draw color for polygons, which will be used on the next polygon.
@@ -282,6 +286,7 @@ namespace rdt {
 		virtual void AddLineImpl(const Line& line) = 0;
 		virtual void SetLineColorImpl(const Color& color) = 0;
 		virtual void SetPolygonColorImpl(const Color& color) = 0;
+		virtual void SetPolygonRotationImpl(const float radians) = 0;
 		virtual void SetPolygonTextureImpl(const std::string& texName, unsigned int atlasX = 0, unsigned int atlasY = 0) = 0;
 		virtual void FlipPolygonTextureHorizontalImpl(bool flip) = 0;
 		virtual void AttachGuiImpl(GuiTemplate* gui) = 0;

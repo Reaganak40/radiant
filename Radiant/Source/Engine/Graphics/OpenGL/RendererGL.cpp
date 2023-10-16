@@ -24,6 +24,7 @@ namespace rdt::core {
         m_polygon_color = BLACK;
         m_line_color = BLACK;
         m_imgui_newFrameCalled = false;
+        begin_called = false;
 	}
 
 	RendererGL::~RendererGL()
@@ -325,6 +326,11 @@ namespace rdt::core {
 
     void RendererGL::BeginImpl(unsigned int layer)
     {
+        if (begin_called) {
+            RDT_CORE_ERROR("Renderer - Called Begin() twice in the same context. Did you forget to call Renderer::End()?");
+            ASSERT(false);
+        }
+
         while (m_layers.size() <= layer) {
             m_layers.push_back(RenderLayer());
             m_layers.back().SetDefaultShader(m_shaders[0]->GetID());
@@ -335,30 +341,54 @@ namespace rdt::core {
         m_polygon_texture = TextureManager::GetTexture("None");
         m_should_flip_texture = false;
         m_polygon_color = WHITE;
+        m_polygon_rotation = 0.0f;
+        
+        begin_called = true;
     }
 
     void RendererGL::EndImpl()
     {
-        /* TODO:end of render context procedures... */
+        begin_called = false;
     }
 
     void RendererGL::SetRenderTypeImpl(core::RenderType type)
     {
+        if (!begin_called) {
+            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
+            ASSERT(false);
+        }
+
         m_current_render_type = type;
     }
 
     void RendererGL::AddPolygonImpl(const Polygon& polygon, const Vec2f& offset)
     {
+        if (!begin_called) {
+            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
+            ASSERT(false);
+        }
+
         Mesh& pMesh = m_render_cache.GetMesh(polygon.GetUUID());
+        const std::vector<Vec2d>* polygonVertices = nullptr;
 
         if (pMesh.indices.size() != polygon.GetIndices().size()) {
             pMesh.indices = polygon.GetIndices();
         }
 
         int index = 0;
+        
 
+        Polygon* util_poly = nullptr;
+        if (m_polygon_rotation != 0.0f) {
+            util_poly = new Polygon(polygon);
+            util_poly->SetRotation(m_polygon_rotation);
+            polygonVertices = &util_poly->GetVertices();
+        }
+        else {
+            polygonVertices = &polygon.GetVertices();
+        }
 
-        for (const auto& vertex : polygon.GetVertices()) {
+        for (const auto& vertex : (*polygonVertices)) {
             if (pMesh.vertices.size() == index) {
 
                 pMesh.vertices.push_back(
@@ -390,10 +420,19 @@ namespace rdt::core {
         }
 
         m_command_queue.push(DrawCommand(polygon.GetUUID(), m_current_render_type));
+
+        if (util_poly != nullptr) {
+            delete util_poly;
+        }
     }
 
     void RendererGL::AddRectImpl(const Vec2d& origin, const Vec2d& size, const Vec2f& offset)
     {
+        if (!begin_called) {
+            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
+            ASSERT(false);
+        }
+
         // Use the rect cache for efficiency
         std::shared_ptr<Rect> rect;
 
@@ -406,14 +445,17 @@ namespace rdt::core {
             rect->SetSize(size);
         }
 
-        Color old_color = m_polygon_color;
-
         // Use draw API
         AddPolygonImpl(*rect, offset);
     }
 
     void RendererGL::AddLineImpl(const Line& line)
     {
+        if (!begin_called) {
+            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
+            ASSERT(false);
+        }
+
         Mesh& pMesh = m_render_cache.GetMesh(line.GetUUID());
 
         if (pMesh.indices.size() != line.GetIndices().size()) {
@@ -449,16 +491,38 @@ namespace rdt::core {
 
     void RendererGL::SetLineColorImpl(const Color& color)
     {
+        if (!begin_called) {
+            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
+            ASSERT(false);
+        }
         m_line_color = color;
     }
 
     void RendererGL::SetPolygonColorImpl(const Color& color)
     {
+        if (!begin_called) {
+            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
+            ASSERT(false);
+        }
         m_polygon_color = color;
+    }
+
+    void RendererGL::SetPolygonRotationImpl(const float radians)
+    {
+        if (!begin_called) {
+            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
+            ASSERT(false);
+        }
+        m_polygon_rotation = radians;
     }
 
     void RendererGL::SetPolygonTextureImpl(const std::string& texName, unsigned int atlasX, unsigned int atlasY)
     {
+        if (!begin_called) {
+            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
+            ASSERT(false);
+        }
+
         m_polygon_texture = TextureManager::GetTexture(texName);
         m_polygon_texture_coords.x = atlasX;
         m_polygon_texture_coords.y = atlasY;
@@ -466,6 +530,10 @@ namespace rdt::core {
 
     void RendererGL::FlipPolygonTextureHorizontalImpl(bool flip)
     {
+        if (!begin_called) {
+            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
+            ASSERT(false);
+        }
         m_should_flip_texture = flip;
     }
 

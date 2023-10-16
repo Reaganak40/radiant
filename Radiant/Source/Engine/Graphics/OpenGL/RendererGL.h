@@ -46,11 +46,13 @@ namespace rdt::core {
 		core::RenderCache m_render_cache;
 		std::queue<DrawCommand> m_command_queue;
 
+		bool begin_called;
+		// Assignable mesh attributes
 		Color m_polygon_color;
 		Texture* m_polygon_texture;
 		bool m_should_flip_texture;
 		Vec2i m_polygon_texture_coords;
-
+		float m_polygon_rotation;
 
 		Color m_line_color;
 
@@ -141,6 +143,7 @@ namespace rdt::core {
 		void AddLineImpl(const Line& line) override final;
 		void SetLineColorImpl(const Color& color) override final;
 		void SetPolygonColorImpl(const Color& color) override final;
+		void SetPolygonRotationImpl(const float radians) override final;
 		void SetPolygonTextureImpl(const std::string& texName, unsigned int atlasX = 0, unsigned int atlasY = 0) override final;
 		void FlipPolygonTextureHorizontalImpl(bool flip) override final;
 		void AttachGuiImpl(GuiTemplate* gui) override final;

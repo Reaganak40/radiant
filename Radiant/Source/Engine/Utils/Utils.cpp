@@ -146,6 +146,11 @@ namespace rdt {
             point.y = origin.y + (magnitude * std::sin(theta));
         }
 
+        float RADIANT_API DegreesToRadians(float degrees)
+        {
+            return degrees * M_PI / 180.0f;
+        }
+
         std::string GetCWD()
         {
             char buff[FILENAME_MAX]; //create string buffer to hold path

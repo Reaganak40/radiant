@@ -123,12 +123,17 @@ namespace rdt {
         /*
             Returns in radians the theta between these two points.
         */
-        double GetRotation(const Vec2d& origin, const Vec2d& point);
+        double RADIANT_API GetRotation(const Vec2d& origin, const Vec2d& point);
 
         /*
             Rotates 'point' by dr about the origin.
         */
         void RotatePoint(const Vec2d& origin, Vec2d& point, const double dr);
+
+        /*
+            Returns an angle in degrees into radians
+        */
+        float RADIANT_API DegreesToRadians(float degrees);
 
         /*
             Returns the absolute path to the current working directory.

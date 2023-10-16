@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "RenderCache.h"
+#include "Logging/Log.h"
 
 namespace rdt::core {
 	RenderCache::RenderCache()

@@ -27,6 +27,8 @@ namespace rdt {
 		Polygon();
 		~Polygon();
 
+		Polygon(const Polygon& polygon);
+
 		/*
 			Get the array of vertices for this polygon.
 		*/
