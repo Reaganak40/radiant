@@ -52,16 +52,23 @@ namespace rdt {
 		const UniqueID GetModelID();
 
 		/*
-			To implement function when the layer this object belongs to is
-			being binded.
+			Returns true if this game object is binded to a scene.
 		*/
-		virtual void OnBind() {}
+		const bool IsBinded();
+
+		/*
+			To implement function when the layer this object belongs to is
+			being binded. The base class should be called at the end to set
+			internal bind flags.
+		*/
+		virtual void OnBind();
 
 		/*
 			To implement function when the scene this object belongs to is
-			being released.
+			being released. The base class should be called at the end to set
+			internal bind flags.
 		*/
-		virtual void OnRelease() {}
+		virtual void OnRelease();
 
 		/*
 			To implement function when object needs to perform update procedures.

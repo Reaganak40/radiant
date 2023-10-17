@@ -173,6 +173,19 @@ namespace rdt {
 		{
 			msg.Destroy();
 		}
+
+		void RemoveMessenger(MessageID mID)
+		{
+			if (m_messengers.find(mID) != m_messengers.end()) {
+				m_messengers.erase(mID);
+			}
+
+			if (m_messengers_IdToAlias.find(mID) != m_messengers_IdToAlias.end()) {
+				std::string alias = m_messengers_IdToAlias.at(mID);
+				m_messengers_IdToAlias.erase(mID);
+				m_messengers_AliasToId.erase(alias);
+			}
+		}
 	};
 
 	// ==============================================================================
@@ -205,6 +218,15 @@ namespace rdt {
 	MessageID MessageBus::Register(const std::string& alias, Messenger* messenger)
 	{
 		return m_instance->m_impl->Register(alias, messenger);
+	}
+
+	void MessageBus::RemoveMessenger(MessageID mID)
+	{
+		if (mID == 0) {
+			return;
+		}
+
+		m_instance->m_impl->RemoveMessenger(mID);
 	}
 
 	std::string MessageBus::GetAlias(MessageID mID)

@@ -173,4 +173,24 @@ namespace rdt {
 		m_impl->m_realms.push_back(Physics::CreateRealm());
 	}
 
+	void Layer::DestroyGameObject(MessageID mID)
+	{
+		bool found = false;
+		for (std::vector<GameObject*>::iterator it = m_impl->m_game_objects.begin(); it != m_impl->m_game_objects.end(); ++it) {
+			if ((*it)->GetMessageID() == mID) {
+				if ((*it)->IsBinded()) {
+					(*it)->OnRelease();
+				}
+				delete((*it));
+				m_impl->m_game_objects.erase(it);
+				found = true;
+				break;
+			}
+		}
+
+		if (!found) {
+			RDT_CORE_WARN("Layer - Could not find game object to destroy with MessageID {}", mID);
+		}
+	}
+
 }

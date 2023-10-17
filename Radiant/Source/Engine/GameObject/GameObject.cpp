@@ -15,10 +15,13 @@ namespace rdt {
 
 		std::shared_ptr<Polygon> m_cached_polygon;
 
+		bool m_isBinded;
+
 		Impl()
 			: m_ID(GetUniqueID()), m_layerID(0), m_model_ID(0), m_realmID(0)
 		{
 			m_cached_polygon.reset();
+			m_isBinded = false;
 		}
 
 		~Impl()
@@ -47,6 +50,7 @@ namespace rdt {
 
 	GameObject::~GameObject()
 	{
+		
 		delete m_impl;
 	}
 
@@ -68,6 +72,21 @@ namespace rdt {
 	const UniqueID GameObject::GetModelID()
 	{
 		return m_impl->m_model_ID;
+	}
+
+	const bool GameObject::IsBinded()
+	{
+		return m_impl->m_isBinded;
+	}
+
+	void GameObject::OnBind()
+	{
+		m_impl->m_isBinded = true;
+	}
+
+	void GameObject::OnRelease()
+	{
+		m_impl->m_isBinded = false;
 	}
 
 	void GameObject::AddObjectToWorld(std::shared_ptr<Polygon> polygon)
