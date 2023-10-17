@@ -19,11 +19,7 @@ namespace rdt {
 			return deltaTime * 1000.0f;
 		}
 
-		void Update() {
-			float time = (float)glfwGetTime();
-			deltaTime = time - _lastTimeFrame;
-			_lastTimeFrame = time;
-		}
+		void Update(bool applyLimit = false);
 	};
 
 	class RADIANT_API Timer {

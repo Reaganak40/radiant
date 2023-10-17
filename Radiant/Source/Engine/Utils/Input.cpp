@@ -15,7 +15,7 @@ namespace rdt {
         int m_state_index;
 
         float m_timestamps[STATE_CACHE_SIZE];
-        BitSet m_keyboard_state[STATE_CACHE_SIZE];
+        BitSet m_input_state[STATE_CACHE_SIZE];
         MouseState m_mouse_state[STATE_CACHE_SIZE];
         WindowState m_window_state[STATE_CACHE_SIZE];
 
@@ -28,7 +28,7 @@ namespace rdt {
             m_state_index = 0;
             m_timestep = 0;
             for (int i = 0; i < STATE_CACHE_SIZE; i++) {
-                m_keyboard_state[i].SetNewFlagMax(NAIS);
+                m_input_state[i].SetNewFlagMax(NAIS);
                 m_timestamps[i] = 0.0f;
                 m_mouse_state[i].position = Vec2d::Zero();
                 m_mouse_state[i].mouse_moved = false;
@@ -43,7 +43,7 @@ namespace rdt {
 
         bool CheckState(unsigned int* stateQuery, size_t count, unsigned int target)
         {
-            return m_keyboard_state[(m_state_index - target + STATE_CACHE_SIZE) % STATE_CACHE_SIZE].CheckFlags(stateQuery, count);
+            return m_input_state[(m_state_index - target + STATE_CACHE_SIZE) % STATE_CACHE_SIZE].CheckFlags(stateQuery, count);
         }
 
         MouseState GetMouseState()
@@ -64,7 +64,7 @@ namespace rdt {
             for (unsigned int stateCode = A_KEY_PRESS; stateCode < (NAIS - 2); stateCode += 3) {
 
                 // if key has not been released
-                if (!m_keyboard_state[m_state_index].CheckFlag(stateCode + 2)) {
+                if (!m_input_state[m_state_index].CheckFlag(stateCode + 2)) {
                     stateQuery[0] = stateCode;
                     stateQuery[1] = stateCode + 1;
 
@@ -72,7 +72,7 @@ namespace rdt {
                     if (CheckState(stateQuery, 2, 1)) {
 
                         // add key down state
-                        m_keyboard_state[m_state_index].ActivateFlag(stateCode + 1);
+                        m_input_state[m_state_index].ActivateFlag(stateCode + 1);
                     }
                 }
             }
@@ -86,7 +86,7 @@ namespace rdt {
 
             // Go to the next buffer in cache arrays
             m_state_index = (m_state_index + 1) % STATE_CACHE_SIZE;
-            m_keyboard_state[m_state_index].Clear();
+            m_input_state[m_state_index].Clear();
 
             // Continue where last mouse state left off
             m_mouse_state[m_state_index] = GetMouseState();
@@ -107,7 +107,7 @@ namespace rdt {
             float limit = Utils::Max(0, m_timestamps[index] - maxTime);
 
             do {
-                if (m_keyboard_state[index].CheckFlags(stateQuery, count)) {
+                if (m_input_state[index].CheckFlags(stateQuery, count)) {
                     return current;
                 }
                 float timeLapsed = m_timestamps[index];
@@ -205,11 +205,11 @@ namespace rdt {
             // Does not currently support text input (typing)
             return;
         default:
-            printf("Warning: Unidentified action: %d\n", action);
+            RDT_CORE_WARN("Input - Unidentified action: {}", action);
             return;
         }
 
-        m_instance->m_impl->m_keyboard_state[m_instance->m_impl->m_state_index].ActivateFlag(flag);
+        m_instance->m_impl->m_input_state[m_instance->m_impl->m_state_index].ActivateFlag(flag);
 
     }
 
@@ -224,6 +224,24 @@ namespace rdt {
     void Input::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
     {
         ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+
+        int flag = MOUSE_PRESS;
+
+        switch (action) {
+        case GLFW_PRESS:
+            break;
+        case GLFW_RELEASE:
+            flag += 2;
+            break;
+        case GLFW_REPEAT:
+            // Does not currently support text input (typing)
+            return;
+        default:
+            RDT_CORE_WARN("Input - Unidentified action: {}", action);
+            return;
+        }
+
+        m_instance->m_impl->m_input_state[m_instance->m_impl->m_state_index].ActivateFlag(flag);
     }
 
     void Input::WindowSizeCallback(GLFWwindow* window, int width, int height)
@@ -232,7 +250,7 @@ namespace rdt {
         m_instance->m_impl->m_window_state[m_instance->m_impl->m_state_index].windowResize = true;
     }
 
-    bool Input::CheckKeyboardState(const std::vector<InputState>& stateQuery, unsigned int targetFrame)
+    bool Input::CheckInput(const std::vector<InputState>& stateQuery, unsigned int targetFrame)
     {
         return m_instance->CheckStateImpl((unsigned int*)stateQuery.data(), stateQuery.size(), targetFrame);
     }

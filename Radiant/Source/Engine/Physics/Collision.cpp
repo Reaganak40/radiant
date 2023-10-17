@@ -191,16 +191,20 @@ namespace rdt::core {
 			return false;
 		}
 
+		std::vector<Vec2d> sourceVertices;
+		std::vector<Vec2d> suspectVertices;
+		source.GetHitBox(sourceVertices);
+		suspect.GetHitBox(suspectVertices);
+
 		Vec2d ray = source.translation.GetChangeInPosition(deltaTime);
+		Vec2d sp = suspectVertices[3];
+		Vec2d ep = suspectVertices[1];
 
-		Vec2d sp = suspect.m_polygon->GetVertices()[3];
-		Vec2d ep = suspect.m_polygon->GetVertices()[1];
+		sp.x = ceil(sp.x - source.GetHitboxWidth() / 2);
+		sp.y = ceil(sp.y + source.GetHitboxHeight() / 2);
 
-		sp.x = ceil(sp.x - source.m_polygon->GetWidth() / 2);
-		sp.y = ceil(sp.y + source.m_polygon->GetHeight() / 2);
-
-		ep.x = ceil(ep.x + source.m_polygon->GetWidth() / 2);
-		ep.y = ceil(ep.y - source.m_polygon->GetHeight() / 2);
+		ep.x = ceil(ep.x + source.GetHitboxWidth() / 2);
+		ep.y = ceil(ep.y - source.GetHitboxHeight() / 2);
 
 		Vec2d start = source.m_polygon->GetOrigin();
 		Vec2d contactPoint;

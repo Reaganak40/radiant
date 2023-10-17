@@ -122,7 +122,7 @@ namespace rdt {
 	void Application::BeginFrame()
 	{
 		// Get the new deltaTime for this frame.
-		m_impl->m_timestep.Update();
+		m_impl->m_timestep.Update(true);
 
 		// Get the currently bounded scene for next game loop procedures.
 		m_impl->m_current_scene = SceneManager::GetCurrentScene();

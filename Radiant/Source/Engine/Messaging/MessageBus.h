@@ -67,7 +67,7 @@ namespace rdt {
 		/*
 			Adds a new message to the Message Queue.
 		*/
-		static void AddToQueue(const Message& msg);
+		static void AddToQueue(Message& msg);
 
 		/*
 			Adds a new message to the Message Queue.

@@ -21,6 +21,12 @@ namespace rdt {
 			return (*this);
 		}
 
+		Vec2d operator-=(const Vec2d& vector) {
+			x -= vector.x;
+			y -= vector.y;
+			return (*this);
+		}
+
 		Vec2d operator*=(const double multiplier) {
 			x *= multiplier;
 			y *= multiplier;

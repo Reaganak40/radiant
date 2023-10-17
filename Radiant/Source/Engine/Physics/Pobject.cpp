@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Pobject.h"
+#include "Utils/Utils.h"
 
 namespace rdt::core {
 	Pobject::Pobject(std::shared_ptr<Polygon> polygon)
@@ -11,29 +12,34 @@ namespace rdt::core {
 	{
 	}
 
+	double Pobject::GetHitboxWidth()
+	{
+		return m_polygon->GetWidth() * m_hitbox_size.x;
+	}
+
+	double Pobject::GetHitboxHeight()
+	{
+		return m_polygon->GetHeight() * m_hitbox_size.y;
+	}
+
+	double Pobject::GetHitboxSize()
+	{
+		return 0.0;
+	}
+
 	void Pobject::GetHitBox(std::vector<Vec2d>& vertices) const
 	{
-		if (!m_polygon->CheckProperties(IsRect)) {
+		vertices = m_polygon->GetVertices();
+		if (m_hitbox_size.x == 1 && m_hitbox_size.y == 1) {
 			return;
 		}
-		vertices = m_polygon->GetVertices();
-
-		if (m_hitbox_size.x != 1 || m_hitbox_size.y != 1) {
-			Vec2d origin = m_polygon->GetOrigin();
-			double width = vertices[1].x - vertices[0].x;
-			double height = vertices[2].y - vertices[1].y;
-			width *= m_hitbox_size.x;
-			height *= m_hitbox_size.y;
-
-			vertices[0].x = origin.x - (width / 2);
-			vertices[1].x = origin.x + (width / 2);
-			vertices[2].x = origin.x + (width / 2);
-			vertices[3].x = origin.x - (width / 2);
-
-			vertices[0].y = origin.y - (height / 2);
-			vertices[1].y = origin.y - (height / 2);
-			vertices[2].y = origin.y + (height / 2);
-			vertices[3].y = origin.y + (height / 2);
+		
+		Vec2d origin = m_polygon->GetOrigin();
+		for (int i = 0; i < vertices.size(); i++) {
+			Vec2d diff = Utils::GetManhattanDistance(origin, vertices[i]);
+			diff.x *= m_hitbox_size.x;
+			diff.y *= m_hitbox_size.y;
+			vertices[i] = origin + diff;
 		}
 	}
 

@@ -176,6 +176,10 @@ namespace rdt {
         NINE_KEY_DOWN,
         NINE_KEY_UP,
 
+        MOUSE_PRESS,
+        MOUSE_DOWN,
+        MOUSE_UP,
+
         NAIS // Not an input state
     };
 
@@ -251,7 +255,7 @@ namespace rdt {
             Returns true if any of keystate in the input query is true.
             The target frame indicates how many frames ago to check for input, starting at 1 (current-frame), up to 5 frames ago.
         */
-        static bool CheckKeyboardState(const std::vector<InputState>& stateQuery, unsigned int targetFrame = 1);
+        static bool CheckInput(const std::vector<InputState>& stateQuery, unsigned int targetFrame = 1);
 
         static inline MouseState GetMouseState() { return m_instance->GetMouseStateImpl(); }
 

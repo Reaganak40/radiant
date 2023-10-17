@@ -27,6 +27,11 @@ namespace rdt::core {
 		const Polygon& GetPolygon() const { return *m_polygon; }
 		const Vec2d& GetHitBoxSize() const { return m_hitbox_size; }
 
+		double GetHitboxWidth();
+		double GetHitboxHeight();
+
+		double GetHitboxSize();
+
 		void GetHitBox(std::vector<Vec2d>& vertices) const;
 
 		void SetProperties(PhysicalProperties nProperties);

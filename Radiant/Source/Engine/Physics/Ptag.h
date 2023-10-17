@@ -25,9 +25,9 @@ namespace rdt {
 		return static_cast<PhysicalProperties>(static_cast<int>(a) ^ static_cast<int>(b));
 	}
 
-	inline PhysicalProperties operator^=(PhysicalProperties a, PhysicalProperties b)
+	inline PhysicalProperties operator^=(PhysicalProperties& a, PhysicalProperties b)
 	{
-		return static_cast<PhysicalProperties>(static_cast<int>(a) ^ static_cast<int>(b));
+		return a = a ^ b;
 	}
 }
 namespace rdt::core {

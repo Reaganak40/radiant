@@ -211,7 +211,7 @@ namespace rdt::core {
 			}
 		}
 
-		if (Input::CheckKeyboardState(controls_ShowTools1) && Input::CheckKeyboardState(controls_ShowTools2)) {
+		if (Input::CheckInput(controls_ShowTools1) && Input::CheckInput(controls_ShowTools2)) {
 			if (Renderer::UsingDefaultViewport()) {
 				m_showTools = !m_showTools;
 			}

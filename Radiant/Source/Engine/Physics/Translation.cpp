@@ -43,8 +43,7 @@ namespace rdt::core {
 	void Translation::UpdateVelocity(const float deltaTime)
 	{
 		m_current_velocity += deltaTime * (m_acceleration + m_gravity);
-
-		m_current_velocity *= m_friction;
+		//m_current_velocity -= (m_current_velocity * deltaTime * m_friction);
 
 		if (abs(m_current_velocity.x) < 1) {
 			m_current_velocity.x = 0;
