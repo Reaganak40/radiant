@@ -24,6 +24,11 @@ namespace rdt {
 		m_gui_pos.y = nY;
 	}
 
+	Vec2f GuiTemplate::GetGuiDimensions()
+	{
+		return { m_gui_width, m_gui_height };
+	}
+
 	void GuiTemplate::PrepareRender()
 	{
 		// First render config

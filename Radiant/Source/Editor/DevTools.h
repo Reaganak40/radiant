@@ -147,6 +147,7 @@ namespace rdt::core {
 		GuiConfig m_scene_panel;
 		GuiConfig m_template_wizard;
 		GuiConfig m_game_window_settings_panel;
+		GuiConfig m_console_panel;
 
 	public:
 		EditorLayout();
@@ -201,6 +202,8 @@ namespace rdt::core {
 		void AddGameObjectPanel(GameObject* gobject);
 		// =======================================================
 		void RenderGameWindowSettingsPanel();
+		// =======================================================
+		void RenderConsolePanel();
 		// =======================================================
 		void RenderTemplateWizard();
 		// =======================================================

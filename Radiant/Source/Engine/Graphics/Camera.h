@@ -60,6 +60,11 @@ namespace rdt {
 		Vec2d GetPosition();
 
 		/*
+			Returns the world cordinates of the camera from the center of the camera view
+		*/
+		Vec2d GetCenter();
+
+		/*
 			Returns the width and height of the camera view window.
 		*/
 		Vec2f GetCameraDimensions();

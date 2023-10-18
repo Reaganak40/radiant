@@ -34,6 +34,8 @@ namespace rdt {
 		void SetGuiPositionX(float nX);
 		void SetGuiPositionY(float nY);
 
+		Vec2f GetGuiDimensions();
+
 		GuiTemplate();
 		~GuiTemplate();
 

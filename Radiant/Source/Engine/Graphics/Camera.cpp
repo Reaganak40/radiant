@@ -161,6 +161,15 @@ namespace rdt {
 	{
 		return m_impl->m_worldCoords;
 	}
+
+	Vec2d Camera::GetCenter()
+	{
+		Vec2d res = m_impl->m_worldCoords;
+		res.x += (m_impl->m_cameraDimensions.x / 2);
+		res.y += (m_impl->m_cameraDimensions.y / 2);
+		return res;
+	}
+
 	Vec2f Camera::GetCameraDimensions()
 	{
 		return m_impl->m_cameraDimensions;

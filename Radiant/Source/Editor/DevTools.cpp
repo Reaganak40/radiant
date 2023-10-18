@@ -103,8 +103,8 @@ namespace rdt::core {
 
 	// ==============================================================================
 
-	constexpr float GameWindowPanelGuiWidth = 1280.0f;
-	constexpr float GameWindowPanelGuiHeight = 741.0f;
+	constexpr float GameWindowPanelGuiWidth = 1118;
+	constexpr float GameWindowPanelGuiHeight = 649.0f;
 
 	GameWindowPanel::GameWindowPanel()
 	{
@@ -186,6 +186,7 @@ namespace rdt::core {
 		m_showTools = true;
 
 		m_game_window_panel->SetGuiPositionY(88);
+		m_game_window_panel->SetGuiPositionX((m_window_width / 2) - (m_game_window_panel->GetGuiDimensions().x / 2));
 
 		ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
 	}
@@ -237,6 +238,7 @@ namespace rdt::core {
 
 		if (!isFullscreen) {
 			RenderScenePanel();
+			RenderConsolePanel();
 			RenderTemplateWizard();
 		}
 
@@ -329,13 +331,23 @@ namespace rdt::core {
 
 	void EditorLayout::OnFirstRender()
 	{
-		m_diagnostics_panel.width = DiagnosticGuiWidth;
+		ImGui::PushFont(m_fonts[ForkAwesome][18]);
+		m_game_window_settings_panel.width = GameWindowSettingsPanelWidth;
+		m_game_window_settings_panel.height = GetButtonHeight(ICON_FK_PAUSE) + 20;
+		m_game_window_settings_panel.xPos = m_game_window_panel->GetLastPosition().x + m_game_window_panel->GetGuiDimensions().x - m_game_window_settings_panel.width;
+		m_game_window_settings_panel.yPos = GetDockPosY(DockTop, m_game_window_settings_panel.height, PanelMargin) + m_menu_bar_height;
+		ImGui::PopFont();
+
+		m_game_window_panel->SetGuiPositionY(m_game_window_settings_panel.yPos + m_game_window_settings_panel.height + PanelMargin);
+		m_game_window_panel->TriggerUpdatePos();
+
+		m_diagnostics_panel.width = m_window_width - (m_game_window_settings_panel.xPos + m_game_window_settings_panel.width + (PanelMargin * 2));
 		m_diagnostics_panel.height = DiagnosticGuiHeight;
 		m_diagnostics_panel.xPos = GetDockPosX(DockRight, m_diagnostics_panel.width, PanelMargin);
 		m_diagnostics_panel.yPos = GetDockPosY(DockTop, m_diagnostics_panel.height, PanelMargin) + m_menu_bar_height;
 
-		m_scene_panel.width = ScenePanelGuiWidth;
-		m_scene_panel.height = ScenePanelGuiHeight;
+		m_scene_panel.width = m_diagnostics_panel.width;
+		m_scene_panel.height = m_window_height - (m_diagnostics_panel.yPos + m_diagnostics_panel.height + (PanelMargin * 2));
 		m_scene_panel.xPos = GetDockPosX(DockRight, m_scene_panel.width, PanelMargin);
 		m_scene_panel.yPos = m_diagnostics_panel.yPos + m_diagnostics_panel.height + PanelMargin;
 
@@ -344,15 +356,10 @@ namespace rdt::core {
 		m_template_wizard.xPos = (m_window_width / 2) - (m_template_wizard.width / 2);
 		m_template_wizard.yPos = (m_window_height / 2) - (m_template_wizard.height / 2);
 
-		ImGui::PushFont(m_fonts[ForkAwesome][18]);
-		m_game_window_settings_panel.width = GameWindowSettingsPanelWidth;
-		m_game_window_settings_panel.height = GetButtonHeight(ICON_FK_PAUSE) + 20;
-		m_game_window_settings_panel.xPos = GetDockPosX(DockRight, m_game_window_settings_panel.width + m_diagnostics_panel.width + PanelMargin, PanelMargin);
-		m_game_window_settings_panel.yPos = GetDockPosY(DockTop, m_game_window_settings_panel.height, PanelMargin) + m_menu_bar_height;
-		ImGui::PopFont();
-
-		m_game_window_panel->SetGuiPositionY(m_game_window_settings_panel.yPos + m_game_window_settings_panel.height + PanelMargin);
-		m_game_window_panel->TriggerUpdatePos();
+		m_console_panel.width = m_game_window_panel->GetGuiDimensions().x;
+		m_console_panel.height = m_window_height -  (m_game_window_panel->GetLastPosition().y + m_game_window_panel->GetGuiDimensions().y + (PanelMargin * 2));
+		m_console_panel.xPos = m_game_window_panel->GetLastPosition().x;
+		m_console_panel.yPos = m_game_window_panel->GetLastPosition().y + m_game_window_panel->GetGuiDimensions().y + PanelMargin;
 	}
 
 	void EditorLayout::AddFont(EditorFont name, std::string& ttfFile, const std::vector<unsigned int>& sizes)
@@ -790,6 +797,13 @@ namespace rdt::core {
 		
 		ImGui::End();
 		ImGui::PopStyleColor();
+	}
+	void EditorLayout::RenderConsolePanel()
+	{
+		ApplyGuiConfig(m_console_panel);
+
+		ImGui::Begin("Console Panel");
+		ImGui::End();
 	}
 	void EditorLayout::RenderTemplateWizard()
 	{
