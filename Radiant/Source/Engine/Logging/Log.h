@@ -34,6 +34,7 @@ namespace rdt {
 		static std::shared_ptr<spdlog::logger>& GetCoreLogger();
 		static std::shared_ptr<spdlog::logger>& GetClientLogger();
 		static bool GetLog(int index, std::string& msg, Color& msgColor);
+		static size_t GetLogCount();
 	};
 }
 

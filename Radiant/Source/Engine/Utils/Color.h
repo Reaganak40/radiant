@@ -31,9 +31,20 @@ namespace rdt {
 
 		const Vec4f& GetColor() const { return m_color; }
 
-		inline Color operator=(const ColorType& nColor) {
+		inline Color operator=(const ColorType& nColor)
+		{
 			SetColor(nColor);
 			return (*this);
+		}
+
+		inline bool operator==(const ColorType& colorType)
+		{
+			Color color = colorType;
+			auto& colorVals = color.GetColor();
+			return (m_color.x1 == colorVals.x1 &&
+					m_color.x2 == colorVals.x2 &&
+					m_color.x3 == colorVals.x3 &&
+					m_color.x4 == colorVals.x4);
 		}
 
 		const Vec4f& SetRed(float r, bool normalized=true);
@@ -41,5 +52,6 @@ namespace rdt {
 		const Vec4f& SetBlue(float b, bool normalized = true);
 		const Vec4f& SetAlpha(float a, bool normalized = true);
 
+		const ImVec4 GetImGuiColor();
 	};
 }

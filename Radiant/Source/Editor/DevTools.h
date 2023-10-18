@@ -112,7 +112,8 @@ namespace rdt::core {
 		const std::vector<InputState> controls_ShowTools2{ T_KEY_PRESS };
 
 		std::unordered_map<EditorFont, std::unordered_map<unsigned int, ImFont*>> m_fonts;
-		int m_last_log_count;
+		
+		std::string m_last_log;
 
 		/*
 			Gui Layout data structures

@@ -190,7 +190,7 @@ namespace rdt::core {
 
 		ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
 
-		m_last_log_count = 0;
+		m_last_log = "";
 	}
 	EditorLayout::~EditorLayout()
 	{
@@ -807,16 +807,20 @@ namespace rdt::core {
 
 		ImGui::Begin("Console Panel");
 
-		int index = 0;
+		int index = Log::GetLogCount() - 1;
 		std::string log;
 		Color logColor;
-		while (Log::GetLog(index++, log, logColor)) {
+		while (index >= 0) {
+			Log::GetLog(index--, log, logColor);
+			
+			ImGui::PushStyleColor(ImGuiCol_Text, logColor.GetImGuiColor());
 			ImGui::Text("%s", log.c_str());
+			ImGui::PopStyleColor();
 		}
 
-		if (m_last_log_count != index) {
+		if (m_last_log != log) {
 			ImGui::SetScrollHereY(0.999f);
-			m_last_log_count = index;
+			m_last_log = log;
 		}
 
 		ImGui::End();

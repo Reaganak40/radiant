@@ -107,4 +107,9 @@ namespace rdt {
 		return m_color;
 	}
 
+	const ImVec4 Color::GetImGuiColor()
+	{
+		return ImColor(m_color.x1, m_color.x2, m_color.x3, m_color.x4);
+	}
+
 }

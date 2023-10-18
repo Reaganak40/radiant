@@ -5,7 +5,7 @@
 
 namespace rdt {
 
-	constexpr size_t MaxLogs = 50;
+	constexpr size_t MaxLogs = 250;
 
 	struct Log::Impl {
 		std::shared_ptr<spdlog::logger> m_CoreLogger;
@@ -48,10 +48,54 @@ namespace rdt {
 
 			Utils::Tokenize(stream, "\n", nLogs);
 
-			for (std::vector<std::string>::reverse_iterator it = nLogs.rbegin(); it != nLogs.rend(); ++it) {
-				m_logs[logIndex] = (*it);
-				m_logColors[logIndex] = WHITE;
+			for (auto log : nLogs) {
+
+				int end1 = 0;
+				int start2 = 0;
+				int i = 0;
+				int bracketCount = 2;
+				for (; i < log.size(); i++) {
+					if (log[i] == ']') {
+						bracketCount--;
+
+						if (bracketCount == 0) {
+							i++;
+							break;
+						}
+					}
+				}
+				end1 = i;
+				for (; i < log.size(); i++) {
+					if (log[i] == ']') {
+						i++;
+						start2 = i;
+						break;
+					}
+				}
+				std::string level;
+				log = StripLogLevel(log, level);
+
+				Color logColor = WHITE;
+				if (level == "info") {
+					logColor = GREEN;
+				}
+				else if (level == "warning") {
+					logColor = { 0.97f, 0.74f, 0.23f, 1.0f };
+				}
+				else if (level == "error") {
+					logColor = RED;
+				}
+				else if (level == "critical") {
+					logColor = { 0.808f, 0.0f, 0.058f, 1.0f };
+				}
+
+				m_logs[logIndex] = log;
+				m_logColors[logIndex] = logColor;
 				logIndex = (logIndex + 1) % MaxLogs;
+
+				if (logIndex == 0) {
+					maxReached = true;
+				}
 			}
 
 			m_log_oss.str("");
@@ -68,11 +112,40 @@ namespace rdt {
 				return false;
 			}
 
-			index = (logIndex - index + MaxLogs) % MaxLogs;
+			index = (logIndex - index - 1 + MaxLogs) % MaxLogs;
 			msg = m_logs[index];
 			msgColor = m_logColors[index];
 
 			return true;
+		}
+
+		std::string StripLogLevel(const std::string& originalLog, std::string& outLevel)
+		{
+			int end1 = 0;
+			int start2 = 0;
+			int i = 0;
+			int bracketCount = 2;
+			for (; i < originalLog.size(); i++) {
+				if (originalLog[i] == ']') {
+					bracketCount--;
+
+					if (bracketCount == 0) {
+						i++;
+						break;
+					}
+				}
+			}
+			end1 = i;
+			for (; i < originalLog.size(); i++) {
+				if (originalLog[i] == ']') {
+					i++;
+					start2 = i;
+					break;
+				}
+			}
+			
+			outLevel = originalLog.substr(end1 + 2, start2 - (end1 + 2) - 1);
+			return originalLog.substr(0, end1) + originalLog.substr(start2, originalLog.size() - start2);
 		}
 	};
 
@@ -107,14 +180,23 @@ namespace rdt {
 		m_instance->m_impl->OnUpdate();
 	}
 
-	inline std::shared_ptr<spdlog::logger>& Log::GetCoreLogger()
+	std::shared_ptr<spdlog::logger>& Log::GetCoreLogger()
 	{
 		return m_instance->m_impl->m_CoreLogger;
 	}
 
-	inline std::shared_ptr<spdlog::logger>& Log::GetClientLogger()
+	std::shared_ptr<spdlog::logger>& Log::GetClientLogger()
 	{
 		return m_instance->m_impl->m_ClientLogger;
+	}
+
+	size_t Log::GetLogCount()
+	{
+		if (m_instance->m_impl->maxReached) {
+			return MaxLogs;
+		}
+		
+		return m_instance->m_impl->logIndex;
 	}
 
 	bool Log::GetLog(int index, std::string& msg, Color& msgColor)
