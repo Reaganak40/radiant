@@ -189,6 +189,8 @@ namespace rdt::core {
 		m_game_window_panel->SetGuiPositionX((m_window_width / 2) - (m_game_window_panel->GetGuiDimensions().x / 2));
 
 		ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
+
+		m_last_log_count = 0;
 	}
 	EditorLayout::~EditorLayout()
 	{
@@ -243,6 +245,8 @@ namespace rdt::core {
 		}
 
 		ImGui::PopFont();
+
+		first_render = false;
 	}
 
 	void EditorLayout::SetTheme(EditorTheme nTheme)
@@ -605,7 +609,6 @@ namespace rdt::core {
 			if (first_render) {
 				m_menu_bar_height = ImGui::GetWindowSize().y;
 				OnFirstRender();
-				first_render = false;
 			}
 
 			if (ImGui::BeginMenu("File")) {
@@ -803,6 +806,19 @@ namespace rdt::core {
 		ApplyGuiConfig(m_console_panel);
 
 		ImGui::Begin("Console Panel");
+
+		int index = 0;
+		std::string log;
+		Color logColor;
+		while (Log::GetLog(index++, log, logColor)) {
+			ImGui::Text("%s", log.c_str());
+		}
+
+		if (m_last_log_count != index) {
+			ImGui::SetScrollHereY(0.999f);
+			m_last_log_count = index;
+		}
+
 		ImGui::End();
 	}
 	void EditorLayout::RenderTemplateWizard()

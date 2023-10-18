@@ -137,6 +137,9 @@ namespace rdt {
 
 		// Run renderer's begin frame procedures.
 		Renderer::OnBeginFrame();
+
+		// Update log buffer
+		Log::Update();
 	}
 
 	void Application::PollMessages1()
