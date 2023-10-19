@@ -25,6 +25,11 @@ namespace rdt {
 		*/
 		void RemoveObjectFromWorld();
 
+		/*
+			Returns the spawn position of this object (if not assigned by the layer should be Zero())
+		*/
+		const Vec2d& GetSpawnPos();
+
 	public:
 		GameObject();
 		~GameObject();
@@ -102,6 +107,9 @@ namespace rdt {
 		*/
 		void RegisterToRealm(const UniqueID nRealmID);
 
-
+		/*
+			Sets the spawn position of this object.
+		*/
+		void SetSpawnPos(double xPos, double yPos);
 	};
 }
