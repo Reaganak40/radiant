@@ -123,7 +123,7 @@ namespace rdt::core {
 		ImGui::SetNextWindowSize(ImVec2(m_gui_width, m_gui_height), ImGuiCond_Appearing);
 		
 		if (update_pos) {
-			ImGui::SetNextWindowPos(ImVec2(m_gui_pos.x, m_gui_pos.y), ImGuiCond_Always);
+			ImGui::SetNextWindowPos(ImVec2((float)m_gui_pos.x, (float)m_gui_pos.y), ImGuiCond_Always);
 			update_pos = false;
 		}
 		
@@ -338,7 +338,7 @@ namespace rdt::core {
 		ImGui::PushFont(m_fonts[ForkAwesome][18]);
 		m_game_window_settings_panel.width = GameWindowSettingsPanelWidth;
 		m_game_window_settings_panel.height = GetButtonHeight(ICON_FK_PAUSE) + 20;
-		m_game_window_settings_panel.xPos = m_game_window_panel->GetLastPosition().x + m_game_window_panel->GetGuiDimensions().x - m_game_window_settings_panel.width;
+		m_game_window_settings_panel.xPos = ((float)m_game_window_panel->GetLastPosition().x) + m_game_window_panel->GetGuiDimensions().x - m_game_window_settings_panel.width;
 		m_game_window_settings_panel.yPos = GetDockPosY(DockTop, m_game_window_settings_panel.height, PanelMargin) + m_menu_bar_height;
 		ImGui::PopFont();
 
@@ -362,8 +362,8 @@ namespace rdt::core {
 
 		m_console_panel.width = m_game_window_panel->GetGuiDimensions().x;
 		m_console_panel.height = m_window_height -  (m_game_window_panel->GetLastPosition().y + m_game_window_panel->GetGuiDimensions().y + (PanelMargin * 2));
-		m_console_panel.xPos = m_game_window_panel->GetLastPosition().x;
-		m_console_panel.yPos = m_game_window_panel->GetLastPosition().y + m_game_window_panel->GetGuiDimensions().y + PanelMargin;
+		m_console_panel.xPos = (float)m_game_window_panel->GetLastPosition().x;
+		m_console_panel.yPos = ((float)m_game_window_panel->GetLastPosition().y) + m_game_window_panel->GetGuiDimensions().y + PanelMargin;
 	}
 
 	void EditorLayout::AddFont(EditorFont name, std::string& ttfFile, const std::vector<unsigned int>& sizes)
@@ -807,7 +807,7 @@ namespace rdt::core {
 
 		ImGui::Begin("Console Panel");
 
-		int index = Log::GetLogCount() - 1;
+		int index = (int)Log::GetLogCount() - 1;
 		std::string log;
 		Color logColor;
 		while (index >= 0) {

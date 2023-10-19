@@ -148,13 +148,18 @@ namespace rdt {
 
         float RADIANT_API DegreesToRadians(float degrees)
         {
-            return degrees * M_PI / 180.0f;
+            return degrees * ((float)M_PI) / 180.0f;
         }
 
         std::string GetCWD()
         {
             char buff[FILENAME_MAX]; //create string buffer to hold path
+
+#pragma warning( push )
+#pragma warning( disable : 6031)
             GetCurrentDir(buff, FILENAME_MAX);
+#pragma warning( pop ) 
+
             std::string current_working_dir(buff);
             return current_working_dir;
         }

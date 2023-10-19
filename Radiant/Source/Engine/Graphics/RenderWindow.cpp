@@ -20,7 +20,7 @@ namespace rdt {
 	{
 		// First render config
 		ImGui::SetNextWindowSize(ImVec2(m_gui_width, m_gui_height), ImGuiCond_Appearing);
-		ImGui::SetNextWindowPos(ImVec2(m_gui_pos.x, m_gui_pos.y), ImGuiCond_Appearing);
+		ImGui::SetNextWindowPos(ImVec2((float)m_gui_pos.x, (float)m_gui_pos.y), ImGuiCond_Appearing);
 
 		ImGui::Begin("My Scene");
 	}

@@ -12,14 +12,12 @@ namespace rdt {
 
 	class RADIANT_API TextureManager {
 	private:
+		struct Impl;
+		Impl* m_impl;
+		
 		TextureManager();
 		~TextureManager();
 		static TextureManager* m_instance;
-
-		std::unordered_map<std::string, Texture> m_textures;
-		std::array<unsigned int, MAX_TEXTURES> m_texture_slots;
-
-		TextureSlot m_next_slot;
 
 	public:
 		/*

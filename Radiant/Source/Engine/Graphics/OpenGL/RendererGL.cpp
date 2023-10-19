@@ -219,10 +219,10 @@ namespace rdt::core {
             
                 /* Update window dimensions and setup viewport */
                 Vec2d windowDimensions = window->UpdateAndGetWindowSize();
-                Vec2f cameraDimensions = GetCamera().GetCameraDimensionsFromViewport(windowDimensions.x, windowDimensions.y);
+                Vec2f cameraDimensions = GetCamera().GetCameraDimensionsFromViewport((float)windowDimensions.x, (float)windowDimensions.y);
                 fbo.Rescale((int)windowDimensions.x, (int)windowDimensions.y);
-                int midX = (windowDimensions.x / 2) - (cameraDimensions.x / 2);
-                int midY = (windowDimensions.y / 2) - (cameraDimensions.y / 2);
+                int midX = (int)((windowDimensions.x / 2) - (cameraDimensions.x / 2));
+                int midY = (int)((windowDimensions.y / 2) - (cameraDimensions.y / 2));
                 SetViewport({ midX, midY, (int)cameraDimensions.x, (int)cameraDimensions.y });
 
                 /* Attach framebuffer texture to ImGui window context. */

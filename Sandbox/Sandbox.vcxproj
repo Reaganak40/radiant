@@ -67,8 +67,9 @@
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
     <PostBuildEvent>
       <Command>IF EXIST ..\bin\Debug-windows-x86_64\Radiant\Radiant.dll\ (xcopy /Q /E /Y /I ..\bin\Debug-windows-x86_64\Radiant\Radiant.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Debug-windows-x86_64\Radiant\Radiant.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul)
@@ -91,9 +92,10 @@ IF EXIST ..\bin\Debug-windows-x86_64\Radiant\OpenAL32.dll\ (xcopy /Q /E /Y /I ..
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
     <PostBuildEvent>
       <Command>IF EXIST ..\bin\Release-windows-x86_64\Radiant\Radiant.dll\ (xcopy /Q /E /Y /I ..\bin\Release-windows-x86_64\Radiant\Radiant.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Release-windows-x86_64\Radiant\Radiant.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul)
