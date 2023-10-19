@@ -1,7 +1,19 @@
 #include "pch.h"
 #include "Timestep.h"
+#include "Utils.h"
 
 namespace rdt {
+
+	void Timestep::Update(bool applyLimit)
+	{
+		float time = (float)glfwGetTime();
+		deltaTime = time - _lastTimeFrame;
+		_lastTimeFrame = time;
+
+		if (applyLimit) {
+			deltaTime = Utils::Max(deltaTime, 0.01667f);
+		}
+	}
 
 	Timer::Timer(float secondInterval)
 		: m_maxTime(secondInterval), m_is_running(false), m_timeLeft(0)
@@ -50,5 +62,4 @@ namespace rdt {
 	float Timer::GetTimeLeft() {
 		return m_timeLeft;
 	}
-
 }

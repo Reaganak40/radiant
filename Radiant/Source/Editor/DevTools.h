@@ -112,6 +112,8 @@ namespace rdt::core {
 		const std::vector<InputState> controls_ShowTools2{ T_KEY_PRESS };
 
 		std::unordered_map<EditorFont, std::unordered_map<unsigned int, ImFont*>> m_fonts;
+		
+		std::string m_last_log;
 
 		/*
 			Gui Layout data structures
@@ -141,11 +143,13 @@ namespace rdt::core {
 			Panels
 		*/
 		GameWindowPanel* m_game_window_panel;
+		int m_gameWindowId;
 
 		GuiConfig m_diagnostics_panel;
 		GuiConfig m_scene_panel;
 		GuiConfig m_template_wizard;
 		GuiConfig m_game_window_settings_panel;
+		GuiConfig m_console_panel;
 
 	public:
 		EditorLayout();
@@ -200,6 +204,8 @@ namespace rdt::core {
 		void AddGameObjectPanel(GameObject* gobject);
 		// =======================================================
 		void RenderGameWindowSettingsPanel();
+		// =======================================================
+		void RenderConsolePanel();
 		// =======================================================
 		void RenderTemplateWizard();
 		// =======================================================

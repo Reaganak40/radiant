@@ -67,23 +67,28 @@ namespace rdt {
 		static UniqueID CreateObject(const UniqueID realmID, const MessageID messageID, std::shared_ptr<Polygon> polygon) { return m_instance->CreateObjectImpl(realmID, messageID, polygon); }
 
 		/*
+			Removes an object from the physical world. Returns its polygon for easy reintroduction if desired.
+		*/
+		static std::shared_ptr<Polygon> RemoveObject(const UniqueID realmID, const UniqueID objectID) { return m_instance->RemoveObjectImpl(realmID, objectID); }
+
+		/*
 			Sets an existing objects properties in the physical world.
 		*/
-		static void SetObjectProperties(const UniqueID realmID, const UniqueID objectID, const unsigned int nProperties) {
+		static void SetObjectProperties(const UniqueID realmID, const UniqueID objectID, PhysicalProperties nProperties) {
 			m_instance->SetObjectPropertiesImpl(realmID, objectID, nProperties);
 		}
 
 		/*
 			Removes an existing objects properties in the physical world.
 		*/
-		static void RemoveObjectProperties(const UniqueID realmID, const UniqueID objectID, const unsigned int rProperties) {
+		static void RemoveObjectProperties(const UniqueID realmID, const UniqueID objectID, PhysicalProperties rProperties) {
 			m_instance->RemoveObjectPropertiesImpl(realmID, objectID, rProperties);
 		}
 
 		/*
 			Returns true if the queried object has any of the specified properties.
 		*/
-		static bool QueryObjectProperties(const UniqueID realmID, const UniqueID objectID, const unsigned int propertyQuery) {
+		static bool QueryObjectProperties(const UniqueID realmID, const UniqueID objectID, PhysicalProperties propertyQuery) {
 			return m_instance->QueryObjectPropertiesImpl(realmID, objectID, propertyQuery);
 		}
 
@@ -92,11 +97,18 @@ namespace rdt {
 		*/
 		static const Polygon& GetPolygon(const UniqueID realmID, const UniqueID objectID) { return m_instance->GetPolygonImpl(realmID, objectID); }
 
+
+		static void CreatePtag(const std::string& tagName, PhysicalProperties tagProperties = NoProperties) { m_instance->CreatePtagImpl(tagName, tagProperties); }
+
 		/*
 			Adds a tag to the physics object, which will be used to interact with other objects.
 		*/
 		static void AddPTag(const UniqueID realmID, const UniqueID objectID, const std::string& tagName) { m_instance->AddPTagImpl(tagName, realmID, objectID); }
 		
+		/*
+			Adds a graviational force to the realm, measured by its accelration ("meters" per second squared)
+		*/
+		static void SetGravity(const UniqueID realmID, double mps2) { m_instance->SetGravityImpl(realmID, mps2); }
 		/*
 			Sets the friction magnitude of the specified object. [0 to 1], where 0 is
 			no friction, and 1 is maximum friction.
@@ -149,6 +161,11 @@ namespace rdt {
 			Gets the current velocity of the queried object.
 		*/
 		static Vec2d GetVelocity(const UniqueID realmID, const UniqueID objectID) { return m_instance->GetVelocityImpl(realmID, objectID); }
+
+		/*
+			Gets the current position of the queried object
+		*/
+		static Vec2d GetPosition(const UniqueID realmID, const UniqueID objectID) { return m_instance->GetPositionImpl(realmID, objectID); }
 private:
 
 		void OnUpdateImpl(const float deltaTime);
@@ -161,23 +178,27 @@ private:
 
 		const Polygon& GetPolygonImpl(const UniqueID realmID, const UniqueID objectID);
 
-		void SetObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, const unsigned int nProperties);
-		void RemoveObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, const unsigned int nProperties);
-		bool QueryObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, const unsigned int propertyQuery);
+		void SetObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, PhysicalProperties nProperties);
+		void RemoveObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, PhysicalProperties nProperties);
+		bool QueryObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, PhysicalProperties propertyQuery);
 
 		UniqueID CreateObjectImpl(const UniqueID realmID, const MessageID messageID, std::shared_ptr<Polygon> polygon);
-		
+		std::shared_ptr<Polygon> RemoveObjectImpl(const UniqueID realmID, const UniqueID objectID);
+
+		void CreatePtagImpl(const std::string& tagName, PhysicalProperties tagProperties);
 		void AddPTagImpl(const std::string& tagName, const UniqueID realmID, const UniqueID objectID);
 		void SetAccelerationImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nAcceleration);
 		void SetAccelerationXImpl(const UniqueID realmID, const UniqueID objectID, const double nX);
 		void SetAccelerationYImpl(const UniqueID realmID, const UniqueID objectID, const double nY);
 		void SetVelocityImpl(const UniqueID realmID, const UniqueID objectID, Vec2d& nVelocity);
 		void SetMaximumVelocityImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nMaxVelocity);
+		void SetGravityImpl(const UniqueID realmID, double mps2);
 		void SetFrictionImpl(const UniqueID realmID, const UniqueID objectID, const double friction);
 		void SetPositionImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nPosition);
 		void SetRotationImpl(const UniqueID realmID, const UniqueID objectID, const double nRadians);
 		void SetHitBoxSizeImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nSize);
 
 		Vec2d GetVelocityImpl(const UniqueID realmID, const UniqueID objectID);
+		Vec2d GetPositionImpl(const UniqueID realmID, const UniqueID objectID);
 	};
 }

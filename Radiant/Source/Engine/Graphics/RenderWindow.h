@@ -7,6 +7,7 @@ namespace rdt {
 	private:
 		void* m_texture;
 		Vec2d m_textureSize;
+		float m_title_bar_offset;
 	public:
 		RenderWindow();
 		~RenderWindow();
@@ -32,6 +33,16 @@ namespace rdt {
 			Called before OnRender to customize RenderWindows. This MUST call ImGui::End()
 		*/
 		virtual void OnEnd();
+
+		/*
+			Returns the xy coordinates of this window on its last rendered.
+		*/
+		Vec2d GetLastPosition();
+
+		/*
+			Returns the width and height of the window when it was last rendered.
+		*/
+		Vec2d GetLastSize();
 
 	private:
 	};

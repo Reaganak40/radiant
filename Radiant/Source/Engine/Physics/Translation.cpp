@@ -7,7 +7,7 @@ namespace rdt::core {
 	
 	Translation::Translation(Vec2d initial_velocity, Vec2d initial_acceleration)
 		: m_current_velocity(initial_velocity), m_acceleration(initial_acceleration),
-		m_friction(0.98)
+		m_friction(0.98), m_gravity{0.0, 0.0}
 	{
 		m_has_max_velocity = false;
 		m_max_velocity = (0.0, 0.0);
@@ -31,15 +31,19 @@ namespace rdt::core {
 		m_current_velocity = nVelocity;
 	}
 
+	void Translation::SetGravity(double nGravity)
+	{
+		m_gravity.y = nGravity;
+	}
+
 	Vec2d Translation::GetVelocity() {
 		return m_current_velocity;
 	}
 
 	void Translation::UpdateVelocity(const float deltaTime)
 	{
-		m_current_velocity += deltaTime * m_acceleration;
-
-		m_current_velocity *= m_friction;
+		m_current_velocity += deltaTime * (m_acceleration + m_gravity);
+		//m_current_velocity -= (m_current_velocity * deltaTime * m_friction);
 
 		if (abs(m_current_velocity.x) < 1) {
 			m_current_velocity.x = 0;

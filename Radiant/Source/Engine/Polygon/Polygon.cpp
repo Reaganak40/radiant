@@ -15,6 +15,12 @@ namespace rdt {
         delete m_impl;
     }
 
+    Polygon::Polygon(const Polygon& polygon)
+        : m_impl(new core::PolygonImpl)
+    {
+        m_impl->Copy(polygon.m_impl);
+    }
+
     core::PolygonImpl* Polygon::BaseImpl()
     {
         return m_impl;

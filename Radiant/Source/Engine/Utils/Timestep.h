@@ -1,4 +1,5 @@
 #pragma once
+#include "Core.h"
 #include "pch.h"
 
 namespace rdt {
@@ -18,14 +19,10 @@ namespace rdt {
 			return deltaTime * 1000.0f;
 		}
 
-		void Update() {
-			float time = (float)glfwGetTime();
-			deltaTime = time - _lastTimeFrame;
-			_lastTimeFrame = time;
-		}
+		void Update(bool applyLimit = false);
 	};
 
-	class Timer {
+	class RADIANT_API Timer {
 	private:
 		float m_maxTime;
 		float m_timeLeft;

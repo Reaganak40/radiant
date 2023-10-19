@@ -11,7 +11,7 @@ namespace rdt {
 		int m_window_width;
 		int m_window_height;
 
-		Vec2f m_gui_pos;
+		Vec2d m_gui_pos;
 
 	protected:
 
@@ -33,6 +33,8 @@ namespace rdt {
 		void SetGuiPosition(float nX, float nY);
 		void SetGuiPositionX(float nX);
 		void SetGuiPositionY(float nY);
+
+		Vec2f GetGuiDimensions();
 
 		GuiTemplate();
 		~GuiTemplate();

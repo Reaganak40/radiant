@@ -56,7 +56,7 @@ namespace rdt::core {
 			}
 
 			for (auto& mesh : meshes) {
-				if (TextureManager::ApplyTextureAtlas(mesh->texture, mesh->texAtlasCoords, mesh->vertices)) {
+				if (TextureManager::ApplyTextureAtlas(mesh->texture, mesh->texAtlasCoords, mesh->vertices, mesh->flipTexture)) {
 					m_updated_texture_slots = true;
 				}
 				m_batches[unitIndex].m_VBO->PushToBatch(mesh->vertices);

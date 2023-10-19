@@ -5,7 +5,7 @@ extern rdt::Application* rdt::CreateApplication();
 
 int main(int argc, char** argv)
 {
-	rdt::Log::Init();
+	rdt::Log::Initialize();
 
 	auto app = rdt::CreateApplication();
 

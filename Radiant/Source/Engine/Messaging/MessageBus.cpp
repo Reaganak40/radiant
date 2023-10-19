@@ -67,20 +67,23 @@ namespace rdt {
 			return m_messengers_AliasToId.at(alias);
 		}
 
-		void AddToQueue(const Message& msg)
+		void AddToQueue(Message& msg)
 		{
 			if (msg.from == 0) {
 				RDT_CORE_WARN("Message sent from unregister object. Message dropped.", msg.from);
+				DropMessage(msg);
 				return;
 			}
 
 			if (m_messengers.find(msg.from) == m_messengers.end()) {
 				RDT_CORE_WARN("Message sent from unknown object [mID: {}]. Message dropped.", msg.from);
+				DropMessage(msg);
 				return;
 			}
 
 			if (m_messengers.find(msg.to) == m_messengers.end()) {
 				RDT_CORE_WARN("Message sent to unknown object [mID: {}]. Message dropped.", msg.to);
+				DropMessage(msg);
 				return;
 			}
 
@@ -165,6 +168,24 @@ namespace rdt {
 				broadcast->SwapBuffers();
 			}
 		}
+
+		void DropMessage(Message& msg)
+		{
+			msg.Destroy();
+		}
+
+		void RemoveMessenger(MessageID mID)
+		{
+			if (m_messengers.find(mID) != m_messengers.end()) {
+				m_messengers.erase(mID);
+			}
+
+			if (m_messengers_IdToAlias.find(mID) != m_messengers_IdToAlias.end()) {
+				std::string alias = m_messengers_IdToAlias.at(mID);
+				m_messengers_IdToAlias.erase(mID);
+				m_messengers_AliasToId.erase(alias);
+			}
+		}
 	};
 
 	// ==============================================================================
@@ -199,6 +220,15 @@ namespace rdt {
 		return m_instance->m_impl->Register(alias, messenger);
 	}
 
+	void MessageBus::RemoveMessenger(MessageID mID)
+	{
+		if (mID == 0) {
+			return;
+		}
+
+		m_instance->m_impl->RemoveMessenger(mID);
+	}
+
 	std::string MessageBus::GetAlias(MessageID mID)
 	{
 		return m_instance->m_impl->GetAlias(mID);
@@ -209,7 +239,7 @@ namespace rdt {
 		return m_instance->m_impl->GetMessageID(alias);
 	}
 
-	void MessageBus::AddToQueue(const Message& msg)
+	void MessageBus::AddToQueue(Message& msg)
 	{
 		m_instance->m_impl->AddToQueue(msg);
 	}

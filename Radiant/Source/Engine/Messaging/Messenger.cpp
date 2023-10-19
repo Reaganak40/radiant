@@ -19,12 +19,22 @@ namespace rdt {
 		}
 	};
 
+	void Messenger::RemoveFromMessageBus()
+	{
+		MessageBus::RemoveMessenger(m_impl->m_messageID);
+		m_impl->m_name = "NoName";
+		m_impl->m_messageID = 0;
+	}
+
 	Messenger::Messenger()
 		: m_impl(new Messenger::Impl)
 	{
 	}
 	Messenger::~Messenger()
 	{
+		if (m_impl->m_messageID != 0) {
+			RemoveFromMessageBus();
+		}
 		delete m_impl;
 	}
 

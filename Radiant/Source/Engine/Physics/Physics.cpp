@@ -36,7 +36,7 @@ namespace rdt {
             return *object->m_polygon;
         }
 
-        void SetObjectProperties(const UniqueID realmID, const UniqueID objectID, const unsigned int nProperties)
+        void SetObjectProperties(const UniqueID realmID, const UniqueID objectID, PhysicalProperties nProperties)
         {
             if (m_realms.find(realmID) == m_realms.end()) {
                 return;
@@ -50,7 +50,7 @@ namespace rdt {
             object->SetProperties(nProperties);
         }
 
-        void RemoveObjectProperties(const UniqueID realmID, const UniqueID objectID, const unsigned int rProperties)
+        void RemoveObjectProperties(const UniqueID realmID, const UniqueID objectID, PhysicalProperties rProperties)
         {
             if (m_realms.find(realmID) == m_realms.end()) {
                 return;
@@ -64,7 +64,7 @@ namespace rdt {
             object->RemoveProperties(rProperties);
         }
 
-        bool QueryObjectProperties(const UniqueID realmID, const UniqueID objectID, const unsigned int propertyQuery)
+        bool QueryObjectProperties(const UniqueID realmID, const UniqueID objectID, PhysicalProperties propertyQuery)
         {
             if (m_realms.find(realmID) == m_realms.end()) {
                 return false;
@@ -97,12 +97,12 @@ namespace rdt {
                 return;
             }
 
-            Ptag ntag;
-            if ((ntag = PtagManager::GetTag(tagName)) == 0) {
-                ntag = PtagManager::CreateTag(tagName);
+            UniqueID nPtag;
+            if ((nPtag = PtagManager::GetTagID(tagName)) == 0) {
+                nPtag = PtagManager::CreateTag(tagName);
             }
 
-            object->AddTag(ntag);
+            object->AddTag(nPtag);
         }
 
         void SetAcceleration(const UniqueID realmID, const UniqueID objectID, const Vec2d& nAcceleration)
@@ -175,6 +175,15 @@ namespace rdt {
             object->translation.SetMaxVelocity(nMaxVelocity);
         }
 
+        void SetGravity(const UniqueID realmID, double mps2)
+        {
+            if (m_realms.find(realmID) == m_realms.end()) {
+                return;
+            }
+
+            m_realms.at(realmID)->SetGravity(mps2);
+        }
+
         void SetFriction(const UniqueID realmID, const UniqueID objectID, const double friction)
         {
             if (m_realms.find(realmID) == m_realms.end()) {
@@ -243,6 +252,34 @@ namespace rdt {
             }
 
             return object->translation.GetVelocity();
+        }
+
+        Vec2d GetPosition(const UniqueID realmID, const UniqueID objectID)
+        {
+            if (m_realms.find(realmID) == m_realms.end()) {
+                return Vec2d::Zero();
+            }
+
+            Pobject* object = m_realms.at(realmID)->GetPhysicsObject(objectID);
+            if (object == nullptr) {
+                return Vec2d::Zero();
+            }
+
+            return object->m_polygon->GetOrigin();
+        }
+
+        std::shared_ptr<Polygon> RemoveObject(const UniqueID realmID, const UniqueID objectID)
+        {
+            if (m_realms.find(realmID) == m_realms.end()) {
+                return std::shared_ptr<Polygon>();
+            }
+
+            Pobject* object = m_realms.at(realmID)->GetPhysicsObject(objectID);
+            if (object == nullptr) {
+                return std::shared_ptr<Polygon>();
+            }
+
+            return m_realms.at(realmID)->DestroyPhysicsObject(objectID);
         }
     };
 
@@ -319,17 +356,17 @@ namespace rdt {
         return m_impl->GetPolygon(realmID, objectID);
     }
 
-    void Physics::SetObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, const unsigned int nProperties)
+    void Physics::SetObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, PhysicalProperties nProperties)
     {
         m_impl->SetObjectProperties(realmID, objectID, nProperties);
     }
 
-    void Physics::RemoveObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, const unsigned int rProperties)
+    void Physics::RemoveObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, PhysicalProperties rProperties)
     {
         m_impl->RemoveObjectProperties(realmID, objectID, rProperties);
     }
 
-    bool Physics::QueryObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, const unsigned int propertyQuery)
+    bool Physics::QueryObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, PhysicalProperties propertyQuery)
     {
         return m_impl->QueryObjectProperties(realmID, objectID, propertyQuery);
     }
@@ -337,6 +374,16 @@ namespace rdt {
     UniqueID Physics::CreateObjectImpl(const UniqueID realmID, const MessageID messageID, std::shared_ptr<Polygon> polygon)
     {
         return m_impl->CreateObject(realmID, messageID, polygon);
+    }
+
+    std::shared_ptr<Polygon> Physics::RemoveObjectImpl(const UniqueID realmID, const UniqueID objectID)
+    {
+        return m_impl->RemoveObject(realmID, objectID);
+    }
+
+    void Physics::CreatePtagImpl(const std::string& tagName, PhysicalProperties tagProperties)
+    {
+        PtagManager::GetTag(PtagManager::CreateTag(tagName)).SetProperties(tagProperties);
     }
 
     void Physics::AddPTagImpl(const std::string& tagName, const UniqueID realmID, const UniqueID objectID)
@@ -369,6 +416,11 @@ namespace rdt {
         m_impl->SetMaximumVelocity(realmID, objectID, nMaxVelocity);
     }
 
+    void Physics::SetGravityImpl(const UniqueID realmID, double mps2)
+    {
+        m_impl->SetGravity(realmID, mps2);
+    }
+
     void Physics::SetFrictionImpl(const UniqueID realmID, const UniqueID objectID, const double friction)
     {
         m_impl->SetFriction(realmID, objectID, friction);
@@ -392,5 +444,9 @@ namespace rdt {
     Vec2d Physics::GetVelocityImpl(const UniqueID realmID, const UniqueID objectID)
     {
         return m_impl->GetVelocity(realmID, objectID);
+    }
+    Vec2d Physics::GetPositionImpl(const UniqueID realmID, const UniqueID objectID)
+    {
+        return m_impl->GetPosition(realmID, objectID);
     }
 }

@@ -119,6 +119,12 @@ namespace rdt {
 		*/
 		void CreateNewRealm();
 
+		/*
+			Looks for a game object in this layer's scope with a matching messageID, releases
+			it from the scene and destroys the object.
+		*/
+		void DestroyGameObject(MessageID mID);
+
 	private:
 
 		/*

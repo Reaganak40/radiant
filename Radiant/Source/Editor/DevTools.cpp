@@ -4,6 +4,7 @@
 
 #include "Messaging/MessageTypes.h"
 #include "Graphics/Renderer.h"
+#include "Physics/Physics.h"
 #include "Utils/Utils.h"
 
 #include "Gui/GuiManager.h"
@@ -102,8 +103,8 @@ namespace rdt::core {
 
 	// ==============================================================================
 
-	constexpr float GameWindowPanelGuiWidth = 1280.0f;
-	constexpr float GameWindowPanelGuiHeight = 741.0f;
+	constexpr float GameWindowPanelGuiWidth = 1118;
+	constexpr float GameWindowPanelGuiHeight = 649.0f;
 
 	GameWindowPanel::GameWindowPanel()
 	{
@@ -122,7 +123,7 @@ namespace rdt::core {
 		ImGui::SetNextWindowSize(ImVec2(m_gui_width, m_gui_height), ImGuiCond_Appearing);
 		
 		if (update_pos) {
-			ImGui::SetNextWindowPos(ImVec2(m_gui_pos.x, m_gui_pos.y), ImGuiCond_Always);
+			ImGui::SetNextWindowPos(ImVec2((float)m_gui_pos.x, (float)m_gui_pos.y), ImGuiCond_Always);
 			update_pos = false;
 		}
 		
@@ -179,13 +180,17 @@ namespace rdt::core {
 		RegisterToMessageBus("EditorLayout");
 		SetTheme(Theme_Codz);
 
-		Renderer::AddRenderWindow(m_game_window_panel = new GameWindowPanel);
+		m_gameWindowId = Renderer::AddRenderWindow(m_game_window_panel = new GameWindowPanel);
 		Renderer::SetDefaultViewport(false);
+		Input::SetTargetRenderWindow(m_gameWindowId);
 		m_showTools = true;
 
 		m_game_window_panel->SetGuiPositionY(88);
+		m_game_window_panel->SetGuiPositionX((m_window_width / 2) - (m_game_window_panel->GetGuiDimensions().x / 2));
 
 		ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
+
+		m_last_log = "";
 	}
 	EditorLayout::~EditorLayout()
 	{
@@ -209,7 +214,7 @@ namespace rdt::core {
 			}
 		}
 
-		if (Input::CheckKeyboardState(controls_ShowTools1) && Input::CheckKeyboardState(controls_ShowTools2)) {
+		if (Input::CheckInput(controls_ShowTools1) && Input::CheckInput(controls_ShowTools2)) {
 			if (Renderer::UsingDefaultViewport()) {
 				m_showTools = !m_showTools;
 			}
@@ -235,10 +240,13 @@ namespace rdt::core {
 
 		if (!isFullscreen) {
 			RenderScenePanel();
+			RenderConsolePanel();
 			RenderTemplateWizard();
 		}
 
 		ImGui::PopFont();
+
+		first_render = false;
 	}
 
 	void EditorLayout::SetTheme(EditorTheme nTheme)
@@ -327,13 +335,23 @@ namespace rdt::core {
 
 	void EditorLayout::OnFirstRender()
 	{
-		m_diagnostics_panel.width = DiagnosticGuiWidth;
+		ImGui::PushFont(m_fonts[ForkAwesome][18]);
+		m_game_window_settings_panel.width = GameWindowSettingsPanelWidth;
+		m_game_window_settings_panel.height = GetButtonHeight(ICON_FK_PAUSE) + 20;
+		m_game_window_settings_panel.xPos = ((float)m_game_window_panel->GetLastPosition().x) + m_game_window_panel->GetGuiDimensions().x - m_game_window_settings_panel.width;
+		m_game_window_settings_panel.yPos = GetDockPosY(DockTop, m_game_window_settings_panel.height, PanelMargin) + m_menu_bar_height;
+		ImGui::PopFont();
+
+		m_game_window_panel->SetGuiPositionY(m_game_window_settings_panel.yPos + m_game_window_settings_panel.height + PanelMargin);
+		m_game_window_panel->TriggerUpdatePos();
+
+		m_diagnostics_panel.width = m_window_width - (m_game_window_settings_panel.xPos + m_game_window_settings_panel.width + (PanelMargin * 2));
 		m_diagnostics_panel.height = DiagnosticGuiHeight;
 		m_diagnostics_panel.xPos = GetDockPosX(DockRight, m_diagnostics_panel.width, PanelMargin);
 		m_diagnostics_panel.yPos = GetDockPosY(DockTop, m_diagnostics_panel.height, PanelMargin) + m_menu_bar_height;
 
-		m_scene_panel.width = ScenePanelGuiWidth;
-		m_scene_panel.height = ScenePanelGuiHeight;
+		m_scene_panel.width = m_diagnostics_panel.width;
+		m_scene_panel.height = m_window_height - (m_diagnostics_panel.yPos + m_diagnostics_panel.height + (PanelMargin * 2));
 		m_scene_panel.xPos = GetDockPosX(DockRight, m_scene_panel.width, PanelMargin);
 		m_scene_panel.yPos = m_diagnostics_panel.yPos + m_diagnostics_panel.height + PanelMargin;
 
@@ -342,15 +360,10 @@ namespace rdt::core {
 		m_template_wizard.xPos = (m_window_width / 2) - (m_template_wizard.width / 2);
 		m_template_wizard.yPos = (m_window_height / 2) - (m_template_wizard.height / 2);
 
-		ImGui::PushFont(m_fonts[ForkAwesome][18]);
-		m_game_window_settings_panel.width = GameWindowSettingsPanelWidth;
-		m_game_window_settings_panel.height = GetButtonHeight(ICON_FK_PAUSE) + 20;
-		m_game_window_settings_panel.xPos = GetDockPosX(DockRight, m_game_window_settings_panel.width + m_diagnostics_panel.width + PanelMargin, PanelMargin);
-		m_game_window_settings_panel.yPos = GetDockPosY(DockTop, m_game_window_settings_panel.height, PanelMargin) + m_menu_bar_height;
-		ImGui::PopFont();
-
-		m_game_window_panel->SetGuiPositionY(m_game_window_settings_panel.yPos + m_game_window_settings_panel.height + PanelMargin);
-		m_game_window_panel->TriggerUpdatePos();
+		m_console_panel.width = m_game_window_panel->GetGuiDimensions().x;
+		m_console_panel.height = m_window_height -  (m_game_window_panel->GetLastPosition().y + m_game_window_panel->GetGuiDimensions().y + (PanelMargin * 2));
+		m_console_panel.xPos = (float)m_game_window_panel->GetLastPosition().x;
+		m_console_panel.yPos = ((float)m_game_window_panel->GetLastPosition().y) + m_game_window_panel->GetGuiDimensions().y + PanelMargin;
 	}
 
 	void EditorLayout::AddFont(EditorFont name, std::string& ttfFile, const std::vector<unsigned int>& sizes)
@@ -596,7 +609,6 @@ namespace rdt::core {
 			if (first_render) {
 				m_menu_bar_height = ImGui::GetWindowSize().y;
 				OnFirstRender();
-				first_render = false;
 			}
 
 			if (ImGui::BeginMenu("File")) {
@@ -634,8 +646,10 @@ namespace rdt::core {
 		ImGui::Begin("Diagnostic Tools");
 
 		// Show framerate
-		ImGui::NewLine();
-		ImGui::NewLine();
+		Vec2d screenCoords = Input::GetMouseCoords(MouseCond::SCREEN_COORDS);
+		Vec2d worldCoords = Input::GetMouseCoords(MouseCond::WORLD_COORDS);
+		ImGui::Text("Mouse screen-coordinates: (%.2f %2.f)", screenCoords.x, screenCoords.y);
+		ImGui::Text("Mouse world-coordinates: (%.2f %2.f)", worldCoords.x, worldCoords.y);
 		ImGui::Text("Performance: %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
 		ImGui::End();
@@ -686,7 +700,22 @@ namespace rdt::core {
 		ImGui::Indent(10);
 		if (ImGui::CollapsingHeader(panel_header.c_str())) {
 
-			ImGui::Text("This is info about this game object!");
+			ImGui::Text("GameObjectID: %d", gobject->GetID());
+			if (gobject->GetModelID() != 0 && gobject->GetRealmID() != 0) {
+				ImGui::Text("RealmID: %d", gobject->GetRealmID());
+				ImGui::Text("ModelID: %d", gobject->GetModelID());
+
+				Vec2d pos = Physics::GetPosition(gobject->GetRealmID(), gobject->GetModelID());
+				ImGui::Text("Position: (%.2f, %.2f)", pos.x, pos.y);
+
+				Vec2d vel = Physics::GetVelocity(gobject->GetRealmID(), gobject->GetModelID());
+				ImGui::Text("Velocity: (%.2f, %.2f)", vel.x, vel.y);
+
+			}
+			else {
+				ImGui::Text("Not Registered to any realms.");
+			}
+
 		}
 		ImGui::Unindent(10);
 	}
@@ -705,7 +734,7 @@ namespace rdt::core {
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.8f, 0.8f, 0.8f, 1.0f });
 
 		/* Play Button */
-		ImGui::PushStyleColor(ImGuiCol_Text, { 0.2, 0.8, 0.2, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_Text, { 0.2f, 0.8f, 0.2f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.2f, 0.9f, 0.2f, 0.2f });
 		ImGui::SetCursorPos({ 10, 10 });
 		if (ImGui::Button(ICON_FK_PLAY)) {
@@ -742,6 +771,7 @@ namespace rdt::core {
 		if (Renderer::UsingDefaultViewport()) {
 			if (ImGui::Button(ICON_FK_COMPRESS)) {
 				Renderer::SetDefaultViewport(false);
+				Input::SetTargetRenderWindow(m_gameWindowId);
 				m_diagnostics_panel.yPos = GetDockPosY(DockTop, m_diagnostics_panel.height, PanelMargin) + m_menu_bar_height;
 				m_game_window_settings_panel.xPos = GetDockPosX(DockRight, m_game_window_settings_panel.width + m_diagnostics_panel.width + PanelMargin, PanelMargin);
 				m_game_window_settings_panel.yPos = GetDockPosY(DockTop, m_game_window_settings_panel.height, PanelMargin) + m_menu_bar_height;
@@ -752,6 +782,7 @@ namespace rdt::core {
 		else {
 			if (ImGui::Button(ICON_FK_EXPAND)) {
 				Renderer::SetDefaultViewport(true);
+				Input::SetTargetRenderWindow(-1);
 				m_showTools = false;
 				m_game_window_settings_panel.yPos = PanelMargin;
 				m_game_window_settings_panel.xPos = GetDockPosX(DockRight, m_game_window_settings_panel.width, PanelMargin);
@@ -769,6 +800,30 @@ namespace rdt::core {
 		
 		ImGui::End();
 		ImGui::PopStyleColor();
+	}
+	void EditorLayout::RenderConsolePanel()
+	{
+		ApplyGuiConfig(m_console_panel);
+
+		ImGui::Begin("Console Panel");
+
+		int index = (int)Log::GetLogCount() - 1;
+		std::string log;
+		Color logColor;
+		while (index >= 0) {
+			Log::GetLog(index--, log, logColor);
+			
+			ImGui::PushStyleColor(ImGuiCol_Text, logColor.GetImGuiColor());
+			ImGui::Text("%s", log.c_str());
+			ImGui::PopStyleColor();
+		}
+
+		if (m_last_log != log) {
+			ImGui::SetScrollHereY(0.999f);
+			m_last_log = log;
+		}
+
+		ImGui::End();
 	}
 	void EditorLayout::RenderTemplateWizard()
 	{

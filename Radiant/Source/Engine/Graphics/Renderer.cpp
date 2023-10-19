@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Renderer.h"
+#include "Polygon/Rect.h"
 
 #ifdef RDT_USE_OPENGL
 

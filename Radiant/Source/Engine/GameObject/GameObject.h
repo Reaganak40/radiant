@@ -16,9 +16,16 @@ namespace rdt {
 
 		/*
 			Helper function for child game object classes to add a polygon
-			to the physical world.
+			to the physical world. When passing a null polygon, will try to
+			use the cached (previously removed) object. 
 		*/
-		void AddObjectToWorld(std::shared_ptr<Polygon> polygon);
+		void AddObjectToWorld(std::shared_ptr<Polygon> polygon = nullptr);
+
+		/*
+			Helper function for child game object classes to remove a poylgon from the
+			physical world. Also caches the polygon for re-introduction.
+		*/
+		void RemoveObjectFromWorld();
 
 	public:
 		GameObject();
@@ -45,16 +52,23 @@ namespace rdt {
 		const UniqueID GetModelID();
 
 		/*
-			To implement function when the layer this object belongs to is
-			being binded.
+			Returns true if this game object is binded to a scene.
 		*/
-		virtual void OnBind() {}
+		const bool IsBinded();
+
+		/*
+			To implement function when the layer this object belongs to is
+			being binded. The base class should be called at the end to set
+			internal bind flags.
+		*/
+		virtual void OnBind();
 
 		/*
 			To implement function when the scene this object belongs to is
-			being released.
+			being released. The base class should be called at the end to set
+			internal bind flags.
 		*/
-		virtual void OnRelease() {}
+		virtual void OnRelease();
 
 		/*
 			To implement function when object needs to perform update procedures.
@@ -89,5 +103,7 @@ namespace rdt {
 			Binds this game object to a realm, where it can communicate with the physics API
 		*/
 		void RegisterToRealm(const UniqueID nRealmID);
+
+
 	};
 }

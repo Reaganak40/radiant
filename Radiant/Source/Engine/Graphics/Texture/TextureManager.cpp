@@ -4,18 +4,63 @@
 namespace rdt {
 	using namespace core;
 
+	struct TextureManager::Impl {
+		std::unordered_map<std::string, Texture> m_textures;
+		std::array<unsigned int, MAX_TEXTURES> m_texture_slots;
+		TextureSlot m_next_slot;
+
+		Impl()
+		{
+			m_texture_slots.fill(UNASSIGNED_TEXTURE);
+			m_next_slot = 2;
+		}
+
+		~Impl()
+		{
+		}
+
+		void AddNoneTexture()
+		{
+			m_textures["None"] = Texture();
+			m_textures.at("None").SetToNone();
+			m_textures.at("None").Bind(NONE_TEXTURE);
+			m_texture_slots[NONE_TEXTURE] = NONE_TEXTURE;
+		}
+
+		Texture& LoadTextureFromPNG(const std::string& name, const std::string& filepath)
+		{
+			if (m_textures.find(name) == m_textures.end()) {
+				m_textures[name] = Texture();
+				m_textures.at(name).LoadTexture(filepath);
+			}
+
+			return m_textures.at(name);
+		}
+
+		Texture* GetTexture(const std::string& name)
+		{
+			if (m_textures.find(name) == m_textures.end()) {
+				printf("Warning: Could not find texture [%s]\n", name.c_str());
+				return nullptr;
+			}
+
+			return &m_textures.at(name);
+		}
+	};
+
+	// ======================================================================
+
 	TextureManager* TextureManager::m_instance = nullptr;
 
 	TextureManager::TextureManager()
+		: m_impl(new TextureManager::Impl)
 	{
-		m_texture_slots.fill(UNASSIGNED_TEXTURE);
-		m_next_slot = 2;
-
 		AddNoneTexture();
 	}
 
 	TextureManager::~TextureManager()
 	{
+		delete m_impl;
 	}
 
 	void TextureManager::Initialize()
@@ -32,13 +77,13 @@ namespace rdt {
 		}
 	}
 
-	bool TextureManager::ApplyTextureAtlas(Texture* texture, const Vec2i& atlasCoords, std::vector<Vertex>& rectVertices)
+	bool TextureManager::ApplyTextureAtlas(Texture* texture, const Vec2i& atlasCoords, std::vector<Vertex>& rectVertices, bool flipHorizontal)
 	{
 		bool slots_changed = false;
 		if (texture->CurrentTextureSlot() == UNASSIGNED_TEXTURE) {
 			TextureSlot slot = m_instance->GetNextSlot();
 			texture->Bind(slot);
-			m_instance->m_texture_slots[slot] = slot;
+			m_instance->m_impl->m_texture_slots[slot] = slot;
 			slots_changed = true;
 		}
 		float texIndex = (float)texture->CurrentTextureSlot();
@@ -77,45 +122,39 @@ namespace rdt {
 			rectVertices[i].texIndex = texIndex;
 		}
 
+		if (flipHorizontal) {
+			std::swap(rectVertices[0].texCoords.x, rectVertices[1].texCoords.x);
+			std::swap(rectVertices[0].texCoords.y, rectVertices[1].texCoords.y);
+
+			std::swap(rectVertices[2].texCoords.x, rectVertices[3].texCoords.x);
+			std::swap(rectVertices[2].texCoords.y, rectVertices[3].texCoords.y);
+		}
+
 		return slots_changed;
 	}
 	
 	std::array<unsigned int, MAX_TEXTURES>& TextureManager::GetTextureSlots()
 	{
-		return m_instance->m_texture_slots;
+		return m_instance->m_impl->m_texture_slots;
 	}
 
 	void TextureManager::AddNoneTexture()
 	{
-		m_textures["None"] = Texture();
-		m_textures.at("None").SetToNone();
-		m_textures.at("None").Bind(NONE_TEXTURE);
-		m_texture_slots[NONE_TEXTURE] = NONE_TEXTURE;
-
+		m_impl->AddNoneTexture();
 	}
 
 	TextureSlot TextureManager::GetNextSlot()
 	{
-		return m_next_slot++;
+		return m_impl->m_next_slot++;
 	}
 
 	Texture& TextureManager::LoadTextureFromPNGImpl(const std::string& name, const std::string& filepath)
 	{
-		if (m_textures.find(name) == m_textures.end()) {
-			m_textures[name] = Texture();
-			m_textures.at(name).LoadTexture(filepath);
-		}
-
-		return m_textures.at(name);
+		return m_impl->LoadTextureFromPNG(name, filepath);
 	}
 
 	Texture* TextureManager::GetTextureImpl(const std::string& name)
 	{
-		if (m_textures.find(name) == m_textures.end()) {
-			printf("Warning: Could not find texture [%s]\n", name.c_str());
-			return nullptr;
-		}
-
-		return &m_textures.at(name);
+		return m_impl->GetTexture(name);
 	}
 }

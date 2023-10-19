@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "Core.h"
 #include "Utils.h"
 #include "Engine/Logging/Log.h"
 
@@ -34,7 +33,7 @@ namespace rdt {
                 return x;
             }
 
-            if (y > x) { Swap(x, y); }
+            if (y > x) { std::swap(x, y); }
 
             return GCD(y, x % y);
         }
@@ -105,23 +104,6 @@ namespace rdt {
             return (x > y ? x : y);
         }
 
-        double Min(double x, double y)
-        {
-            return (x > y ? y : x);
-        }
-
-        void Swap(double& A, double& B)
-        {
-            double temp = A;
-            A = B;
-            B = temp;
-        }
-        void Swap(unsigned int& A, unsigned int& B)
-        {
-            int temp = A;
-            A = B;
-            B = temp;
-        }
         Vec2d GetClosestVertex(const std::vector<Vec2d>& vertices, const Vec2d& point)
         {
             constexpr double minDistance = std::numeric_limits<double>::max();
@@ -164,10 +146,20 @@ namespace rdt {
             point.y = origin.y + (magnitude * std::sin(theta));
         }
 
+        float RADIANT_API DegreesToRadians(float degrees)
+        {
+            return degrees * ((float)M_PI) / 180.0f;
+        }
+
         std::string GetCWD()
         {
             char buff[FILENAME_MAX]; //create string buffer to hold path
+
+#pragma warning( push )
+#pragma warning( disable : 6031)
             GetCurrentDir(buff, FILENAME_MAX);
+#pragma warning( pop ) 
+
             std::string current_working_dir(buff);
             return current_working_dir;
         }

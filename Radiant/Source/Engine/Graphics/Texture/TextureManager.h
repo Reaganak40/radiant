@@ -1,5 +1,5 @@
 #pragma once
-#include "pch.h"
+#include "Core.h"
 #include "Texture.h"
 #include "../Mesh.h"
 
@@ -10,16 +10,14 @@ namespace rdt::core {
 
 namespace rdt {
 
-	class TextureManager {
+	class RADIANT_API TextureManager {
 	private:
+		struct Impl;
+		Impl* m_impl;
+		
 		TextureManager();
 		~TextureManager();
 		static TextureManager* m_instance;
-
-		std::unordered_map<std::string, Texture> m_textures;
-		std::array<unsigned int, MAX_TEXTURES> m_texture_slots;
-
-		TextureSlot m_next_slot;
 
 	public:
 		/*
@@ -55,7 +53,7 @@ namespace rdt {
 			tile map.
 			Returns true if the texture slots changed.
 		*/
-		static bool ApplyTextureAtlas(Texture* texture, const Vec2i& atlasCoords, std::vector<core::Vertex>& rectVertices);
+		static bool ApplyTextureAtlas(Texture* texture, const Vec2i& atlasCoords, std::vector<core::Vertex>& rectVertices, bool flipHorizontal = false);
 		static std::array<unsigned int, MAX_TEXTURES>& GetTextureSlots();
 
 		void AddNoneTexture();

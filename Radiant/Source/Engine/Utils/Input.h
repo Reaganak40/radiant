@@ -1,5 +1,5 @@
 #pragma once
-#include "pch.h"
+#include "Core.h"
 #include "MathTypes.h"
 #include "BitSet.h"
 
@@ -128,9 +128,57 @@ namespace rdt {
         UP_KEY_DOWN,
         UP_KEY_UP,
 
+        SPACE_KEY_PRESS,
+        SPACE_KEY_DOWN,
+        SPACE_KEY_UP,
+
         CTRL_KEY_PRESS,
         CTRL_KEY_DOWN,
         CTRL_KEY_UP,
+
+        ZERO_KEY_PRESS,
+        ZERO_KEY_DOWN,
+        ZERO_KEY_UP,
+
+        ONE_KEY_PRESS,
+        ONE_KEY_DOWN,
+        ONE_KEY_UP,
+
+        TWO_KEY_PRESS,
+        TWO_KEY_DOWN,
+        TWO_KEY_UP,
+
+        THREE_KEY_PRESS,
+        THREE_KEY_DOWN,
+        THREE_KEY_UP,
+
+        FOUR_KEY_PRESS,
+        FOUR_KEY_DOWN,
+        FOUR_KEY_UP,
+
+        FIVE_KEY_PRESS,
+        FIVE_KEY_DOWN,
+        FIVE_KEY_UP,
+
+        SIX_KEY_PRESS,
+        SIX_KEY_DOWN,
+        SIX_KEY_UP,
+
+        SEVEN_KEY_PRESS,
+        SEVEN_KEY_DOWN,
+        SEVEN_KEY_UP,
+
+        EIGHT_KEY_PRESS,
+        EIGHT_KEY_DOWN,
+        EIGHT_KEY_UP,
+
+        NINE_KEY_PRESS,
+        NINE_KEY_DOWN,
+        NINE_KEY_UP,
+
+        MOUSE_PRESS,
+        MOUSE_DOWN,
+        MOUSE_UP,
 
         NAIS // Not an input state
     };
@@ -145,6 +193,7 @@ namespace rdt {
 
     struct MouseState {
         Vec2d position;
+        bool mouse_moved = false;
 
         MouseState()
             : position(Vec2d(0, 0)) {}
@@ -165,33 +214,16 @@ namespace rdt {
 // 120 frames = ~2 seconds of stored input
 #define STATE_CACHE_SIZE 120
 
-    class Input {
+    class RADIANT_API Input {
     private:
+        struct Impl;
+        Impl* m_impl;
+
         Input();
         ~Input();
         static Input* m_instance;
-        float m_timestep;
-
-        GLFWwindow* m_window;
-        
-        // the buffer index where new input is being added.
-        // The last polled input will be m_current_state-1.
-        int m_state_index; 
-
-        float m_timestamps[STATE_CACHE_SIZE];
-        BitSet m_keyboard_state[STATE_CACHE_SIZE];
-        MouseState m_mouse_state[STATE_CACHE_SIZE];
-        WindowState m_window_state[STATE_CACHE_SIZE];
-        bool m_mouse_changed;
 
     public:
-        static Input* GetInstance() {
-            if (m_instance == nullptr) {
-                m_instance = new Input;
-            }
-            return m_instance;
-        }
-
         /* Sets up the input handling with the given glfw window. */
         static void Initialize();
         static void Destroy();
@@ -223,10 +255,14 @@ namespace rdt {
             Returns true if any of keystate in the input query is true.
             The target frame indicates how many frames ago to check for input, starting at 1 (current-frame), up to 5 frames ago.
         */
-        static bool CheckKeyboardState(const std::vector<InputState>& stateQuery, unsigned int targetFrame = 1);
+        static bool CheckInput(const std::vector<InputState>& stateQuery, unsigned int targetFrame = 1);
 
         static inline MouseState GetMouseState() { return m_instance->GetMouseStateImpl(); }
 
+        /*
+            Returns the xy coordinates of the mouse either in screen coordinates (relative to the window),
+            or world coordnates (relative to the camera position).
+        */
         static Vec2d GetMouseCoords(const MouseCond cond) { return m_instance->GetMouseCoordsImpl(cond); }
 
         static bool CheckWindowResize() { return m_instance->CheckWindowResizeImpl(); }
@@ -234,6 +270,12 @@ namespace rdt {
         static float GetTimeSinceKeyState(const std::vector<InputState>& stateQuery, const float maxTime = 1.0f) {
             return m_instance->GetTimeSinceKeyStateImpl((unsigned int*)stateQuery.data(), stateQuery.size(), maxTime);
         }
+
+        /*
+            Sets the render window that shoud be used to offset the mouse coordinates. By default
+            is -1, which means to use the default viewport.
+        */
+        static void SetTargetRenderWindow(int renderWindowIndex);
 
     private:
         void UpdateTimeImpl(const float deltaTime);

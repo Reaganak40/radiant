@@ -6,7 +6,7 @@
 namespace rdt::core {
 
     Realm::Realm()
-        : m_ID(GetUniqueID())
+        : m_ID(GetUniqueID()), m_gravity(0)
     {
     }
 
@@ -26,9 +26,24 @@ namespace rdt::core {
             if (!object1.HasProperties(NoCollision)) {
 
                 for (auto& [id2, object2] : m_objects) {
-                    if (id1 == id2 || !object1.ShareTags(object2)) {
+                    if (id1 == id2) {
                         continue;
                     }
+
+                    std::vector<UniqueID> sharedTags;
+                    if (object1.GetSharedTags(object2, sharedTags)) {
+                        bool skip = false;
+                        for (auto tagID : sharedTags) {
+                            if (PtagManager::GetTag(tagID).HasProperties(NoCollision)) {
+                                skip = true;
+                                break;
+                            }
+                        }
+                        if (skip) {
+                            continue;
+                        }
+                    }
+                    
 
                     if (Collision::CheckCollision(object1, object2, deltaTime)) {
                         MessageBus::AddToQueue(m_object_mIDs[id2], m_object_mIDs[id1], MT_Collision, new CollisionData(id2));
@@ -54,7 +69,20 @@ namespace rdt::core {
         UniqueID objectID = GetUniqueID();
         m_objects[objectID] = Pobject(polygon);
         m_object_mIDs[objectID] = messageID;
+        
+        m_objects.at(objectID).SetGravity(m_gravity);
         return objectID;
+    }
+
+    std::shared_ptr<Polygon> Realm::DestroyPhysicsObject(const UniqueID UUID)
+    {
+        if (m_objects.find(UUID) == m_objects.end()) {
+            return std::shared_ptr<Polygon>();
+        }
+
+        std::shared_ptr<Polygon> polygon = m_objects.at(UUID).m_polygon;
+        m_objects.erase(UUID);
+        return polygon;
     }
 
     Pobject* Realm::GetPhysicsObject(const UniqueID UUID)
@@ -64,5 +92,13 @@ namespace rdt::core {
         }
 
         return &m_objects.at(UUID);
+    }
+
+    void Realm::SetGravity(double mps2)
+    {
+        m_gravity = mps2;
+        for (auto& [id, object] : m_objects) {
+            object.SetGravity(m_gravity);
+        }
     }
 }

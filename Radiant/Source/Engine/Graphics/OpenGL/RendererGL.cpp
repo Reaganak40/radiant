@@ -24,6 +24,7 @@ namespace rdt::core {
         m_polygon_color = BLACK;
         m_line_color = BLACK;
         m_imgui_newFrameCalled = false;
+        begin_called = false;
 	}
 
 	RendererGL::~RendererGL()
@@ -140,11 +141,6 @@ namespace rdt::core {
         return m_window;
     }
 
-    Vec2d RendererGL::GetCameraCoordinates2DImpl()
-    {
-        return Vec2d(m_screen_origin.x, m_screen_origin.y);
-    }
-
     void RendererGL::SetBackgroundColorImpl(const Color& color)
     {
         m_clear_color = color;
@@ -164,7 +160,12 @@ namespace rdt::core {
         m_frame_buffers[id];
         auto& fbo = m_frame_buffers.at(id);
         fbo.Init();
+
+#pragma warning( push )
+#pragma warning( disable : 4312)
         nRenderWindow->AssignTexture((void*)fbo.GetTexture());
+#pragma warning( pop ) 
+
     }
 
     void RendererGL::ClearImpl()
@@ -201,7 +202,13 @@ namespace rdt::core {
         */
 
         if (UsingDefaultViewport()) {
-            SetViewport(m_default_viewport);
+            Clear(m_default_viewport, BLACK);
+
+            Vec2d windowDimensions = { (double)m_default_viewport.width, (double)m_default_viewport.height };
+            Vec2f cameraDimensions = GetCamera().GetCameraDimensionsFromViewport((float)windowDimensions.x, (float)windowDimensions.y);
+            double midX = (windowDimensions.x / 2) - (cameraDimensions.x / 2);
+            double midY = (windowDimensions.y / 2) - (cameraDimensions.y / 2);
+            SetViewport({ (int)midX, (int)midY, (int)cameraDimensions.x, (int)cameraDimensions.y });
             DrawContext();
         }
         else {
@@ -212,10 +219,10 @@ namespace rdt::core {
             
                 /* Update window dimensions and setup viewport */
                 Vec2d windowDimensions = window->UpdateAndGetWindowSize();
-                Vec2f cameraDimensions = GetCamera().GetCameraDimensionsFromViewport(windowDimensions.x, windowDimensions.y);
-                fbo.Rescale(windowDimensions.x, windowDimensions.y);
-                int midX = (windowDimensions.x / 2) - (cameraDimensions.x / 2);
-                int midY = (windowDimensions.y / 2) - (cameraDimensions.y / 2);
+                Vec2f cameraDimensions = GetCamera().GetCameraDimensionsFromViewport((float)windowDimensions.x, (float)windowDimensions.y);
+                fbo.Rescale((int)windowDimensions.x, (int)windowDimensions.y);
+                int midX = (int)((windowDimensions.x / 2) - (cameraDimensions.x / 2));
+                int midY = (int)((windowDimensions.y / 2) - (cameraDimensions.y / 2));
                 SetViewport({ midX, midY, (int)cameraDimensions.x, (int)cameraDimensions.y });
 
                 /* Attach framebuffer texture to ImGui window context. */
@@ -284,7 +291,7 @@ namespace rdt::core {
         BeginImpl(layer);
         SetPolygonColorImpl(color);
         SetRenderTypeImpl(DrawFilled);
-        AddPolygonImpl(*rect);
+        AddPolygonImpl(*rect, Vec2f::Zero());
         EndImpl();
 
         // Go back to saved settings
@@ -319,6 +326,11 @@ namespace rdt::core {
 
     void RendererGL::BeginImpl(unsigned int layer)
     {
+        if (begin_called) {
+            RDT_CORE_ERROR("Renderer - Called Begin() twice in the same context. Did you forget to call Renderer::End()?");
+            ASSERT(false);
+        }
+
         while (m_layers.size() <= layer) {
             m_layers.push_back(RenderLayer());
             m_layers.back().SetDefaultShader(m_shaders[0]->GetID());
@@ -327,31 +339,56 @@ namespace rdt::core {
         m_current_layer = layer;
         m_current_render_type = DrawFilled;
         m_polygon_texture = TextureManager::GetTexture("None");
+        m_should_flip_texture = false;
         m_polygon_color = WHITE;
+        m_polygon_rotation = 0.0f;
+        
+        begin_called = true;
     }
 
     void RendererGL::EndImpl()
     {
-        /* TODO:end of render context procedures... */
+        begin_called = false;
     }
 
     void RendererGL::SetRenderTypeImpl(core::RenderType type)
     {
+        if (!begin_called) {
+            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
+            ASSERT(false);
+        }
+
         m_current_render_type = type;
     }
 
-    void RendererGL::AddPolygonImpl(const Polygon& polygon)
+    void RendererGL::AddPolygonImpl(const Polygon& polygon, const Vec2f& offset)
     {
+        if (!begin_called) {
+            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
+            ASSERT(false);
+        }
+
         Mesh& pMesh = m_render_cache.GetMesh(polygon.GetUUID());
+        const std::vector<Vec2d>* polygonVertices = nullptr;
 
         if (pMesh.indices.size() != polygon.GetIndices().size()) {
             pMesh.indices = polygon.GetIndices();
         }
 
         int index = 0;
+        
 
+        Polygon* util_poly = nullptr;
+        if (m_polygon_rotation != 0.0f) {
+            util_poly = new Polygon(polygon);
+            util_poly->SetRotation(m_polygon_rotation);
+            polygonVertices = &util_poly->GetVertices();
+        }
+        else {
+            polygonVertices = &polygon.GetVertices();
+        }
 
-        for (const auto& vertex : polygon.GetVertices()) {
+        for (const auto& vertex : (*polygonVertices)) {
             if (pMesh.vertices.size() == index) {
 
                 pMesh.vertices.push_back(
@@ -372,13 +409,53 @@ namespace rdt::core {
 
         pMesh.layer = m_current_layer;
         pMesh.texture = m_polygon_texture;
+        pMesh.flipTexture = m_should_flip_texture;
         pMesh.texAtlasCoords = m_polygon_texture_coords;
 
+        if (offset.x != 0.0f || offset.y != 0.0f) {
+            for (auto& vertex : pMesh.vertices) {
+                vertex.position.x += offset.x;
+                vertex.position.y += offset.y;
+            }
+        }
+
         m_command_queue.push(DrawCommand(polygon.GetUUID(), m_current_render_type));
+
+        if (util_poly != nullptr) {
+            delete util_poly;
+        }
+    }
+
+    void RendererGL::AddRectImpl(const Vec2d& origin, const Vec2d& size, const Vec2f& offset)
+    {
+        if (!begin_called) {
+            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
+            ASSERT(false);
+        }
+
+        // Use the rect cache for efficiency
+        std::shared_ptr<Rect> rect;
+
+        if ((rect = m_render_cache.GetFreeRect()) == nullptr) {
+            m_render_cache.AddRectToCache(std::shared_ptr<Rect>(new Rect(origin, size.x, size.y)));
+            rect = m_render_cache.GetFreeRect();
+        }
+        else {
+            rect->SetPosition(origin);
+            rect->SetSize(size);
+        }
+
+        // Use draw API
+        AddPolygonImpl(*rect, offset);
     }
 
     void RendererGL::AddLineImpl(const Line& line)
     {
+        if (!begin_called) {
+            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
+            ASSERT(false);
+        }
+
         Mesh& pMesh = m_render_cache.GetMesh(line.GetUUID());
 
         if (pMesh.indices.size() != line.GetIndices().size()) {
@@ -414,19 +491,50 @@ namespace rdt::core {
 
     void RendererGL::SetLineColorImpl(const Color& color)
     {
+        if (!begin_called) {
+            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
+            ASSERT(false);
+        }
         m_line_color = color;
     }
 
     void RendererGL::SetPolygonColorImpl(const Color& color)
     {
+        if (!begin_called) {
+            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
+            ASSERT(false);
+        }
         m_polygon_color = color;
+    }
+
+    void RendererGL::SetPolygonRotationImpl(const float radians)
+    {
+        if (!begin_called) {
+            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
+            ASSERT(false);
+        }
+        m_polygon_rotation = radians;
     }
 
     void RendererGL::SetPolygonTextureImpl(const std::string& texName, unsigned int atlasX, unsigned int atlasY)
     {
+        if (!begin_called) {
+            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
+            ASSERT(false);
+        }
+
         m_polygon_texture = TextureManager::GetTexture(texName);
         m_polygon_texture_coords.x = atlasX;
         m_polygon_texture_coords.y = atlasY;
+    }
+
+    void RendererGL::FlipPolygonTextureHorizontalImpl(bool flip)
+    {
+        if (!begin_called) {
+            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
+            ASSERT(false);
+        }
+        m_should_flip_texture = flip;
     }
 
     void RendererGL::AttachGuiImpl(GuiTemplate* gui)
@@ -445,9 +553,49 @@ namespace rdt::core {
         }
     }
 
+    Vec2d RendererGL::ScreenToWorldCoordinatesImpl(const Vec2d& ScreenCoords, int renderWindowIndex)
+    {
+        auto& camera = GetCamera();
+        Vec2d res = Vec2d::Zero();
+
+        if (UsingDefaultViewport() || renderWindowIndex < 0) {
+            res.x = camera.GetCameraDimensions().x * ScreenCoords.x / m_current_viewport.width;
+            res.y = camera.GetCameraDimensions().y * ScreenCoords.y / m_current_viewport.height;
+        }
+        else {
+
+            auto& renderWindows = GetRenderWindows();
+            if (renderWindows.find(renderWindowIndex) == renderWindows.end()) {
+                return Vec2d::Zero();
+            }
+            Vec2d size = renderWindows.at(renderWindowIndex)->GetLastSize();
+            res.x = camera.GetCameraDimensions().x * ScreenCoords.x / size.x;
+            res.y = camera.GetCameraDimensions().y * ScreenCoords.y / size.y;
+        };
+
+        res += camera.GetPosition();
+        return res;
+    }
+
     void RendererGL::_FlushPolygonImpl(const UniqueID UUID)
     {
         m_render_cache.Flush(UUID);
+    }
+
+    Vec2d RendererGL::_TranslateMouseCoordsToViewportImpl(const Vec2d& mouseCoords, int renderWindowIndex)
+    {
+        if (UsingDefaultViewport() || renderWindowIndex < 0) {
+            return { mouseCoords.x - m_current_viewport.posX, mouseCoords.y - m_current_viewport.posY };
+        }
+        
+        auto& renderWindows = GetRenderWindows();
+        if (renderWindows.find(renderWindowIndex) == renderWindows.end()) {
+            return Vec2d::Zero();
+        }
+        Vec2d offset = renderWindows.at(renderWindowIndex)->GetLastPosition();
+        offset.y = m_window_height - offset.y;
+        offset.y -= renderWindows.at(renderWindowIndex)->GetLastSize().y;
+        return { mouseCoords.x - offset.x, mouseCoords.y - offset.y };
     }
 
     void RendererGL::DrawContext()

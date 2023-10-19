@@ -46,9 +46,13 @@ namespace rdt::core {
 		core::RenderCache m_render_cache;
 		std::queue<DrawCommand> m_command_queue;
 
+		bool begin_called;
+		// Assignable mesh attributes
 		Color m_polygon_color;
 		Texture* m_polygon_texture;
+		bool m_should_flip_texture;
 		Vec2i m_polygon_texture_coords;
+		float m_polygon_rotation;
 
 		Color m_line_color;
 
@@ -114,7 +118,6 @@ namespace rdt::core {
 		unsigned int GetWindowHeightImpl() override final;
 		bool CreateWindowImpl(const std::string& windowName) override final;
 		void* GetWindowInstanceImpl() override final;
-		Vec2d GetCameraCoordinates2DImpl() override final;
 		void SetBackgroundColorImpl(const Color& color) override final;
 		Vec2i OnWindowResizeImpl() override final;
 		void OnNewRenderWindow(int id, RenderWindow* nRenderWindow) override final;
@@ -134,15 +137,23 @@ namespace rdt::core {
 		void EndImpl() override final;
 
 		void SetRenderTypeImpl(core::RenderType type) override final;
-		void AddPolygonImpl(const Polygon& polygon) override final;
+		void AddPolygonImpl(const Polygon& polygon, const Vec2f& offset) override final;
+		void AddRectImpl(const Vec2d& origin, const Vec2d& size, const Vec2f& offset) override final;
+
 		void AddLineImpl(const Line& line) override final;
 		void SetLineColorImpl(const Color& color) override final;
 		void SetPolygonColorImpl(const Color& color) override final;
+		void SetPolygonRotationImpl(const float radians) override final;
 		void SetPolygonTextureImpl(const std::string& texName, unsigned int atlasX = 0, unsigned int atlasY = 0) override final;
+		void FlipPolygonTextureHorizontalImpl(bool flip) override final;
 		void AttachGuiImpl(GuiTemplate* gui) override final;
 		void DetachGuiImpl(const GuiTemplate* gui) override final;
 
+		Vec2d ScreenToWorldCoordinatesImpl(const Vec2d& ScreenCoords, int renderWindowIndex) override final;
+
 		void _FlushPolygonImpl(const UniqueID UUID) override final;
+		Vec2d _TranslateMouseCoordsToViewportImpl(const Vec2d& mouseCoords, int renderWindowIndex) override final;
+
 
 		/* ***********************************************
 			    OpenGL Rendering Helper Functions

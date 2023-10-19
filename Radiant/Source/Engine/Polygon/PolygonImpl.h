@@ -16,5 +16,7 @@ namespace rdt::core {
 
 		PolygonImpl();
 		~PolygonImpl();
+
+		void Copy(const PolygonImpl* src);
 	};
 }

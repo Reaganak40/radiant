@@ -1,6 +1,5 @@
 #pragma once
-
-#include "pch.h"
+#include "Core.h"
 #include "MathTypes.h"
 
 namespace rdt {
@@ -65,7 +64,7 @@ namespace rdt {
         /*
             Returns a random int in the range [min, max].
         */
-        int RandInt(const int min, const int max);
+        int RADIANT_API RandInt(const int min, const int max);
 
         /*
             Reads an ASCII text file and returns the contents to the passed reference.
@@ -80,28 +79,26 @@ namespace rdt {
         /*
             Returns the max between two unsigned integers
         */
-        unsigned int Max(unsigned int x, unsigned int y);
+        unsigned int RADIANT_API Max(unsigned int x, unsigned int y);
 
         /*
             Returns the max between two doubles
         */
-        double Max(double x, double y);
+        double RADIANT_API Max(double x, double y);
 
         /*
             Returns the max between two floats.
         */
-        float Max(float x, float y);
+        float RADIANT_API Max(float x, float y);
 
         /*
             Returns the minimum between two doubles
         */
-        double Min(double x, double y);
-
-        /*
-            Swaps the contents of the two values.
-        */
-        void Swap(double& A, double& B);
-        void Swap(unsigned int& A, unsigned int& B);
+        template<typename T>
+        T Min(T x, T y)
+        {
+            return (x > y ? y : x);
+        }
 
         /*
             Returns the vertex in the list that is closest to the provided point.
@@ -111,7 +108,7 @@ namespace rdt {
         /*
             Returns the distance between two points.
         */
-        double GetDistance(const Vec2d& pointA, const Vec2d& pointB);
+        double RADIANT_API GetDistance(const Vec2d& pointA, const Vec2d& pointB);
 
         /*
             Returns the manhattan distance between two points.
@@ -126,12 +123,17 @@ namespace rdt {
         /*
             Returns in radians the theta between these two points.
         */
-        double GetRotation(const Vec2d& origin, const Vec2d& point);
+        double RADIANT_API GetRotation(const Vec2d& origin, const Vec2d& point);
 
         /*
             Rotates 'point' by dr about the origin.
         */
         void RotatePoint(const Vec2d& origin, Vec2d& point, const double dr);
+
+        /*
+            Returns an angle in degrees into radians
+        */
+        float RADIANT_API DegreesToRadians(float degrees);
 
         /*
             Returns the absolute path to the current working directory.

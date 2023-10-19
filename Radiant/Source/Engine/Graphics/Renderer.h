@@ -76,11 +76,6 @@ namespace rdt {
 		static unsigned int GetWindowHeight() { return m_instance->GetWindowHeightImpl(); }
 
 		/*
-			Gets the 2D camera coordinates based in the bottom left corner.
-		*/
-		static Vec2d GetCameraCoordinates2D() { return m_instance->GetCameraCoordinates2DImpl(); }
-
-		/*
 			Sets the background color used on clear.
 		*/
 		static void SetBackgroundColor(const Color& color) { m_instance->SetBackgroundColorImpl(color); }
@@ -90,7 +85,6 @@ namespace rdt {
 			the aspect ratio.
 		*/
 		static Vec2i OnWindowResize() { return m_instance->OnWindowResizeImpl(); }
-
 
 		/*
 			Adds a new render window to the rendering context. The renderer will draw
@@ -156,9 +150,17 @@ namespace rdt {
 		static void SetRenderType(core::RenderType type) { m_instance->SetRenderTypeImpl(type); }
 
 		/*
-			Adds a polygon to the render queue to be drawn next frame.
+			Adds a polygon to the render queue to be drawn next frame. Use optional
+			offset to move the origin of the polygon an arbitary distance from its
+			current location.
 		*/
-		static void AddPolygon(const Polygon& polygon) { m_instance->AddPolygonImpl(polygon); }
+		static void AddPolygon(const Polygon& polygon, const Vec2f& offset = Vec2f::Zero()) { m_instance->AddPolygonImpl(polygon, offset); }
+
+		/*
+			Adds a rect polygon to the next draw frame. This effectively calls
+			AddPolygon but without the need for a stored polygon reference.
+		*/
+		static void AddRect(const Vec2d& origin, const Vec2d& size, const Vec2f& offset = Vec2f::Zero()) { m_instance->AddRectImpl(origin, size, offset); }
 
 		/*
 			Adds a line to the render queue to be drawn next frame.
@@ -174,6 +176,11 @@ namespace rdt {
 			Sets the draw color for lines, which will be used on the next line.
 		*/
 		static void SetLineColor(ColorType color) { m_instance->SetLineColorImpl(color); }
+
+		/*
+			Applies a post (applied later) rotation to the next polygon when it is drawn.
+		*/
+		static void SetPolygonRotation(const float radians) { m_instance->SetPolygonRotationImpl(radians); }
 
 		/*
 			Sets the draw color for polygons, which will be used on the next polygon.
@@ -193,6 +200,12 @@ namespace rdt {
 			This currently only works for Rects.
 		*/
 		static void SetPolygonTexture(const std::string& texName, unsigned int atlasX = 0, unsigned int atlasY = 0) { m_instance->SetPolygonTextureImpl(texName, atlasX, atlasY); }
+
+
+		/*
+			Flips the texture coordinates for the next polygon, horizontally.
+		*/
+		static void FlipPolygonTextureHorizontal(bool flip = true) { m_instance->FlipPolygonTextureHorizontalImpl(flip); }
 
 		/*
 			Attaches a Gui instance, which will be drawn at the end of the draw command queue.
@@ -223,6 +236,11 @@ namespace rdt {
 		*/
 		static bool UsingDefaultViewport();
 
+		/*
+		Returns the world coordinates from provided screen coordinates on the camera.
+		*/
+		static Vec2d ScreenToWorldCoordinates(const Vec2d& ScreenCoords, int renderWindowIndex = -1) { return m_instance->ScreenToWorldCoordinatesImpl(ScreenCoords, renderWindowIndex); }
+
 		// *****************************************************
 		// 
 		//			     Renderer Core Engine Calls
@@ -233,6 +251,13 @@ namespace rdt {
 		*/
 		static void _FlushPolygon(const UniqueID UUID) { m_instance->_FlushPolygonImpl(UUID); }
 
+		/*
+			Takes in mouse coordinates and returns them scopes relative to the game window viewport.
+			If not using default viewport, specify the render window by its id/index to get the 
+			coordinate offset from that window.
+		*/
+		static Vec2d _TranslateMouseCoordsToViewport(const Vec2d& mouseCoords, int renderWindowIndex = -1) { return m_instance->_TranslateMouseCoordsToViewportImpl(mouseCoords, renderWindowIndex); }
+
 	protected:
 		// Implementation Functions to be implemented by the proper platform.
 
@@ -241,7 +266,6 @@ namespace rdt {
 		virtual unsigned int GetWindowHeightImpl() = 0;
 		virtual bool CreateWindowImpl(const std::string& windowName) = 0;
 		virtual void* GetWindowInstanceImpl() = 0;
-		virtual Vec2d GetCameraCoordinates2DImpl() = 0;
 		virtual void SetBackgroundColorImpl(const Color& color) = 0;
 		virtual Vec2i OnWindowResizeImpl() = 0;
 		virtual void OnNewRenderWindow(int id, RenderWindow* nRenderWindow) = 0;
@@ -257,15 +281,20 @@ namespace rdt {
 		virtual void EndImpl() = 0;
 
 		virtual void SetRenderTypeImpl(core::RenderType type) = 0;
-		virtual void AddPolygonImpl(const Polygon& polygon) = 0;
+		virtual void AddPolygonImpl(const Polygon& polygon, const Vec2f& offset) = 0;
+		virtual void AddRectImpl(const Vec2d& origin, const Vec2d& size, const Vec2f& offset) = 0;
 		virtual void AddLineImpl(const Line& line) = 0;
 		virtual void SetLineColorImpl(const Color& color) = 0;
 		virtual void SetPolygonColorImpl(const Color& color) = 0;
+		virtual void SetPolygonRotationImpl(const float radians) = 0;
 		virtual void SetPolygonTextureImpl(const std::string& texName, unsigned int atlasX = 0, unsigned int atlasY = 0) = 0;
+		virtual void FlipPolygonTextureHorizontalImpl(bool flip) = 0;
 		virtual void AttachGuiImpl(GuiTemplate* gui) = 0;
 		virtual void DetachGuiImpl(const GuiTemplate* gui) = 0;
 
+		virtual Vec2d ScreenToWorldCoordinatesImpl(const Vec2d& ScreenCoords, int renderWindowIndex) = 0;
+
 		virtual void _FlushPolygonImpl(const UniqueID UUID) = 0;
-		
+		virtual Vec2d _TranslateMouseCoordsToViewportImpl(const Vec2d& mouseCoords, int renderWindowIndex) = 0;
 	};
 }

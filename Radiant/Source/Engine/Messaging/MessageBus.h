@@ -47,6 +47,12 @@ namespace rdt {
 		static MessageID Register(const std::string& alias, Messenger* messenger);
 
 		/*
+			Removes a messenger from the MessageBus that had previously been registered with
+			the MessageBus.
+		*/
+		static void RemoveMessenger(MessageID mID);
+
+		/*
 			Creates a new broadcast instance under the provided alias. The owner of the broadcast
 			should be the only entity that can add broadcast messages, but all entities should be
 			able to see the broadcast messages at any time.
@@ -67,7 +73,7 @@ namespace rdt {
 		/*
 			Adds a new message to the Message Queue.
 		*/
-		static void AddToQueue(const Message& msg);
+		static void AddToQueue(Message& msg);
 
 		/*
 			Adds a new message to the Message Queue.

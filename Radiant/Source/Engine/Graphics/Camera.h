@@ -5,7 +5,8 @@
 
 namespace rdt {
 	enum AspectRatio {
-		AR_16_9 // Window Projection = (1920px, 1080px)
+		AR_16_9, // Window Projection = (1920px, 1080px)
+		AR_1_1,  // Window Projection = (1000px, 1000px)
 	};
 
 	class RADIANT_API Camera {
@@ -47,5 +48,25 @@ namespace rdt {
 			lesser window and we want to maximize the camera view size while maintaining its aspect ratio.
 		*/
 		Vec2f GetCameraDimensionsFromViewport(float viewportWidth, float viewportHeight);
+		
+		/*
+			Centers the camera to focus on the provided coordinates
+		*/
+		void FocusOn(const Vec2d& coords);
+
+		/*
+			Returns the world coordinates of the camera from the bottom left corner.
+		*/
+		Vec2d GetPosition();
+
+		/*
+			Returns the world cordinates of the camera from the center of the camera view
+		*/
+		Vec2d GetCenter();
+
+		/*
+			Returns the width and height of the camera view window.
+		*/
+		Vec2f GetCameraDimensions();
 	};
 }

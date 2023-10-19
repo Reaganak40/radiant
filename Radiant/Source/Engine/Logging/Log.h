@@ -2,27 +2,39 @@
 #include "pch.h"
 #include "Core.h"
 
+#include "Utils/Color.h"
+
 namespace rdt {
 	
 	class RADIANT_API Log {
 	private:
+		struct Impl;
+		Impl* m_impl;
+
+		Log();
+		~Log();
+		static Log* m_instance;
+
 	public:
 		/*
 			Initialize the logging system for the engine core and the client.
 		*/
-		static void Init();
+		static void Initialize();
 
-		inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return m_CoreLogger; }
-		inline static std::shared_ptr<spdlog::logger>& GetClientLogger() { return m_ClientLogger; }
+		/*
+			Destroys the logging instance
+		*/
+		static void Destroy();
 
-	private:
+		/*
+			Updates the list of cached logs
+		*/
+		static void Update();
 
-#pragma warning(push)
-#pragma warning(disable: 4251)
-		static std::shared_ptr<spdlog::logger> m_CoreLogger;
-		static std::shared_ptr<spdlog::logger> m_ClientLogger;
-#pragma warning(pop)
-
+		static std::shared_ptr<spdlog::logger>& GetCoreLogger();
+		static std::shared_ptr<spdlog::logger>& GetClientLogger();
+		static bool GetLog(int index, std::string& msg, Color& msgColor);
+		static size_t GetLogCount();
 	};
 }
 

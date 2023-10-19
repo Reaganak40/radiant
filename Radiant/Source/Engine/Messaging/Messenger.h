@@ -17,11 +17,16 @@ namespace rdt {
 	protected:
 
 		/*
-			Registers this game object with the Message Bus, the core messaging system in Radiant.
+			Registers this object with the Message Bus, the core messaging system in Radiant.
 			This will set the MessageID to a unique identifer which can be used to send and receive
 			messages. Also sets the internal name for this messanger class. 
 		*/
 		bool RegisterToMessageBus(const std::string& alias);
+
+		/*
+			Removes this object from the Message Bus and resets the MessageID for this object.
+		*/
+		void RemoveFromMessageBus();
 
 	public:
 		Messenger();

@@ -191,16 +191,20 @@ namespace rdt::core {
 			return false;
 		}
 
+		std::vector<Vec2d> sourceVertices;
+		std::vector<Vec2d> suspectVertices;
+		source.GetHitBox(sourceVertices);
+		suspect.GetHitBox(suspectVertices);
+
 		Vec2d ray = source.translation.GetChangeInPosition(deltaTime);
+		Vec2d sp = suspectVertices[3];
+		Vec2d ep = suspectVertices[1];
 
-		Vec2d sp = suspect.m_polygon->GetVertices()[3];
-		Vec2d ep = suspect.m_polygon->GetVertices()[1];
+		sp.x = ceil(sp.x - source.GetHitboxWidth() / 2);
+		sp.y = ceil(sp.y + source.GetHitboxHeight() / 2);
 
-		sp.x = ceil(sp.x - source.m_polygon->GetWidth() / 2);
-		sp.y = ceil(sp.y + source.m_polygon->GetHeight() / 2);
-
-		ep.x = ceil(ep.x + source.m_polygon->GetWidth() / 2);
-		ep.y = ceil(ep.y - source.m_polygon->GetHeight() / 2);
+		ep.x = ceil(ep.x + source.GetHitboxWidth() / 2);
+		ep.y = ceil(ep.y - source.GetHitboxHeight() / 2);
 
 		Vec2d start = source.m_polygon->GetOrigin();
 		Vec2d contactPoint;
@@ -254,8 +258,8 @@ namespace rdt::core {
 		if (std::isnan(tFar.y)) { tFar.y = std::numeric_limits<double>::infinity(); }
 
 		// Sort
-		if (tNear.x > tFar.x) { Utils::Swap(tNear.x, tFar.x); }
-		if (tNear.y > tFar.y) { Utils::Swap(tNear.y, tFar.y); }
+		if (tNear.x > tFar.x) { std::swap(tNear.x, tFar.x); }
+		if (tNear.y > tFar.y) { std::swap(tNear.y, tFar.y); }
 
 		// Check for intersection
 		if (tNear.x > tFar.y || tNear.y > tFar.x) { return false; }
@@ -341,7 +345,7 @@ namespace rdt::core {
 		outMax = Vec2d::Dot(p2, axis);
 
 		if (outMin > outMax) {
-			Utils::Swap(outMin, outMax);
+			std::swap(outMin, outMax);
 		}
 	}
 }
