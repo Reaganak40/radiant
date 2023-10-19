@@ -1,11 +1,8 @@
 #pragma once
 #include "Core.h"
-#include "Messaging/Messenger.h"
-#include "Utils/UniqueID.h"
-#include "GameObject/GameObject.h"
+#include "Components/Component.h"
+#include "Components/GameObject/GameObject.h"
 #include "Gui/Gui.h"
-#include "Graphics/Camera.h"
-
 
 namespace rdt {
 	
@@ -15,7 +12,7 @@ namespace rdt {
 		Scenes own game objects and GUIs that can be used by the application under
 		specified conditions.
 	*/
-	class RADIANT_API Layer : public Messenger {
+	class RADIANT_API Layer : public core::Component {
 	private:
 		struct Impl;
 		Impl* m_impl;

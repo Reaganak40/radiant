@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "GameObject.h"
+#include "Utils/UniqueID.h"
+#include "Polygon/Polygon.h"
 #include "Physics/Physics.h"
 #include "Logging/Log.h"
 
@@ -9,9 +11,7 @@ namespace rdt {
 		UniqueID m_ID;
 		UniqueID m_layerID;
 		UniqueID m_realmID;
-
 		UniqueID m_model_ID;
-		GameState GState;
 
 		std::shared_ptr<Polygon> m_cached_polygon;
 

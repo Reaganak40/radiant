@@ -1,13 +1,11 @@
 #pragma once
 #include "Core.h"
+#include "Components/Component.h"
 #include "Utils/UniqueID.h"
-#include "Messaging/MessageBus.h"
-#include "Utils/BitSet.h"
 #include "Polygon/Polygon.h"
-#include "GameState.h"
 
 namespace rdt {
-	class RADIANT_API GameObject : public Messenger {
+	class RADIANT_API GameObject : public core::Component {
 	private:
 		struct Impl;
 		Impl* m_impl;

@@ -1,15 +1,18 @@
 #pragma once
+#include "Core.h"
 #include "Utils/BitSet.h"
 
 namespace rdt {
-	class GameState {
+	class RADIANT_API GameState {
 	private:
-		BitSet m_states;
-		unsigned int m_stateCount;
+		struct Impl;
+		Impl* m_impl;
+	
 	public:
 		GameState();
 		~GameState();
 
+	protected:
 		/*
 			Set the maximum number of game states.
 		*/
@@ -18,11 +21,11 @@ namespace rdt {
 		/*
 			Using a unique state ID, set and store its value in this game state container.
 		*/
-		void SetState(unsigned int stateID, bool nVal);
+		void Set(unsigned int stateID, bool nVal);
 
 		/*
 			Returns true if the provided unique state ID stored in this game state container is true.
 		*/
-		bool CheckState(unsigned int stateID);
+		bool Check(unsigned int stateID);
 	};
 }
