@@ -18,10 +18,10 @@ namespace rdt {
 	};
 
 	struct CollisionData {
-		UniqueID source;
+		UniqueID objectID;
 
 		CollisionData(UniqueID nSource)
-			: source(nSource) {}
+			: objectID(nSource) {}
 	};
 
 	struct GameObjectPtrData {

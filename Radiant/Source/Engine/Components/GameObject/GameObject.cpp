@@ -4,6 +4,7 @@
 #include "Polygon/Polygon.h"
 #include "Physics/Physics.h"
 #include "Logging/Log.h"
+#include "Graphics/Renderer.h"
 
 namespace rdt {
 
@@ -49,6 +50,16 @@ namespace rdt {
 	{
 		return m_impl->m_spawn_pos;
 	}
+
+	bool GameObject::IsObjectInView()
+	{
+		if (m_impl->m_model_ID == 0 || m_impl->m_realmID == 0) {
+			return false;
+		}
+
+		return Renderer::IsInView(Physics::GetPolygon(GetRealmID(), GetModelID()));
+	}
+
 
 	GameObject::GameObject()
 		: m_impl(new GameObject::Impl)

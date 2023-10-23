@@ -237,6 +237,18 @@ namespace rdt {
 		static bool UsingDefaultViewport();
 
 		/*
+			Returns true if the provided polygon will be seen by the currently bounded
+			camera.
+		*/
+		static bool IsInView(const Polygon& polygon);
+
+		/*
+			Returns true if the provided rect will be seen by the currently bounded
+			camera.
+		*/
+		static bool IsInView(const Vec2d& rectOrigin, const Vec2d& rectSize);
+
+		/*
 		Returns the world coordinates from provided screen coordinates on the camera.
 		*/
 		static Vec2d ScreenToWorldCoordinates(const Vec2d& ScreenCoords, int renderWindowIndex = -1) { return m_instance->ScreenToWorldCoordinatesImpl(ScreenCoords, renderWindowIndex); }
@@ -249,7 +261,7 @@ namespace rdt {
 		/*
 			Removes a polygon from renderer mesh cache.
 		*/
-		static void _FlushPolygon(const UniqueID UUID) { m_instance->_FlushPolygonImpl(UUID); }
+		static void _FlushPolygon(const UniqueID UUID);
 
 		/*
 			Takes in mouse coordinates and returns them scopes relative to the game window viewport.

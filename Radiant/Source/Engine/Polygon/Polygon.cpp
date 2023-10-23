@@ -115,4 +115,9 @@ namespace rdt {
         m_impl->m_rotation = nRadians;
     }
 
+    void Polygon::_DontFlush()
+    {
+        m_impl->shouldFlush = false;
+    }
+
 }

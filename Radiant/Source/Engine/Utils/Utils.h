@@ -59,7 +59,7 @@ namespace rdt {
         /*
             Returns a float [min, max] with the assigned precision (default 2 sig figs).
         */
-        float RandomFloat(float min, float max, unsigned int precision = 2);
+        float RADIANT_API RandomFloat(float min, float max, unsigned int precision = 2);
 
         /*
             Returns a random int in the range [min, max].

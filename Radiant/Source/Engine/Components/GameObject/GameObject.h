@@ -30,6 +30,11 @@ namespace rdt {
 		*/
 		const Vec2d& GetSpawnPos();
 
+		/*
+			Returns true if the registered game object is in view of the camera
+		*/
+		bool IsObjectInView();
+
 	public:
 		GameObject();
 		~GameObject();

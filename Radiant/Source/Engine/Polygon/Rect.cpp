@@ -39,4 +39,8 @@ namespace rdt {
 		BaseImpl()->m_vertices[2] = Vec2d(BaseImpl()->m_origin.x + (BaseImpl()->m_width / 2), BaseImpl()->m_origin.y + (BaseImpl()->m_height / 2));
 		BaseImpl()->m_vertices[3] = Vec2d(BaseImpl()->m_origin.x - (BaseImpl()->m_width / 2), BaseImpl()->m_origin.y + (BaseImpl()->m_height / 2));
 	}
+	Vec2d Rect::GetBottomLeftCorner()
+	{
+		return BaseImpl()->m_vertices[0];
+	}
 }
