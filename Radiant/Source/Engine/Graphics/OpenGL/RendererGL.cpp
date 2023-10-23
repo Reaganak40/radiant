@@ -152,6 +152,10 @@ namespace rdt::core {
         if (m_window_width == 0 || m_window_height == 0) {
             return Vec2i(0, 0);
         }
+
+        m_default_viewport.width = m_window_width;
+        m_default_viewport.height = m_window_height;
+
         return Utils::GetRatio(m_window_width, m_window_height);
     }
 
