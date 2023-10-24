@@ -246,7 +246,6 @@ namespace rdt {
 
     void Input::WindowSizeCallback(GLFWwindow* window, int width, int height)
     {
-        glViewport(0, 0, width, height);
         m_instance->m_impl->m_window_state[m_instance->m_impl->m_state_index].windowResize = true;
     }
 

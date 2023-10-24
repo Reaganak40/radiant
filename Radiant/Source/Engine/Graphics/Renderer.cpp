@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Renderer.h"
 #include "Polygon/Rect.h"
+#include "Physics/Collision.h"
 
 #ifdef RDT_USE_OPENGL
 
@@ -22,9 +23,10 @@ namespace rdt {
 		static int RenderWindowID;
 
 		bool m_use_default_viewport;
+		bool m_is_fullscreen;
 
 		Impl()
-			: m_use_default_viewport(true)
+			: m_use_default_viewport(true), m_is_fullscreen(false)
 		{
 		}
 
@@ -53,6 +55,11 @@ namespace rdt {
 	std::unordered_map<int, RenderWindow*>& Renderer::GetRenderWindows()
 	{
 		return m_impl->m_render_windows;
+	}
+
+	void Renderer::SetFullscreenFlag(bool isFullscreen)
+	{
+		m_impl->m_is_fullscreen = isFullscreen;
 	}
 
 	void Renderer::Initialize()
@@ -88,8 +95,36 @@ namespace rdt {
 		m_instance->m_impl->m_use_default_viewport = use;
 	}
 
+	bool Renderer::IsFullscreen()
+	{
+		return m_instance->m_impl->m_is_fullscreen;
+	}
+
 	bool Renderer::UsingDefaultViewport()
 	{
 		return m_instance->m_impl->m_use_default_viewport;
+	}
+
+	bool Renderer::IsInView(const Polygon& polygon)
+	{
+		using namespace core;
+
+		const Polygon& cameraRect = m_instance->m_impl->m_camera.GetCameraBoundaryBox();
+		return Collision::CheckCollisionSAT(cameraRect, polygon);;
+	}
+	bool Renderer::IsInView(const Vec2d& rectOrigin, const Vec2d& rectSize)
+	{
+		using namespace core;
+
+		Rect rect(rectOrigin, rectSize.x, rectSize.y);
+		const Polygon& cameraRect = m_instance->m_impl->m_camera.GetCameraBoundaryBox();
+		return Collision::CheckCollisionSAT(cameraRect, rect);;
+	}
+	void Renderer::_FlushPolygon(const UniqueID UUID)
+	{
+		if (m_instance == nullptr) {
+			return;
+		}
+		m_instance->_FlushPolygonImpl(UUID);
 	}
 }

@@ -5,12 +5,16 @@
 rdt::core::PolygonImpl::PolygonImpl()
 	: m_UUID(GetUniqueID()), m_width(0), m_height(0), m_properties(0), m_rotation(0)
 {
+	shouldFlush = true;
 }
 
 rdt::core::PolygonImpl::~PolygonImpl()
 {
 	FreeUniqueID(m_UUID);
-	Renderer::_FlushPolygon(m_UUID);
+
+	if (shouldFlush) {
+		Renderer::_FlushPolygon(m_UUID);
+	}
 }
 
 void rdt::core::PolygonImpl::Copy(const PolygonImpl* src)

@@ -1,7 +1,10 @@
 #include "pch.h"
 #include "GameObject.h"
+#include "Utils/UniqueID.h"
+#include "Polygon/Polygon.h"
 #include "Physics/Physics.h"
 #include "Logging/Log.h"
+#include "Graphics/Renderer.h"
 
 namespace rdt {
 
@@ -9,9 +12,8 @@ namespace rdt {
 		UniqueID m_ID;
 		UniqueID m_layerID;
 		UniqueID m_realmID;
-
 		UniqueID m_model_ID;
-		GameState GState;
+		Vec2d m_spawn_pos;
 
 		std::shared_ptr<Polygon> m_cached_polygon;
 
@@ -22,6 +24,7 @@ namespace rdt {
 		{
 			m_cached_polygon.reset();
 			m_isBinded = false;
+			m_spawn_pos = Vec2d::Zero();
 		}
 
 		~Impl()
@@ -42,6 +45,21 @@ namespace rdt {
 		m_impl->m_cached_polygon = Physics::RemoveObject(m_impl->m_realmID, m_impl->m_model_ID);
 		m_impl->m_model_ID = 0;
 	}
+
+	const Vec2d& GameObject::GetSpawnPos()
+	{
+		return m_impl->m_spawn_pos;
+	}
+
+	bool GameObject::IsObjectInView()
+	{
+		if (m_impl->m_model_ID == 0 || m_impl->m_realmID == 0) {
+			return false;
+		}
+
+		return Renderer::IsInView(Physics::GetPolygon(GetRealmID(), GetModelID()));
+	}
+
 
 	GameObject::GameObject()
 		: m_impl(new GameObject::Impl)
@@ -123,5 +141,11 @@ namespace rdt {
 	void GameObject::RegisterToRealm(const UniqueID nRealmID)
 	{
 		m_impl->m_realmID = nRealmID;
+	}
+
+	void GameObject::SetSpawnPos(double xPos, double yPos)
+	{
+		m_impl->m_spawn_pos.x = xPos;
+		m_impl->m_spawn_pos.y = yPos;
 	}
 }

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "SceneManager.h"
+#include "Messaging/MessageBus.h"
 #include "Messaging/MessageTypes.h"
 
 namespace rdt {

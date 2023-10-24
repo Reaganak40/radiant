@@ -2,6 +2,7 @@
 #include "Core.h"
 #include "Utils/MathTypes.h"
 #include "Utils/Color.h"
+#include "Polygon/Rect.h"
 
 namespace rdt {
 	enum AspectRatio {
@@ -68,5 +69,10 @@ namespace rdt {
 			Returns the width and height of the camera view window.
 		*/
 		Vec2f GetCameraDimensions();
+
+		/*
+			Returns a rect representative of the camera's position and dimensions.
+		*/
+		const Rect& GetCameraBoundaryBox();
 	};
 }

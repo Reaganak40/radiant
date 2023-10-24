@@ -98,6 +98,11 @@ namespace rdt {
 		*/
 		void SetRotation(const double nRadians);
 
+		/*
+			Tells the polygon not to call Flush with the Render cache when this instance is deleted.
+		*/
+		void _DontFlush();
+
 		friend class core::Translation;
 		friend class Renderer;
 	};

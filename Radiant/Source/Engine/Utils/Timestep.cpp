@@ -11,7 +11,7 @@ namespace rdt {
 		_lastTimeFrame = time;
 
 		if (applyLimit) {
-			deltaTime = Utils::Max(deltaTime, 0.01667f);
+			deltaTime = Utils::Min(deltaTime, 0.03334f);
 		}
 	}
 

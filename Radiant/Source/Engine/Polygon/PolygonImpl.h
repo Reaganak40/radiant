@@ -13,6 +13,7 @@ namespace rdt::core {
 		Vec2d m_origin;
 		double m_width;
 		double m_height;
+		bool shouldFlush;
 
 		PolygonImpl();
 		~PolygonImpl();

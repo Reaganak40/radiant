@@ -6,6 +6,14 @@
 
 namespace rdt {
 	
+	enum LogLevel {
+		L_INFO,
+		L_TRACE,
+		L_WARNING,
+		L_ERROR,
+		L_CRITICAL,
+	};
+
 	class RADIANT_API Log {
 	private:
 		struct Impl;
@@ -35,6 +43,8 @@ namespace rdt {
 		static std::shared_ptr<spdlog::logger>& GetClientLogger();
 		static bool GetLog(int index, std::string& msg, Color& msgColor);
 		static size_t GetLogCount();
+
+		static void SetLogColor(LogLevel level, Color nColor);
 	};
 }
 

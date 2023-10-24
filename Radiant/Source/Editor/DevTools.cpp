@@ -23,7 +23,6 @@ namespace rdt::core {
 
 		EditorLayout* layout;
 		RegisterGUI(layout = new EditorLayout);
-		layout->SetTheme(Theme_Codz);
 
 		m_base_directory = Utils::GetCWD();
 		RDT_CORE_INFO("DevTools base directory: {}", m_base_directory);
@@ -50,11 +49,14 @@ namespace rdt::core {
 			RDT_CORE_WARN("No resource filepath found!");
 		}
 
+		layout->AddConfigPtr(&m_config);
+		layout->ApplyConfig();
 
 		Renderer::SetBackgroundColor({0.2f, 0.2f, 0.2f, 1.0f});
 	}
 	DevLayer::~DevLayer()
 	{
+		m_config.Write();
 	}
 
 	void DevLayer::Destroy()
@@ -103,8 +105,8 @@ namespace rdt::core {
 
 	// ==============================================================================
 
-	constexpr float GameWindowPanelGuiWidth = 1118;
-	constexpr float GameWindowPanelGuiHeight = 649.0f;
+	constexpr float GameWindowPanelGuiWidth = 1115;
+	constexpr float GameWindowPanelGuiHeight = 653.0f;
 
 	GameWindowPanel::GameWindowPanel()
 	{
@@ -119,6 +121,9 @@ namespace rdt::core {
 
 	void GameWindowPanel::OnBegin()
 	{
+
+		ImGui::PushFont(GuiManager::GetFont(NunitoSans, 18));
+
 		// First render config
 		ImGui::SetNextWindowSize(ImVec2(m_gui_width, m_gui_height), ImGuiCond_Appearing);
 		
@@ -133,7 +138,7 @@ namespace rdt::core {
 
 		ImGuiWindowFlags flags = 0;
 
-		ImGui::Begin("##GameWindowPanel", (bool*)0, flags);
+		ImGui::Begin("Game Window", (bool*)0, flags);
 		if (ImGui::GetMouseCursor() == ImGuiMouseCursor_ResizeNWSE) {
 			ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
 		}
@@ -145,6 +150,8 @@ namespace rdt::core {
 		ImGui::PopStyleColor();
 		ImGui::PopStyleVar();
 		ImGui::PopStyleVar();
+
+		ImGui::PopFont();
 	}
 
 	void GameWindowPanel::TriggerUpdatePos()
@@ -172,10 +179,10 @@ namespace rdt::core {
 	constexpr float TemplateWizardGuiWidth = 500.0f;
 	constexpr float TemplateWizardGuiHeight = 575.0f;
 
-	constexpr float GameWindowSettingsPanelWidth = 200.0f;
+	constexpr float GameWindowSettingsPanelWidth = 250.0f;
 
 	EditorLayout::EditorLayout()
-		: m_scene(nullptr), first_render(true), m_templateWizardLaunched(false)
+		: m_scene(nullptr), first_render(true), m_templateWizardLaunched(false), m_config(nullptr)
 	{
 		RegisterToMessageBus("EditorLayout");
 		SetTheme(Theme_Codz);
@@ -191,6 +198,7 @@ namespace rdt::core {
 		ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
 
 		m_last_log = "";
+
 	}
 	EditorLayout::~EditorLayout()
 	{
@@ -293,7 +301,63 @@ namespace rdt::core {
 			style.Colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
 			style.Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
 			style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.00f, 0.00f, 1.00f, 0.35f);
+
+			Log::SetLogColor(LogLevel::L_TRACE, WHITE);
+
 			break;
+
+		case Nightingale:
+			style.WindowRounding = 5.3f;
+			style.FrameRounding = 2.3f;
+			style.ScrollbarRounding = 0;
+
+			ImVec4 black = ImVec4(0.1f, 0.1f, 0.1f, 0.95f);
+			ImVec4 white = ImVec4(0.95f, 0.95f, 0.95f, 1.0f);
+			ImVec4 header(0.153f, 0.157f, 0.161f, 1.0f);
+			ImVec4 base(0.38f, 0.404f, 0.478f, 0.95f);
+			ImVec4 border(0.847f, 0.851f, 0.855f, 1.0f);
+
+			style.Colors[ImGuiCol_Text] = white;
+			style.Colors[ImGuiCol_TextDisabled] = white;
+			style.Colors[ImGuiCol_WindowBg] = base;
+			style.Colors[ImGuiCol_PopupBg] = base;
+			style.Colors[ImGuiCol_Border] = border;
+			style.Colors[ImGuiCol_BorderShadow] = border;
+			style.Colors[ImGuiCol_FrameBg] = header;
+			style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.90f, 0.80f, 0.80f, 0.40f);
+			style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0.90f, 0.65f, 0.65f, 0.45f);
+			style.Colors[ImGuiCol_TitleBg] = header;
+			style.Colors[ImGuiCol_TitleBgCollapsed] = header;
+			style.Colors[ImGuiCol_TitleBgActive] = header;
+			style.Colors[ImGuiCol_MenuBarBg] = header;
+			style.Colors[ImGuiCol_ScrollbarBg] = ImVec4(0.20f, 0.25f, 0.30f, 0.60f);
+			style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.55f, 0.53f, 0.55f, 0.51f);
+			style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.56f, 0.56f, 0.56f, 1.00f);
+			style.Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.56f, 0.56f, 0.56f, 0.91f);
+			style.Colors[ImGuiCol_CheckMark] = ImVec4(0.90f, 0.90f, 0.90f, 0.83f);
+			style.Colors[ImGuiCol_SliderGrab] = ImVec4(0.70f, 0.70f, 0.70f, 0.62f);
+			style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.30f, 0.30f, 0.30f, 0.84f);
+			style.Colors[ImGuiCol_Button] = ImVec4(0.48f, 0.72f, 0.89f, 0.49f);
+			style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.50f, 0.69f, 0.99f, 0.68f);
+			style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.80f, 0.50f, 0.50f, 1.00f);
+			style.Colors[ImGuiCol_Header] = header;
+			style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.44f, 0.61f, 0.86f, 1.00f);
+			style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.38f, 0.62f, 0.83f, 1.00f);
+			style.Colors[ImGuiCol_ResizeGrip] = ImVec4(1.00f, 1.00f, 1.00f, 0.85f);
+			style.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(1.00f, 1.00f, 1.00f, 0.60f);
+			style.Colors[ImGuiCol_ResizeGripActive] = ImVec4(1.00f, 1.00f, 1.00f, 0.90f);
+			style.Colors[ImGuiCol_PlotLines] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+			style.Colors[ImGuiCol_PlotLinesHovered] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
+			style.Colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
+			style.Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
+			style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.00f, 0.00f, 1.00f, 0.35f);
+
+			Log::SetLogColor(LogLevel::L_TRACE, WHITE);
+			break;
+		}
+
+		if (m_config != nullptr) {
+			m_config->SetAttribute("DevTools", "Theme", nTheme);
 		}
 	}
 
@@ -331,6 +395,30 @@ namespace rdt::core {
 		}
 		templatePath = templateFolder.generic_string();
 
+	}
+
+	void EditorLayout::AddConfigPtr(ConfigReader* ptr)
+	{
+		m_config = ptr;
+	}
+
+	void EditorLayout::ApplyConfig()
+	{
+		if (m_config == nullptr) {
+			return;
+		}
+
+		std::string config_theme;
+		if (m_config->GetAttribute("DevTools", "Theme", config_theme)) {
+			int themeVal = std::stoi(config_theme);
+
+			if (themeVal >= EditorTheme::Theme_Codz && themeVal <= EditorTheme::Nightingale) {
+				SetTheme((EditorTheme)themeVal);
+			}
+			else {
+				RDT_CORE_WARN("Could not find theme associated with id: {}", themeVal);
+			}
+		}
 	}
 
 	void EditorLayout::OnFirstRender()
@@ -634,6 +722,20 @@ namespace rdt::core {
 				}
 				ImGui::EndMenu();
 			}
+
+			if (ImGui::BeginMenu("Themes")) {
+
+				if (ImGui::MenuItem("Codz")) {
+					SetTheme(Theme_Codz);
+				}
+				if (ImGui::MenuItem("Nightingale")) {
+					SetTheme(Nightingale);
+				}
+			
+				ImGui::EndMenu();
+			}
+
+
 			ImGui::EndMainMenuBar();
 		}
 	}
@@ -767,9 +869,14 @@ namespace rdt::core {
 		/* Expand Window Button*/
 		ImGui::PushStyleColor(ImGuiCol_Text, { 0.1f, 0.1f, 0.1f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.7f, 0.7f, 0.7f, 0.2f });
-		ImGui::SetCursorPosX(ImGui::GetWindowWidth() - GetButtonWidth(ICON_FK_PAUSE) - 10);
 		if (Renderer::UsingDefaultViewport()) {
+			ImGui::SetCursorPosX(ImGui::GetWindowWidth() - GetButtonWidth(ICON_FK_PAUSE) - 10);
 			if (ImGui::Button(ICON_FK_COMPRESS)) {
+
+				if (Renderer::IsFullscreen()) {
+					Renderer::DisableFullscreen();
+				}
+
 				Renderer::SetDefaultViewport(false);
 				Input::SetTargetRenderWindow(m_gameWindowId);
 				m_diagnostics_panel.yPos = GetDockPosY(DockTop, m_diagnostics_panel.height, PanelMargin) + m_menu_bar_height;
@@ -780,9 +887,23 @@ namespace rdt::core {
 			}
 		}
 		else {
+			ImGui::SetCursorPosX(ImGui::GetWindowWidth() - (2 * GetButtonWidth(ICON_FK_PAUSE)) - 18);
+
 			if (ImGui::Button(ICON_FK_EXPAND)) {
 				Renderer::SetDefaultViewport(true);
 				Input::SetTargetRenderWindow(-1);
+				m_showTools = false;
+				m_game_window_settings_panel.yPos = PanelMargin;
+				m_game_window_settings_panel.xPos = GetDockPosX(DockRight, m_game_window_settings_panel.width, PanelMargin);
+				m_diagnostics_panel.yPos = m_game_window_settings_panel.yPos + m_game_window_settings_panel.height + PanelMargin;
+			}
+
+			ImGui::SameLine();
+			if (ImGui::Button(ICON_FK_ARROWS_ALT)) {
+				Renderer::SetDefaultViewport(true);
+				Renderer::EnableFullscreen();
+				Input::SetTargetRenderWindow(-1);
+
 				m_showTools = false;
 				m_game_window_settings_panel.yPos = PanelMargin;
 				m_game_window_settings_panel.xPos = GetDockPosX(DockRight, m_game_window_settings_panel.width, PanelMargin);

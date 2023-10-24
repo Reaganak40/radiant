@@ -8,8 +8,10 @@
 #include "Messaging/MessageBus.h"
 #include "Physics/Physics.h"
 #include "Gui/GuiManager.h"
-#include "Scene/SceneManager.h"
+#include "Components/Scene/SceneManager.h"
 #include "Physics/Ptag.h"
+#include "Utils/Timestep.h"
+
 
 #include "Editor/DevTools.h"
 
@@ -45,9 +47,10 @@ namespace rdt {
 	{
 		delete m_impl;
 
-#ifdef RDT_DEBUG
+#ifdef RDT_USE_DEV_TOOLS
 		core::DevLayer::Destroy();
 #endif
+		SceneManager::Destroy();
 		Physics::Destroy();
 		core::PtagManager::Destroy();
 		Input::Destroy();

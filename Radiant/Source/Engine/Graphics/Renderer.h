@@ -30,6 +30,11 @@ namespace rdt {
 		*/
 		std::unordered_map<int, RenderWindow*>& GetRenderWindows();
 
+		/*
+			Sets the fullscreen flag to true (enabled), or false (disabled)
+		*/
+		void SetFullscreenFlag(bool isFullscreen);
+
 	private:
 		static Renderer* m_instance;
 	public:
@@ -232,9 +237,36 @@ namespace rdt {
 		static void SetDefaultViewport(bool use);
 
 		/*
+			Makes the window fullscreen
+		*/
+		static void EnableFullscreen() { m_instance->EnableFullscreenImpl(); }
+
+		/*
+			Restores the window back to windowed mdoe
+		*/
+		static void DisableFullscreen() { m_instance->DisableFullscreenImpl(); }
+
+		/*
+			Returns true if the window is currently in fullscreen.
+		*/
+		static bool IsFullscreen();
+
+		/*
 			Returns true if the default viewport should be used for render windows.
 		*/
 		static bool UsingDefaultViewport();
+
+		/*
+			Returns true if the provided polygon will be seen by the currently bounded
+			camera.
+		*/
+		static bool IsInView(const Polygon& polygon);
+
+		/*
+			Returns true if the provided rect will be seen by the currently bounded
+			camera.
+		*/
+		static bool IsInView(const Vec2d& rectOrigin, const Vec2d& rectSize);
 
 		/*
 		Returns the world coordinates from provided screen coordinates on the camera.
@@ -249,7 +281,7 @@ namespace rdt {
 		/*
 			Removes a polygon from renderer mesh cache.
 		*/
-		static void _FlushPolygon(const UniqueID UUID) { m_instance->_FlushPolygonImpl(UUID); }
+		static void _FlushPolygon(const UniqueID UUID);
 
 		/*
 			Takes in mouse coordinates and returns them scopes relative to the game window viewport.
@@ -269,6 +301,9 @@ namespace rdt {
 		virtual void SetBackgroundColorImpl(const Color& color) = 0;
 		virtual Vec2i OnWindowResizeImpl() = 0;
 		virtual void OnNewRenderWindow(int id, RenderWindow* nRenderWindow) = 0;
+		virtual void EnableFullscreenImpl() = 0;
+		virtual void DisableFullscreenImpl() = 0;
+
 
 		virtual void ClearImpl() = 0;
 		virtual void OnBeginFrameImpl() = 0;

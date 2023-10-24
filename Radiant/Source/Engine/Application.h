@@ -1,9 +1,12 @@
 #pragma once
 #include "pch.h"
 #include "Core.h"
-#include "Utils/Timestep.h"
-#include "GameObject/GameObject.h"
-#include "Scene/Scene.h"
+#include "Components/Scene/Scene.h"
+
+// For ApplicationConfig Struct
+#include "Utils/UniqueID.h"
+#include "Utils/Color.h"
+#include "Graphics/Camera.h"
 
 namespace rdt {
 

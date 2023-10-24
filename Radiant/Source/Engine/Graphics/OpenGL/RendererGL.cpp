@@ -63,8 +63,8 @@ namespace rdt::core {
         m_window_name = windowName;
         
         // Get monitor and mode for windowed fullscreen
-        GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-        const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+        m_monitor = glfwGetPrimaryMonitor();
+        const GLFWvidmode* mode = glfwGetVideoMode(m_monitor);
         glfwWindowHint(GLFW_RED_BITS, mode->redBits);
         glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
         glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
@@ -152,6 +152,10 @@ namespace rdt::core {
         if (m_window_width == 0 || m_window_height == 0) {
             return Vec2i(0, 0);
         }
+
+        m_default_viewport.width = m_window_width;
+        m_default_viewport.height = m_window_height;
+
         return Utils::GetRatio(m_window_width, m_window_height);
     }
 
@@ -166,6 +170,21 @@ namespace rdt::core {
         nRenderWindow->AssignTexture((void*)fbo.GetTexture());
 #pragma warning( pop ) 
 
+    }
+
+    void RendererGL::EnableFullscreenImpl()
+    {
+        const GLFWvidmode* mode = glfwGetVideoMode(m_monitor);
+        glfwSetWindowMonitor(m_window, m_monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+        SetFullscreenFlag(true);
+    }
+
+    void RendererGL::DisableFullscreenImpl()
+    {
+        const GLFWvidmode* mode = glfwGetVideoMode(m_monitor);
+        glfwSetWindowMonitor(m_window, NULL, 0, 0, mode->width, mode->height, mode->refreshRate);
+        glfwMaximizeWindow(m_window);
+        SetFullscreenFlag(false);
     }
 
     void RendererGL::ClearImpl()

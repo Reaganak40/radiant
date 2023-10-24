@@ -4,7 +4,7 @@
 #include "Editor/DevTools.h"
 #include "Graphics/Renderer.h"
 
-#ifdef RDT_DEBUG
+#ifdef RDT_USE_DEV_TOOLS
 #define ADD_DEV_LAYER 1
 #else
 #define ADD_DEV_LAYER 0

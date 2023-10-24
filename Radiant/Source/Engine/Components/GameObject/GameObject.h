@@ -1,13 +1,11 @@
 #pragma once
 #include "Core.h"
+#include "Components/Component.h"
 #include "Utils/UniqueID.h"
-#include "Messaging/MessageBus.h"
-#include "Utils/BitSet.h"
 #include "Polygon/Polygon.h"
-#include "GameState.h"
 
 namespace rdt {
-	class RADIANT_API GameObject : public Messenger {
+	class RADIANT_API GameObject : public core::Component {
 	private:
 		struct Impl;
 		Impl* m_impl;
@@ -26,6 +24,16 @@ namespace rdt {
 			physical world. Also caches the polygon for re-introduction.
 		*/
 		void RemoveObjectFromWorld();
+
+		/*
+			Returns the spawn position of this object (if not assigned by the layer should be Zero())
+		*/
+		const Vec2d& GetSpawnPos();
+
+		/*
+			Returns true if the registered game object is in view of the camera
+		*/
+		bool IsObjectInView();
 
 	public:
 		GameObject();
@@ -104,6 +112,9 @@ namespace rdt {
 		*/
 		void RegisterToRealm(const UniqueID nRealmID);
 
-
+		/*
+			Sets the spawn position of this object.
+		*/
+		void SetSpawnPos(double xPos, double yPos);
 	};
 }

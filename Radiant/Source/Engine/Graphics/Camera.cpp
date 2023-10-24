@@ -10,33 +10,29 @@ namespace rdt {
 		glm::mat4 m_model;
 
 		AspectRatio m_aspectRatio;
-		
-		Vec2f m_cameraDimensions;
-		Vec2d m_worldCoords;
-
 		Color m_background_color;
+		Rect m_window_shape;
 
 		Impl(AspectRatio aspectRatio)
 		{
-			m_cameraDimensions.x = 0.0f;
-			m_cameraDimensions.y = 0.0f;
-
 			m_aspectRatio = aspectRatio;
 			switch (aspectRatio) {
 			case AR_16_9:
-				m_cameraDimensions.x = 1920.0f;
-				m_cameraDimensions.y = 1080.0f;
+				m_window_shape.SetSize({ 1920.0, 1080.0 });
 				break;
 			case AR_1_1:
-				m_cameraDimensions.x = 1000.0f;
-				m_cameraDimensions.y = 1000.0f;
+				m_window_shape.SetSize({ 1000.0, 1000.0 });
 				break;
 			}
-			m_worldCoords = { 0, 0 };
 
-			m_view = glm::translate(glm::mat4(1.0f), glm::vec3(-m_worldCoords.x, -m_worldCoords.y, 0));
+			m_window_shape.SetPosition({ m_window_shape.GetWidth() / 2, m_window_shape.GetHeight() / 2 });
+			Vec2d translation = GetTranslation();
+
+			m_view = glm::translate(glm::mat4(1.0f), glm::vec3(translation.x, translation.y, 0));
 			m_model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-			m_proj = glm::ortho(0.0f, m_cameraDimensions.x, 0.0f, m_cameraDimensions.y, -1.0f, 1.0f);
+			m_proj = glm::ortho(0.0f, (float)m_window_shape.GetWidth(), 0.0f, (float)m_window_shape.GetHeight(), -1.0f, 1.0f);
+			
+			m_window_shape._DontFlush();
 		}
 
 		~Impl()
@@ -50,22 +46,24 @@ namespace rdt {
 
 		void SetAspectRatio(AspectRatio nAspectRatio)
 		{
-			m_cameraDimensions.x = 0.0f;
-			m_cameraDimensions.y = 0.0f;
-
 			m_aspectRatio = nAspectRatio;
 			switch (nAspectRatio) {
 			case AR_16_9:
-				m_cameraDimensions.x = 1920.0f;
-				m_cameraDimensions.y = 1080.0f;
+				m_window_shape.SetSize({ 1920.0, 1080.0 });
 				break;
 			case AR_1_1:
-				m_cameraDimensions.x = 1000.0f;
-				m_cameraDimensions.y = 1000.0f;
+				m_window_shape.SetSize({ 1000.0, 1000.0 });
 				break;
 			}
+			m_proj = glm::ortho(0.0f, (float)m_window_shape.GetWidth(), 0.0f, (float)m_window_shape.GetHeight(), -1.0f, 1.0f);
+		}
 
-			m_proj = glm::ortho(0.0f, m_cameraDimensions.x, 0.0f, m_cameraDimensions.y, -1.0f, 1.0f);
+		Vec2d GetTranslation()
+		{
+			Vec2d coords = m_window_shape.GetBottomLeftCorner();
+			coords.x = -coords.x;
+			coords.y = -coords.y;
+			return coords;
 		}
 
 		Vec2f GetCameraDimensionsFromViewport(float viewportWidth, float viewportHeight)
@@ -103,9 +101,9 @@ namespace rdt {
 
 		void FocusOn(const Vec2d& coords)
 		{
-			m_worldCoords.x = coords.x - (m_cameraDimensions.x / 2);
-			m_worldCoords.y = coords.y - (m_cameraDimensions.y / 2);
-			m_view = glm::translate(glm::mat4(1.0f), glm::vec3(-m_worldCoords.x, -m_worldCoords.y, 0));
+			m_window_shape.SetPosition(coords);
+			Vec2d translation = GetTranslation();
+			m_view = glm::translate(glm::mat4(1.0f), glm::vec3(translation.x, translation.y, 0));
 		}
 	};
 
@@ -159,19 +157,20 @@ namespace rdt {
 	}
 	Vec2d Camera::GetPosition()
 	{
-		return m_impl->m_worldCoords;
+		return m_impl->m_window_shape.GetBottomLeftCorner();
 	}
 
 	Vec2d Camera::GetCenter()
 	{
-		Vec2d res = m_impl->m_worldCoords;
-		res.x += (m_impl->m_cameraDimensions.x / 2);
-		res.y += (m_impl->m_cameraDimensions.y / 2);
-		return res;
+		return m_impl->m_window_shape.GetOrigin();
 	}
 
 	Vec2f Camera::GetCameraDimensions()
 	{
-		return m_impl->m_cameraDimensions;
+		return { (float)m_impl->m_window_shape.GetWidth(), (float)m_impl->m_window_shape.GetHeight() };
+	}
+	const Rect& Camera::GetCameraBoundaryBox()
+	{
+		return m_impl->m_window_shape;
 	}
 }

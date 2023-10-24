@@ -13,7 +13,6 @@ namespace rdt {
 		std::vector<GameObject*> m_game_objects;
 		std::vector<GuiTemplate*> m_GUIs;
 		std::vector<UniqueID> m_realms;
-		GameState GState;
 
 		Impl()
 			: m_ID(GetUniqueID()), m_attached(false)

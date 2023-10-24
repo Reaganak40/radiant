@@ -59,7 +59,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;RDT_BUILD_DLL;RDT_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;RDT_BUILD_DLL;RDT_USE_DEV_TOOLS;RDT_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>Source;Source\Engine;Vendor\glfw\include;Vendor\glad\include;Vendor\imgui;Vendor\imgui\backends;Vendor\glm;Vendor\stb;Vendor\AL;Vendor\AudioFile-1.1.1;Vendor\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
@@ -82,7 +82,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;RDT_BUILD_DLL;RDT_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;RDT_BUILD_DLL;RDT_USE_DEV_TOOLS;RDT_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>Source;Source\Engine;Vendor\glfw\include;Vendor\glad\include;Vendor\imgui;Vendor\imgui\backends;Vendor\glm;Vendor\stb;Vendor\AL;Vendor\AudioFile-1.1.1;Vendor\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -115,10 +115,11 @@
     <ClInclude Include="Source\Engine\Audio\SoundData.h" />
     <ClInclude Include="Source\Engine\Audio\SoundEngine.h" />
     <ClInclude Include="Source\Engine\Audio\SoundSource.h" />
+    <ClInclude Include="Source\Engine\Components\Component.h" />
     <ClInclude Include="Source\Engine\Core.h" />
     <ClInclude Include="Source\Engine\EntryPoint.h" />
-    <ClInclude Include="Source\Engine\GameObject\GameObject.h" />
-    <ClInclude Include="Source\Engine\GameObject\GameState.h" />
+    <ClInclude Include="Source\Engine\Components\GameObject\GameObject.h" />
+    <ClInclude Include="Source\Engine\Components\GameState.h" />
     <ClInclude Include="Source\Engine\Graphics\Camera.h" />
     <ClInclude Include="Source\Engine\Graphics\Mesh.h" />
     <ClInclude Include="Source\Engine\Graphics\OpenGL\ErrorHandling.h" />
@@ -156,9 +157,9 @@
     <ClInclude Include="Source\Engine\Polygon\PolygonImpl.h" />
     <ClInclude Include="Source\Engine\Polygon\Rect.h" />
     <ClInclude Include="Source\Engine\Polygon\Triangle.h" />
-    <ClInclude Include="Source\Engine\Scene\Layer.h" />
-    <ClInclude Include="Source\Engine\Scene\Scene.h" />
-    <ClInclude Include="Source\Engine\Scene\SceneManager.h" />
+    <ClInclude Include="Source\Engine\Components\Scene\Layer.h" />
+    <ClInclude Include="Source\Engine\Components\Scene\Scene.h" />
+    <ClInclude Include="Source\Engine\Components\Scene\SceneManager.h" />
     <ClInclude Include="Source\Engine\Utils\BitSet.h" />
     <ClInclude Include="Source\Engine\Utils\Color.h" />
     <ClInclude Include="Source\Engine\Utils\ConfigReader.h" />
@@ -237,8 +238,9 @@
     <ClCompile Include="Source\Engine\Audio\SoundData.cpp" />
     <ClCompile Include="Source\Engine\Audio\SoundEngine.cpp" />
     <ClCompile Include="Source\Engine\Audio\SoundSource.cpp" />
-    <ClCompile Include="Source\Engine\GameObject\GameObject.cpp" />
-    <ClCompile Include="Source\Engine\GameObject\GameState.cpp" />
+    <ClCompile Include="Source\Engine\Components\Component.cpp" />
+    <ClCompile Include="Source\Engine\Components\GameObject\GameObject.cpp" />
+    <ClCompile Include="Source\Engine\Components\GameState.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Camera.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\ErrorHandling.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\FrameBuffer.cpp" />
@@ -273,9 +275,9 @@
     <ClCompile Include="Source\Engine\Polygon\PolygonImpl.cpp" />
     <ClCompile Include="Source\Engine\Polygon\Rect.cpp" />
     <ClCompile Include="Source\Engine\Polygon\Triangle.cpp" />
-    <ClCompile Include="Source\Engine\Scene\Layer.cpp" />
-    <ClCompile Include="Source\Engine\Scene\Scene.cpp" />
-    <ClCompile Include="Source\Engine\Scene\SceneManager.cpp" />
+    <ClCompile Include="Source\Engine\Components\Scene\Layer.cpp" />
+    <ClCompile Include="Source\Engine\Components\Scene\Scene.cpp" />
+    <ClCompile Include="Source\Engine\Components\Scene\SceneManager.cpp" />
     <ClCompile Include="Source\Engine\Utils\BitSet.cpp" />
     <ClCompile Include="Source\Engine\Utils\Color.cpp" />
     <ClCompile Include="Source\Engine\Utils\ConfigReader.cpp" />

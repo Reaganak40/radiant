@@ -1,13 +1,12 @@
 #pragma once
 #include "Core.h"
+#include "Components/Component.h"
 #include "Utils/UniqueID.h"
-#include "Messaging/Messenger.h"
-#include "Graphics/Camera.h"
 #include "Layer.h"
 
 namespace rdt {
 
-	class RADIANT_API Scene : public Messenger {
+	class RADIANT_API Scene : public core::Component {
 	private:
 		struct Impl;
 		Impl* m_impl;

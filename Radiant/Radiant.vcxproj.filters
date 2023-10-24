@@ -183,10 +183,10 @@
     <ClInclude Include="Source\Engine\EntryPoint.h">
       <Filter>Source\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Engine\GameObject\GameObject.h">
+    <ClInclude Include="Source\Engine\Components\GameObject\GameObject.h">
       <Filter>Source\Engine\GameObject</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Engine\GameObject\GameState.h">
+    <ClInclude Include="Source\Engine\Components\GameState.h">
       <Filter>Source\Engine\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Graphics\Mesh.h">
@@ -288,13 +288,13 @@
     <ClInclude Include="Source\Engine\Polygon\Triangle.h">
       <Filter>Source\Engine\Polygon</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Engine\Scene\Layer.h">
+    <ClInclude Include="Source\Engine\Components\Scene\Layer.h">
       <Filter>Source\Engine\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Engine\Scene\Scene.h">
+    <ClInclude Include="Source\Engine\Components\Scene\Scene.h">
       <Filter>Source\Engine\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Engine\Scene\SceneManager.h">
+    <ClInclude Include="Source\Engine\Components\Scene\SceneManager.h">
       <Filter>Source\Engine\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Utils\BitSet.h">
@@ -506,6 +506,7 @@
     <ClInclude Include="Source\Editor\IconsForkAwesome.h" />
     <ClInclude Include="Source\Engine\Graphics\OpenGL\FrameBuffer.h" />
     <ClInclude Include="Source\Engine\Graphics\RenderWindow.h" />
+    <ClInclude Include="Source\Engine\Components\Component.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Editor\DevTools.cpp">
@@ -532,10 +533,10 @@
     <ClCompile Include="Source\Engine\Audio\SoundSource.cpp">
       <Filter>Source\Engine\Audio</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Engine\GameObject\GameObject.cpp">
+    <ClCompile Include="Source\Engine\Components\GameObject\GameObject.cpp">
       <Filter>Source\Engine\GameObject</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Engine\GameObject\GameState.cpp">
+    <ClCompile Include="Source\Engine\Components\GameState.cpp">
       <Filter>Source\Engine\GameObject</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine\Graphics\OpenGL\ErrorHandling.cpp">
@@ -628,13 +629,13 @@
     <ClCompile Include="Source\Engine\Polygon\Triangle.cpp">
       <Filter>Source\Engine\Polygon</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Scene\Layer.cpp">
+    <ClCompile Include="Source\Engine\Components\Scene\Layer.cpp">
       <Filter>Source\Engine\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Scene\Scene.cpp">
+    <ClCompile Include="Source\Engine\Components\Scene\Scene.cpp">
       <Filter>Source\Engine\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Scene\SceneManager.cpp">
+    <ClCompile Include="Source\Engine\Components\Scene\SceneManager.cpp">
       <Filter>Source\Engine\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine\Utils\BitSet.cpp">
@@ -671,6 +672,7 @@
     <ClCompile Include="Source\Engine\Polygon\PolygonImpl.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\FrameBuffer.cpp" />
     <ClCompile Include="Source\Engine\Graphics\RenderWindow.cpp" />
+    <ClCompile Include="Source\Engine\Components\Component.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Resources\templates\gameObject.h.txt" />
