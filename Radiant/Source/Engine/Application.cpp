@@ -47,9 +47,10 @@ namespace rdt {
 	{
 		delete m_impl;
 
-#ifdef RDT_DEBUG
+#ifdef RDT_USE_DEV_TOOLS
 		core::DevLayer::Destroy();
 #endif
+		SceneManager::Destroy();
 		Physics::Destroy();
 		core::PtagManager::Destroy();
 		Input::Destroy();

@@ -23,9 +23,10 @@ namespace rdt {
 		static int RenderWindowID;
 
 		bool m_use_default_viewport;
+		bool m_is_fullscreen;
 
 		Impl()
-			: m_use_default_viewport(true)
+			: m_use_default_viewport(true), m_is_fullscreen(false)
 		{
 		}
 
@@ -54,6 +55,11 @@ namespace rdt {
 	std::unordered_map<int, RenderWindow*>& Renderer::GetRenderWindows()
 	{
 		return m_impl->m_render_windows;
+	}
+
+	void Renderer::SetFullscreenFlag(bool isFullscreen)
+	{
+		m_impl->m_is_fullscreen = isFullscreen;
 	}
 
 	void Renderer::Initialize()
@@ -87,6 +93,11 @@ namespace rdt {
 	void Renderer::SetDefaultViewport(bool use)
 	{
 		m_instance->m_impl->m_use_default_viewport = use;
+	}
+
+	bool Renderer::IsFullscreen()
+	{
+		return m_instance->m_impl->m_is_fullscreen;
 	}
 
 	bool Renderer::UsingDefaultViewport()

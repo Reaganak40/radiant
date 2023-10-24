@@ -67,23 +67,12 @@ namespace rdt::core {
 	*/
 	enum EditorTheme {
 		Theme_Codz,
+		Nightingale,
 	};
 
 	enum EditorFont {
 		NunitoSans = 1,
 		ForkAwesome,
-	};
-
-	struct ThemeData {
-		ImVec4 Titlebackground;
-		ImVec4 TitlebackgroundActive;
-		ImVec4 TitleBackgroundCollapsed;
-		ImVec4 HeaderColor;
-		ImVec4 HeaderHoverColor;
-		ImVec4 WindowBackground;
-		ImVec4 TextColor;
-		ImVec4 MenuBarBackground;
-		ImVec4 PopupBackground;
 	};
 
 	// =====================================================================================
@@ -96,7 +85,6 @@ namespace rdt::core {
 			Development dependables
 		*/
 		Scene* m_scene;
-		ThemeData theme_data;
 		std::string sourcePath;
 		std::string templatePath;
 		bool first_render;
@@ -114,6 +102,8 @@ namespace rdt::core {
 		std::unordered_map<EditorFont, std::unordered_map<unsigned int, ImFont*>> m_fonts;
 		
 		std::string m_last_log;
+
+		ConfigReader* m_config;
 
 		/*
 			Gui Layout data structures
@@ -163,6 +153,9 @@ namespace rdt::core {
 		void SetSourcePath(const std::string& path);
 
 		void InitResources(std::string& resourcePath);
+
+		void AddConfigPtr(ConfigReader* ptr);
+		void ApplyConfig();
 
 	private:
 		void OnFirstRender();

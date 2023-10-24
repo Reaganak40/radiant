@@ -30,6 +30,11 @@ namespace rdt {
 		*/
 		std::unordered_map<int, RenderWindow*>& GetRenderWindows();
 
+		/*
+			Sets the fullscreen flag to true (enabled), or false (disabled)
+		*/
+		void SetFullscreenFlag(bool isFullscreen);
+
 	private:
 		static Renderer* m_instance;
 	public:
@@ -232,6 +237,21 @@ namespace rdt {
 		static void SetDefaultViewport(bool use);
 
 		/*
+			Makes the window fullscreen
+		*/
+		static void EnableFullscreen() { m_instance->EnableFullscreenImpl(); }
+
+		/*
+			Restores the window back to windowed mdoe
+		*/
+		static void DisableFullscreen() { m_instance->DisableFullscreenImpl(); }
+
+		/*
+			Returns true if the window is currently in fullscreen.
+		*/
+		static bool IsFullscreen();
+
+		/*
 			Returns true if the default viewport should be used for render windows.
 		*/
 		static bool UsingDefaultViewport();
@@ -281,6 +301,9 @@ namespace rdt {
 		virtual void SetBackgroundColorImpl(const Color& color) = 0;
 		virtual Vec2i OnWindowResizeImpl() = 0;
 		virtual void OnNewRenderWindow(int id, RenderWindow* nRenderWindow) = 0;
+		virtual void EnableFullscreenImpl() = 0;
+		virtual void DisableFullscreenImpl() = 0;
+
 
 		virtual void ClearImpl() = 0;
 		virtual void OnBeginFrameImpl() = 0;

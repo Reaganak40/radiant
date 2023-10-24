@@ -19,6 +19,7 @@ namespace rdt::core {
 
 		// Window management
 		GLFWwindow* m_window;
+		GLFWmonitor* m_monitor;
 		
 #pragma warning(push)
 #pragma warning(disable: 4251)
@@ -121,6 +122,9 @@ namespace rdt::core {
 		void SetBackgroundColorImpl(const Color& color) override final;
 		Vec2i OnWindowResizeImpl() override final;
 		void OnNewRenderWindow(int id, RenderWindow* nRenderWindow) override final;
+		void EnableFullscreenImpl() override final;
+		void DisableFullscreenImpl() override final;
+
 
 		void ClearImpl() override final;
 		void OnBeginFrameImpl() override final;
