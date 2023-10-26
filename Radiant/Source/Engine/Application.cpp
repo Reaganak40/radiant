@@ -46,7 +46,7 @@ namespace rdt {
 	Application::~Application()
 	{
 		delete m_impl;
-
+  
 #ifdef RDT_USE_DEV_TOOLS
 		core::DevLayer::Destroy();
 #endif
