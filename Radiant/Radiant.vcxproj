@@ -117,6 +117,9 @@
     <ClInclude Include="Source\Engine\Audio\SoundSource.h" />
     <ClInclude Include="Source\Engine\Components\Component.h" />
     <ClInclude Include="Source\Engine\Core.h" />
+    <ClInclude Include="Source\Engine\ECS\Component.h" />
+    <ClInclude Include="Source\Engine\ECS\ComponentManager.h" />
+    <ClInclude Include="Source\Engine\ECS\Entity.h" />
     <ClInclude Include="Source\Engine\EntryPoint.h" />
     <ClInclude Include="Source\Engine\Components\GameObject\GameObject.h" />
     <ClInclude Include="Source\Engine\Components\GameState.h" />
@@ -241,6 +244,8 @@
     <ClCompile Include="Source\Engine\Components\Component.cpp" />
     <ClCompile Include="Source\Engine\Components\GameObject\GameObject.cpp" />
     <ClCompile Include="Source\Engine\Components\GameState.cpp" />
+    <ClCompile Include="Source\Engine\ECS\ComponentManager.cpp" />
+    <ClCompile Include="Source\Engine\ECS\Entity.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Camera.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\ErrorHandling.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\FrameBuffer.cpp" />

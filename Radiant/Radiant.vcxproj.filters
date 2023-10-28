@@ -507,6 +507,9 @@
     <ClInclude Include="Source\Engine\Graphics\OpenGL\FrameBuffer.h" />
     <ClInclude Include="Source\Engine\Graphics\RenderWindow.h" />
     <ClInclude Include="Source\Engine\Components\Component.h" />
+    <ClInclude Include="Source\Engine\ECS\Entity.h" />
+    <ClInclude Include="Source\Engine\ECS\Component.h" />
+    <ClInclude Include="Source\Engine\ECS\ComponentManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Editor\DevTools.cpp">
@@ -673,6 +676,8 @@
     <ClCompile Include="Source\Engine\Graphics\OpenGL\FrameBuffer.cpp" />
     <ClCompile Include="Source\Engine\Graphics\RenderWindow.cpp" />
     <ClCompile Include="Source\Engine\Components\Component.cpp" />
+    <ClCompile Include="Source\Engine\ECS\Entity.cpp" />
+    <ClCompile Include="Source\Engine\ECS\ComponentManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Resources\templates\gameObject.h.txt" />
