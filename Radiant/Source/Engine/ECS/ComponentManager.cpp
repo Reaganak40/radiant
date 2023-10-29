@@ -11,6 +11,9 @@ namespace rdt {
 
 	ComponentManager::~ComponentManager()
 	{
+		for (auto& [id, component] : m_components) {
+			delete component;
+		}
 	}
 
 	void ComponentManager::Initialize()
@@ -23,6 +26,13 @@ namespace rdt {
 		if (m_instance != nullptr) {
 			delete m_instance;
 			m_instance = nullptr;
+		}
+	}
+
+	void ComponentManager::OnEntityRemoved(EntityID eID)
+	{
+		for (auto& [id, component] : m_instance->m_components) {
+			component->RemoveData(eID);
 		}
 	}
 }

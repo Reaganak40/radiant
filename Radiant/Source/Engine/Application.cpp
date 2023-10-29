@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Application.h"
 
+// Engine
 #include "Graphics/Renderer.h"
 #include "Audio/SoundEngine.h"
 #include "Utils/Input.h"
@@ -12,7 +13,13 @@
 #include "Physics/Ptag.h"
 #include "Utils/Timestep.h"
 
+// ECS
+#include "Engine/ECS/EntityManager.h"
+#include "Engine/ECS/ComponentManager.h"
+#include "Engine/ECS/SystemManager.h"
+#include "Engine/ECS/CommonComponents.h"
 
+// DevTools
 #include "Editor/DevTools.h"
 
 namespace rdt {
@@ -41,6 +48,8 @@ namespace rdt {
 		core::PtagManager::Initialize();
 		Physics::Initialize();
 		SceneManager::Initialize();
+		
+		AddECS();
 	}
 
 	Application::~Application()
@@ -50,6 +59,10 @@ namespace rdt {
 #ifdef RDT_USE_DEV_TOOLS
 		core::DevLayer::Destroy();
 #endif
+		SystemManager::Destroy();
+		ComponentManager::Destroy();
+		EntityManager::Destroy();
+
 		SceneManager::Destroy();
 		Physics::Destroy();
 		core::PtagManager::Destroy();
@@ -115,6 +128,17 @@ namespace rdt {
 	void Application::SetApplicationConfig(const ApplicationConfig& config)
 	{
 		m_impl->m_config = config;
+	}
+
+	void Application::AddECS()
+	{
+		// Initialize ECS Singletons
+		EntityManager::Initialize();
+		ComponentManager::Initialize();
+		SystemManager::Initialize();
+
+		// Add Common Components
+		ComponentManager::RegisterComponent<Transform2D>();
 	}
 
 	bool Application::IsRunning()

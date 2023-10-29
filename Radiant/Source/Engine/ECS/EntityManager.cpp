@@ -1,5 +1,6 @@
 #include "pch.h"
-#include "Entity.h"
+#include "EntityManager.h"
+#include "SystemManager.h"
 #include "Logging/Log.h"
 
 namespace rdt {
@@ -37,16 +38,16 @@ namespace rdt {
 			return nID;
 		}
 
-		void RemoveEntity(EntityID eID)
+		bool RemoveEntity(EntityID eID)
 		{
 			if (m_signatures.find(eID) == m_signatures.end()) {
 				RDT_CORE_WARN("EntityManager - Tried to remove entity [id:{}], but it doesn't exist.", eID);
-				return;
+				return false;
 			}
 
 			m_signatures.erase(eID);
-
 			m_idCache.push_back(eID);
+			return true;
 		}
 
 		bool EntityExists(EntityID eID)
@@ -68,6 +69,26 @@ namespace rdt {
 		{
 			// Precondition: Entity for sure exists
 			return m_signatures.at(eID);
+		}
+
+		void AddToSignature(EntityID eID, ComponentID cID)
+		{
+			if (m_signatures.find(eID) == m_signatures.end()) {
+				RDT_CORE_WARN("EntityManager - Tried to add component to unregistered entity [id:{}]", eID);
+				return;
+			}
+			
+			m_signatures.at(eID).set(cID, true);
+		}
+
+		void RemoveFromSignature(EntityID eID, ComponentID cID)
+		{
+			if (m_signatures.find(eID) == m_signatures.end()) {
+				RDT_CORE_WARN("EntityManager - Tried to remove component to unregistered entity [id:{}]", eID);
+				return;
+			}
+
+			m_signatures.at(eID).set(cID, false);
 		}
 	};
 
@@ -107,7 +128,12 @@ namespace rdt {
 
 	void EntityManager::RemoveEntity(EntityID eID)
 	{
-		m_instance->m_impl->RemoveEntity(eID);
+		if (!m_instance->m_impl->RemoveEntity(eID)) {
+			return;
+		}
+
+		ComponentManager::OnEntityRemoved(eID);
+		SystemManager::OnEntityRemoved(eID);
 	}
 	void EntityManager::SetSignature(EntityID eID, const Signature& signature)
 	{
@@ -122,5 +148,16 @@ namespace rdt {
 		}
 
 		return m_instance->m_impl->GetSignature(eID);
+	}
+
+	void EntityManager::AddToSignature(EntityID eID, ComponentID cID)
+	{
+		m_instance->m_impl->AddToSignature(eID, cID);
+	}
+
+	void EntityManager::RemoveFromSignature(EntityID eID, ComponentID cID)
+	{
+		m_instance->m_impl->RemoveFromSignature(eID, cID);
+		SystemManager::OnEntityComponentRemoved(eID, cID);
 	}
 }

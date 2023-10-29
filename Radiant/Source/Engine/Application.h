@@ -84,6 +84,12 @@ namespace rdt {
 
 	private:
 	private:
+
+		/*
+			Initializes the entity component system and common components
+		*/
+		void AddECS();
+
 		/*
 			Returns true if the application is running and the window is launched.
 		*/

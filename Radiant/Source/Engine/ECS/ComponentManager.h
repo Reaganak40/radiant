@@ -1,22 +1,76 @@
 #pragma once
+#include "ECSTypes.h"
 #include "Logging/Log.h"
-#include "Component.h"
-
-using ComponentType = std::uint32_t;
-constexpr ComponentType MAX_COMPONENTS = 32;
-constexpr ComponentType NOT_REGISTERED_COMPONENT = MAX_COMPONENTS + 1;
-
-using Signature = std::bitset<MAX_COMPONENTS>;
 
 namespace rdt {
+
+	class IComponentArray {
+	public:
+		virtual ~IComponentArray() = default;
+
+		virtual void RemoveData(EntityID eID) = 0;
+	};
+
+	template <typename T>
+	class Component : public IComponentArray {
+	private:
+
+		std::unordered_map<EntityID, size_t> m_entity_map;
+
+		std::vector<EntityID> m_entities;
+		std::vector<T> m_data;
+	public:
+
+		/*
+			Adds data to the component array while tracking the associated
+			entity.
+		*/
+		void InsertData(EntityID eID, T data) {
+			if (m_entity_map.find(eID) != m_entity_map.end()) {
+				RDT_CORE_WARN("Component - Tried to insert duplicate entity [eID: {}]", eID);
+				return;
+			}
+
+			m_entity_map[eID] = m_data.size();
+			m_entities.push_back(eID);
+			m_data.push_back(data);
+		}
+
+		/*
+			Removes the data from this component data array that is associated with this
+			Entity.
+		*/
+		void RemoveData(EntityID eID) override final {
+			if (m_entity_map.find(eID) == m_entity_map.end()) {
+				RDT_CORE_WARN("Component - Could not remove data, entity not found [eID: {}]", eID);
+				return;
+			}
+
+			size_t index = m_entity_map.at(eID);
+			m_data.erase(m_data.begin() + index);
+			m_entities.erase(m_entities.begin() + index);
+			m_entity_map.erase(eID);
+
+			// Update the data index location of all entities using this component
+			for (int i = index; i < m_entities.size(); i++) {
+				m_entity_map.at(m_entities[i]) = i;
+			}
+		}
+
+		T& GetData(EntityID eID) {
+			return m_data[m_entity_map.at(eID)];
+		}
+	};
+	// ====================================================================
+
 	class ComponentManager {
 	private:
 		ComponentManager();
 		~ComponentManager();
 		static ComponentManager* m_instance;
 
-		ComponentType m_componentCounter;
-		std::unordered_map<const char*, ComponentType> m_componentTypes;
+		ComponentID m_componentCounter;
+		std::unordered_map<const char*, ComponentID> m_componentTypes;
 		std::unordered_map<const char*, IComponentArray*> m_components;
 	public:
 
@@ -34,22 +88,25 @@ namespace rdt {
 		static void RegisterComponent() {
 			const char* typeName = typeid(T).name();
 
-			if (m_componentTypes.find(typeName) != m_componentTypes.end()) {
+			if (m_instance->m_componentTypes.find(typeName) != m_instance->m_componentTypes.end()) {
 				RDT_CORE_WARN("ComponentManager - Tried to register duplicate component '{}'", typeName);
 				return;
 			}
 
-			if (m_componentCounter == MAX_COMPONENTS) {
+			if (m_instance->m_componentCounter == MAX_COMPONENTS) {
 				RDT_CORE_FATAL("ComponentManager - Max components reached!", typeName);
 				assert(false);
 			}
 
-			m_componentTypes[typeName] = m_componentCounter++;
-			m_components[typeName] = new Component<T>();
+			m_instance->m_componentTypes[typeName] = m_instance->m_componentCounter++;
+			m_instance->m_components[typeName] = new Component<T>();
 		}
 
+		/*
+			Returns the component ID for this component if it is registered.
+		*/
 		template <typename T>
-		ComponentType GetComponentType()
+		ComponentID GetComponentID()
 		{
 			const char* typeName = typeid(T).name();
 
@@ -61,8 +118,11 @@ namespace rdt {
 			return m_componentTypes.at(typeName);
 		}
 
+		friend class EntityManager;
+		friend class System;
+	private:
 		template<typename T>
-		void AddComponent(EntityID eID, T component)
+		void AddToComponent(EntityID eID, T nData)
 		{
 			Component<T>* component = GetComponent<T>();
 
@@ -70,11 +130,11 @@ namespace rdt {
 				return;
 			}
 
-			component->InsertData(eID, T);
+			component->InsertData(eID, nData);
 		}
 
 		template<typename T>
-		void RemoveComponent(EntityID eID)
+		void RemoveFromComponent(EntityID eID)
 		{
 			Component<T>* component = GetComponent<T>();
 
@@ -85,7 +145,6 @@ namespace rdt {
 			component->RemoveData(eID);
 		}
 
-	private:
 
 		template<typename T>
 		Component<T>* GetComponent()
@@ -98,6 +157,11 @@ namespace rdt {
 
 			return (Component<T>*)m_components.at(typeName);
 		}
+
+		/*
+			Removes this entity from all components
+		*/
+		static void OnEntityRemoved(EntityID eID);
 
 	};
 }

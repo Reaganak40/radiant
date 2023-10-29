@@ -1,6 +1,6 @@
 #pragma once
 /*
-	To be used by Radiant Applications
+	Header file to be included by Radiant Applications
 */
 #include "Engine/Application.h"
 #include "Engine/Logging/Log.h"
@@ -13,6 +13,13 @@
 #include "Engine/Utils/Utils.h"
 #include "Engine/Utils/Input.h"
 #include "Engine/Utils/Timestep.h"
+// -------------------------------------------
+
+// -- Entity Component System ----------------
+#include "Engine/ECS/EntityManager.h"
+#include "Engine/ECS/ComponentManager.h"
+#include "Engine/ECS/SystemManager.h"
+#include "Engine/ECS/CommonComponents.h"
 // -------------------------------------------
 
 // -- Game Developer APIs --------------------
