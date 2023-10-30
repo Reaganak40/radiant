@@ -30,6 +30,11 @@ namespace rdt {
 		Polygon(const Polygon& polygon);
 
 		/*
+			Used to copy the PIMPL of a child polygon class.
+		*/
+		void Copy(const Polygon& polygon);
+
+		/*
 			Get the array of vertices for this polygon.
 		*/
 		const std::vector<Vec2d>& GetVertices() const;

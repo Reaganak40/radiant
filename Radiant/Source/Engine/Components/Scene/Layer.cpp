@@ -13,6 +13,7 @@ namespace rdt {
 		std::vector<GameObject*> m_game_objects;
 		std::vector<GuiTemplate*> m_GUIs;
 		std::vector<UniqueID> m_realms;
+		std::vector<Entity> m_entities;
 
 		Impl()
 			: m_ID(GetUniqueID()), m_attached(false)
@@ -27,6 +28,10 @@ namespace rdt {
 
 			for (auto& gui : m_GUIs) {
 				delete gui;
+			}
+
+			for (auto entity : m_entities) {
+				EntityManager::RemoveEntity(entity);
 			}
 
 			FreeUniqueID(m_ID);
@@ -113,6 +118,11 @@ namespace rdt {
 		m_impl->m_GUIs.push_back(nGUI);
 	}
 
+	void Layer::RegisterEntity(EntityDefinition* nEntity)
+	{
+		m_impl->m_entities.push_back(EntityFactory::Create(nEntity)); // frees nEntity
+	}
+
 	Layer::Layer()
 		: m_impl(new Layer::Impl)
 	{
@@ -150,6 +160,11 @@ namespace rdt {
 	GameObject** Layer::GetGameObjects(size_t* numObjects)
 	{
 		return m_impl->GetGameObjects(numObjects);
+	}
+
+	const std::vector<Entity>& Layer::GetEntities()
+	{
+		return m_impl->m_entities;
 	}
 
 	void Layer::BindAll()

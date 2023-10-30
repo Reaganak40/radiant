@@ -44,6 +44,7 @@
 #include <filesystem>
 #include <vector>
 #include <unordered_map>
+#include <bitset>
 #include <queue>
 #include <array>
 #include <set>

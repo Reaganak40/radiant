@@ -3,13 +3,13 @@
 #include "Logging/Log.h"
 
 namespace rdt::core {
-	Component::Component()
+	OOComponent::OOComponent()
 	{
 	}
-	Component::~Component()
+	OOComponent::~OOComponent()
 	{
 	}
-	void Component::OnMessage(Message msg)
+	void OOComponent::OnMessage(Message msg)
 	{
 		RDT_CORE_WARN("Core Component - OnMessage Called!");
 	}

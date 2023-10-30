@@ -117,6 +117,13 @@
     <ClInclude Include="Source\Engine\Audio\SoundSource.h" />
     <ClInclude Include="Source\Engine\Components\Component.h" />
     <ClInclude Include="Source\Engine\Core.h" />
+    <ClInclude Include="Source\Engine\ECS\CommonComponents.h" />
+    <ClInclude Include="Source\Engine\ECS\ComponentManager.h" />
+    <ClInclude Include="Source\Engine\ECS\ECS.h" />
+    <ClInclude Include="Source\Engine\ECS\ECSTypes.h" />
+    <ClInclude Include="Source\Engine\ECS\EntityFactory.h" />
+    <ClInclude Include="Source\Engine\ECS\EntityManager.h" />
+    <ClInclude Include="Source\Engine\ECS\SystemManager.h" />
     <ClInclude Include="Source\Engine\EntryPoint.h" />
     <ClInclude Include="Source\Engine\Components\GameObject\GameObject.h" />
     <ClInclude Include="Source\Engine\Components\GameState.h" />
@@ -132,6 +139,7 @@
     <ClInclude Include="Source\Engine\Graphics\OpenGL\Shader.h" />
     <ClInclude Include="Source\Engine\Graphics\OpenGL\VertexArray.h" />
     <ClInclude Include="Source\Engine\Graphics\OpenGL\VertexBuffer.h" />
+    <ClInclude Include="Source\Engine\Graphics\RenderSystem.h" />
     <ClInclude Include="Source\Engine\Graphics\RenderTypes.h" />
     <ClInclude Include="Source\Engine\Graphics\Renderer.h" />
     <ClInclude Include="Source\Engine\Graphics\RenderWindow.h" />
@@ -147,6 +155,7 @@
     <ClInclude Include="Source\Engine\Messaging\Messenger.h" />
     <ClInclude Include="Source\Engine\Physics\Collision.h" />
     <ClInclude Include="Source\Engine\Physics\Physics.h" />
+    <ClInclude Include="Source\Engine\Physics\PhysicsSystem.h" />
     <ClInclude Include="Source\Engine\Physics\Pobject.h" />
     <ClInclude Include="Source\Engine\Physics\Ptag.h" />
     <ClInclude Include="Source\Engine\Physics\Realm.h" />
@@ -241,6 +250,10 @@
     <ClCompile Include="Source\Engine\Components\Component.cpp" />
     <ClCompile Include="Source\Engine\Components\GameObject\GameObject.cpp" />
     <ClCompile Include="Source\Engine\Components\GameState.cpp" />
+    <ClCompile Include="Source\Engine\ECS\ComponentManager.cpp" />
+    <ClCompile Include="Source\Engine\ECS\EntityFactory.cpp" />
+    <ClCompile Include="Source\Engine\ECS\EntityManager.cpp" />
+    <ClCompile Include="Source\Engine\ECS\SystemManager.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Camera.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\ErrorHandling.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\FrameBuffer.cpp" />
@@ -253,6 +266,7 @@
     <ClCompile Include="Source\Engine\Graphics\OpenGL\VertexArray.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\VertexBuffer.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Renderer.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\RenderSystem.cpp" />
     <ClCompile Include="Source\Engine\Graphics\RenderWindow.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Texture\Texture.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Texture\TextureManager.cpp" />
@@ -265,6 +279,7 @@
     <ClCompile Include="Source\Engine\Messaging\Messenger.cpp" />
     <ClCompile Include="Source\Engine\Physics\Collision.cpp" />
     <ClCompile Include="Source\Engine\Physics\Physics.cpp" />
+    <ClCompile Include="Source\Engine\Physics\PhysicsSystem.cpp" />
     <ClCompile Include="Source\Engine\Physics\Pobject.cpp" />
     <ClCompile Include="Source\Engine\Physics\Ptag.cpp" />
     <ClCompile Include="Source\Engine\Physics\Realm.cpp" />

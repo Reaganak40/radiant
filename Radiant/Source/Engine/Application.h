@@ -84,6 +84,17 @@ namespace rdt {
 
 	private:
 	private:
+
+		/*
+			Initializes the entity component system and common components
+		*/
+		void AddECS();
+
+		/*
+			Removes the entity component system singletons
+		*/
+		void RemoveECS();
+
 		/*
 			Returns true if the application is running and the window is launched.
 		*/

@@ -4,10 +4,38 @@
 
 using namespace rdt;
 
+class PinkBox : public EntityDefinition, SpawnRect {
+private:
+public:
+
+	PinkBox(double xPos, double yPos, double width, double height)
+		: SpawnRect(xPos, yPos, width, height)
+	{
+	}
+
+	void OnCreate() override final
+	{
+		Register();
+		Entity eID = GetID();
+
+		Sprite sprite = SpawnRect::CreateSprite();
+		EntityManager::AddComponent<Sprite>(eID, sprite);
+
+		RigidBody2D rigidBody;
+		EntityManager::AddComponent<RigidBody2D>(eID, rigidBody);
+
+		Renderable renderable;
+		renderable.polygon_color = PINK;
+		EntityManager::AddComponent<Renderable>(eID, renderable);
+
+		SystemManager::AddEntity<PhysicsSystem>(eID);
+		SystemManager::AddEntity<RenderSystem>(eID);
+	}
+};
+
 TestLayer::TestLayer(const std::string& alias)
 {
 	RegisterToMessageBus(alias);
-
 	CreateNewRealm();
 
 	TestQuad* quad3;
@@ -16,6 +44,10 @@ TestLayer::TestLayer(const std::string& alias)
 	quad3->RegisterToLayer(GetID());
 
 	RegisterGameObject(new MyBeautifulObject("Object1"));
+
+	for (int i = 1; i < 15; i++) {
+		RegisterEntity(new PinkBox(100 * i, 100, 50, 50));
+	}
 }
 
 TestLayer::~TestLayer()

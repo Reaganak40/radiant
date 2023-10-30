@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Application.h"
 
+// Engine
 #include "Graphics/Renderer.h"
 #include "Audio/SoundEngine.h"
 #include "Utils/Input.h"
@@ -12,7 +13,12 @@
 #include "Physics/Ptag.h"
 #include "Utils/Timestep.h"
 
+// ECS
+#include "Engine/ECS/ECS.h"
+#include "Engine/Physics/PhysicsSystem.h"
+#include "Engine/Graphics/RenderSystem.h"
 
+// DevTools
 #include "Editor/DevTools.h"
 
 namespace rdt {
@@ -41,6 +47,8 @@ namespace rdt {
 		core::PtagManager::Initialize();
 		Physics::Initialize();
 		SceneManager::Initialize();
+		
+		AddECS();
 	}
 
 	Application::~Application()
@@ -50,9 +58,13 @@ namespace rdt {
 #ifdef RDT_USE_DEV_TOOLS
 		core::DevLayer::Destroy();
 #endif
+
 		SceneManager::Destroy();
 		Physics::Destroy();
 		core::PtagManager::Destroy();
+
+		RemoveECS();
+
 		Input::Destroy();
 		SoundEngine::Destroy();
 		MessageBus::Destroy();
@@ -117,6 +129,30 @@ namespace rdt {
 		m_impl->m_config = config;
 	}
 
+	void Application::AddECS()
+	{
+		// Initialize ECS Singletons
+		EntityManager::Initialize();
+		ComponentManager::Initialize();
+		SystemManager::Initialize();
+
+		// Add Common Components
+		ComponentManager::RegisterComponent<Sprite>();
+		ComponentManager::RegisterComponent<RigidBody2D>();
+		ComponentManager::RegisterComponent<Renderable>();
+
+		// Add Common Systems
+		SystemManager::RegisterSystem<PhysicsSystem>();
+		SystemManager::RegisterSystem<RenderSystem>();
+	}
+
+	void Application::RemoveECS()
+	{
+		SystemManager::Destroy();
+		ComponentManager::Destroy();
+		EntityManager::Destroy();
+	}
+
 	bool Application::IsRunning()
 	{
 		return !(Renderer::ShouldWindowClose());
@@ -156,12 +192,16 @@ namespace rdt {
 		if (m_impl->m_current_scene != nullptr) {
 			m_impl->m_current_scene->OnProcessInput(m_impl->m_timestep.deltaTime);
 		}
+
+		SystemManager::OnProcessInput(m_impl->m_timestep.deltaTime);
 	}
 
 	void Application::UpdateWorld()
 	{
 		// Updates all active physical objects.
 		Physics::OnUpdate(m_impl->m_timestep.deltaTime);
+		SystemManager::OnWorldUpdate(m_impl->m_timestep.deltaTime);
+
 	}
 
 	void Application::PollMessages2()
@@ -175,7 +215,8 @@ namespace rdt {
 		if (m_impl->m_current_scene != nullptr) {
 			m_impl->m_current_scene->OnFinalUpdate();
 		}
-
+		SystemManager::OnFinalUpdate();
+		
 		// Renderer does its update procedure.
 		Renderer::OnUpdate(m_impl->m_timestep.deltaTime);
 	}
@@ -187,7 +228,9 @@ namespace rdt {
 			m_impl->m_current_scene->OnRender();
 		}
 
-		// RUn the render queue and display the new frame.
+		SystemManager::OnRender();
+
+		// Run the render queue and display the new frame.
 		Renderer::Render();
 	}
 

@@ -7,14 +7,14 @@
 namespace rdt::core {
 
 	/*
-		Core Components make up that child class instances that define
+		Core Object-Oriented Components make up that child class instances that define
 		the structure of the Game (i.e, GameObjects, Layers, Scenes)
 	*/
-	class RADIANT_API Component : public Messenger, public GameState {
+	class RADIANT_API OOComponent : public Messenger, public GameState {
 	private:
 	public:
-		Component();
-		~Component();
+		OOComponent();
+		~OOComponent();
 
 		virtual void OnMessage(Message msg);
 	};
