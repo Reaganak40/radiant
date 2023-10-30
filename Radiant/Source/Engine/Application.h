@@ -91,6 +91,11 @@ namespace rdt {
 		void AddECS();
 
 		/*
+			Removes the entity component system singletons
+		*/
+		void RemoveECS();
+
+		/*
 			Returns true if the application is running and the window is launched.
 		*/
 		bool IsRunning();

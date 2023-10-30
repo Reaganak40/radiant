@@ -3,6 +3,7 @@
 #include "Components/Component.h"
 #include "Components/GameObject/GameObject.h"
 #include "Gui/Gui.h"
+#include "ECS/ECS.h"
 
 namespace rdt {
 	
@@ -12,7 +13,7 @@ namespace rdt {
 		Scenes own game objects and GUIs that can be used by the application under
 		specified conditions.
 	*/
-	class RADIANT_API Layer : public core::Component {
+	class RADIANT_API Layer : public core::OOComponent {
 	private:
 		struct Impl;
 		Impl* m_impl;
@@ -45,6 +46,14 @@ namespace rdt {
 		*/
 		void RegisterGUI(GuiTemplate* nGUI);
 
+		/*
+			Registers a new entity to this layer. The layer is now
+			responsible for this entity. 
+			
+			NOTE: This entity definition will be freed upon completion of this function.
+		*/
+		void RegisterEntity(EntityDefinition* nEntity);
+
 
 	public:
 		Layer();
@@ -59,7 +68,8 @@ namespace rdt {
 		virtual void OnAttach() {}
 
 		/*
-			Function called when a layer is about to be released, not active.
+			Function called when a layer is about to be released, not active,
+			removed from the game loop.
 		*/
 		virtual void OnDetach() {}
 
@@ -95,6 +105,11 @@ namespace rdt {
 			Returns a constant pointer to the array of game objects
 		*/
 		GameObject** GetGameObjects(size_t* numObjects);
+
+		/*
+			Returns a list of the entities registered by this layer.
+		*/
+		const std::vector<Entity>& GetEntities();
 
 		friend class Scene;
 

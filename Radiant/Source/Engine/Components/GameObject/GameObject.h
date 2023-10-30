@@ -5,7 +5,7 @@
 #include "Polygon/Polygon.h"
 
 namespace rdt {
-	class RADIANT_API GameObject : public core::Component {
+	class RADIANT_API GameObject : public core::OOComponent {
 	private:
 		struct Impl;
 		Impl* m_impl;

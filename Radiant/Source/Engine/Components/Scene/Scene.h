@@ -6,7 +6,7 @@
 
 namespace rdt {
 
-	class RADIANT_API Scene : public core::Component {
+	class RADIANT_API Scene : public core::OOComponent {
 	private:
 		struct Impl;
 		Impl* m_impl;

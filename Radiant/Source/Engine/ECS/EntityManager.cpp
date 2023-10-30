@@ -158,10 +158,16 @@ namespace rdt {
 	void EntityManager::RemoveFromSignature(Entity eID, ComponentID cID)
 	{
 		m_instance->m_impl->RemoveFromSignature(eID, cID);
-		SystemManager::OnEntityComponentRemoved(eID, cID);
 	}
+
 	bool EntityManager::EntityExists(Entity eID)
 	{
 		return m_instance->m_impl->m_signatures.find(eID) != m_instance->m_impl->m_signatures.end();
 	}
+
+	bool EntityManager::HasComponentImpl(Entity eID, ComponentID cID)
+	{
+		return m_impl->m_signatures.at(eID)[cID];
+	}
+
 }

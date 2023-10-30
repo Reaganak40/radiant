@@ -12,14 +12,22 @@
 namespace rdt {
 
 	/*
-		Defines a physics object's shape and properties
+		Defines the dimensionality of an entity, that is
+		its vertices, location in space and volume.
+	*/
+	struct Sprite
+	{
+		// Contains a centeralized origin and 2D vertices
+		// NOTE: Pointer required because the number of vertices in arbitrary
+		std::shared_ptr<Polygon> polygon = nullptr; 
+	};
 
-		Contains a polygon which contains a centeralized origin and
-		2D vertices. Used by the physics and rendering engines.
+	/*
+		Defines a physics object's properties
 	*/
 	struct RigidBody2D
 	{
-		std::shared_ptr<Polygon> polygon; // Contains a centeralized origin and 2D vertices
+		double mass = 1;
 	};
 
 	/*
@@ -29,16 +37,6 @@ namespace rdt {
 	{
 		unsigned int layer = 0;		 // The render layer to begin draw
 		std::string texture = "";    // texture alias to be applied to this render object
-		std::shared_ptr<Polygon> polygon = nullptr;  // Polygon to use for mesh vertices
 		Color polygon_color = BLACK; // The shader color for the polygon
-
-		bool IsUsingTexture() { return !texture.empty(); }
-		bool IsUsingPolygon() { return polygon != nullptr; }
-
-		/*
-			Gets the polygon from the RigidBody component for this 
-			entity and sets the pointer of the polygon attribute to it
-		*/
-		static void RADIANT_API AddPolygonFromRigidBody(Entity entity);
 	};
 }

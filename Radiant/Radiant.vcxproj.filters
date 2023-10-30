@@ -687,7 +687,6 @@
     <ClCompile Include="Source\Engine\ECS\SystemManager.cpp" />
     <ClCompile Include="Source\Engine\Physics\PhysicsSystem.cpp" />
     <ClCompile Include="Source\Engine\Graphics\RenderSystem.cpp" />
-    <ClCompile Include="Source\Engine\ECS\CommonComponents.cpp" />
     <ClCompile Include="Source\Engine\ECS\EntityFactory.cpp" />
   </ItemGroup>
   <ItemGroup>

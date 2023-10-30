@@ -53,7 +53,7 @@ namespace rdt {
 			m_entity_map.erase(eID);
 
 			// Update the data index location of all entities using this component
-			for (int i = index; i < m_entities.size(); i++) {
+			for (size_t i = index; i < m_entities.size(); i++) {
 				m_entity_map.at(m_entities[i]) = i;
 			}
 		}
@@ -70,13 +70,12 @@ namespace rdt {
 
 	class RADIANT_API ComponentManager {
 	private:
+		struct Impl;
+		Impl* m_impl;
+
 		ComponentManager();
 		~ComponentManager();
 		static ComponentManager* m_instance;
-
-		ComponentID m_componentCounter;
-		std::unordered_map<std::string, ComponentID> m_componentTypes;
-		std::unordered_map<std::string, IComponentArray*> m_components;
 	public:
 
 		/*
@@ -93,18 +92,17 @@ namespace rdt {
 		static void RegisterComponent() {
 			const char* typeName = typeid(T).name();
 
-			if (m_instance->m_componentTypes.find(typeName) != m_instance->m_componentTypes.end()) {
+			if (m_instance->ComponentExists(typeName)) {
 				RDT_CORE_WARN("ComponentManager - Tried to register duplicate component '{}'", typeName);
 				return;
 			}
 
-			if (m_instance->m_componentCounter == MAX_COMPONENTS) {
+			if (m_instance->MaxComponentsReached()) {
 				RDT_CORE_FATAL("ComponentManager - Max components reached!", typeName);
 				assert(false);
 			}
 
-			m_instance->m_componentTypes[typeName] = m_instance->m_componentCounter++;
-			m_instance->m_components[typeName] = new Component<T>();
+			m_instance->RegisterComponentImpl(typeName, new Component<T>());
 		}
 
 		/*
@@ -166,12 +164,12 @@ namespace rdt {
 		static Component<T>* GetComponent()
 		{
 			const char* typeName = typeid(T).name();
-			if (m_instance->m_componentTypes.find(typeName) == m_instance->m_componentTypes.end()) {
+			if (!m_instance->ComponentExists(typeName)) {
 				RDT_CORE_WARN("ComponentManager - Tried to use unregistered component '{}'", typeName);
 				return nullptr;
 			}
 
-			return (Component<T>*)m_instance->m_components.at(typeName);
+			return (Component<T>*)m_instance->GetComponentImpl(typeName);
 		}
 
 		/*
@@ -179,7 +177,10 @@ namespace rdt {
 		*/
 		static void OnEntityRemoved(Entity eID);
 
-
+		bool ComponentExists(const char* typeName);
+		bool MaxComponentsReached();
+		void RegisterComponentImpl(const char* typeName, IComponentArray* component);
+		void* GetComponentImpl(const char* typeName);
 		ComponentID GetComponentIDImpl(const char* typeName);
 
 	};

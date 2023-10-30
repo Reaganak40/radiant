@@ -12,14 +12,14 @@ namespace rdt {
 		SystemFinalUpdate,	// System for OnFinalUpdate()
 		SystemRenderUpdate, // System for OnRender()
 	};
-	class System {
+	class RADIANT_API System {
 	private:
-		std::set<Entity> m_entities;
-		Signature m_signature;
+		struct Impl;
+		Impl* m_impl;
 
 	public:
 		System();
-		virtual ~System() = default;
+		virtual ~System();
 		virtual SystemType GetType() { return SystemNAT; }
 
 		/*
@@ -76,7 +76,7 @@ namespace rdt {
 				return nullptr;
 			}
 
-			if (!m_signature[cID]) {
+			if (!UsesComponent(cID)) {
 				const char* typeName = typeid(T).name();
 				RDT_CORE_ERROR("System - Tried to get component '{}' but does not match this system's signature.", typeName);
 				return nullptr;
@@ -88,7 +88,7 @@ namespace rdt {
 
 	namespace systems {
 		// =====================================================
-		class ProcessInput : public System {
+		class RADIANT_API ProcessInput : public System {
 		public:
 			ProcessInput() {}
 			~ProcessInput() {}
@@ -96,7 +96,7 @@ namespace rdt {
 			virtual void Update(float deltaTime = 0) { RDT_CORE_WARN("System::ProcessInput - virtual update called."); }
 		};
 		// =====================================================
-		class WorldUpdate : public System {
+		class RADIANT_API WorldUpdate : public System {
 		public:
 			WorldUpdate() {}
 			~WorldUpdate() {}
@@ -104,7 +104,7 @@ namespace rdt {
 			virtual void Update(float deltaTime = 0) { RDT_CORE_WARN("System::WorldUpdate - virtual update called."); }
 		};
 		// =====================================================
-		class FinalUpdate : public System {
+		class RADIANT_API FinalUpdate : public System {
 		public:
 			FinalUpdate() {}
 			~FinalUpdate() {}
@@ -112,7 +112,7 @@ namespace rdt {
 			virtual void Update(float deltaTime = 0) { RDT_CORE_WARN("System::FinalUpdate - virtual update called."); }
 		};
 		// =====================================================
-		class RenderUpdate : public System {
+		class RADIANT_API RenderUpdate : public System {
 		public:
 			RenderUpdate() {}
 			~RenderUpdate() {}
@@ -124,15 +124,12 @@ namespace rdt {
 
 	class RADIANT_API SystemManager {
 	private:
+		struct Impl;
+		Impl* m_impl;
+
 		SystemManager();
 		~SystemManager();
 		static SystemManager* m_instance;
-
-		std::unordered_map<std::string, System*> m_systems;
-		std::vector<System*> m_process_input_systems;
-		std::vector<System*> m_update_world_systems;
-		std::vector<System*> m_final_update_systems;
-		std::vector<System*> m_render_systems;
 
 	public:
 
@@ -184,10 +181,6 @@ namespace rdt {
 		void RegisterSystemImpl(const char* name, System* nSystem);
 		void AddEntityImpl(const char* typeName, Entity entity);
 		
-		void AddToSystemQueue(System* nSystem);
-		static void OnEntityComponentRemoved(Entity eID, ComponentID cID);
 		static void OnEntityRemoved(Entity eID);
-
-
 	};
 }

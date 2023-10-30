@@ -250,7 +250,6 @@
     <ClCompile Include="Source\Engine\Components\Component.cpp" />
     <ClCompile Include="Source\Engine\Components\GameObject\GameObject.cpp" />
     <ClCompile Include="Source\Engine\Components\GameState.cpp" />
-    <ClCompile Include="Source\Engine\ECS\CommonComponents.cpp" />
     <ClCompile Include="Source\Engine\ECS\ComponentManager.cpp" />
     <ClCompile Include="Source\Engine\ECS\EntityFactory.cpp" />
     <ClCompile Include="Source\Engine\ECS\EntityManager.cpp" />

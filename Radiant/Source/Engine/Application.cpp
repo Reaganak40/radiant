@@ -58,13 +58,13 @@ namespace rdt {
 #ifdef RDT_USE_DEV_TOOLS
 		core::DevLayer::Destroy();
 #endif
-		SystemManager::Destroy();
-		ComponentManager::Destroy();
-		EntityManager::Destroy();
 
 		SceneManager::Destroy();
 		Physics::Destroy();
 		core::PtagManager::Destroy();
+
+		RemoveECS();
+
 		Input::Destroy();
 		SoundEngine::Destroy();
 		MessageBus::Destroy();
@@ -137,12 +137,20 @@ namespace rdt {
 		SystemManager::Initialize();
 
 		// Add Common Components
+		ComponentManager::RegisterComponent<Sprite>();
 		ComponentManager::RegisterComponent<RigidBody2D>();
 		ComponentManager::RegisterComponent<Renderable>();
 
 		// Add Common Systems
 		SystemManager::RegisterSystem<PhysicsSystem>();
 		SystemManager::RegisterSystem<RenderSystem>();
+	}
+
+	void Application::RemoveECS()
+	{
+		SystemManager::Destroy();
+		ComponentManager::Destroy();
+		EntityManager::Destroy();
 	}
 
 	bool Application::IsRunning()

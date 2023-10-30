@@ -45,6 +45,26 @@ namespace rdt {
 		*/
 		static Signature GetSignature(Entity eID);
 
+
+		template<typename T>
+		static bool HasComponent(Entity eID)
+		{
+			ComponentID cID = ComponentManager::GetComponentID<T>();
+
+			if (cID == NOT_REGISTERED_COMPONENT) {
+				const char* typeName = typeid(T).name();
+				RDT_CORE_WARN("EntityManager - Could not check unregistered component '{}' for entity.", typeName);
+				return false;
+			}
+
+			if (!EntityExists(eID)) {
+				RDT_CORE_WARN("EntityManager - Could not check component for entity unregisrted entity [{}].", eID);
+				return false;
+			}
+
+			return m_instance->HasComponentImpl(eID, cID);
+		}
+
 		/*
 			Adds a componenet to this entity, modifying its signature
 		*/
@@ -122,5 +142,8 @@ namespace rdt {
 			Returns true if the entity is registered
 		*/
 		static bool EntityExists(Entity eID);
+
+
+		bool HasComponentImpl(Entity eID, ComponentID cID);
 	};
 }
