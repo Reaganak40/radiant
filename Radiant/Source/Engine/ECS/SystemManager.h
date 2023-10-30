@@ -1,4 +1,5 @@
 #pragma once
+#include "Core.h"
 #include "ECSTypes.h"
 #include "ComponentManager.h"
 
@@ -13,7 +14,7 @@ namespace rdt {
 	};
 	class System {
 	private:
-		std::set<EntityID> m_entities;
+		std::set<Entity> m_entities;
 		Signature m_signature;
 
 	public:
@@ -29,17 +30,17 @@ namespace rdt {
 		/*
 			Adds an entity to the this system.
 		*/
-		void AddEntity(EntityID entity);
+		void AddEntity(Entity entity);
 
 		/*
 			Removes an entity from this system, if it exists.
 		*/
-		void RemoveEntity(EntityID entity);
+		void RemoveEntity(Entity entity);
 
 		/*
 			Returns true if the entity is currently being used by this system.
 		*/
-		bool HasEntity(EntityID entity);
+		bool HasEntity(Entity entity);
 
 		/*
 			Returns true if this system utilizes the provided component
@@ -50,10 +51,15 @@ namespace rdt {
 
 		/*
 			Sets the component signature for this sysem. Indicates what components
-			this system utilizes when it called Update(). This should be called in
+			this system utilizes when it calls Update(). This should be called in
 			the child class constructor.
 		*/
 		void SetSignature(const Signature& signature);
+
+		/*
+			Gets the set of entities that are registered to this system.
+		*/
+		const std::set<Entity>& GetEntities();
 
 		/*
 			Gets a component (array) from the ComponentManager if it exists and it matches
@@ -116,13 +122,13 @@ namespace rdt {
 		// =====================================================
 	}
 
-	class SystemManager {
+	class RADIANT_API SystemManager {
 	private:
 		SystemManager();
 		~SystemManager();
 		static SystemManager* m_instance;
 
-		std::unordered_map<const char*, System*> m_systems;
+		std::unordered_map<std::string, System*> m_systems;
 		std::vector<System*> m_process_input_systems;
 		std::vector<System*> m_update_world_systems;
 		std::vector<System*> m_final_update_systems;
@@ -140,26 +146,17 @@ namespace rdt {
 		static void RegisterSystem()
 		{
 			const char* typeName = typeid(T).name();
-
-			if (m_systems.find(typeName) != m_systems.end()) {
-				RDT_CORE_WARN("SystemManager - Tried to register system '{}'", typeName);
-				return;
-			}
-
-			m_systems[typeName] = new T;
-			AddToSystemQueue(m_systems.at(typeName));
+			m_instance->RegisterSystemImpl(typeName, new T);
 		}
 
+		/*
+			Adds an entity to the system T
+		*/
 		template<typename T>
-		static void AddEntity(EntityID entity)
+		static void AddEntity(Entity entity)
 		{
 			const char* typeName = typeid(T).name();
-
-			if (m_systems.find(typeName) == m_systems.end()) {
-				RDT_CORE_WARN("SystemManager - Tried to add entity to unregistered system '{}'", typeName);
-				return;
-			}
-
+			m_instance->AddEntityImpl(typeName, entity);
 		}
 
 		/*
@@ -184,8 +181,13 @@ namespace rdt {
 
 		friend class EntityManager;
 	private:
-		static void AddToSystemQueue(System* nSystem);
-		static void OnEntityComponentRemoved(EntityID eID, ComponentID cID);
-		static void OnEntityRemoved(EntityID eID);
+		void RegisterSystemImpl(const char* name, System* nSystem);
+		void AddEntityImpl(const char* typeName, Entity entity);
+		
+		void AddToSystemQueue(System* nSystem);
+		static void OnEntityComponentRemoved(Entity eID, ComponentID cID);
+		static void OnEntityRemoved(Entity eID);
+
+
 	};
 }

@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 
-using EntityID = std::uint32_t;
+using Entity = std::uint32_t;
 #define NO_ENTITY_ID 0
 
 using ComponentID = std::uint32_t;

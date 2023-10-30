@@ -512,6 +512,10 @@
     <ClInclude Include="Source\Engine\ECS\SystemManager.h" />
     <ClInclude Include="Source\Engine\ECS\ECSTypes.h" />
     <ClInclude Include="Source\Engine\ECS\CommonComponents.h" />
+    <ClInclude Include="Source\Engine\Physics\PhysicsSystem.h" />
+    <ClInclude Include="Source\Engine\ECS\ECS.h" />
+    <ClInclude Include="Source\Engine\Graphics\RenderSystem.h" />
+    <ClInclude Include="Source\Engine\ECS\EntityFactory.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Editor\DevTools.cpp">
@@ -681,6 +685,10 @@
     <ClCompile Include="Source\Engine\ECS\EntityManager.cpp" />
     <ClCompile Include="Source\Engine\ECS\ComponentManager.cpp" />
     <ClCompile Include="Source\Engine\ECS\SystemManager.cpp" />
+    <ClCompile Include="Source\Engine\Physics\PhysicsSystem.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\RenderSystem.cpp" />
+    <ClCompile Include="Source\Engine\ECS\CommonComponents.cpp" />
+    <ClCompile Include="Source\Engine\ECS\EntityFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Resources\templates\gameObject.h.txt" />

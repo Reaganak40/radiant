@@ -8,10 +8,10 @@ namespace rdt {
 	struct EntityManager::Impl {
 		
 		// EntityID management
-		EntityID m_idCounter;
-		std::vector<EntityID> m_idCache;
+		Entity m_idCounter;
+		std::vector<Entity> m_idCache;
 
-		std::unordered_map<EntityID, Signature> m_signatures;
+		std::unordered_map<Entity, Signature> m_signatures;
 
 		Impl()
 		{
@@ -22,9 +22,9 @@ namespace rdt {
 		{
 		}
 
-		EntityID RegisterEntity()
+		Entity RegisterEntity()
 		{
-			EntityID nID = NO_ENTITY_ID;
+			Entity nID = NO_ENTITY_ID;
 			if (m_idCache.size() > 0) {
 				nID = m_idCache.back();
 				m_idCache.pop_back();
@@ -38,7 +38,7 @@ namespace rdt {
 			return nID;
 		}
 
-		bool RemoveEntity(EntityID eID)
+		bool RemoveEntity(Entity eID)
 		{
 			if (m_signatures.find(eID) == m_signatures.end()) {
 				RDT_CORE_WARN("EntityManager - Tried to remove entity [id:{}], but it doesn't exist.", eID);
@@ -50,12 +50,12 @@ namespace rdt {
 			return true;
 		}
 
-		bool EntityExists(EntityID eID)
+		bool EntityExists(Entity eID)
 		{
 			return m_signatures.find(eID) != m_signatures.end();
 		}
 
-		void SetSignature(EntityID eID, const Signature& signature)
+		void SetSignature(Entity eID, const Signature& signature)
 		{
 			if (m_signatures.find(eID) == m_signatures.end()) {
 				RDT_CORE_WARN("EntityManager - Tried to add signature to unregistered entity [id:{}]", eID);
@@ -65,13 +65,13 @@ namespace rdt {
 			m_signatures[eID] = signature;
 		}
 
-		const Signature& GetSignature(EntityID eID)
+		const Signature& GetSignature(Entity eID)
 		{
 			// Precondition: Entity for sure exists
 			return m_signatures.at(eID);
 		}
 
-		void AddToSignature(EntityID eID, ComponentID cID)
+		void AddToSignature(Entity eID, ComponentID cID)
 		{
 			if (m_signatures.find(eID) == m_signatures.end()) {
 				RDT_CORE_WARN("EntityManager - Tried to add component to unregistered entity [id:{}]", eID);
@@ -81,7 +81,7 @@ namespace rdt {
 			m_signatures.at(eID).set(cID, true);
 		}
 
-		void RemoveFromSignature(EntityID eID, ComponentID cID)
+		void RemoveFromSignature(Entity eID, ComponentID cID)
 		{
 			if (m_signatures.find(eID) == m_signatures.end()) {
 				RDT_CORE_WARN("EntityManager - Tried to remove component to unregistered entity [id:{}]", eID);
@@ -121,12 +121,12 @@ namespace rdt {
 		}
 	}
 	
-	EntityID EntityManager::RegisterEntity()
+	Entity EntityManager::RegisterEntity()
 	{
 		return m_instance->m_impl->RegisterEntity();
 	}
 
-	void EntityManager::RemoveEntity(EntityID eID)
+	void EntityManager::RemoveEntity(Entity eID)
 	{
 		if (!m_instance->m_impl->RemoveEntity(eID)) {
 			return;
@@ -135,12 +135,12 @@ namespace rdt {
 		ComponentManager::OnEntityRemoved(eID);
 		SystemManager::OnEntityRemoved(eID);
 	}
-	void EntityManager::SetSignature(EntityID eID, const Signature& signature)
+	void EntityManager::SetSignature(Entity eID, const Signature& signature)
 	{
 		m_instance->m_impl->SetSignature(eID, signature);
 	}
 
-	Signature EntityManager::GetSignature(EntityID eID)
+	Signature EntityManager::GetSignature(Entity eID)
 	{
 		if (!m_instance->m_impl->EntityExists(eID)) {
 			RDT_CORE_WARN("EntityManager - Tried to get signature to unregistered entity [id:{}]", eID);
@@ -150,14 +150,18 @@ namespace rdt {
 		return m_instance->m_impl->GetSignature(eID);
 	}
 
-	void EntityManager::AddToSignature(EntityID eID, ComponentID cID)
+	void EntityManager::AddToSignature(Entity eID, ComponentID cID)
 	{
 		m_instance->m_impl->AddToSignature(eID, cID);
 	}
 
-	void EntityManager::RemoveFromSignature(EntityID eID, ComponentID cID)
+	void EntityManager::RemoveFromSignature(Entity eID, ComponentID cID)
 	{
 		m_instance->m_impl->RemoveFromSignature(eID, cID);
 		SystemManager::OnEntityComponentRemoved(eID, cID);
+	}
+	bool EntityManager::EntityExists(Entity eID)
+	{
+		return m_instance->m_impl->m_signatures.find(eID) != m_instance->m_impl->m_signatures.end();
 	}
 }

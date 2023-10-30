@@ -14,10 +14,9 @@
 #include "Utils/Timestep.h"
 
 // ECS
-#include "Engine/ECS/EntityManager.h"
-#include "Engine/ECS/ComponentManager.h"
-#include "Engine/ECS/SystemManager.h"
-#include "Engine/ECS/CommonComponents.h"
+#include "Engine/ECS/ECS.h"
+#include "Engine/Physics/PhysicsSystem.h"
+#include "Engine/Graphics/RenderSystem.h"
 
 // DevTools
 #include "Editor/DevTools.h"
@@ -138,7 +137,12 @@ namespace rdt {
 		SystemManager::Initialize();
 
 		// Add Common Components
-		ComponentManager::RegisterComponent<Transform2D>();
+		ComponentManager::RegisterComponent<RigidBody2D>();
+		ComponentManager::RegisterComponent<Renderable>();
+
+		// Add Common Systems
+		SystemManager::RegisterSystem<PhysicsSystem>();
+		SystemManager::RegisterSystem<RenderSystem>();
 	}
 
 	bool Application::IsRunning()
@@ -180,12 +184,16 @@ namespace rdt {
 		if (m_impl->m_current_scene != nullptr) {
 			m_impl->m_current_scene->OnProcessInput(m_impl->m_timestep.deltaTime);
 		}
+
+		SystemManager::OnProcessInput(m_impl->m_timestep.deltaTime);
 	}
 
 	void Application::UpdateWorld()
 	{
 		// Updates all active physical objects.
 		Physics::OnUpdate(m_impl->m_timestep.deltaTime);
+		SystemManager::OnWorldUpdate(m_impl->m_timestep.deltaTime);
+
 	}
 
 	void Application::PollMessages2()
@@ -199,7 +207,8 @@ namespace rdt {
 		if (m_impl->m_current_scene != nullptr) {
 			m_impl->m_current_scene->OnFinalUpdate();
 		}
-
+		SystemManager::OnFinalUpdate();
+		
 		// Renderer does its update procedure.
 		Renderer::OnUpdate(m_impl->m_timestep.deltaTime);
 	}
@@ -211,7 +220,9 @@ namespace rdt {
 			m_impl->m_current_scene->OnRender();
 		}
 
-		// RUn the render queue and display the new frame.
+		SystemManager::OnRender();
+
+		// Run the render queue and display the new frame.
 		Renderer::Render();
 	}
 

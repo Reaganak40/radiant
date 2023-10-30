@@ -21,6 +21,12 @@ namespace rdt {
         m_impl->Copy(polygon.m_impl);
     }
 
+    void Polygon::Copy(const Polygon& polygon)
+    {
+        m_impl->Copy(polygon.m_impl);
+    }
+
+
     core::PolygonImpl* Polygon::BaseImpl()
     {
         return m_impl;

@@ -1,4 +1,5 @@
 #pragma once
+#include "Core.h"
 #include "ECSTypes.h"
 #include "Logging/Log.h"
 
@@ -8,16 +9,16 @@ namespace rdt {
 	public:
 		virtual ~IComponentArray() = default;
 
-		virtual void RemoveData(EntityID eID) = 0;
+		virtual void RemoveData(Entity eID) = 0;
 	};
 
 	template <typename T>
 	class Component : public IComponentArray {
 	private:
 
-		std::unordered_map<EntityID, size_t> m_entity_map;
+		std::unordered_map<Entity, size_t> m_entity_map;
 
-		std::vector<EntityID> m_entities;
+		std::vector<Entity> m_entities;
 		std::vector<T> m_data;
 	public:
 
@@ -25,7 +26,7 @@ namespace rdt {
 			Adds data to the component array while tracking the associated
 			entity.
 		*/
-		void InsertData(EntityID eID, T data) {
+		void InsertData(Entity eID, const T& data) {
 			if (m_entity_map.find(eID) != m_entity_map.end()) {
 				RDT_CORE_WARN("Component - Tried to insert duplicate entity [eID: {}]", eID);
 				return;
@@ -40,7 +41,7 @@ namespace rdt {
 			Removes the data from this component data array that is associated with this
 			Entity.
 		*/
-		void RemoveData(EntityID eID) override final {
+		void RemoveData(Entity eID) override final {
 			if (m_entity_map.find(eID) == m_entity_map.end()) {
 				RDT_CORE_WARN("Component - Could not remove data, entity not found [eID: {}]", eID);
 				return;
@@ -57,21 +58,25 @@ namespace rdt {
 			}
 		}
 
-		T& GetData(EntityID eID) {
+		T& GetData(Entity eID) {
 			return m_data[m_entity_map.at(eID)];
+		}
+
+		bool HasEntity(Entity eID) {
+			return m_entity_map.find(eID) != m_entity_map.end();
 		}
 	};
 	// ====================================================================
 
-	class ComponentManager {
+	class RADIANT_API ComponentManager {
 	private:
 		ComponentManager();
 		~ComponentManager();
 		static ComponentManager* m_instance;
 
 		ComponentID m_componentCounter;
-		std::unordered_map<const char*, ComponentID> m_componentTypes;
-		std::unordered_map<const char*, IComponentArray*> m_components;
+		std::unordered_map<std::string, ComponentID> m_componentTypes;
+		std::unordered_map<std::string, IComponentArray*> m_components;
 	public:
 
 		/*
@@ -106,23 +111,34 @@ namespace rdt {
 			Returns the component ID for this component if it is registered.
 		*/
 		template <typename T>
-		ComponentID GetComponentID()
+		static ComponentID GetComponentID()
 		{
 			const char* typeName = typeid(T).name();
+			return m_instance->GetComponentIDImpl(typeName);
+		}
 
-			if (m_componentTypes.find(typeName) == m_componentTypes.end()) {
-				RDT_CORE_WARN("ComponentManager - Could not get component type for '{}'", typeName);
-				return NOT_REGISTERED_COMPONENT;
+
+		/*
+			Updates the provided signature to include the component T
+		*/
+		template<typename T>
+		static void UpdateSignature(Signature& signature)
+		{
+			const char* typeName = typeid(T).name();
+			ComponentID cID = m_instance->GetComponentIDImpl(typeName);
+
+			if (cID == NOT_REGISTERED_COMPONENT) {
+				return;
 			}
 
-			return m_componentTypes.at(typeName);
+			signature.set(cID, true);
 		}
 
 		friend class EntityManager;
 		friend class System;
 	private:
 		template<typename T>
-		void AddToComponent(EntityID eID, T nData)
+		static void AddToComponent(Entity eID, const T& nData)
 		{
 			Component<T>* component = GetComponent<T>();
 
@@ -134,7 +150,7 @@ namespace rdt {
 		}
 
 		template<typename T>
-		void RemoveFromComponent(EntityID eID)
+		static void RemoveFromComponent(Entity eID)
 		{
 			Component<T>* component = GetComponent<T>();
 
@@ -147,21 +163,24 @@ namespace rdt {
 
 
 		template<typename T>
-		Component<T>* GetComponent()
+		static Component<T>* GetComponent()
 		{
 			const char* typeName = typeid(T).name();
-			if (m_componentTypes.find(typeName) == m_componentTypes.end()) {
+			if (m_instance->m_componentTypes.find(typeName) == m_instance->m_componentTypes.end()) {
 				RDT_CORE_WARN("ComponentManager - Tried to use unregistered component '{}'", typeName);
 				return nullptr;
 			}
 
-			return (Component<T>*)m_components.at(typeName);
+			return (Component<T>*)m_instance->m_components.at(typeName);
 		}
 
 		/*
 			Removes this entity from all components
 		*/
-		static void OnEntityRemoved(EntityID eID);
+		static void OnEntityRemoved(Entity eID);
+
+
+		ComponentID GetComponentIDImpl(const char* typeName);
 
 	};
 }

@@ -7,17 +7,17 @@ namespace rdt {
 	{
 	}
 
-	void System::AddEntity(EntityID entity)
+	void System::AddEntity(Entity entity)
 	{
 		m_entities.insert(entity);
 	}
 
-	void System::RemoveEntity(EntityID entity)
+	void System::RemoveEntity(Entity entity)
 	{
 		m_entities.erase(entity);
 	}
 
-	bool System::HasEntity(EntityID entity)
+	bool System::HasEntity(Entity entity)
 	{
 		return m_entities.contains(entity);
 	}
@@ -30,6 +30,11 @@ namespace rdt {
 	void System::SetSignature(const Signature& signature)
 	{
 		m_signature = signature;
+	}
+
+	const std::set<Entity>& System::GetEntities()
+	{
+		return m_entities;
 	}
 
 	// ===================================================
@@ -87,6 +92,28 @@ namespace rdt {
 		}
 	}
 
+	void SystemManager::RegisterSystemImpl(const char* name, System* nSystem)
+	{
+		if (m_systems.find(name) != m_systems.end()) {
+			RDT_CORE_WARN("SystemManager - Tried to register system '{}'", name);
+			delete nSystem;
+			return;
+		}
+
+		m_systems[name] = nSystem;
+		AddToSystemQueue(nSystem);
+	}
+
+	void SystemManager::AddEntityImpl(const char* typeName, Entity entity)
+	{
+		if (m_systems.find(typeName) == m_systems.end()) {
+			RDT_CORE_WARN("SystemManager - Tried to add entity to unregistered system '{}'", typeName);
+			return;
+		}
+
+		m_systems.at(typeName)->AddEntity(entity);
+	}
+
 	void SystemManager::AddToSystemQueue(System* nSystem)
 	{
 		switch (nSystem->GetType()) {
@@ -94,16 +121,16 @@ namespace rdt {
 			RDT_CORE_WARN("SystemManager - Tried to add a system with NAT. Not added to any queues.");
 			return;
 		case SystemType::SystemProcessInput:
-			m_instance->m_process_input_systems.push_back(nSystem);
+			m_process_input_systems.push_back(nSystem);
 			return;
 		case SystemType::SystemWorldUpdate:
-			m_instance->m_update_world_systems.push_back(nSystem);
+			m_update_world_systems.push_back(nSystem);
 			return;
 		case SystemType::SystemFinalUpdate:
-			m_instance->m_final_update_systems.push_back(nSystem);
+			m_final_update_systems.push_back(nSystem);
 			return;
 		case SystemType::SystemRenderUpdate:
-			m_instance->m_render_systems.push_back(nSystem);
+			m_render_systems.push_back(nSystem);
 			return;
 		default:
 			RDT_CORE_WARN("SystemManager - Tried to add system with unknown type [{}].", nSystem->GetType());
@@ -111,7 +138,7 @@ namespace rdt {
 		}
 	}
 
-	void SystemManager::OnEntityComponentRemoved(EntityID eID, ComponentID cID)
+	void SystemManager::OnEntityComponentRemoved(Entity eID, ComponentID cID)
 	{
 		for (auto& [id, system] : m_instance->m_systems) {
 			if (system->HasEntity(eID) && system->UsesComponent(cID)) {
@@ -120,7 +147,7 @@ namespace rdt {
 		}
 	}
 
-	void SystemManager::OnEntityRemoved(EntityID eID)
+	void SystemManager::OnEntityRemoved(Entity eID)
 	{
 		for (auto& [id, system] : m_instance->m_systems) {
 			if (system->HasEntity(eID)) {

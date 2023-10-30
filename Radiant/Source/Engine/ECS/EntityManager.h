@@ -28,28 +28,28 @@ namespace rdt {
 		/*
 			Create a new entity by registering the returned EntityID
 		*/
-		static EntityID RegisterEntity();
+		static Entity RegisterEntity();
 
 		/*
 			Removes a registered entity that is referenced by the eID
 		*/
-		static void RemoveEntity(EntityID eID);
+		static void RemoveEntity(Entity eID);
 
 		/*
 			Sets the component signature for this entity.
 		*/
-		static void SetSignature(EntityID eID, const Signature& signature);
+		static void SetSignature(Entity eID, const Signature& signature);
 
 		/*
 			Gets the component signature for this entity.
 		*/
-		static Signature GetSignature(EntityID eID);
+		static Signature GetSignature(Entity eID);
 
 		/*
 			Adds a componenet to this entity, modifying its signature
 		*/
 		template<typename T>
-		void AddComponent(EntityID eID, T nData = T())
+		static void AddComponent(Entity eID, const T& nData = T())
 		{
 			ComponentID cID = ComponentManager::GetComponentID<T>();
 
@@ -64,7 +64,7 @@ namespace rdt {
 		}
 
 		template<typename T>
-		void RemoveComponent(EntityID eID)
+		static void RemoveComponent(Entity eID)
 		{
 			ComponentID cID = ComponentManager::GetComponentID<T>();
 
@@ -78,16 +78,49 @@ namespace rdt {
 			ComponentManager::RemoveFromComponent<T>(eID);
 		}
 
+		/*
+			Returns a pointer to this entities component data,
+			if this entity has added that component.
+		*/
+		template<typename T>
+		static T* GetComponent(Entity eID)
+		{
+			if (!EntityExists(eID)) {
+				RDT_CORE_WARN("EntityManager - Could get get component from unregistered entity [{}].", eID);
+				return nullptr;
+			}
+
+			if (ComponentManager::GetComponentID<T>() == NOT_REGISTERED_COMPONENT) {
+				const char* typeName = typeid(T).name();
+				RDT_CORE_WARN("EntityManager - Could not get unregistered component '{}' from entity.", typeName);
+				return nullptr;
+			}
+
+			Component<T>* component = ComponentManager::GetComponent<T>();
+			if (!component->HasEntity(eID)) {
+				const char* typeName = typeid(T).name();
+				RDT_CORE_WARN("EntityManager - Entity [{}] is not regisrted to component '{}'.", eID, typeName);
+				return nullptr;
+			}
+
+			return &component->GetData(eID);
+		}
+
 	private:
 		/*
 			Adds this component to the entity's signature.
 		*/
-		static void AddToSignature(EntityID eID, ComponentID cID);
+		static void AddToSignature(Entity eID, ComponentID cID);
 
 
 		/*
 			Adds this component to the entity's signature.
 		*/
-		static void RemoveFromSignature(EntityID eID, ComponentID cID);
+		static void RemoveFromSignature(Entity eID, ComponentID cID);
+
+		/*
+			Returns true if the entity is registered
+		*/
+		static bool EntityExists(Entity eID);
 	};
 }
