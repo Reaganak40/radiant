@@ -160,6 +160,297 @@ namespace rdt::core {
 	}
 
 	// ==============================================================================
+	/*
+		PopUpWIndow Implementation
+	*/
+
+	struct Panel::Impl {
+
+		/*
+			Virtual function to render ImGui Window
+		*/
+		virtual void OnRender() {}
+
+		/*
+			Virtual function to get data from popup window.
+		*/
+		virtual void* OnGetData() { return nullptr; }
+	};
+
+	struct TemplateWizardImpl : public Panel::Impl {
+	};
+
+	struct EntityWizardImpl : public Panel::Impl {
+	};
+
+	// =========================================================
+	struct MenuBarData {
+		PanelType openPanelRequest;
+		EditorTheme changeThemeRequest;
+
+		MenuBarData() { Reset(); }
+
+		void Reset() {
+			openPanelRequest = PT_NAP;
+			changeThemeRequest = ET_NAT;
+		}
+	};
+	struct MenuBarImpl : public Panel::Impl {
+
+		MenuBarData m_data;
+		bool m_request_made;
+
+		void OnRender() override final {
+
+			if (m_request_made) {
+				m_data.Reset();
+				m_request_made = false;
+			}
+
+			if (ImGui::BeginMainMenuBar()) {
+
+				if (ImGui::BeginMenu("File")) {
+					if (ImGui::MenuItem("Create")) {
+					}
+					if (ImGui::MenuItem("Open", "Ctrl+O")) {
+					}
+					if (ImGui::MenuItem("Save", "Ctrl+S")) {
+					}
+					if (ImGui::MenuItem("Save as..")) {
+					}
+					ImGui::EndMenu();
+				}
+
+				if (ImGui::BeginMenu("Tools")) {
+					if (ImGui::MenuItem("Template Wizard")) {
+						m_data.openPanelRequest = TemplateWizard;
+						m_request_made = true;
+					}
+					if (ImGui::MenuItem("Add Entity Definition")) {
+						m_data.openPanelRequest = EntityWizard;
+						m_request_made = true;
+					}
+					ImGui::EndMenu();
+				}
+
+				if (ImGui::BeginMenu("Themes")) {
+
+					if (ImGui::MenuItem("Codz")) {
+						m_data.changeThemeRequest = Theme_Codz;
+						m_request_made = true;
+					}
+					if (ImGui::MenuItem("Nightingale")) {
+						m_data.changeThemeRequest = Nightingale;
+						m_request_made = true;
+					}
+
+					ImGui::EndMenu();
+				}
+
+				ImGui::EndMainMenuBar();
+			}
+		}
+
+		void* OnGetData() {
+			if (m_request_made) {
+				return &m_data;
+			}
+
+			return nullptr;
+		}
+	};
+	// =========================================================
+	struct DiagnosticsPanelImpl : public Panel::Impl {
+		void OnRender() override final {
+			
+			// Start drawing window
+			ImGui::Begin("Diagnostic Tools");
+
+			// Show framerate
+			Vec2d screenCoords = Input::GetMouseCoords(MouseCond::SCREEN_COORDS);
+			Vec2d worldCoords = Input::GetMouseCoords(MouseCond::WORLD_COORDS);
+			ImGui::Text("Mouse screen-coordinates: (%.2f %2.f)", screenCoords.x, screenCoords.y);
+			ImGui::Text("Mouse world-coordinates: (%.2f %2.f)", worldCoords.x, worldCoords.y);
+			ImGui::Text("Performance: %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+			ImGui::End();
+		}
+	};
+	// =========================================================
+
+
+	Panel::Panel(PanelType type)
+	{
+		m_impl = nullptr;
+		SetPanelType(type);
+	}
+
+	Panel::~Panel()
+	{
+		if (m_impl != nullptr) {
+			delete m_impl;
+		}
+	}
+
+	void Panel::SetPanelType(PanelType type)
+	{
+		if (m_impl != nullptr) {
+			delete m_impl;
+		}
+
+		m_type = type;
+
+		switch (type)
+		{
+		case PanelType::PT_NAP:
+			m_impl = nullptr;
+			break;
+		case PanelType::MenuBar:
+			m_impl = new MenuBarImpl;
+			break;
+		case PanelType::DiagnosticsPanel:
+			m_impl = new DiagnosticsPanelImpl;
+			break;
+		case PanelType::TemplateWizard:
+			m_impl = new TemplateWizardImpl;
+			break;
+		case PanelType::EntityWizard:
+			m_impl = new EntityWizardImpl;
+			break;
+		default:
+			RDT_CORE_ERROR("Unknown popup window type!");
+			m_impl = new Panel::Impl;
+			break;
+		}
+	}
+
+	void Panel::Render()
+	{
+		ApplyGuiConfig();
+		m_impl->OnRender();
+	}
+
+	void* Panel::GetData()
+	{
+		return m_impl->OnGetData();
+	}
+
+	PanelConfig& Panel::GetConfig()
+	{
+		return m_config;
+	}
+
+	PanelType Panel::GetType()
+	{
+		return m_type;
+	}
+
+	void Panel::ApplyGuiConfig()
+	{
+		if (m_config.update) {
+			ImGui::SetNextWindowSize(ImVec2(m_config.width, m_config.height), ImGuiCond_Always);
+			ImGui::SetNextWindowPos(ImVec2(m_config.xPos, m_config.yPos), ImGuiCond_Always);
+			m_config.update = false;
+		}
+		else {
+			ImGui::SetNextWindowSize(ImVec2(m_config.width, m_config.height), ImGuiCond_Appearing);
+			ImGui::SetNextWindowPos(ImVec2(m_config.xPos, m_config.yPos), ImGuiCond_Appearing);
+		}
+	}
+
+	// ==============================================================================
+
+	/*
+		Docking Layout Defualts
+	*/
+
+	namespace LayoutDefaults {
+		constexpr float BorderTopHeight = 15.0f;
+	}
+
+	PanelManager::PanelManager()
+	{
+		m_workspaces[CommonWorkspaces::Default];
+		m_workspaces[CommonWorkspaces::Fullscreen];
+		m_workspace_id = CommonWorkspaces::Default;
+	}
+
+	PanelManager::~PanelManager()
+	{
+	}
+
+	void PanelManager::RegisterPanel(PanelType type)
+	{
+		m_panels[type];
+		m_panels.at(type).SetPanelType(type);
+		ActiveWorkspace().m_panel_placements[type] = NotActive;
+	}
+
+	void PanelManager::SetPanelPlacement(PanelType panel, PanelPlacement placement)
+	{
+		if (m_panels.find(panel) == m_panels.end()) {
+			RDT_CORE_ERROR("PanelManager - Tried to place unregistered panel");
+			return;
+		}
+
+		ActiveWorkspace().m_panel_placements.at(panel) = placement;
+		UpdateDockConainers(placement);
+	}
+
+	PanelManager::Workspace& PanelManager::ActiveWorkspace()
+	{
+		return m_workspaces.at(m_workspace_id);
+	}
+
+	const std::unordered_map<PanelType, void*>& PanelManager::GetMessages()
+	{
+		for (auto& [type, panel] : m_panels) {
+			m_messages[type] = panel.GetData();
+		}
+
+		return m_messages;
+	}
+
+	void PanelManager::RenderMDI()
+	{
+		for (int index = (NotActive + 1); index != DockEndOfOptions; index++) {
+			
+			for (auto& panel : ActiveWorkspace().m_active_panels[index]) {
+				panel.Render();
+			}
+		}
+	}
+
+	void PanelManager::UpdateDockConainers(PanelPlacement updatedContainer)
+	{
+		auto& activeContainers = ActiveWorkspace().m_dock_containers;
+		if (updatedContainer == DockBorderTop && activeContainers[DockBorderTop].height == 0) {
+			activeContainers[DockBorderTop].xPos = 0;
+			activeContainers[DockBorderTop].yPos = 0;
+			activeContainers[DockBorderTop].width = (float)Renderer::GetWindowWidth();
+			activeContainers[DockBorderTop].height = LayoutDefaults::BorderTopHeight;
+			activeContainers[DockBorderTop].update = true;
+			return;
+		}
+
+
+	}
+
+	void PanelManager::AddToDockContainer(PanelPlacement container, PanelType panel)
+	{
+		PanelConfig& panelConfig = m_panels.at(panel).GetConfig();
+		auto& activeContainers = ActiveWorkspace().m_dock_containers;
+		auto& activePanels = ActiveWorkspace().m_active_panels;
+
+		if (activePanels[container].size() == 0) {
+			panelConfig = activeContainers[container];
+			activePanels[container].push_back(m_panels.at(panel));
+			return;
+		}
+	}
+	
+
+	// ==============================================================================
 
 	/*
 		Editor Gui Implementation
@@ -182,7 +473,8 @@ namespace rdt::core {
 	constexpr float GameWindowSettingsPanelWidth = 250.0f;
 
 	EditorLayout::EditorLayout()
-		: m_scene(nullptr), first_render(true), m_templateWizardLaunched(false), m_config(nullptr)
+		: m_scene(nullptr), first_render(true), m_templateWizardLaunched(false), m_config(nullptr),
+		m_entityWizardLaunched(false)
 	{
 		RegisterToMessageBus("EditorLayout");
 		SetTheme(Theme_Codz);
@@ -198,6 +490,12 @@ namespace rdt::core {
 		ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
 
 		m_last_log = "";
+
+		m_panel_manager.RegisterPanel(MenuBar);
+		m_panel_manager.SetPanelPlacement(MenuBar, PanelPlacement::DockBorderTop);
+
+		m_panel_manager.RegisterPanel(DiagnosticsPanel);
+		m_panel_manager.SetPanelPlacement(MenuBar, PanelPlacement::DockRight);
 
 	}
 	EditorLayout::~EditorLayout()
@@ -250,6 +548,7 @@ namespace rdt::core {
 			RenderScenePanel();
 			RenderConsolePanel();
 			RenderTemplateWizard();
+			RenderEntityWizard();
 		}
 
 		ImGui::PopFont();
@@ -402,6 +701,37 @@ namespace rdt::core {
 		m_config = ptr;
 	}
 
+	void EditorLayout::ProcessMessages()
+	{
+		for (auto& [panelType, message] : m_panel_manager.GetMessages()) {
+
+			if (message == nullptr) {
+				continue;
+			}
+
+			switch (panelType) {
+			case MenuBar:
+				OnMenuBarMessage((MenuBarData*)message);
+				break;
+			}
+		}
+	}
+
+	void EditorLayout::OnMenuBarMessage(MenuBarData* data)
+	{
+		if (data->changeThemeRequest != ET_NAT) {
+			SetTheme(data->changeThemeRequest);
+		}
+
+		if (data->openPanelRequest != PT_NAP) {
+			OpenPanel(data->openPanelRequest);
+		}
+	}
+
+	void EditorLayout::OpenPanel(PanelType panel)
+	{
+	}
+
 	void EditorLayout::ApplyConfig()
 	{
 		if (m_config == nullptr) {
@@ -447,6 +777,8 @@ namespace rdt::core {
 		m_template_wizard.height = TemplateWizardGuiHeight;
 		m_template_wizard.xPos = (m_window_width / 2) - (m_template_wizard.width / 2);
 		m_template_wizard.yPos = (m_window_height / 2) - (m_template_wizard.height / 2);
+
+		m_entity_wizard = m_template_wizard;
 
 		m_console_panel.width = m_game_window_panel->GetGuiDimensions().x;
 		m_console_panel.height = m_window_height -  (m_game_window_panel->GetLastPosition().y + m_game_window_panel->GetGuiDimensions().y + (PanelMargin * 2));
@@ -688,56 +1020,6 @@ namespace rdt::core {
 		}
 
 		return 0;
-	}
-
-	void EditorLayout::RenderMenuBar()
-	{
-		if (ImGui::BeginMainMenuBar()) {
-
-			if (first_render) {
-				m_menu_bar_height = ImGui::GetWindowSize().y;
-				OnFirstRender();
-			}
-
-			if (ImGui::BeginMenu("File")) {
-				if (ImGui::MenuItem("Create")) {
-				}
-				if (ImGui::MenuItem("Open", "Ctrl+O")) {
-				}
-				if (ImGui::MenuItem("Save", "Ctrl+S")) {
-				}
-				if (ImGui::MenuItem("Save as..")) {
-				}
-				ImGui::EndMenu();
-			}
-
-			if (ImGui::BeginMenu("Tools")) {
-				if (ImGui::MenuItem("Template Wizard")) {
-					if (!m_templateWizardLaunched) {
-						m_template_selection_index = -1;
-						m_templateWizardLaunched = true;
-						strcpy_s(m_template_name, 60, "");
-						m_template_name_edited = false;
-					}
-				}
-				ImGui::EndMenu();
-			}
-
-			if (ImGui::BeginMenu("Themes")) {
-
-				if (ImGui::MenuItem("Codz")) {
-					SetTheme(Theme_Codz);
-				}
-				if (ImGui::MenuItem("Nightingale")) {
-					SetTheme(Nightingale);
-				}
-			
-				ImGui::EndMenu();
-			}
-
-
-			ImGui::EndMainMenuBar();
-		}
 	}
 
 	void EditorLayout::RenderDiagnosticsPanel()
@@ -1042,6 +1324,36 @@ namespace rdt::core {
 			}
 		}
 	
+		ImGui::End();
+	}
+
+	void EditorLayout::RenderEntityWizard()
+	{
+		if (!m_entityWizardLaunched) {
+			return;
+		}
+
+		ApplyGuiConfig(m_entity_wizard);
+
+		ImGuiWindowFlags windowConfig = 0;
+		windowConfig |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize;
+
+		if (ImGui::Begin("##Entity Wizard", &m_entityWizardLaunched, windowConfig)) {
+			ImGui::PushFont(m_fonts[NunitoSans][36]);
+			AddCenteredText("Entity Wizard");
+			ImGui::PopFont();
+			ImGui::PushFont(m_fonts[NunitoSans][24]);
+			AddCenteredText("-- Create Entity Definition -- ");
+			ImGui::PopFont();
+
+			ImGui::NewLine();
+			ImGuiInputTextFlags textFlags;
+			textFlags = ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackEdit;
+
+			if (ImGui::InputText("##Filename", m_entity_name, 60, textFlags, MyTextCallback, (void*)&m_template_name_edited)) {
+			}
+		}
+
 		ImGui::End();
 	}
 	

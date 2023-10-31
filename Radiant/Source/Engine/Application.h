@@ -83,7 +83,6 @@ namespace rdt {
 		virtual void OnGameBegin() {}
 
 	private:
-	private:
 
 		/*
 			Initializes the entity component system and common components
