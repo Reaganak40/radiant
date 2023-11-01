@@ -108,18 +108,18 @@ namespace rdt::core {
 	constexpr float GameWindowPanelGuiWidth = 1115;
 	constexpr float GameWindowPanelGuiHeight = 653.0f;
 
-	GameWindowPanel::GameWindowPanel()
+	GameRenderWindow::GameRenderWindow()
 	{
 		m_gui_width = GameWindowPanelGuiWidth;
 		m_gui_height = GameWindowPanelGuiHeight;
 		update_pos = true;
 	}
 
-	GameWindowPanel::~GameWindowPanel()
+	GameRenderWindow::~GameRenderWindow()
 	{
 	}
 
-	void GameWindowPanel::OnBegin()
+	void GameRenderWindow::OnBegin()
 	{
 
 		ImGui::PushFont(GuiManager::GetFont(NunitoSans, 18));
@@ -144,7 +144,7 @@ namespace rdt::core {
 		}
 	}
 
-	void GameWindowPanel::OnEnd()
+	void GameRenderWindow::OnEnd()
 	{
 		ImGui::End();
 		ImGui::PopStyleColor();
@@ -154,7 +154,7 @@ namespace rdt::core {
 		ImGui::PopFont();
 	}
 
-	void GameWindowPanel::TriggerUpdatePos()
+	void GameRenderWindow::TriggerUpdatePos()
 	{
 		update_pos = true;
 	}
@@ -175,12 +175,6 @@ namespace rdt::core {
 			Virtual function to get data from popup window.
 		*/
 		virtual void* OnGetData() { return nullptr; }
-	};
-
-	struct TemplateWizardImpl : public Panel::Impl {
-	};
-
-	struct EntityWizardImpl : public Panel::Impl {
 	};
 
 	// =========================================================
@@ -277,7 +271,444 @@ namespace rdt::core {
 		}
 	};
 	// =========================================================
+	struct GameWindowPanelImpl : public Panel::Impl {
 
+		void OnRender() override final {
+
+		}
+	};
+	// =========================================================
+	struct GameWindowSettingsPanelImpl : public Panel::Impl {
+		void OnRender() override final {
+			ImGuiWindowFlags windowConfig = 0;
+			windowConfig |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar;
+
+			ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.7f, 0.7f, 0.7f, 0.9f });
+			ImGui::Begin("##GameWindowSettingsPanel", (bool*)0, windowConfig);
+
+			ImGui::PushFont(EditorLayout::m_fonts[ForkAwesome][18]);
+			ImGui::PushStyleColor(ImGuiCol_Button, { 1.0f, 1.0f, 1.0f, 1.0f });
+			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.8f, 0.8f, 0.8f, 1.0f });
+
+			/* Play Button */
+			ImGui::PushStyleColor(ImGuiCol_Text, { 0.2f, 0.8f, 0.2f, 1.0f });
+			ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.2f, 0.9f, 0.2f, 0.2f });
+			ImGui::SetCursorPos({ 10, 10 });
+			if (ImGui::Button(ICON_FK_PLAY)) {
+
+			}
+			ImGui::PopStyleColor();
+			ImGui::PopStyleColor();
+			ImGui::SameLine();
+
+			/* Pause Button */
+			ImGui::PushStyleColor(ImGuiCol_Text, { 0.8f, 0.2f, 0.2f, 1.0f });
+			ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.9f, 0.2f, 0.2f, 0.2f });
+			if (ImGui::Button(ICON_FK_PAUSE)) {
+
+			}
+			ImGui::PopStyleColor();
+			ImGui::PopStyleColor();
+			ImGui::SameLine();
+
+			/* Restart Button */
+			ImGui::PushStyleColor(ImGuiCol_Text, { 0.1f, 0.1f, 0.1f, 1.0f });
+			ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.7f, 0.7f, 0.7f, 0.2f });
+			if (ImGui::Button(ICON_FK_REFRESH)) {
+
+			}
+			ImGui::PopStyleColor();
+			ImGui::PopStyleColor();
+			ImGui::SameLine();
+
+			/* Expand Window Button*/
+			ImGui::PushStyleColor(ImGuiCol_Text, { 0.1f, 0.1f, 0.1f, 1.0f });
+			ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.7f, 0.7f, 0.7f, 0.2f });
+			if (Renderer::UsingDefaultViewport()) {
+				ImGui::SetCursorPosX(ImGui::GetWindowWidth() - EditorLayout::GetButtonWidth(ICON_FK_PAUSE) - 10);
+				if (ImGui::Button(ICON_FK_COMPRESS)) {
+
+					if (Renderer::IsFullscreen()) {
+						Renderer::DisableFullscreen();
+					}
+
+					Renderer::SetDefaultViewport(false);
+					Input::SetTargetRenderWindow(EditorLayout::m_gameWindowId);
+					
+					/*m_diagnostics_panel.yPos = GetDockPosY(DockTop, m_diagnostics_panel.height, PanelMargin) + m_menu_bar_height;
+					m_game_window_settings_panel.xPos = GetDockPosX(DockRight, m_game_window_settings_panel.width + m_diagnostics_panel.width + PanelMargin, PanelMargin);
+					m_game_window_settings_panel.yPos = GetDockPosY(DockTop, m_game_window_settings_panel.height, PanelMargin) + m_menu_bar_height;
+					m_diagnostics_panel.update = true;
+					m_game_window_settings_panel.update = true;*/
+				}
+			}
+			else {
+				ImGui::SetCursorPosX(ImGui::GetWindowWidth() - (2 * EditorLayout::GetButtonWidth(ICON_FK_PAUSE)) - 18);
+
+				if (ImGui::Button(ICON_FK_EXPAND)) {
+					Renderer::SetDefaultViewport(true);
+					Input::SetTargetRenderWindow(-1);
+					
+					/*m_showTools = false;
+					m_game_window_settings_panel.yPos = PanelMargin;
+					m_game_window_settings_panel.xPos = GetDockPosX(DockRight, m_game_window_settings_panel.width, PanelMargin);
+					m_diagnostics_panel.yPos = m_game_window_settings_panel.yPos + m_game_window_settings_panel.height + PanelMargin;*/
+				}
+
+				ImGui::SameLine();
+				if (ImGui::Button(ICON_FK_ARROWS_ALT)) {
+					Renderer::SetDefaultViewport(true);
+					Renderer::EnableFullscreen();
+					Input::SetTargetRenderWindow(-1);
+
+					/*m_showTools = false;
+					m_game_window_settings_panel.yPos = PanelMargin;
+					m_game_window_settings_panel.xPos = GetDockPosX(DockRight, m_game_window_settings_panel.width, PanelMargin);
+					m_diagnostics_panel.yPos = m_game_window_settings_panel.yPos + m_game_window_settings_panel.height + PanelMargin;*/
+				}
+			}
+			ImGui::PopStyleColor();
+			ImGui::PopStyleColor();
+
+
+			ImGui::PopStyleColor();
+			ImGui::PopStyleColor();
+
+			ImGui::PopFont();
+
+			ImGui::End();
+			ImGui::PopStyleColor();
+		}
+	};
+	// =========================================================
+	struct ScenePanelImpl : public Panel::Impl {
+
+		void AddGameObjectPanel(GameObject* gobject) {
+			std::string name = typeid(*gobject).name();
+			std::string panel_header = name.substr(6, name.size() - 6) + ": " + gobject->GetName();
+
+			ImGui::Indent(10);
+			if (ImGui::CollapsingHeader(panel_header.c_str())) {
+
+				ImGui::Text("GameObjectID: %d", gobject->GetID());
+				if (gobject->GetModelID() != 0 && gobject->GetRealmID() != 0) {
+					ImGui::Text("RealmID: %d", gobject->GetRealmID());
+					ImGui::Text("ModelID: %d", gobject->GetModelID());
+
+					Vec2d pos = Physics::GetPosition(gobject->GetRealmID(), gobject->GetModelID());
+					ImGui::Text("Position: (%.2f, %.2f)", pos.x, pos.y);
+
+					Vec2d vel = Physics::GetVelocity(gobject->GetRealmID(), gobject->GetModelID());
+					ImGui::Text("Velocity: (%.2f, %.2f)", vel.x, vel.y);
+
+				}
+				else {
+					ImGui::Text("Not Registered to any realms.");
+				}
+
+			}
+			ImGui::Unindent(10);
+		}
+
+		void AddLayerPanel(Layer* layer) {
+			std::string name = typeid(*layer).name();
+			std::string panel_header = "Layer: " + name.substr(6, name.size() - 6);
+
+			if (ImGui::CollapsingHeader(panel_header.c_str())) {
+
+				size_t count;
+				GameObject** objects = layer->GetGameObjects(&count);
+				for (size_t i = 0; i < count; i++) {
+					AddGameObjectPanel(objects[i]);
+				}
+			}
+		}
+		void OnRender() override final {
+			if (ImGui::Begin("Scene Panel")) {
+
+				if (EditorLayout::m_scene == nullptr) {
+					ImGui::Text("No Scene Selected!");
+				}
+				else {
+					ImGui::Text("Scene: %s", EditorLayout::m_scene->GetName().c_str());
+
+					size_t count;
+					Layer** layers = EditorLayout::m_scene->GetLayers(&count);
+					for (size_t i = 0; i < count; i++) {
+						AddLayerPanel(layers[i]);
+					}
+				}
+			}
+		}
+	};
+	// =========================================================
+	struct ConsolePanelImpl : public Panel::Impl {
+
+		std::string m_last_log = "";
+
+		void OnRender() override final {
+			ImGui::Begin("Console Panel");
+
+			int index = (int)Log::GetLogCount() - 1;
+			std::string log;
+			Color logColor;
+			while (index >= 0) {
+				Log::GetLog(index--, log, logColor);
+
+				ImGui::PushStyleColor(ImGuiCol_Text, logColor.GetImGuiColor());
+				ImGui::Text("%s", log.c_str());
+				ImGui::PopStyleColor();
+			}
+
+			if (m_last_log != log) {
+				ImGui::SetScrollHereY(0.999f);
+				m_last_log = log;
+			}
+
+			ImGui::End();
+		}
+	};
+	// =========================================================
+	struct TemplateWizardImpl : public Panel::Impl {
+
+		bool m_templateWizardLaunched = false;
+		int m_template_selection_index;
+		char m_template_name[60];
+		bool m_template_name_edited;
+
+		enum TemplateType {
+			T_GameObject,
+			T_Layer,
+			T_Scene,
+		};
+
+		void CreateFileFromTemplate(TemplateType type, const std::string& name)
+		{
+
+			fs::path filepath = fs::path(EditorLayout::sourcePath);
+			fs::path template_h = fs::path(EditorLayout::templatePath);
+			fs::path template_cpp = fs::path(EditorLayout::templatePath);
+
+
+			switch (type) {
+			case T_GameObject:
+				filepath = filepath / fs::path("GameObjects");
+				template_h = template_h / fs::path("gameObject.h.txt");
+				template_cpp = template_cpp / fs::path("gameObject.cpp.txt");
+				break;
+			case T_Layer:
+				filepath = filepath / fs::path("Layers");
+				template_h = template_h / fs::path("layer.h.txt");
+				template_cpp = template_cpp / fs::path("layer.cpp.txt");
+				break;
+			case T_Scene:
+				filepath = filepath / fs::path("Scenes");
+				template_h = template_h / fs::path("scene.h.txt");
+				template_cpp = template_cpp / fs::path("scene.cpp.txt");
+				break;
+			default:
+				return;
+			}
+
+			if (!Utils::PathExists(template_h.generic_string())) {
+				RDT_CORE_WARN("Could not locate template header at '{}'", template_h.generic_string());
+				return;
+			}
+
+			if (!Utils::PathExists(template_cpp.generic_string())) {
+				RDT_CORE_WARN("Could not locate template source at '{}'", template_cpp.generic_string());
+				return;
+			}
+
+			if (!fs::is_directory(filepath) || !fs::exists(filepath)) {
+				fs::create_directory(filepath);
+			}
+			std::string headerFile = (filepath / fs::path(name + ".h")).generic_string();
+			std::string srcFile = (filepath / fs::path(name + ".cpp")).generic_string();
+
+			if (Utils::PathExists(headerFile) || Utils::PathExists(srcFile)) {
+				RDT_CORE_WARN("Could not create from template, duplicate '{}' found!", name);
+				return;
+			}
+
+			std::string contents;
+
+			// Write header file;
+			Utils::ReadTextFile(template_h.generic_string(), contents);
+			Utils::ReplaceAll(contents, "TEMPLATENAME", name);
+			Utils::WriteFile(headerFile, contents);
+			contents.clear();
+
+			// Write src file
+			Utils::ReadTextFile(template_cpp.generic_string(), contents);
+			Utils::ReplaceAll(contents, "TEMPLATENAME", name);
+			Utils::WriteFile(srcFile, contents);
+
+		}
+
+		bool ValidTemplateName(const std::string& name, std::string& errorMsg) {
+			if (name.length() == 0) {
+				errorMsg = "Template name cannot be empty!";
+				return false;
+			}
+
+			for (int i = 0; i < name.length(); i++) {
+				if (name[i] >= 'A' && name[i] <= 'Z') {
+					continue;
+				}
+				if (name[i] >= 'a' && name[i] <= 'z') {
+					continue;
+				}
+				if (name[i] >= '0' && name[i] <= '9') {
+
+					if (i == 0) {
+						errorMsg = "Template cannot start with a number!";
+						return false;
+					}
+					continue;
+				}
+				if (name[i] == '_') {
+					continue;
+				}
+
+				errorMsg = "Invalid character '";
+				errorMsg += name[i];
+				errorMsg += "'!";
+				return false;
+			}
+			return true;
+		}
+
+		void OnRender() override final {
+			if (!m_templateWizardLaunched) {
+				return;
+			}
+
+			ImGuiWindowFlags windowConfig = 0;
+			windowConfig |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize;
+
+			if (ImGui::Begin("##Template Wizard", &m_templateWizardLaunched, windowConfig)) {
+
+				bool createRequested = false;
+
+				ImGui::PushFont(EditorLayout::m_fonts[NunitoSans][36]);
+				EditorLayout::AddCenteredText("Template Wizard");
+				ImGui::PopFont();
+				ImGui::PushFont(EditorLayout::m_fonts[NunitoSans][24]);
+				EditorLayout::AddCenteredText("-- Create New File -- ");
+				ImGui::NewLine();
+
+				ImGui::Indent(80);
+
+				const char* items[] = { "Game Object", "Layer", "Scene" };
+				const char* preview = m_template_selection_index < 0 ? "Template Options" : items[m_template_selection_index];
+
+				if (ImGui::BeginCombo("##TemplateOptions", preview))
+				{
+
+					for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+					{
+						const bool is_selected = (m_template_selection_index == n);
+						if (ImGui::Selectable(items[n], is_selected)) {
+							m_template_selection_index = n;
+							strcpy_s(m_template_name, 60, (std::string("Name of ") + items[n]).c_str());
+							m_template_name_edited = false;
+						}
+
+						// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+						if (is_selected)
+							ImGui::SetItemDefaultFocus();
+					}
+					ImGui::EndCombo();
+				}
+				ImGui::NewLine();
+				ImGuiInputTextFlags textFlags;
+				textFlags = ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackEdit;
+
+				if (m_template_selection_index < 0) {
+					textFlags |= ImGuiInputTextFlags_ReadOnly;
+					EditorLayout::InactiveTextBoxBegin();
+				}
+
+				if (ImGui::InputText("##Filename", m_template_name, 60, textFlags, EditorLayout::MyTextCallback, (void*)&m_template_name_edited)) {
+					createRequested = true;
+				}
+
+				if (m_template_selection_index < 0) {
+					EditorLayout::InactiveTextBoxEnd();
+				}
+
+				bool validName = false;
+				if (m_template_name_edited) {
+					std::string errorMsg;
+					validName = ValidTemplateName(m_template_name, errorMsg);
+
+					if (!validName) {
+						ImGui::NewLine();
+						ImGui::PushStyleColor(ImGuiCol_Text, { 0.9f, 0.2f, 0.2f, 1.0f });
+						ImGui::Text("* %s", errorMsg.c_str());
+						ImGui::PopStyleColor();
+					}
+				}
+
+				ImGui::Unindent(80);
+				ImGui::Indent(195);
+
+				ImGui::SetCursorPosY(500);
+
+				if (!validName) { EditorLayout::InactiveButtonBegin(); }
+				if (ImGui::Button("Create File") && validName) {
+					createRequested = true;
+				}
+				if (!validName) { EditorLayout::InactiveButtonEnd(); }
+
+				ImGui::Unindent(160);
+				ImGui::PopFont();
+
+				if (validName && createRequested) {
+					CreateFileFromTemplate((TemplateType)m_template_selection_index, m_template_name);
+					m_templateWizardLaunched = false;
+				}
+			}
+
+			ImGui::End();
+		}
+	};
+	// =========================================================
+	struct EntityWizardImpl : public Panel::Impl {
+
+		bool m_entityWizardLaunched;
+		char m_entity_name[60];
+		bool m_template_name_edited;
+
+		void OnRender() override final {
+			if (!m_entityWizardLaunched) {
+				return;
+			}
+
+			ImGuiWindowFlags windowConfig = 0;
+			windowConfig |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize;
+
+			if (ImGui::Begin("##Entity Wizard", &m_entityWizardLaunched, windowConfig)) {
+				ImGui::PushFont(EditorLayout::m_fonts[NunitoSans][36]);
+				EditorLayout::AddCenteredText("Entity Wizard");
+				ImGui::PopFont();
+				ImGui::PushFont(EditorLayout::m_fonts[NunitoSans][24]);
+				EditorLayout::AddCenteredText("-- Create Entity Definition -- ");
+				ImGui::PopFont();
+
+				ImGui::NewLine();
+				ImGuiInputTextFlags textFlags;
+				textFlags = ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackEdit;
+
+				if (ImGui::InputText("##Filename", m_entity_name, 60, textFlags, EditorLayout::MyTextCallback, (void*)&m_template_name_edited)) {
+				}
+			}
+
+			ImGui::End();
+		}
+	};
+	// =========================================================
 
 	Panel::Panel(PanelType type)
 	{
@@ -310,6 +741,18 @@ namespace rdt::core {
 			break;
 		case PanelType::DiagnosticsPanel:
 			m_impl = new DiagnosticsPanelImpl;
+			break;
+		case PanelType::ScenePanel:
+			m_impl = new ScenePanelImpl;
+			break;
+		case PanelType::ConsolePanel:
+			m_impl = new ConsolePanelImpl;
+			break;
+		case PanelType::GameWindowSettingsPanel:
+			m_impl = new GameWindowSettingsPanelImpl;
+			break;
+		case PanelType::GameWindowPanel:
+			m_impl = new GameWindowPanelImpl;
 			break;
 		case PanelType::TemplateWizard:
 			m_impl = new TemplateWizardImpl;
@@ -357,8 +800,106 @@ namespace rdt::core {
 			ImGui::SetNextWindowPos(ImVec2(m_config.xPos, m_config.yPos), ImGuiCond_Appearing);
 		}
 	}
+	
+	// ==============================================================================
+
+	struct Container::Impl {
+		std::vector<Panel*> m_panels;
+
+		Impl()
+		{
+		}
+
+		~Impl()
+		{
+		}
+
+		virtual void OnRenderContainer() {}
+
+		int FindPanel(PanelType type) {
+			int index = 0;
+			for (auto panel : m_panels) {
+				if (panel->GetType() == type) {
+					return index;
+				}
+				index++;
+			}
+
+			return -1;
+		}
+
+		void OnAddPanel(Panel* nPanel) {
+			if (FindPanel(nPanel->GetType()) >= 0) {
+				RDT_CORE_ERROR("Container::Impl - Tried to add duplicate panel: {}", nPanel->GetType());
+				return;
+			}
+
+			m_panels.push_back(nPanel);
+		}
+
+		void OnRemovePanel(PanelType type) {
+			int index = FindPanel(type);
+
+			if (index < 0) {
+				RDT_CORE_ERROR("Container::Impl - Tried to remove panel that isn't in this container: {}", type);
+				return;
+			}
+
+			m_panels.erase(m_panels.begin() + index);
+		}
+	};
+
+	Container::Container(ContainerType type)
+	{
+		m_impl = nullptr;
+		SetContainerType(type);
+	}
+
+	Container::~Container()
+	{
+		if (m_impl != nullptr) {
+			delete m_impl;
+		}
+	}
+	
+	void Container::SetContainerType(ContainerType type)
+	{
+		if (m_impl != nullptr) {
+			delete m_impl;
+		}
+
+		m_type = type;
+
+		switch (type) {
+		default:
+			m_impl = new Container::Impl;
+			break;
+		}
+	}
+
+	ContainerType Container::GetType()
+	{
+		return m_type;
+	}
+
+	void Container::RenderContainer()
+	{
+		m_impl->OnRenderContainer();
+	}
+
+	void Container::AddToContainer(Panel* nPanel)
+	{
+		m_impl->OnAddPanel(nPanel);
+	}
+
+	void Container::RemoveFromContainer(PanelType type)
+	{
+		m_impl->OnRemovePanel(type);
+	}
 
 	// ==============================================================================
+	
+
 
 	/*
 		Docking Layout Defualts
@@ -372,89 +913,119 @@ namespace rdt::core {
 	{
 		m_workspaces[CommonWorkspaces::Default];
 		m_workspaces[CommonWorkspaces::Fullscreen];
-		m_workspace_id = CommonWorkspaces::Default;
+		SetCurrentWorkspace(CommonWorkspaces::Default);
+
+		RegisterContainer(ContainerType::DockFill);
 	}
 
 	PanelManager::~PanelManager()
 	{
+		for (auto& [type, panel] : m_panels) {
+			delete panel;
+		}
 	}
 
 	void PanelManager::RegisterPanel(PanelType type)
 	{
-		m_panels[type];
-		m_panels.at(type).SetPanelType(type);
-		ActiveWorkspace().m_panel_placements[type] = NotActive;
+		m_panels[type] = new Panel(type);
 	}
 
-	void PanelManager::SetPanelPlacement(PanelType panel, PanelPlacement placement)
+	void PanelManager::AssignToContainer(PanelType panel, ContainerType container)
 	{
 		if (m_panels.find(panel) == m_panels.end()) {
 			RDT_CORE_ERROR("PanelManager - Tried to place unregistered panel");
 			return;
 		}
 
-		ActiveWorkspace().m_panel_placements.at(panel) = placement;
-		UpdateDockConainers(placement);
+		// Remove panel from its presently bounded container
+		if (m_panel_locations.at(panel) != ContainerType::NotActive) {
+			RemoveFromContainer(panel);
+		}
+
+		// Update container tree if container node doesn't exist
+		if (!ContainerExists(container)) {
+			RegisterContainer(container);
+		}
+
+		// Add panel to container
+		GetCurrentWorkspace().at(container).container.AddToContainer(m_panels.at(panel));
+		m_panel_locations.at(panel) = container;
 	}
 
-	PanelManager::Workspace& PanelManager::ActiveWorkspace()
+	void PanelManager::RemoveFromContainer(PanelType panel)
+	{
+		GetCurrentWorkspace().at(m_panel_locations.at(panel)).container.RemoveFromContainer(panel);
+		m_panel_locations.at(panel) = ContainerType::NotActive;
+	}
+
+
+	void PanelManager::SetCurrentWorkspace(int workspaceID)
+	{
+		if (m_workspaces.find(workspaceID) == m_workspaces.end()) {
+			RDT_CORE_ERROR("PanelManager - Could not find workspace with ID: {}", workspaceID);
+			return;
+		}
+
+		m_workspace_id = workspaceID;
+	}
+
+	Workspace& PanelManager::GetCurrentWorkspace()
 	{
 		return m_workspaces.at(m_workspace_id);
+	}
+
+	void PanelManager::RegisterContainer(ContainerType type)
+	{
+		auto& workspace = GetCurrentWorkspace();
+		if (workspace.find(type) == workspace.end()) {
+			RDT_CORE_ERROR("PanelManager - Tried to register duplicate container type: {}", type);
+			return;
+		}
+		
+		workspace[type];
+		workspace.at(type).SetContainerType(type);
 	}
 
 	const std::unordered_map<PanelType, void*>& PanelManager::GetMessages()
 	{
 		for (auto& [type, panel] : m_panels) {
-			m_messages[type] = panel.GetData();
+			m_messages[type] = panel->GetData();
 		}
 
 		return m_messages;
 	}
 
+	bool PanelManager::ContainerExists(ContainerType type)
+	{
+		return GetCurrentWorkspace().find(type) != GetCurrentWorkspace().end();
+	}
+
+	ContainerNode& PanelManager::GetHead()
+	{
+		return GetCurrentWorkspace().at(DockFill);
+	}
+
 	void PanelManager::RenderMDI()
 	{
-		for (int index = (NotActive + 1); index != DockEndOfOptions; index++) {
-			
-			for (auto& panel : ActiveWorkspace().m_active_panels[index]) {
-				panel.Render();
-			}
+		auto& workspace = GetCurrentWorkspace();
+
+		for (auto& [container, node] : workspace) {
+			node.container.RenderContainer();
 		}
 	}
-
-	void PanelManager::UpdateDockConainers(PanelPlacement updatedContainer)
-	{
-		auto& activeContainers = ActiveWorkspace().m_dock_containers;
-		if (updatedContainer == DockBorderTop && activeContainers[DockBorderTop].height == 0) {
-			activeContainers[DockBorderTop].xPos = 0;
-			activeContainers[DockBorderTop].yPos = 0;
-			activeContainers[DockBorderTop].width = (float)Renderer::GetWindowWidth();
-			activeContainers[DockBorderTop].height = LayoutDefaults::BorderTopHeight;
-			activeContainers[DockBorderTop].update = true;
-			return;
-		}
-
-
-	}
-
-	void PanelManager::AddToDockContainer(PanelPlacement container, PanelType panel)
-	{
-		PanelConfig& panelConfig = m_panels.at(panel).GetConfig();
-		auto& activeContainers = ActiveWorkspace().m_dock_containers;
-		auto& activePanels = ActiveWorkspace().m_active_panels;
-
-		if (activePanels[container].size() == 0) {
-			panelConfig = activeContainers[container];
-			activePanels[container].push_back(m_panels.at(panel));
-			return;
-		}
-	}
-	
 
 	// ==============================================================================
-
 	/*
 		Editor Gui Implementation
 	*/
+
+	// Static Variables
+	std::string EditorLayout::sourcePath = "";
+	std::string EditorLayout::templatePath = "";
+	Scene* EditorLayout::m_scene = nullptr;
+	std::unordered_map<EditorFont, std::unordered_map<unsigned int, ImFont*>> EditorLayout::m_fonts;
+	GameRenderWindow* EditorLayout::m_gameWindow = nullptr;
+	int EditorLayout::m_gameWindowId = -1;
 
 	/*
 		Panel Layout Macros
@@ -473,31 +1044,35 @@ namespace rdt::core {
 	constexpr float GameWindowSettingsPanelWidth = 250.0f;
 
 	EditorLayout::EditorLayout()
-		: m_scene(nullptr), first_render(true), m_templateWizardLaunched(false), m_config(nullptr),
-		m_entityWizardLaunched(false)
 	{
+		m_showTools = true;
+		
 		RegisterToMessageBus("EditorLayout");
 		SetTheme(Theme_Codz);
 
-		m_gameWindowId = Renderer::AddRenderWindow(m_game_window_panel = new GameWindowPanel);
+		m_gameWindowId = Renderer::AddRenderWindow(m_gameWindow = new GameRenderWindow);
 		Renderer::SetDefaultViewport(false);
 		Input::SetTargetRenderWindow(m_gameWindowId);
-		m_showTools = true;
-
-		m_game_window_panel->SetGuiPositionY(88);
-		m_game_window_panel->SetGuiPositionX((m_window_width / 2) - (m_game_window_panel->GetGuiDimensions().x / 2));
+		m_gameWindow->SetGuiPositionY(88);
+		m_gameWindow->SetGuiPositionX((m_window_width / 2) - (m_gameWindow->GetGuiDimensions().x / 2));
 
 		ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
 
-		m_last_log = "";
-
 		m_panel_manager.RegisterPanel(MenuBar);
-		m_panel_manager.SetPanelPlacement(MenuBar, PanelPlacement::DockBorderTop);
-
 		m_panel_manager.RegisterPanel(DiagnosticsPanel);
-		m_panel_manager.SetPanelPlacement(MenuBar, PanelPlacement::DockRight);
+		m_panel_manager.RegisterPanel(ScenePanel);
+		m_panel_manager.RegisterPanel(ConsolePanel);
+		m_panel_manager.RegisterPanel(GameWindowPanel);
+		m_panel_manager.RegisterPanel(GameWindowSettingsPanel);
 
+		m_panel_manager.AssignToContainer(MenuBar, ContainerType::DockBorderTop);
+		m_panel_manager.AssignToContainer(DiagnosticsPanel, ContainerType::DockRight);
+		m_panel_manager.AssignToContainer(ScenePanel, ContainerType::DockRight);
+		m_panel_manager.AssignToContainer(ConsolePanel, ContainerType::DockBottom);
+		m_panel_manager.AssignToContainer(GameWindowPanel, ContainerType::DockFill);
+		m_panel_manager.AssignToContainer(GameWindowSettingsPanel, ContainerType::DockTop);
 	}
+
 	EditorLayout::~EditorLayout()
 	{
 	}
@@ -533,27 +1108,11 @@ namespace rdt::core {
 			return;
 		}
 
-		bool isFullscreen = Renderer::UsingDefaultViewport();
-
 		ImGui::PushFont(m_fonts[NunitoSans][18]);
-
-		if (!isFullscreen) {
-			RenderMenuBar();
-		}
-
-		RenderDiagnosticsPanel();
-		RenderGameWindowSettingsPanel();
-
-		if (!isFullscreen) {
-			RenderScenePanel();
-			RenderConsolePanel();
-			RenderTemplateWizard();
-			RenderEntityWizard();
-		}
-
+		m_panel_manager.RenderMDI();
 		ImGui::PopFont();
 
-		first_render = false;
+		bool isFullscreen = Renderer::UsingDefaultViewport();
 	}
 
 	void EditorLayout::SetTheme(EditorTheme nTheme)
@@ -753,7 +1312,7 @@ namespace rdt::core {
 
 	void EditorLayout::OnFirstRender()
 	{
-		ImGui::PushFont(m_fonts[ForkAwesome][18]);
+		/*ImGui::PushFont(m_fonts[ForkAwesome][18]);
 		m_game_window_settings_panel.width = GameWindowSettingsPanelWidth;
 		m_game_window_settings_panel.height = GetButtonHeight(ICON_FK_PAUSE) + 20;
 		m_game_window_settings_panel.xPos = ((float)m_game_window_panel->GetLastPosition().x) + m_game_window_panel->GetGuiDimensions().x - m_game_window_settings_panel.width;
@@ -783,7 +1342,7 @@ namespace rdt::core {
 		m_console_panel.width = m_game_window_panel->GetGuiDimensions().x;
 		m_console_panel.height = m_window_height -  (m_game_window_panel->GetLastPosition().y + m_game_window_panel->GetGuiDimensions().y + (PanelMargin * 2));
 		m_console_panel.xPos = (float)m_game_window_panel->GetLastPosition().x;
-		m_console_panel.yPos = ((float)m_game_window_panel->GetLastPosition().y) + m_game_window_panel->GetGuiDimensions().y + PanelMargin;
+		m_console_panel.yPos = ((float)m_game_window_panel->GetLastPosition().y) + m_game_window_panel->GetGuiDimensions().y + PanelMargin;*/
 	}
 
 	void EditorLayout::AddFont(EditorFont name, std::string& ttfFile, const std::vector<unsigned int>& sizes)
@@ -798,19 +1357,6 @@ namespace rdt::core {
 		else {
 			RDT_CORE_WARN("Could not find file '{}'", ttfFile);
 			return;
-		}
-	}
-
-	void EditorLayout::ApplyGuiConfig(GuiConfig& config)
-	{
-		if (config.update) {
-			ImGui::SetNextWindowSize(ImVec2(config.width, config.height), ImGuiCond_Always);
-			ImGui::SetNextWindowPos(ImVec2(config.xPos, config.yPos), ImGuiCond_Always);
-			config.update = false;
-		}
-		else {
-			ImGui::SetNextWindowSize(ImVec2(config.width, config.height), ImGuiCond_Appearing);
-			ImGui::SetNextWindowPos(ImVec2(config.xPos, config.yPos), ImGuiCond_Appearing);
 		}
 	}
 
@@ -869,70 +1415,6 @@ namespace rdt::core {
 		ImGui::EndDisabled();
 	}
 
-	void EditorLayout::CreateFileFromTemplate(TemplateType type, const std::string& name)
-	{
-
-		fs::path filepath = fs::path(sourcePath);
-		fs::path template_h = fs::path(templatePath);
-		fs::path template_cpp = fs::path(templatePath);
-
-
-		switch (type) {
-		case T_GameObject:
-			filepath = filepath / fs::path("GameObjects");
-			template_h = template_h / fs::path("gameObject.h.txt");
-			template_cpp = template_cpp / fs::path("gameObject.cpp.txt");
-			break;
-		case T_Layer:
-			filepath = filepath / fs::path("Layers");
-			template_h = template_h / fs::path("layer.h.txt");
-			template_cpp = template_cpp / fs::path("layer.cpp.txt");
-			break;
-		case T_Scene:
-			filepath = filepath / fs::path("Scenes");
-			template_h = template_h / fs::path("scene.h.txt");
-			template_cpp = template_cpp / fs::path("scene.cpp.txt");
-			break;
-		default:
-			return;
-		}
-
-		if (!Utils::PathExists(template_h.generic_string())) {
-			RDT_CORE_WARN("Could not locate template header at '{}'", template_h.generic_string());
-			return;
-		}
-
-		if (!Utils::PathExists(template_cpp.generic_string())) {
-			RDT_CORE_WARN("Could not locate template source at '{}'", template_cpp.generic_string());
-			return;
-		}
-
-		if (!fs::is_directory(filepath) || !fs::exists(filepath)) { 
-			fs::create_directory(filepath);
-		}
-		std::string headerFile = (filepath / fs::path(name + ".h")).generic_string();
-		std::string srcFile = (filepath / fs::path(name + ".cpp")).generic_string();
-
-		if (Utils::PathExists(headerFile) || Utils::PathExists(srcFile)) {
-			RDT_CORE_WARN("Could not create from template, duplicate '{}' found!", name);
-			return;
-		}
-
-		std::string contents;
-		
-		// Write header file;
-		Utils::ReadTextFile(template_h.generic_string(), contents);
-		Utils::ReplaceAll(contents, "TEMPLATENAME", name);
-		Utils::WriteFile(headerFile, contents);
-		contents.clear();
-
-		// Write src file
-		Utils::ReadTextFile(template_cpp.generic_string(), contents);
-		Utils::ReplaceAll(contents, "TEMPLATENAME", name);
-		Utils::WriteFile(srcFile, contents);
-
-	}
-
 	float EditorLayout::GetButtonWidth(const char* label)
 	{
 		ImGuiStyle& style = ImGui::GetStyle();
@@ -945,40 +1427,6 @@ namespace rdt::core {
 		return ImGui::CalcTextSize(label).y + (style.FramePadding.y * 2);
 	}
 
-	bool EditorLayout::ValidTemplateName(const std::string& name, std::string& errorMsg)
-	{
-		if (name.length() == 0) {
-			errorMsg = "Template name cannot be empty!";
-			return false;
-		}
-
-		for (int i = 0; i < name.length(); i++) {
-			if (name[i] >= 'A' && name[i] <= 'Z') {
-				continue;
-			}
-			if (name[i] >= 'a' && name[i] <= 'z') {
-				continue;
-			}
-			if (name[i] >= '0' && name[i] <= '9') {
-
-				if (i == 0) {
-					errorMsg = "Template cannot start with a number!";
-					return false;
-				}
-				continue;
-			}
-			if (name[i] == '_') {
-				continue;
-			}
-
-			errorMsg = "Invalid character '";
-			errorMsg += name[i];
-			errorMsg += "'!";
-			return false;
-		}
-		return true;
-	}
-
 	int EditorLayout::MyTextCallback(ImGuiInputTextCallbackData* data)
 	{
 		if (data->EventFlag == ImGuiInputTextFlags_CallbackEdit)
@@ -989,372 +1437,4 @@ namespace rdt::core {
 
 		return 0;
 	}
-
-	float EditorLayout::GetDockPosX(Dock docking, float guiWidth, float margin)
-	{
-		switch (docking) {
-		case DockLeft:
-			return margin;
-		case DockRight:
-			return (float)m_window_width - guiWidth - margin;
-		case DockTop:
-			return 0;
-		case DockBottom:
-			return 0;
-		}
-
-		return 0;
-	}
-
-	float EditorLayout::GetDockPosY(Dock docking, float guiHeight, float margin)
-	{
-		switch (docking) {
-		case DockLeft:
-			return 0;
-		case DockRight:
-			return 0;
-		case DockTop:
-			return margin;
-		case DockBottom:
-			return (float)m_window_height - guiHeight - margin;
-		}
-
-		return 0;
-	}
-
-	void EditorLayout::RenderDiagnosticsPanel()
-	{
-		ApplyGuiConfig(m_diagnostics_panel);
-
-		// Start drawing window
-		ImGui::Begin("Diagnostic Tools");
-
-		// Show framerate
-		Vec2d screenCoords = Input::GetMouseCoords(MouseCond::SCREEN_COORDS);
-		Vec2d worldCoords = Input::GetMouseCoords(MouseCond::WORLD_COORDS);
-		ImGui::Text("Mouse screen-coordinates: (%.2f %2.f)", screenCoords.x, screenCoords.y);
-		ImGui::Text("Mouse world-coordinates: (%.2f %2.f)", worldCoords.x, worldCoords.y);
-		ImGui::Text("Performance: %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-
-		ImGui::End();
-	}
-	void EditorLayout::RenderScenePanel()
-	{
-		ApplyGuiConfig(m_scene_panel);
-
-		// Start drawing window
-		if (ImGui::Begin("Scene Panel")) {
-
-			if (m_scene == nullptr) {
-				ImGui::Text("No Scene Selected!");
-			}
-			else {
-				ImGui::Text("Scene: %s", m_scene->GetName().c_str());
-
-				size_t count;
-				Layer** layers = m_scene->GetLayers(&count);
-				for (size_t i = 0; i < count; i++) {
-					AddLayerPanel(layers[i]);
-				}
-			}
-		}
-
-		ImGui::End();
-
-	}
-	void EditorLayout::AddLayerPanel(Layer* layer)
-	{
-		std::string name = typeid(*layer).name();
-		std::string panel_header = "Layer: " + name.substr(6, name.size() - 6);
-
-		if (ImGui::CollapsingHeader(panel_header.c_str())) {
-
-			size_t count;
-			GameObject** objects = layer->GetGameObjects(&count);
-			for (size_t i = 0; i < count; i++) {
-				AddGameObjectPanel(objects[i]);
-			}
-		}
-	}
-	void EditorLayout::AddGameObjectPanel(GameObject* gobject)
-	{
-		std::string name = typeid(*gobject).name();
-		std::string panel_header = name.substr(6, name.size() - 6) + ": " + gobject->GetName();
-
-		ImGui::Indent(10);
-		if (ImGui::CollapsingHeader(panel_header.c_str())) {
-
-			ImGui::Text("GameObjectID: %d", gobject->GetID());
-			if (gobject->GetModelID() != 0 && gobject->GetRealmID() != 0) {
-				ImGui::Text("RealmID: %d", gobject->GetRealmID());
-				ImGui::Text("ModelID: %d", gobject->GetModelID());
-
-				Vec2d pos = Physics::GetPosition(gobject->GetRealmID(), gobject->GetModelID());
-				ImGui::Text("Position: (%.2f, %.2f)", pos.x, pos.y);
-
-				Vec2d vel = Physics::GetVelocity(gobject->GetRealmID(), gobject->GetModelID());
-				ImGui::Text("Velocity: (%.2f, %.2f)", vel.x, vel.y);
-
-			}
-			else {
-				ImGui::Text("Not Registered to any realms.");
-			}
-
-		}
-		ImGui::Unindent(10);
-	}
-	void EditorLayout::RenderGameWindowSettingsPanel()
-	{
-		ApplyGuiConfig(m_game_window_settings_panel);
-
-		ImGuiWindowFlags windowConfig = 0;
-		windowConfig |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar;
-		
-		ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.7f, 0.7f, 0.7f, 0.9f });
-		ImGui::Begin("##GameWindowSettingsPanel", (bool*)0, windowConfig);
-
-		ImGui::PushFont(m_fonts[ForkAwesome][18]);
-		ImGui::PushStyleColor(ImGuiCol_Button, { 1.0f, 1.0f, 1.0f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.8f, 0.8f, 0.8f, 1.0f });
-
-		/* Play Button */
-		ImGui::PushStyleColor(ImGuiCol_Text, { 0.2f, 0.8f, 0.2f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.2f, 0.9f, 0.2f, 0.2f });
-		ImGui::SetCursorPos({ 10, 10 });
-		if (ImGui::Button(ICON_FK_PLAY)) {
-
-		}
-		ImGui::PopStyleColor();
-		ImGui::PopStyleColor();
-		ImGui::SameLine();
-
-		/* Pause Button */
-		ImGui::PushStyleColor(ImGuiCol_Text, { 0.8f, 0.2f, 0.2f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.9f, 0.2f, 0.2f, 0.2f });
-		if (ImGui::Button(ICON_FK_PAUSE)) {
-
-		}
-		ImGui::PopStyleColor();
-		ImGui::PopStyleColor();
-		ImGui::SameLine();
-
-		/* Restart Button */
-		ImGui::PushStyleColor(ImGuiCol_Text, { 0.1f, 0.1f, 0.1f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.7f, 0.7f, 0.7f, 0.2f });
-		if (ImGui::Button(ICON_FK_REFRESH)) {
-
-		}
-		ImGui::PopStyleColor();
-		ImGui::PopStyleColor();
-		ImGui::SameLine();
-
-		/* Expand Window Button*/
-		ImGui::PushStyleColor(ImGuiCol_Text, { 0.1f, 0.1f, 0.1f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.7f, 0.7f, 0.7f, 0.2f });
-		if (Renderer::UsingDefaultViewport()) {
-			ImGui::SetCursorPosX(ImGui::GetWindowWidth() - GetButtonWidth(ICON_FK_PAUSE) - 10);
-			if (ImGui::Button(ICON_FK_COMPRESS)) {
-
-				if (Renderer::IsFullscreen()) {
-					Renderer::DisableFullscreen();
-				}
-
-				Renderer::SetDefaultViewport(false);
-				Input::SetTargetRenderWindow(m_gameWindowId);
-				m_diagnostics_panel.yPos = GetDockPosY(DockTop, m_diagnostics_panel.height, PanelMargin) + m_menu_bar_height;
-				m_game_window_settings_panel.xPos = GetDockPosX(DockRight, m_game_window_settings_panel.width + m_diagnostics_panel.width + PanelMargin, PanelMargin);
-				m_game_window_settings_panel.yPos = GetDockPosY(DockTop, m_game_window_settings_panel.height, PanelMargin) + m_menu_bar_height;
-				m_diagnostics_panel.update = true;
-				m_game_window_settings_panel.update = true;
-			}
-		}
-		else {
-			ImGui::SetCursorPosX(ImGui::GetWindowWidth() - (2 * GetButtonWidth(ICON_FK_PAUSE)) - 18);
-
-			if (ImGui::Button(ICON_FK_EXPAND)) {
-				Renderer::SetDefaultViewport(true);
-				Input::SetTargetRenderWindow(-1);
-				m_showTools = false;
-				m_game_window_settings_panel.yPos = PanelMargin;
-				m_game_window_settings_panel.xPos = GetDockPosX(DockRight, m_game_window_settings_panel.width, PanelMargin);
-				m_diagnostics_panel.yPos = m_game_window_settings_panel.yPos + m_game_window_settings_panel.height + PanelMargin;
-			}
-
-			ImGui::SameLine();
-			if (ImGui::Button(ICON_FK_ARROWS_ALT)) {
-				Renderer::SetDefaultViewport(true);
-				Renderer::EnableFullscreen();
-				Input::SetTargetRenderWindow(-1);
-
-				m_showTools = false;
-				m_game_window_settings_panel.yPos = PanelMargin;
-				m_game_window_settings_panel.xPos = GetDockPosX(DockRight, m_game_window_settings_panel.width, PanelMargin);
-				m_diagnostics_panel.yPos = m_game_window_settings_panel.yPos + m_game_window_settings_panel.height + PanelMargin;
-			}
-		}
-		ImGui::PopStyleColor();
-		ImGui::PopStyleColor();
-
-
-		ImGui::PopStyleColor();
-		ImGui::PopStyleColor();
-
-		ImGui::PopFont();
-		
-		ImGui::End();
-		ImGui::PopStyleColor();
-	}
-	void EditorLayout::RenderConsolePanel()
-	{
-		ApplyGuiConfig(m_console_panel);
-
-		ImGui::Begin("Console Panel");
-
-		int index = (int)Log::GetLogCount() - 1;
-		std::string log;
-		Color logColor;
-		while (index >= 0) {
-			Log::GetLog(index--, log, logColor);
-			
-			ImGui::PushStyleColor(ImGuiCol_Text, logColor.GetImGuiColor());
-			ImGui::Text("%s", log.c_str());
-			ImGui::PopStyleColor();
-		}
-
-		if (m_last_log != log) {
-			ImGui::SetScrollHereY(0.999f);
-			m_last_log = log;
-		}
-
-		ImGui::End();
-	}
-	void EditorLayout::RenderTemplateWizard()
-	{
-		if (!m_templateWizardLaunched) {
-			return;
-		}
-
-		ApplyGuiConfig(m_template_wizard);
-
-		ImGuiWindowFlags windowConfig = 0;
-		windowConfig |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize;
-
-
-		if (ImGui::Begin("##Template Wizard", &m_templateWizardLaunched, windowConfig)) {
-			
-			bool createRequested = false;
-
-			ImGui::PushFont(m_fonts[NunitoSans][36]);
-			AddCenteredText("Template Wizard");
-			ImGui::PopFont();
-			ImGui::PushFont(m_fonts[NunitoSans][24]);
-			AddCenteredText("-- Create New File -- ");
-			ImGui::NewLine();
-
-			ImGui::Indent(80);
-
-			const char* items[] = { "Game Object", "Layer", "Scene" };
-			const char* preview = m_template_selection_index < 0 ? "Template Options" : items[m_template_selection_index];
-			
-			if (ImGui::BeginCombo("##TemplateOptions", preview))
-			{
-
-				for (int n = 0; n < IM_ARRAYSIZE(items); n++)
-				{
-					const bool is_selected = (m_template_selection_index == n);
-					if (ImGui::Selectable(items[n], is_selected)) {
-						m_template_selection_index = n;
-						strcpy_s(m_template_name, 60, (std::string("Name of ") + items[n]).c_str());
-						m_template_name_edited = false;
-					}
-
-					// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-					if (is_selected)
-						ImGui::SetItemDefaultFocus();
-				}
-				ImGui::EndCombo();
-			}
-			ImGui::NewLine();
-			ImGuiInputTextFlags textFlags;
-			textFlags = ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackEdit;
-			
-			if (m_template_selection_index < 0) {
-				textFlags |= ImGuiInputTextFlags_ReadOnly;
-				InactiveTextBoxBegin();
-			}
-			
-			if (ImGui::InputText("##Filename", m_template_name, 60, textFlags, MyTextCallback, (void*)&m_template_name_edited)) {
-				createRequested = true;
-			}
-
-			if (m_template_selection_index < 0) {
-				InactiveTextBoxEnd();
-			}
-			
-			bool validName = false;
-			if (m_template_name_edited) {
-				std::string errorMsg;
-				validName = ValidTemplateName(m_template_name, errorMsg);
-
-				if (!validName) {
-					ImGui::NewLine();
-					ImGui::PushStyleColor(ImGuiCol_Text, { 0.9f, 0.2f, 0.2f, 1.0f });
-					ImGui::Text("* %s", errorMsg.c_str());
-					ImGui::PopStyleColor();
-				}
-			}
-
-			ImGui::Unindent(80);
-			ImGui::Indent(195);
-			
-			ImGui::SetCursorPosY(500);
-
-			if (!validName) { InactiveButtonBegin(); }
-			if (ImGui::Button("Create File") && validName) {
-				createRequested = true;
-			}
-			if (!validName) { InactiveButtonEnd(); }
-
-			ImGui::Unindent(160);
-			ImGui::PopFont();
-
-			if (validName && createRequested) {
-				CreateFileFromTemplate((TemplateType)m_template_selection_index, m_template_name);
-				m_templateWizardLaunched = false;
-			}
-		}
-	
-		ImGui::End();
-	}
-
-	void EditorLayout::RenderEntityWizard()
-	{
-		if (!m_entityWizardLaunched) {
-			return;
-		}
-
-		ApplyGuiConfig(m_entity_wizard);
-
-		ImGuiWindowFlags windowConfig = 0;
-		windowConfig |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize;
-
-		if (ImGui::Begin("##Entity Wizard", &m_entityWizardLaunched, windowConfig)) {
-			ImGui::PushFont(m_fonts[NunitoSans][36]);
-			AddCenteredText("Entity Wizard");
-			ImGui::PopFont();
-			ImGui::PushFont(m_fonts[NunitoSans][24]);
-			AddCenteredText("-- Create Entity Definition -- ");
-			ImGui::PopFont();
-
-			ImGui::NewLine();
-			ImGuiInputTextFlags textFlags;
-			textFlags = ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackEdit;
-
-			if (ImGui::InputText("##Filename", m_entity_name, 60, textFlags, MyTextCallback, (void*)&m_template_name_edited)) {
-			}
-		}
-
-		ImGui::End();
-	}
-	
 }

@@ -52,12 +52,12 @@ namespace rdt::core {
 	/*
 		ImGui Panel that contains the game viewport
 	*/	
-	class GameWindowPanel : public RenderWindow {
+	class GameRenderWindow : public RenderWindow {
 	private:
 		bool update_pos;
 	public:
-		GameWindowPanel();
-		~GameWindowPanel();
+		GameRenderWindow();
+		~GameRenderWindow();
 
 		void OnBegin() override final;
 		void OnEnd() override final;
@@ -68,6 +68,10 @@ namespace rdt::core {
 		PT_NAP, // Not a Panel
 		MenuBar,
 		DiagnosticsPanel,
+		ScenePanel,
+		ConsolePanel,
+		GameWindowPanel,
+		GameWindowSettingsPanel,
 		TemplateWizard,
 		EntityWizard,
 	};
@@ -124,7 +128,8 @@ namespace rdt::core {
 	};
 
 	// =====================================================================================
-	enum PanelPlacement {
+	
+	enum ContainerType {
 		NotActive,
 		DockBorderTop,
 		DockTop,
@@ -138,21 +143,71 @@ namespace rdt::core {
 		Floating,
 		DockEndOfOptions
 	};
+
+	class Container {
+	private:
+		struct Impl;
+		Impl* m_impl;
+		ContainerType m_type;
+	public:
+
+		Container(ContainerType type = DockEndOfOptions);
+		~Container();
+
+		/*
+			Sets the container type, defining its location and size
+			in the MDI application.
+		*/
+		void SetContainerType(ContainerType type);
+
+		/*
+			Returns the current type of this container.
+		*/
+		ContainerType GetType();
+
+		/*
+			Renders the container with ImGui and its child panels
+		*/
+		void RenderContainer();
+
+		/*
+			Adds a new panel to the container
+		*/
+		void AddToContainer(Panel* nPanel);
+
+		/*
+			Removes a currently bound panel of the given type.
+		*/
+		void RemoveFromContainer(PanelType type);
+	};
+
+	struct ContainerNode {
+		Container container;
+		/*std::vector<ContainerNode&> nodesUp;
+		std::vector<ContainerNode&> nodesDown;
+		std::vector<ContainerNode&> nodesLeft;
+		std::vector<ContainerNode&> nodesRight;*/
+
+		void SetContainerType(ContainerType type) {
+			container.SetContainerType(type);
+		}
+
+		ContainerType GetType() {
+			return container.GetType();
+		}
+	};
+
 	enum CommonWorkspaces {
 		Default,
 		Fullscreen,
 	};
+
+	using Workspace = std::unordered_map<ContainerType, ContainerNode>;
+
 	class PanelManager {
 	private:
-		std::unordered_map<PanelType, Panel> m_panels;
-
-		struct Workspace {
-			std::unordered_map<PanelType, PanelPlacement> m_panel_placements;
-			std::vector<Panel&> m_active_panels[DockEndOfOptions];
-
-			// Defines the parent container for all panels the reside in that placement option
-			PanelConfig m_dock_containers[DockEndOfOptions];
-		};
+		std::unordered_map<PanelType, Panel*> m_panels;
+		std::unordered_map<PanelType, ContainerType> m_panel_locations;
 
 		std::unordered_map<int, Workspace> m_workspaces;
 		int m_workspace_id;
@@ -171,7 +226,12 @@ namespace rdt::core {
 		/*
 			Sets the panel location and visibility
 		*/
-		void SetPanelPlacement(PanelType panel, PanelPlacement placement);
+		void AssignToContainer(PanelType panel, ContainerType container);
+
+		/*
+			Removes a panel from its currently bound container, making it inactive.
+		*/
+		void RemoveFromContainer(PanelType panel);
 
 		/*
 			Renders all panels as a multiple document interface
@@ -186,19 +246,30 @@ namespace rdt::core {
 	private:
 
 		/*
+			Switches the current workspace to the one with the registered workspace ID
+		*/
+		void SetCurrentWorkspace(int workspaceID);
+
+		/*
 			Returns the currently active workspace
 		*/
-		Workspace& ActiveWorkspace();
+		Workspace& GetCurrentWorkspace();
 
 		/*
-			Updates the config information for all dock containers
+			Registers a new container type to the current workspace
 		*/
-		void UpdateDockConainers(PanelPlacement updatedContainer);
+		void RegisterContainer(ContainerType type);
 
 		/*
-			Adds a panel to the described dock container
+			Returns true if a container of the given type exists
 		*/
-		void AddToDockContainer(PanelPlacement container, PanelType panel);
+		bool ContainerExists(ContainerType type);
+
+		/*
+			Gets the root of the container tree, which is always the DockFill
+			container.
+		*/
+		ContainerNode& GetHead();
 	};
 
 	// =====================================================================================
@@ -221,59 +292,20 @@ namespace rdt::core {
 		Editor Layout Implementation
 	*/
 	class EditorLayout : public GuiTemplate, public Messenger {
+	public:
+		static std::string sourcePath;
+		static std::string templatePath;
+		static Scene* m_scene;
+		static std::unordered_map<EditorFont, std::unordered_map<unsigned int, ImFont*>> m_fonts;
+		static GameRenderWindow* m_gameWindow;
+		static int m_gameWindowId;
 	private:
 		PanelManager m_panel_manager;
-
-		/*
-			Development dependables
-		*/
-		Scene* m_scene;
-		std::string sourcePath;
-		std::string templatePath;
+		ConfigReader* m_config;
 		bool first_render;
-
-		// Template Wizard
-		bool m_templateWizardLaunched;
-		int m_template_selection_index;
-		char m_template_name[60];
-		bool m_template_name_edited;
-
-		// Entity Wizard
-		bool m_entityWizardLaunched;
-		char m_entity_name[60];
-
 		bool m_showTools;
 		const std::vector<InputState> controls_ShowTools1{ CTRL_KEY_DOWN };
 		const std::vector<InputState> controls_ShowTools2{ T_KEY_PRESS };
-
-		std::unordered_map<EditorFont, std::unordered_map<unsigned int, ImFont*>> m_fonts;
-		
-		std::string m_last_log;
-
-		ConfigReader* m_config;
-
-		/*
-			Gui Layout data structures
-		*/
-		enum Dock {
-			DockLeft,
-			DockRight,
-			DockTop,
-			DockBottom
-		};
-
-		enum TemplateType {
-			T_GameObject,
-			T_Layer,
-			T_Scene,
-		};
-
-		/*
-			Panels
-		*/
-		GameWindowPanel* m_game_window_panel;
-		int m_gameWindowId;
-
 	public:
 		EditorLayout();
 		~EditorLayout();
@@ -290,6 +322,19 @@ namespace rdt::core {
 		void AddConfigPtr(ConfigReader* ptr);
 		void ApplyConfig();
 
+		// ===========================================================
+		/* Utility functions used by many panels */
+
+		static float GetButtonWidth(const char* label);
+		static float GetButtonHeight(const char* label);
+		static void AddCenteredText(const std::string& text);
+		static void InactiveButtonBegin();
+		static void InactiveButtonEnd();
+		static void InactiveTextBoxBegin();
+		static void InactiveTextBoxEnd();
+		static int MyTextCallback(ImGuiInputTextCallbackData* data);
+		// ===========================================================
+
 	private:
 		
 		// ===============================================
@@ -302,44 +347,5 @@ namespace rdt::core {
 		void OnFirstRender();
 		void AddFont(EditorFont name, std::string& ttfFile, const std::vector<unsigned int>& sizes);
 		void SetScenePtr(Scene* ptr);
-		void AddCenteredText(const std::string& text);
-		void InactiveButtonBegin();
-		void InactiveButtonEnd();
-		void InactiveTextBoxBegin();
-		void InactiveTextBoxEnd();
-		void CreateFileFromTemplate(TemplateType type, const std::string& name);
-		float GetButtonWidth(const char* label);
-		float GetButtonHeight(const char* label);
-
-		bool ValidTemplateName(const std::string& name, std::string& errorMsg);
-		static int MyTextCallback(ImGuiInputTextCallbackData* data);
-
-		/*
-			Returns the docking x-position for the Gui to be docked in the
-			provided direction with the given margin.
-		*/
-		float GetDockPosX(Dock docking, float guiWidth, float margin = 0);
-
-		/*
-			Returns the docking y-position for the Gui to be docked in the
-			provided direction with the given margin.
-		*/
-		float GetDockPosY(Dock docking, float guiHeight, float margin = 0);
-
-		// =======================================================
-		void RenderDiagnosticsPanel();
-		// =======================================================
-		void RenderScenePanel();
-		void AddLayerPanel(Layer* layer);
-		void AddGameObjectPanel(GameObject* gobject);
-		// =======================================================
-		void RenderGameWindowSettingsPanel();
-		// =======================================================
-		void RenderConsolePanel();
-		// =======================================================
-		void RenderTemplateWizard();
-		void RenderEntityWizard();
-		// =======================================================
-
 	};
 }
