@@ -233,6 +233,10 @@ namespace rdt::core {
         else {
             for (auto& [id, window] : GetRenderWindows()) {
 
+                if (!window->ShouldShow()) {
+                    continue;
+                }
+
                 auto& fbo = m_frame_buffers.at(id);
                 window->OnBegin();
             

@@ -122,9 +122,6 @@ namespace rdt::core {
 			Gets the type of panel implementation for this instance
 		*/
 		PanelType GetType();
-
-	private:
-		void ApplyGuiConfig();
 	};
 
 	// =====================================================================================
@@ -145,10 +142,12 @@ namespace rdt::core {
 	};
 
 	class Container {
-	private:
+	public:
 		struct Impl;
+	private:
 		Impl* m_impl;
 		ContainerType m_type;
+		PanelConfig m_config;
 	public:
 
 		Container(ContainerType type = DockEndOfOptions);
@@ -179,14 +178,21 @@ namespace rdt::core {
 			Removes a currently bound panel of the given type.
 		*/
 		void RemoveFromContainer(PanelType type);
+
+		/*
+			Gets the panel configuration (editable)
+		*/
+		PanelConfig& GetConfig();
+
+	private:
 	};
 
 	struct ContainerNode {
 		Container container;
-		/*std::vector<ContainerNode&> nodesUp;
-		std::vector<ContainerNode&> nodesDown;
-		std::vector<ContainerNode&> nodesLeft;
-		std::vector<ContainerNode&> nodesRight;*/
+		ContainerNode* nodeUp = nullptr;
+		ContainerNode* nodeDown = nullptr;
+		ContainerNode* nodeLeft = nullptr;
+		ContainerNode* nodeRight = nullptr;
 
 		void SetContainerType(ContainerType type) {
 			container.SetContainerType(type);
@@ -202,7 +208,7 @@ namespace rdt::core {
 		Fullscreen,
 	};
 
-	using Workspace = std::unordered_map<ContainerType, ContainerNode>;
+	using Workspace = std::unordered_map<ContainerType, ContainerNode*>;
 
 	class PanelManager {
 	private:
@@ -213,6 +219,16 @@ namespace rdt::core {
 		int m_workspace_id;
 
 		std::unordered_map<PanelType, void*> m_messages;
+
+		enum TreeDirection
+		{
+			TD_LEFT,
+			TD_RIGHT,
+			TD_UP,
+			TD_DOWN,
+			TD_NOMOVEMENT
+		};
+
 	public:
 		PanelManager();
 		~PanelManager();
@@ -243,6 +259,11 @@ namespace rdt::core {
 		*/
 		const std::unordered_map<PanelType, void*>& GetMessages();
 
+		/*
+			Registers a new container type to the current workspace
+		*/
+		void RegisterContainer(ContainerType type);
+
 	private:
 
 		/*
@@ -255,10 +276,6 @@ namespace rdt::core {
 		*/
 		Workspace& GetCurrentWorkspace();
 
-		/*
-			Registers a new container type to the current workspace
-		*/
-		void RegisterContainer(ContainerType type);
 
 		/*
 			Returns true if a container of the given type exists
@@ -266,10 +283,17 @@ namespace rdt::core {
 		bool ContainerExists(ContainerType type);
 
 		/*
+			Gets the config for a container given its type
+		*/
+		PanelConfig& GetContainerConfig(ContainerType type);
+
+		/*
 			Gets the root of the container tree, which is always the DockFill
 			container.
 		*/
-		ContainerNode& GetHead();
+		ContainerNode* GetHead();
+
+		ContainerType GetNextExpected(ContainerType current, ContainerType target, TreeDirection& next);
 	};
 
 	// =====================================================================================
@@ -291,7 +315,7 @@ namespace rdt::core {
 	/*
 		Editor Layout Implementation
 	*/
-	class EditorLayout : public GuiTemplate, public Messenger {
+	class Editor : public GuiTemplate, public Messenger {
 	public:
 		static std::string sourcePath;
 		static std::string templatePath;
@@ -307,8 +331,8 @@ namespace rdt::core {
 		const std::vector<InputState> controls_ShowTools1{ CTRL_KEY_DOWN };
 		const std::vector<InputState> controls_ShowTools2{ T_KEY_PRESS };
 	public:
-		EditorLayout();
-		~EditorLayout();
+		Editor();
+		~Editor();
 
 		void OnMessage(Message msg) override final;
 		void OnUpdate(const float deltaTime) override;
@@ -333,6 +357,7 @@ namespace rdt::core {
 		static void InactiveTextBoxBegin();
 		static void InactiveTextBoxEnd();
 		static int MyTextCallback(ImGuiInputTextCallbackData* data);
+		static void ApplyGuiConfig(PanelConfig& config);
 		// ===========================================================
 
 	private:

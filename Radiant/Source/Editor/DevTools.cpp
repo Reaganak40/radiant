@@ -21,8 +21,8 @@ namespace rdt::core {
 
 		RegisterToMessageBus("DevLayer");
 
-		EditorLayout* layout;
-		RegisterGUI(layout = new EditorLayout);
+		Editor* layout;
+		RegisterGUI(layout = new Editor);
 
 		m_base_directory = Utils::GetCWD();
 		RDT_CORE_INFO("DevTools base directory: {}", m_base_directory);
@@ -107,6 +107,7 @@ namespace rdt::core {
 
 	constexpr float GameWindowPanelGuiWidth = 1115;
 	constexpr float GameWindowPanelGuiHeight = 653.0f;
+	constexpr float PanelMargin = 7.5f;
 
 	GameRenderWindow::GameRenderWindow()
 	{
@@ -121,7 +122,6 @@ namespace rdt::core {
 
 	void GameRenderWindow::OnBegin()
 	{
-
 		ImGui::PushFont(GuiManager::GetFont(NunitoSans, 18));
 
 		// First render config
@@ -286,7 +286,7 @@ namespace rdt::core {
 			ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.7f, 0.7f, 0.7f, 0.9f });
 			ImGui::Begin("##GameWindowSettingsPanel", (bool*)0, windowConfig);
 
-			ImGui::PushFont(EditorLayout::m_fonts[ForkAwesome][18]);
+			ImGui::PushFont(Editor::m_fonts[ForkAwesome][18]);
 			ImGui::PushStyleColor(ImGuiCol_Button, { 1.0f, 1.0f, 1.0f, 1.0f });
 			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.8f, 0.8f, 0.8f, 1.0f });
 
@@ -325,7 +325,7 @@ namespace rdt::core {
 			ImGui::PushStyleColor(ImGuiCol_Text, { 0.1f, 0.1f, 0.1f, 1.0f });
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 0.7f, 0.7f, 0.7f, 0.2f });
 			if (Renderer::UsingDefaultViewport()) {
-				ImGui::SetCursorPosX(ImGui::GetWindowWidth() - EditorLayout::GetButtonWidth(ICON_FK_PAUSE) - 10);
+				ImGui::SetCursorPosX(ImGui::GetWindowWidth() - Editor::GetButtonWidth(ICON_FK_PAUSE) - 10);
 				if (ImGui::Button(ICON_FK_COMPRESS)) {
 
 					if (Renderer::IsFullscreen()) {
@@ -333,7 +333,7 @@ namespace rdt::core {
 					}
 
 					Renderer::SetDefaultViewport(false);
-					Input::SetTargetRenderWindow(EditorLayout::m_gameWindowId);
+					Input::SetTargetRenderWindow(Editor::m_gameWindowId);
 					
 					/*m_diagnostics_panel.yPos = GetDockPosY(DockTop, m_diagnostics_panel.height, PanelMargin) + m_menu_bar_height;
 					m_game_window_settings_panel.xPos = GetDockPosX(DockRight, m_game_window_settings_panel.width + m_diagnostics_panel.width + PanelMargin, PanelMargin);
@@ -343,7 +343,7 @@ namespace rdt::core {
 				}
 			}
 			else {
-				ImGui::SetCursorPosX(ImGui::GetWindowWidth() - (2 * EditorLayout::GetButtonWidth(ICON_FK_PAUSE)) - 18);
+				ImGui::SetCursorPosX(ImGui::GetWindowWidth() - (2 * Editor::GetButtonWidth(ICON_FK_PAUSE)) - 18);
 
 				if (ImGui::Button(ICON_FK_EXPAND)) {
 					Renderer::SetDefaultViewport(true);
@@ -426,14 +426,14 @@ namespace rdt::core {
 		void OnRender() override final {
 			if (ImGui::Begin("Scene Panel")) {
 
-				if (EditorLayout::m_scene == nullptr) {
+				if (Editor::m_scene == nullptr) {
 					ImGui::Text("No Scene Selected!");
 				}
 				else {
-					ImGui::Text("Scene: %s", EditorLayout::m_scene->GetName().c_str());
+					ImGui::Text("Scene: %s", Editor::m_scene->GetName().c_str());
 
 					size_t count;
-					Layer** layers = EditorLayout::m_scene->GetLayers(&count);
+					Layer** layers = Editor::m_scene->GetLayers(&count);
 					for (size_t i = 0; i < count; i++) {
 						AddLayerPanel(layers[i]);
 					}
@@ -485,9 +485,9 @@ namespace rdt::core {
 		void CreateFileFromTemplate(TemplateType type, const std::string& name)
 		{
 
-			fs::path filepath = fs::path(EditorLayout::sourcePath);
-			fs::path template_h = fs::path(EditorLayout::templatePath);
-			fs::path template_cpp = fs::path(EditorLayout::templatePath);
+			fs::path filepath = fs::path(Editor::sourcePath);
+			fs::path template_h = fs::path(Editor::templatePath);
+			fs::path template_cpp = fs::path(Editor::templatePath);
 
 
 			switch (type) {
@@ -591,11 +591,11 @@ namespace rdt::core {
 
 				bool createRequested = false;
 
-				ImGui::PushFont(EditorLayout::m_fonts[NunitoSans][36]);
-				EditorLayout::AddCenteredText("Template Wizard");
+				ImGui::PushFont(Editor::m_fonts[NunitoSans][36]);
+				Editor::AddCenteredText("Template Wizard");
 				ImGui::PopFont();
-				ImGui::PushFont(EditorLayout::m_fonts[NunitoSans][24]);
-				EditorLayout::AddCenteredText("-- Create New File -- ");
+				ImGui::PushFont(Editor::m_fonts[NunitoSans][24]);
+				Editor::AddCenteredText("-- Create New File -- ");
 				ImGui::NewLine();
 
 				ImGui::Indent(80);
@@ -627,15 +627,15 @@ namespace rdt::core {
 
 				if (m_template_selection_index < 0) {
 					textFlags |= ImGuiInputTextFlags_ReadOnly;
-					EditorLayout::InactiveTextBoxBegin();
+					Editor::InactiveTextBoxBegin();
 				}
 
-				if (ImGui::InputText("##Filename", m_template_name, 60, textFlags, EditorLayout::MyTextCallback, (void*)&m_template_name_edited)) {
+				if (ImGui::InputText("##Filename", m_template_name, 60, textFlags, Editor::MyTextCallback, (void*)&m_template_name_edited)) {
 					createRequested = true;
 				}
 
 				if (m_template_selection_index < 0) {
-					EditorLayout::InactiveTextBoxEnd();
+					Editor::InactiveTextBoxEnd();
 				}
 
 				bool validName = false;
@@ -656,11 +656,11 @@ namespace rdt::core {
 
 				ImGui::SetCursorPosY(500);
 
-				if (!validName) { EditorLayout::InactiveButtonBegin(); }
+				if (!validName) { Editor::InactiveButtonBegin(); }
 				if (ImGui::Button("Create File") && validName) {
 					createRequested = true;
 				}
-				if (!validName) { EditorLayout::InactiveButtonEnd(); }
+				if (!validName) { Editor::InactiveButtonEnd(); }
 
 				ImGui::Unindent(160);
 				ImGui::PopFont();
@@ -690,18 +690,18 @@ namespace rdt::core {
 			windowConfig |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize;
 
 			if (ImGui::Begin("##Entity Wizard", &m_entityWizardLaunched, windowConfig)) {
-				ImGui::PushFont(EditorLayout::m_fonts[NunitoSans][36]);
-				EditorLayout::AddCenteredText("Entity Wizard");
+				ImGui::PushFont(Editor::m_fonts[NunitoSans][36]);
+				Editor::AddCenteredText("Entity Wizard");
 				ImGui::PopFont();
-				ImGui::PushFont(EditorLayout::m_fonts[NunitoSans][24]);
-				EditorLayout::AddCenteredText("-- Create Entity Definition -- ");
+				ImGui::PushFont(Editor::m_fonts[NunitoSans][24]);
+				Editor::AddCenteredText("-- Create Entity Definition -- ");
 				ImGui::PopFont();
 
 				ImGui::NewLine();
 				ImGuiInputTextFlags textFlags;
 				textFlags = ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackEdit;
 
-				if (ImGui::InputText("##Filename", m_entity_name, 60, textFlags, EditorLayout::MyTextCallback, (void*)&m_template_name_edited)) {
+				if (ImGui::InputText("##Filename", m_entity_name, 60, textFlags, Editor::MyTextCallback, (void*)&m_template_name_edited)) {
 				}
 			}
 
@@ -769,7 +769,7 @@ namespace rdt::core {
 
 	void Panel::Render()
 	{
-		ApplyGuiConfig();
+		Editor::ApplyGuiConfig(m_config);
 		m_impl->OnRender();
 	}
 
@@ -788,21 +788,7 @@ namespace rdt::core {
 		return m_type;
 	}
 
-	void Panel::ApplyGuiConfig()
-	{
-		if (m_config.update) {
-			ImGui::SetNextWindowSize(ImVec2(m_config.width, m_config.height), ImGuiCond_Always);
-			ImGui::SetNextWindowPos(ImVec2(m_config.xPos, m_config.yPos), ImGuiCond_Always);
-			m_config.update = false;
-		}
-		else {
-			ImGui::SetNextWindowSize(ImVec2(m_config.width, m_config.height), ImGuiCond_Appearing);
-			ImGui::SetNextWindowPos(ImVec2(m_config.xPos, m_config.yPos), ImGuiCond_Appearing);
-		}
-	}
-	
 	// ==============================================================================
-
 	struct Container::Impl {
 		std::vector<Panel*> m_panels;
 
@@ -847,7 +833,62 @@ namespace rdt::core {
 
 			m_panels.erase(m_panels.begin() + index);
 		}
+
+		const static ImGuiWindowFlags ContainerWindowFlags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove
+			| ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoScrollbar
+			| ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar;
 	};
+	// ==============================================================================
+	struct FillContainerImpl : public Container::Impl {
+		std::string name = "##" + std::string(typeid(this).name());
+
+		void OnRenderContainer() override final {
+
+			ImGui::Begin(name.c_str(), (bool*)0, ContainerWindowFlags);
+			ImGui::End();
+		}
+	};
+	// ==============================================================================
+	struct DockLeftContainerImpl : public Container::Impl {
+		std::string name = "##" + std::string(typeid(this).name());
+
+		void OnRenderContainer() override final {
+
+			ImGui::Begin(name.c_str(), (bool*)0, ContainerWindowFlags);
+			ImGui::End();
+		}
+	};
+	// ==============================================================================
+	struct DockTopContainerImpl : public Container::Impl {
+		std::string name = "##" + std::string(typeid(this).name());
+
+		void OnRenderContainer() override final {
+
+			ImGui::Begin(name.c_str(), (bool*)0, ContainerWindowFlags);
+			ImGui::End();
+		}
+	};
+	// ==============================================================================
+	struct DockBottomContainerImpl : public Container::Impl {
+		std::string name = "##" + std::string(typeid(this).name());
+
+		void OnRenderContainer() override final {
+
+			ImGui::Begin(name.c_str(), (bool*)0, ContainerWindowFlags);
+			ImGui::End();
+		}
+	};
+	// ==============================================================================
+	struct DockRightContainerImpl : public Container::Impl {
+		std::string name = "##" + std::string(typeid(this).name());
+
+		void OnRenderContainer() override final {
+
+			ImGui::Begin(name.c_str(), (bool*)0, ContainerWindowFlags);
+			ImGui::End();
+		}
+	};
+	// ==============================================================================
 
 	Container::Container(ContainerType type)
 	{
@@ -871,6 +912,21 @@ namespace rdt::core {
 		m_type = type;
 
 		switch (type) {
+		case ContainerType::DockFill:
+			m_impl = new FillContainerImpl;
+			break;
+		case ContainerType::DockLeft:
+			m_impl = new DockLeftContainerImpl;
+			break;
+		case ContainerType::DockTop:
+			m_impl = new DockTopContainerImpl;
+			break;
+		case ContainerType::DockBottom:
+			m_impl = new DockBottomContainerImpl;
+			break;
+		case ContainerType::DockRight:
+			m_impl = new DockRightContainerImpl;
+			break;
 		default:
 			m_impl = new Container::Impl;
 			break;
@@ -884,6 +940,7 @@ namespace rdt::core {
 
 	void Container::RenderContainer()
 	{
+		Editor::ApplyGuiConfig(m_config);
 		m_impl->OnRenderContainer();
 	}
 
@@ -897,9 +954,12 @@ namespace rdt::core {
 		m_impl->OnRemovePanel(type);
 	}
 
-	// ==============================================================================
-	
+	PanelConfig& Container::GetConfig()
+	{
+		return m_config;
+	}
 
+	// ==============================================================================
 
 	/*
 		Docking Layout Defualts
@@ -916,12 +976,23 @@ namespace rdt::core {
 		SetCurrentWorkspace(CommonWorkspaces::Default);
 
 		RegisterContainer(ContainerType::DockFill);
+		auto& fillConfig = GetHead()->container.GetConfig();
+		fillConfig.xPos = 0;
+		fillConfig.yPos = 0;
+		fillConfig.width = Renderer::GetWindowWidth();
+		fillConfig.height = Renderer::GetWindowHeight();
 	}
 
 	PanelManager::~PanelManager()
 	{
 		for (auto& [type, panel] : m_panels) {
 			delete panel;
+		}
+
+		for (auto& [id, workspace] : m_workspaces) {
+			for (auto& [type, container] : workspace) {
+				delete container;
+			}
 		}
 	}
 
@@ -948,16 +1019,15 @@ namespace rdt::core {
 		}
 
 		// Add panel to container
-		GetCurrentWorkspace().at(container).container.AddToContainer(m_panels.at(panel));
+		GetCurrentWorkspace().at(container)->container.AddToContainer(m_panels.at(panel));
 		m_panel_locations.at(panel) = container;
 	}
 
 	void PanelManager::RemoveFromContainer(PanelType panel)
 	{
-		GetCurrentWorkspace().at(m_panel_locations.at(panel)).container.RemoveFromContainer(panel);
+		GetCurrentWorkspace().at(m_panel_locations.at(panel))->container.RemoveFromContainer(panel);
 		m_panel_locations.at(panel) = ContainerType::NotActive;
 	}
-
 
 	void PanelManager::SetCurrentWorkspace(int workspaceID)
 	{
@@ -977,13 +1047,117 @@ namespace rdt::core {
 	void PanelManager::RegisterContainer(ContainerType type)
 	{
 		auto& workspace = GetCurrentWorkspace();
-		if (workspace.find(type) == workspace.end()) {
+		if (ContainerExists(type)) {
 			RDT_CORE_ERROR("PanelManager - Tried to register duplicate container type: {}", type);
 			return;
 		}
 		
-		workspace[type];
-		workspace.at(type).SetContainerType(type);
+		workspace[type] = new ContainerNode;
+		workspace.at(type)->SetContainerType(type);
+
+		if (type == ContainerType::DockFill) {
+			return;
+		}
+
+		auto& nConfig = GetContainerConfig(type);
+		if (type == ContainerType::DockLeft) {
+			nConfig.xPos = 0;
+			nConfig.yPos = 0;
+			nConfig.width = Renderer::GetWindowWidth() * 0.225f;
+			nConfig.height = Renderer::GetWindowHeight();
+			float dw = nConfig.width + PanelMargin;
+
+			if (ContainerExists(ContainerType::DockFill)) {
+				auto& oConfig = GetContainerConfig(ContainerType::DockFill);
+				oConfig.xPos += dw;
+				oConfig.width -= dw;
+				oConfig.update = true;
+			}
+
+			if (ContainerExists(ContainerType::DockTop)) {
+				auto& oConfig = GetContainerConfig(ContainerType::DockTop);
+				oConfig.xPos += dw;
+				oConfig.width -= dw;
+				oConfig.update = true;
+			}
+
+			if (ContainerExists(ContainerType::DockBottom)) {
+				auto& oConfig = GetContainerConfig(ContainerType::DockBottom);
+				oConfig.xPos += dw;
+				oConfig.width -= dw;
+				oConfig.update = true;
+			}
+
+			return;
+		}
+
+		if (type == ContainerType::DockTop) {
+
+			nConfig.xPos = 0;
+			nConfig.yPos = 0;
+
+			nConfig.height = Renderer::GetWindowHeight() * 0.10f;
+			float dh = nConfig.height + PanelMargin;
+			
+			if (ContainerExists(ContainerType::DockFill)) {
+				auto& oConfig = GetContainerConfig(ContainerType::DockFill);
+				
+				nConfig.width = oConfig.width;
+				nConfig.xPos = oConfig.xPos;
+
+				oConfig.yPos += dh;
+				oConfig.height -= dh;
+			}
+
+			return;
+		}
+
+		if (type == ContainerType::DockBottom) {
+
+			nConfig.xPos = 0;
+			nConfig.yPos = 0;
+
+			nConfig.height = Renderer::GetWindowHeight() * 0.25f;
+			float dh = nConfig.height + PanelMargin;
+
+			if (ContainerExists(ContainerType::DockFill)) {
+				auto& oConfig = GetContainerConfig(ContainerType::DockFill);
+				
+				nConfig.width = oConfig.width;
+				nConfig.xPos = oConfig.xPos;
+
+				oConfig.height -= dh;
+				nConfig.yPos = oConfig.yPos + oConfig.height + PanelMargin;
+			}
+
+			return;
+		}
+
+		if (type == ContainerType::DockRight) {
+			nConfig.xPos = 0;
+			nConfig.yPos = 0;
+			nConfig.width = Renderer::GetWindowWidth() * 0.225f;
+			nConfig.height = Renderer::GetWindowHeight();
+
+			float dw = nConfig.width + PanelMargin;
+
+			if (ContainerExists(ContainerType::DockFill)) {
+				auto& oConfig = GetContainerConfig(ContainerType::DockFill);
+
+				oConfig.width -= dw;
+				nConfig.xPos = oConfig.xPos + oConfig.width + PanelMargin;
+			}
+
+			if (ContainerExists(ContainerType::DockTop)) {
+				auto& oConfig = GetContainerConfig(ContainerType::DockTop);
+				oConfig.width -= dw;
+			}
+
+			if (ContainerExists(ContainerType::DockBottom)) {
+				auto& oConfig = GetContainerConfig(ContainerType::DockBottom);
+				oConfig.width -= dw;
+			}
+		}
 	}
 
 	const std::unordered_map<PanelType, void*>& PanelManager::GetMessages()
@@ -1000,9 +1174,44 @@ namespace rdt::core {
 		return GetCurrentWorkspace().find(type) != GetCurrentWorkspace().end();
 	}
 
-	ContainerNode& PanelManager::GetHead()
+	PanelConfig& PanelManager::GetContainerConfig(ContainerType type)
+	{
+		return GetCurrentWorkspace().at(type)->container.GetConfig();
+	}
+
+	ContainerNode* PanelManager::GetHead()
 	{
 		return GetCurrentWorkspace().at(DockFill);
+	}
+
+	ContainerType PanelManager::GetNextExpected(ContainerType current, ContainerType target, TreeDirection& next)
+	{
+		switch (current) {
+		case ContainerType::DockFill:
+			switch (target) {
+			case ContainerType::DockLeft:
+				next = TreeDirection::TD_LEFT;
+				return ContainerType::DockLeft;
+			case ContainerType::DockTop:
+				next = TreeDirection::TD_UP;
+				return ContainerType::DockTop;
+			case ContainerType::DockRight:
+				next = TreeDirection::TD_RIGHT;
+				return ContainerType::DockRight;
+			case ContainerType::DockBottom:
+				next = TreeDirection::TD_DOWN;
+				return ContainerType::DockBottom;
+			default:
+				next = TreeDirection::TD_NOMOVEMENT;
+				return ContainerType::NotActive;
+			}
+			break;
+		default:
+			next = TreeDirection::TD_NOMOVEMENT;
+			break;
+		}
+
+		return ContainerType::NotActive;
 	}
 
 	void PanelManager::RenderMDI()
@@ -1010,7 +1219,7 @@ namespace rdt::core {
 		auto& workspace = GetCurrentWorkspace();
 
 		for (auto& [container, node] : workspace) {
-			node.container.RenderContainer();
+			node->container.RenderContainer();
 		}
 	}
 
@@ -1020,17 +1229,16 @@ namespace rdt::core {
 	*/
 
 	// Static Variables
-	std::string EditorLayout::sourcePath = "";
-	std::string EditorLayout::templatePath = "";
-	Scene* EditorLayout::m_scene = nullptr;
-	std::unordered_map<EditorFont, std::unordered_map<unsigned int, ImFont*>> EditorLayout::m_fonts;
-	GameRenderWindow* EditorLayout::m_gameWindow = nullptr;
-	int EditorLayout::m_gameWindowId = -1;
+	std::string Editor::sourcePath = "";
+	std::string Editor::templatePath = "";
+	Scene* Editor::m_scene = nullptr;
+	std::unordered_map<EditorFont, std::unordered_map<unsigned int, ImFont*>> Editor::m_fonts;
+	GameRenderWindow* Editor::m_gameWindow = nullptr;
+	int Editor::m_gameWindowId = -1;
 
 	/*
 		Panel Layout Macros
 	*/
-	constexpr int PanelMargin = 10;
 
 	constexpr float DiagnosticGuiWidth = 300.0f;
 	constexpr float DiagnosticGuiHeight = 105.0f;
@@ -1043,7 +1251,8 @@ namespace rdt::core {
 
 	constexpr float GameWindowSettingsPanelWidth = 250.0f;
 
-	EditorLayout::EditorLayout()
+	Editor::Editor()
+		: m_config(nullptr)
 	{
 		m_showTools = true;
 		
@@ -1058,7 +1267,12 @@ namespace rdt::core {
 
 		ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
 
-		m_panel_manager.RegisterPanel(MenuBar);
+		m_panel_manager.RegisterContainer(ContainerType::DockTop);
+		m_panel_manager.RegisterContainer(ContainerType::DockLeft);
+		m_panel_manager.RegisterContainer(ContainerType::DockBottom);
+		m_panel_manager.RegisterContainer(ContainerType::DockRight);
+
+		/*m_panel_manager.RegisterPanel(MenuBar);
 		m_panel_manager.RegisterPanel(DiagnosticsPanel);
 		m_panel_manager.RegisterPanel(ScenePanel);
 		m_panel_manager.RegisterPanel(ConsolePanel);
@@ -1070,17 +1284,17 @@ namespace rdt::core {
 		m_panel_manager.AssignToContainer(ScenePanel, ContainerType::DockRight);
 		m_panel_manager.AssignToContainer(ConsolePanel, ContainerType::DockBottom);
 		m_panel_manager.AssignToContainer(GameWindowPanel, ContainerType::DockFill);
-		m_panel_manager.AssignToContainer(GameWindowSettingsPanel, ContainerType::DockTop);
+		m_panel_manager.AssignToContainer(GameWindowSettingsPanel, ContainerType::DockTop);*/
 	}
 
-	EditorLayout::~EditorLayout()
+	Editor::~Editor()
 	{
 	}
-	void EditorLayout::OnMessage(Message msg)
+	void Editor::OnMessage(Message msg)
 	{
 	}
 
-	void EditorLayout::OnUpdate(const float deltaTime)
+	void Editor::OnUpdate(const float deltaTime)
 	{
 		auto broadcast = MessageBus::GetBroadcast("SceneManager");
 		if (broadcast == nullptr) {
@@ -1102,7 +1316,7 @@ namespace rdt::core {
 		}
 	}
 
-	void EditorLayout::OnRender()
+	void Editor::OnRender()
 	{
 		if (!m_showTools) {
 			return;
@@ -1115,7 +1329,7 @@ namespace rdt::core {
 		bool isFullscreen = Renderer::UsingDefaultViewport();
 	}
 
-	void EditorLayout::SetTheme(EditorTheme nTheme)
+	void Editor::SetTheme(EditorTheme nTheme)
 	{
 		ImGuiStyle& style = ImGui::GetStyle();
 		switch (nTheme) {
@@ -1219,7 +1433,7 @@ namespace rdt::core {
 		}
 	}
 
-	void EditorLayout::SetSourcePath(const std::string& path)
+	void Editor::SetSourcePath(const std::string& path)
 	{
 		if (Utils::PathExists(path)) {
 			sourcePath = path;
@@ -1229,7 +1443,7 @@ namespace rdt::core {
 		}
 	}
 
-	void EditorLayout::InitResources(std::string& resourcePath)
+	void Editor::InitResources(std::string& resourcePath)
 	{
 		fs::path fontFolder = fs::path(resourcePath) / fs::path("fonts");
 		std::string ttfFile;
@@ -1255,12 +1469,12 @@ namespace rdt::core {
 
 	}
 
-	void EditorLayout::AddConfigPtr(ConfigReader* ptr)
+	void Editor::AddConfigPtr(ConfigReader* ptr)
 	{
 		m_config = ptr;
 	}
 
-	void EditorLayout::ProcessMessages()
+	void Editor::ProcessMessages()
 	{
 		for (auto& [panelType, message] : m_panel_manager.GetMessages()) {
 
@@ -1276,7 +1490,7 @@ namespace rdt::core {
 		}
 	}
 
-	void EditorLayout::OnMenuBarMessage(MenuBarData* data)
+	void Editor::OnMenuBarMessage(MenuBarData* data)
 	{
 		if (data->changeThemeRequest != ET_NAT) {
 			SetTheme(data->changeThemeRequest);
@@ -1287,11 +1501,11 @@ namespace rdt::core {
 		}
 	}
 
-	void EditorLayout::OpenPanel(PanelType panel)
+	void Editor::OpenPanel(PanelType panel)
 	{
 	}
 
-	void EditorLayout::ApplyConfig()
+	void Editor::ApplyConfig()
 	{
 		if (m_config == nullptr) {
 			return;
@@ -1310,7 +1524,7 @@ namespace rdt::core {
 		}
 	}
 
-	void EditorLayout::OnFirstRender()
+	void Editor::OnFirstRender()
 	{
 		/*ImGui::PushFont(m_fonts[ForkAwesome][18]);
 		m_game_window_settings_panel.width = GameWindowSettingsPanelWidth;
@@ -1345,7 +1559,7 @@ namespace rdt::core {
 		m_console_panel.yPos = ((float)m_game_window_panel->GetLastPosition().y) + m_game_window_panel->GetGuiDimensions().y + PanelMargin;*/
 	}
 
-	void EditorLayout::AddFont(EditorFont name, std::string& ttfFile, const std::vector<unsigned int>& sizes)
+	void Editor::AddFont(EditorFont name, std::string& ttfFile, const std::vector<unsigned int>& sizes)
 	{
 		if (Utils::PathExists(ttfFile)) {
 			GuiManager::LoadFont(name, ttfFile);
@@ -1360,12 +1574,12 @@ namespace rdt::core {
 		}
 	}
 
-	void EditorLayout::SetScenePtr(Scene* ptr)
+	void Editor::SetScenePtr(Scene* ptr)
 	{
 		m_scene = ptr;
 	}
 
-	void EditorLayout::AddCenteredText(const std::string& text)
+	void Editor::AddCenteredText(const std::string& text)
 	{
 		ImVec2 size = ImGui::CalcTextSize(text.c_str());
 
@@ -1374,7 +1588,7 @@ namespace rdt::core {
 		ImGui::Text(text.c_str());
 	}
 
-	void EditorLayout::InactiveButtonBegin()
+	void Editor::InactiveButtonBegin()
 	{
 		ImGuiStyle& style = ImGui::GetStyle();
 		ImVec4 color;
@@ -1390,7 +1604,7 @@ namespace rdt::core {
 		ImGui::PushStyleColor(ImGuiCol_Text, color);
 	}
 
-	void EditorLayout::InactiveButtonEnd()
+	void Editor::InactiveButtonEnd()
 	{
 		ImGui::PopStyleColor();
 		ImGui::PopStyleColor();
@@ -1398,7 +1612,7 @@ namespace rdt::core {
 		ImGui::PopStyleColor();
 	}
 
-	void EditorLayout::InactiveTextBoxBegin()
+	void Editor::InactiveTextBoxBegin()
 	{
 		ImGuiStyle& style = ImGui::GetStyle();
 		ImVec4 color;
@@ -1409,25 +1623,25 @@ namespace rdt::core {
 		ImGui::BeginDisabled();
 	}
 
-	void EditorLayout::InactiveTextBoxEnd()
+	void Editor::InactiveTextBoxEnd()
 	{
 		ImGui::PopStyleColor();
 		ImGui::EndDisabled();
 	}
 
-	float EditorLayout::GetButtonWidth(const char* label)
+	float Editor::GetButtonWidth(const char* label)
 	{
 		ImGuiStyle& style = ImGui::GetStyle();
 		return ImGui::CalcTextSize(label).x + (style.FramePadding.x * 2);
 	}
 
-	float EditorLayout::GetButtonHeight(const char* label)
+	float Editor::GetButtonHeight(const char* label)
 	{
 		ImGuiStyle& style = ImGui::GetStyle();
 		return ImGui::CalcTextSize(label).y + (style.FramePadding.y * 2);
 	}
 
-	int EditorLayout::MyTextCallback(ImGuiInputTextCallbackData* data)
+	int Editor::MyTextCallback(ImGuiInputTextCallbackData* data)
 	{
 		if (data->EventFlag == ImGuiInputTextFlags_CallbackEdit)
 		{
@@ -1436,5 +1650,18 @@ namespace rdt::core {
 		}
 
 		return 0;
+	}
+	
+	void Editor::ApplyGuiConfig(PanelConfig& config)
+	{
+		if (config.update) {
+			ImGui::SetNextWindowSize(ImVec2(config.width, config.height), ImGuiCond_Always);
+			ImGui::SetNextWindowPos(ImVec2(config.xPos, config.yPos), ImGuiCond_Always);
+			config.update = false;
+		}
+		else {
+			ImGui::SetNextWindowSize(ImVec2(config.width, config.height), ImGuiCond_Appearing);
+			ImGui::SetNextWindowPos(ImVec2(config.xPos, config.yPos), ImGuiCond_Appearing);
+		}
 	}
 }
