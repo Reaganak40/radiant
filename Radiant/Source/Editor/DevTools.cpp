@@ -248,6 +248,11 @@ namespace rdt::core {
 					ImGui::EndMenu();
 				}
 
+				if (ImGui::BeginMenu("View")) {
+
+					ImGui::EndMenu();
+				}
+
 				if (ImGui::BeginMenu("Themes")) {
 
 					if (ImGui::MenuItem("Codz")) {
@@ -1378,9 +1383,7 @@ namespace rdt::core {
 			return;
 		}
 
-		ImGui::PushFont(m_fonts[NunitoSans][18]);
 		m_panel_manager.RenderMDI();
-		ImGui::PopFont();
 
 		bool isFullscreen = Renderer::UsingDefaultViewport();
 	}
@@ -1504,7 +1507,11 @@ namespace rdt::core {
 		fs::path fontFolder = fs::path(resourcePath) / fs::path("fonts");
 		std::string ttfFile;
 		
+		// Set the default font
 		ttfFile = (fontFolder / fs::path("NunitoSans_7pt_Condensed-Medium.ttf")).generic_string();
+		GuiManager::LoadFont(NunitoSans, ttfFile);
+		GuiManager::SetDefaultFont(NunitoSans, 18);
+
 		AddFont(NunitoSans, ttfFile, std::vector<unsigned int>{18, 24, 36});
 
 		// Load Icons from ForkAwesome
@@ -1618,7 +1625,10 @@ namespace rdt::core {
 	void Editor::AddFont(EditorFont name, std::string& ttfFile, const std::vector<unsigned int>& sizes)
 	{
 		if (Utils::PathExists(ttfFile)) {
-			GuiManager::LoadFont(name, ttfFile);
+			
+			if (!GuiManager::FontExists(name)) {
+				GuiManager::LoadFont(name, ttfFile);
+			}
 
 			for (auto size : sizes) {
 				m_fonts[name][size] = GuiManager::GetFont(name, size);

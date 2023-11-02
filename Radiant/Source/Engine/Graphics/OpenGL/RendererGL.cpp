@@ -731,6 +731,9 @@ namespace rdt::core {
     void RendererGL::StartImGuiFrame()
     {
         if (m_GUIs.size() > 0 && !m_imgui_newFrameCalled) {
+
+            GuiManager::BeforeGuiNewFrame();
+
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
