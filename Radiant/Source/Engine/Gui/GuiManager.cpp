@@ -12,6 +12,7 @@ namespace rdt::core {
 		LoadFontImpl(GUI_DEFAULT_FONT, "");
 		ImGuiIO& io = ImGui::GetIO();
 		m_fonts.at(GUI_DEFAULT_FONT).font_ptrs[GUI_DEFAULT_FONT_SIZE] = io.Fonts->AddFontDefault();
+		callDockOverViewport = false;
 	}
 
 	GuiManager::~GuiManager()
@@ -38,6 +39,18 @@ namespace rdt::core {
 		if (m_instance != nullptr) {
 			delete m_instance;
 			m_instance = nullptr;
+		}
+	}
+
+	void GuiManager::EnableDockOverViewport(bool enable)
+	{
+		m_instance->callDockOverViewport = enable;
+	}
+
+	void GuiManager::OnGuiNewFrame()
+	{
+		if (m_instance->callDockOverViewport) {
+			ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 		}
 	}
 

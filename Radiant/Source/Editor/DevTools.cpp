@@ -125,12 +125,12 @@ namespace rdt::core {
 		ImGui::PushFont(GuiManager::GetFont(NunitoSans, 18));
 
 		// First render config
-		ImGui::SetNextWindowSize(ImVec2(m_gui_width, m_gui_height), ImGuiCond_Appearing);
+		//ImGui::SetNextWindowSize(ImVec2(m_gui_width, m_gui_height), ImGuiCond_Appearing);
 		
-		if (update_pos) {
+		/*if (update_pos) {
 			ImGui::SetNextWindowPos(ImVec2((float)m_gui_pos.x, (float)m_gui_pos.y), ImGuiCond_Always);
 			update_pos = false;
-		}
+		}*/
 		
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(1.0f, 1.0f));
@@ -164,6 +164,22 @@ namespace rdt::core {
 		PopUpWIndow Implementation
 	*/
 
+	namespace PanelDefaults {
+		constexpr float DiagnosticGuiWidth = 300.0f;
+		constexpr float DiagnosticGuiHeight = 105.0f;
+
+		constexpr float ScenePanelGuiWidth = 300.0f;
+		constexpr float ScenePanelGuiHeight = 400.0f;
+
+		constexpr float ConsolePanelWidth = GameWindowPanelGuiWidth;
+		constexpr float ConsolePanelHeight = 300.0f;
+
+		constexpr float TemplateWizardGuiWidth = 500.0f;
+		constexpr float TemplateWizardGuiHeight = 575.0f;
+
+		constexpr float GameWindowSettingsPanelWidth = 250.0f;
+	}
+
 	struct Panel::Impl {
 
 		/*
@@ -175,6 +191,11 @@ namespace rdt::core {
 			Virtual function to get data from popup window.
 		*/
 		virtual void* OnGetData() { return nullptr; }
+
+		/*
+			Virtual function to set the config from the panel wrapper.
+		*/
+		virtual void ApplyConfigPreferences(PanelConfig& config) {}
 	};
 
 	// =========================================================
@@ -255,6 +276,15 @@ namespace rdt::core {
 	};
 	// =========================================================
 	struct DiagnosticsPanelImpl : public Panel::Impl {
+
+		void ApplyConfigPreferences(PanelConfig& config) override final {
+			config.width = PanelDefaults::DiagnosticGuiWidth;
+			config.height = PanelDefaults::DiagnosticGuiHeight;
+
+			config.xPos = 100;
+			config.yPos = 100;
+		}
+		
 		void OnRender() override final {
 			
 			// Start drawing window
@@ -273,8 +303,13 @@ namespace rdt::core {
 	// =========================================================
 	struct GameWindowPanelImpl : public Panel::Impl {
 
-		void OnRender() override final {
+		GameWindowPanelImpl()
+		{
+			Editor::m_gameWindow->SetShouldShow(true);
 
+			Editor::m_gameWindow->SetGuiPositionY(88);
+			Editor::m_gameWindow->SetGuiPositionX((Renderer::GetWindowWidth() / 2)
+				- (Editor::m_gameWindow->GetGuiDimensions().x / 2));
 		}
 	};
 	// =========================================================
@@ -383,6 +418,15 @@ namespace rdt::core {
 	// =========================================================
 	struct ScenePanelImpl : public Panel::Impl {
 
+		void ApplyConfigPreferences(PanelConfig& config) override final {
+			config.width = PanelDefaults::ScenePanelGuiWidth;
+			config.height = PanelDefaults::ScenePanelGuiHeight;
+
+			config.xPos = 500;
+			config.yPos = 100;
+		}
+
+
 		void AddGameObjectPanel(GameObject* gobject) {
 			std::string name = typeid(*gobject).name();
 			std::string panel_header = name.substr(6, name.size() - 6) + ": " + gobject->GetName();
@@ -439,12 +483,22 @@ namespace rdt::core {
 					}
 				}
 			}
+
+			ImGui::End();
 		}
 	};
 	// =========================================================
 	struct ConsolePanelImpl : public Panel::Impl {
 
 		std::string m_last_log = "";
+
+		void ApplyConfigPreferences(PanelConfig& config) override final {
+			config.width = PanelDefaults::ConsolePanelWidth;
+			config.height = PanelDefaults::ConsolePanelHeight;
+
+			config.xPos = 200;
+			config.yPos = 900;
+		}
 
 		void OnRender() override final {
 			ImGui::Begin("Console Panel");
@@ -765,6 +819,8 @@ namespace rdt::core {
 			m_impl = new Panel::Impl;
 			break;
 		}
+
+		m_impl->ApplyConfigPreferences(m_config);
 	}
 
 	void Panel::Render()
@@ -1218,8 +1274,8 @@ namespace rdt::core {
 	{
 		auto& workspace = GetCurrentWorkspace();
 
-		for (auto& [container, node] : workspace) {
-			node->container.RenderContainer();
+		for (auto& [type, panel] : m_panels) {
+			panel->Render();
 		}
 	}
 
@@ -1240,16 +1296,7 @@ namespace rdt::core {
 		Panel Layout Macros
 	*/
 
-	constexpr float DiagnosticGuiWidth = 300.0f;
-	constexpr float DiagnosticGuiHeight = 105.0f;
-
-	constexpr float ScenePanelGuiWidth = 300.0f;
-	constexpr float ScenePanelGuiHeight = 400.0f;
-
-	constexpr float TemplateWizardGuiWidth = 500.0f;
-	constexpr float TemplateWizardGuiHeight = 575.0f;
-
-	constexpr float GameWindowSettingsPanelWidth = 250.0f;
+	
 
 	Editor::Editor()
 		: m_config(nullptr)
@@ -1259,18 +1306,27 @@ namespace rdt::core {
 		RegisterToMessageBus("EditorLayout");
 		SetTheme(Theme_Codz);
 
+		ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
+		ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+		GuiManager::EnableDockOverViewport();
+
 		m_gameWindowId = Renderer::AddRenderWindow(m_gameWindow = new GameRenderWindow);
 		Renderer::SetDefaultViewport(false);
 		Input::SetTargetRenderWindow(m_gameWindowId);
 		m_gameWindow->SetGuiPositionY(88);
 		m_gameWindow->SetGuiPositionX((m_window_width / 2) - (m_gameWindow->GetGuiDimensions().x / 2));
 
-		ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
 
 		m_panel_manager.RegisterContainer(ContainerType::DockTop);
 		m_panel_manager.RegisterContainer(ContainerType::DockLeft);
 		m_panel_manager.RegisterContainer(ContainerType::DockBottom);
 		m_panel_manager.RegisterContainer(ContainerType::DockRight);
+		
+		m_panel_manager.RegisterPanel(MenuBar);
+		m_panel_manager.RegisterPanel(DiagnosticsPanel);
+		m_panel_manager.RegisterPanel(ScenePanel);
+		m_panel_manager.RegisterPanel(GameWindowPanel);
+		m_panel_manager.RegisterPanel(ConsolePanel);
 
 		/*m_panel_manager.RegisterPanel(MenuBar);
 		m_panel_manager.RegisterPanel(DiagnosticsPanel);
@@ -1660,8 +1716,8 @@ namespace rdt::core {
 			config.update = false;
 		}
 		else {
-			ImGui::SetNextWindowSize(ImVec2(config.width, config.height), ImGuiCond_Appearing);
-			ImGui::SetNextWindowPos(ImVec2(config.xPos, config.yPos), ImGuiCond_Appearing);
+			//ImGui::SetNextWindowSize(ImVec2(config.width, config.height), ImGuiCond_Appearing);
+			//ImGui::SetNextWindowPos(ImVec2(config.xPos, config.yPos), ImGuiCond_Appearing);
 		}
 	}
 }

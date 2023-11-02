@@ -22,6 +22,7 @@ namespace rdt::core {
 		};
 
 		std::unordered_map<int, FontCache> m_fonts;
+		bool callDockOverViewport;
 
 	public:
 		static GuiManager* GetInstance();
@@ -36,6 +37,17 @@ namespace rdt::core {
 		}
 
 		static ImFont* GetFont(const int magicWord, const unsigned int fontSize) { return m_instance->GetFontImpl(magicWord, fontSize); }
+	
+		/*
+			When set to true, calls ImGui::DockSpaceOverViewport at the start of each frame.
+		*/
+		static void EnableDockOverViewport(bool enable = true);
+
+		/*
+			Called by the renderer after ImGui::NewFrame
+		*/
+		static void OnGuiNewFrame();
+
 	private:
 		void LoadFontImpl(int magicWord, const std::string& filepath);
 		void LoadIconsImpl(int magicWord, const std::string& filepath, const ImWchar* iconRanges, float alignSizeOffset);

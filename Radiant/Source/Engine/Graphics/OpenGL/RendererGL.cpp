@@ -735,6 +735,7 @@ namespace rdt::core {
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
 
+            GuiManager::OnGuiNewFrame();
             m_imgui_newFrameCalled = true;
         }
     }
