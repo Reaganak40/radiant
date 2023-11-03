@@ -92,7 +92,7 @@ namespace rdt {
 
 		void SendDirectMessage(Message& msg)
 		{
-			if (m_messengers.find(msg.from) == m_messengers.end()) {
+			if (msg.from != FROM_ANONYMOUS && m_messengers.find(msg.from) == m_messengers.end()) {
 				return;
 			}
 

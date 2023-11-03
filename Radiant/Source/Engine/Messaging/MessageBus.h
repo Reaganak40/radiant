@@ -4,6 +4,7 @@
 #include "Messenger.h"
 #include "Broadcast.h"
 
+#define FROM_ANONYMOUS 0
 namespace rdt {
 
 	constexpr MessageID SoundMessengerID = 1;
@@ -93,12 +94,12 @@ namespace rdt {
 		/*
 			Sends a message directly to the receiver, calling its OnMessage immediately.
 		*/
-		static void SendDirectMessage(const std::string& from, const std::string& to, MessageType type, void* data);
+		static void SendDirectMessage(const std::string& from, const std::string& to, MessageType type, void* data = nullptr);
 
 		/*
 			Sends a message directly to the receiver, calling its OnMessage immediately.
 		*/
-		static void SendDirectMessage(const MessageID from, const MessageID to, MessageType type, void* data);
+		static void SendDirectMessage(const MessageID from, const MessageID to, MessageType type, void* data = nullptr);
 
 		static void AddToBroadcast(const MessageID broadcastID, MessageType type, void* data) { m_instance->AddToBroadcastImpl(broadcastID, type, data); }
 

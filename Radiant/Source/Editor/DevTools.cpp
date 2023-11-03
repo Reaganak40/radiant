@@ -171,6 +171,9 @@ namespace rdt::core {
 		constexpr float ScenePanelGuiWidth = 300.0f;
 		constexpr float ScenePanelGuiHeight = 400.0f;
 
+		constexpr float EntityHierarchyPanelGuiWidth = 300.0f;
+		constexpr float EntityHierarchyPanelGuiHeight = 400.0f;
+
 		constexpr float ConsolePanelWidth = GameWindowPanelGuiWidth;
 		constexpr float ConsolePanelHeight = 300.0f;
 
@@ -180,7 +183,16 @@ namespace rdt::core {
 		constexpr float GameWindowSettingsPanelWidth = 250.0f;
 	}
 
+	// =========================================================
+	using PanelID = int;
 	struct Panel::Impl {
+
+		PanelID mID = 0;
+		bool isOpen = false;
+		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_None;
+
+		std::string GetWindowLabel(const std::string& title) const { return title + "###" + typeid(*this).name(); }
+		bool Panel_ImGuiBegin(const std::string& title) { return ImGui::Begin(GetWindowLabel(title).c_str(), &isOpen, windowFlags); }
 
 		/*
 			Virtual function to render ImGui Window
@@ -196,31 +208,38 @@ namespace rdt::core {
 			Virtual function to set the config from the panel wrapper.
 		*/
 		virtual void ApplyConfigPreferences(PanelConfig& config) {}
+
+		void OpenWindow() { isOpen = true; }
+		void CloseWindow() { isOpen = false; }
 	};
-
 	// =========================================================
-	struct MenuBarData {
-		PanelType openPanelRequest;
-		EditorTheme changeThemeRequest;
+	struct OpenPanelRequestData
+	{
+		PanelType panelToOpen;
 
-		MenuBarData() { Reset(); }
+		OpenPanelRequestData(PanelType panel)
+			: panelToOpen(panel) {}
+	};
+	struct ChangeThemeRequestData
+	{
+		EditorTheme theme;
 
-		void Reset() {
-			openPanelRequest = PT_NAP;
-			changeThemeRequest = ET_NAT;
-		}
+		ChangeThemeRequestData(EditorTheme nTheme)
+			: theme(nTheme) {}
 	};
 	struct MenuBarImpl : public Panel::Impl {
 
-		MenuBarData m_data;
-		bool m_request_made;
+		void CallOpenPanel(PanelType panel) {
+			MessageBus::SendDirectMessage(FROM_ANONYMOUS, MessageBus::GetMessageID("Editor"), CM_OpenPanelRequest,
+				new OpenPanelRequestData(panel));
+		}
+
+		void CallChangeTheme(EditorTheme nTheme) {
+			MessageBus::SendDirectMessage(FROM_ANONYMOUS, MessageBus::GetMessageID("Editor"), CM_ChangeSceneRequest,
+				new ChangeThemeRequestData(nTheme));
+		}
 
 		void OnRender() override final {
-
-			if (m_request_made) {
-				m_data.Reset();
-				m_request_made = false;
-			}
 
 			if (ImGui::BeginMainMenuBar()) {
 
@@ -238,17 +257,27 @@ namespace rdt::core {
 
 				if (ImGui::BeginMenu("Tools")) {
 					if (ImGui::MenuItem("Template Wizard")) {
-						m_data.openPanelRequest = TemplateWizard;
-						m_request_made = true;
+						CallOpenPanel(TemplateWizard);
 					}
 					if (ImGui::MenuItem("Add Entity Definition")) {
-						m_data.openPanelRequest = EntityWizard;
-						m_request_made = true;
 					}
 					ImGui::EndMenu();
 				}
 
 				if (ImGui::BeginMenu("View")) {
+
+					if (ImGui::MenuItem("Scene Hierarchy Panel")) {
+						CallOpenPanel(ScenePanel);
+					}
+					if (ImGui::MenuItem("Entity Hierarchy Panel")) {
+						CallOpenPanel(EntityHierarchyPanel);
+					}
+					if (ImGui::MenuItem("Diagnostics Panel")) {
+						CallOpenPanel(DiagnosticsPanel);
+					}
+					if (ImGui::MenuItem("Console Window")) {
+						CallOpenPanel(ConsolePanel);
+					}
 
 					ImGui::EndMenu();
 				}
@@ -256,12 +285,10 @@ namespace rdt::core {
 				if (ImGui::BeginMenu("Themes")) {
 
 					if (ImGui::MenuItem("Codz")) {
-						m_data.changeThemeRequest = Theme_Codz;
-						m_request_made = true;
+						CallChangeTheme(Theme_Codz);
 					}
 					if (ImGui::MenuItem("Nightingale")) {
-						m_data.changeThemeRequest = Nightingale;
-						m_request_made = true;
+						CallChangeTheme(Nightingale);
 					}
 
 					ImGui::EndMenu();
@@ -269,14 +296,6 @@ namespace rdt::core {
 
 				ImGui::EndMainMenuBar();
 			}
-		}
-
-		void* OnGetData() {
-			if (m_request_made) {
-				return &m_data;
-			}
-
-			return nullptr;
 		}
 	};
 	// =========================================================
@@ -292,16 +311,14 @@ namespace rdt::core {
 		
 		void OnRender() override final {
 			
-			// Start drawing window
-			ImGui::Begin("Diagnostic Tools");
-
-			// Show framerate
-			Vec2d screenCoords = Input::GetMouseCoords(MouseCond::SCREEN_COORDS);
-			Vec2d worldCoords = Input::GetMouseCoords(MouseCond::WORLD_COORDS);
-			ImGui::Text("Mouse screen-coordinates: (%.2f %2.f)", screenCoords.x, screenCoords.y);
-			ImGui::Text("Mouse world-coordinates: (%.2f %2.f)", worldCoords.x, worldCoords.y);
-			ImGui::Text("Performance: %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-
+			if (Panel_ImGuiBegin("Diagnostic Tools")) {
+				// Show framerate
+				Vec2d screenCoords = Input::GetMouseCoords(MouseCond::SCREEN_COORDS);
+				Vec2d worldCoords = Input::GetMouseCoords(MouseCond::WORLD_COORDS);
+				ImGui::Text("Mouse screen-coordinates: (%.2f %2.f)", screenCoords.x, screenCoords.y);
+				ImGui::Text("Mouse world-coordinates: (%.2f %2.f)", worldCoords.x, worldCoords.y);
+				ImGui::Text("Performance: %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			}
 			ImGui::End();
 		}
 	};
@@ -310,11 +327,17 @@ namespace rdt::core {
 
 		GameWindowPanelImpl()
 		{
-			Editor::m_gameWindow->SetShouldShow(true);
+			Editor::m_gameWindow->SetShouldShow(isOpen);
 
 			Editor::m_gameWindow->SetGuiPositionY(88);
 			Editor::m_gameWindow->SetGuiPositionX((Renderer::GetWindowWidth() / 2)
 				- (Editor::m_gameWindow->GetGuiDimensions().x / 2));
+		}
+
+		void OnRender() override final {
+			if (!Editor::m_gameWindow->ShouldShow()) {
+				Editor::m_gameWindow->SetShouldShow(true);
+			}
 		}
 	};
 	// =========================================================
@@ -431,7 +454,6 @@ namespace rdt::core {
 			config.yPos = 100;
 		}
 
-
 		void AddGameObjectPanel(GameObject* gobject) {
 			std::string name = typeid(*gobject).name();
 			std::string panel_header = name.substr(6, name.size() - 6) + ": " + gobject->GetName();
@@ -473,8 +495,8 @@ namespace rdt::core {
 			}
 		}
 		void OnRender() override final {
-			if (ImGui::Begin("Scene Panel")) {
 
+			if (Panel_ImGuiBegin("Scene Hierarchy")) {
 				if (Editor::m_scene == nullptr) {
 					ImGui::Text("No Scene Selected!");
 				}
@@ -493,6 +515,23 @@ namespace rdt::core {
 		}
 	};
 	// =========================================================
+	struct EntityHierarchyPanelImpl : public Panel::Impl {
+
+		void ApplyConfigPreferences(PanelConfig& config) override final {
+			config.width = PanelDefaults::EntityHierarchyPanelGuiWidth;
+			config.height = PanelDefaults::EntityHierarchyPanelGuiHeight;
+
+			config.xPos = 200;
+			config.yPos = 900;
+		}
+		void OnRender() override final {
+			if (Panel_ImGuiBegin("Entity Hierarchy")) {
+
+			}
+			ImGui::End();
+		}
+	};
+	// =========================================================
 	struct ConsolePanelImpl : public Panel::Impl {
 
 		std::string m_last_log = "";
@@ -506,34 +545,53 @@ namespace rdt::core {
 		}
 
 		void OnRender() override final {
-			ImGui::Begin("Console Panel");
 
-			int index = (int)Log::GetLogCount() - 1;
-			std::string log;
-			Color logColor;
-			while (index >= 0) {
-				Log::GetLog(index--, log, logColor);
+			ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.1f, 0.1f, 0.1f, 1.0f });
 
-				ImGui::PushStyleColor(ImGuiCol_Text, logColor.GetImGuiColor());
-				ImGui::Text("%s", log.c_str());
-				ImGui::PopStyleColor();
+			if (Panel_ImGuiBegin("Console Window")) {
+
+				int index = (int)Log::GetLogCount() - 1;
+				std::string log;
+				Color logColor;
+				while (index >= 0) {
+					Log::GetLog(index--, log, logColor);
+
+					ImGui::PushStyleColor(ImGuiCol_Text, logColor.GetImGuiColor());
+					ImGui::Text("%s", log.c_str());
+					ImGui::PopStyleColor();
+				}
+
+				if (m_last_log != log) {
+					ImGui::SetScrollHereY(0.999f);
+					m_last_log = log;
+				}
 			}
-
-			if (m_last_log != log) {
-				ImGui::SetScrollHereY(0.999f);
-				m_last_log = log;
-			}
-
 			ImGui::End();
+			ImGui::PopStyleColor();
 		}
 	};
 	// =========================================================
 	struct TemplateWizardImpl : public Panel::Impl {
 
-		bool m_templateWizardLaunched = false;
-		int m_template_selection_index;
+		int m_template_selection_index = -1;
 		char m_template_name[60];
-		bool m_template_name_edited;
+		bool m_template_name_edited = false;
+
+		TemplateWizardImpl ()
+		{
+			windowFlags |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar 
+				| ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoDocking;
+
+			strcpy_s(m_template_name, 60, "");
+		}
+
+		void ApplyConfigPreferences(PanelConfig& config) override final {
+			config.width = PanelDefaults::TemplateWizardGuiWidth;
+			config.height = PanelDefaults::TemplateWizardGuiHeight;
+			config.xPos = (Renderer::GetWindowWidth() / 2) - (config.width / 2);
+			config.yPos = (Renderer::GetWindowHeight() / 2) - (config.height / 2);
+			config.update = true;
+		}
 
 		enum TemplateType {
 			T_GameObject,
@@ -639,15 +697,8 @@ namespace rdt::core {
 		}
 
 		void OnRender() override final {
-			if (!m_templateWizardLaunched) {
-				return;
-			}
 
-			ImGuiWindowFlags windowConfig = 0;
-			windowConfig |= ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize;
-
-			if (ImGui::Begin("##Template Wizard", &m_templateWizardLaunched, windowConfig)) {
-
+			if (Panel_ImGuiBegin("")) {
 				bool createRequested = false;
 
 				ImGui::PushFont(Editor::m_fonts[NunitoSans][36]);
@@ -726,11 +777,17 @@ namespace rdt::core {
 
 				if (validName && createRequested) {
 					CreateFileFromTemplate((TemplateType)m_template_selection_index, m_template_name);
-					m_templateWizardLaunched = false;
 				}
 			}
 
 			ImGui::End();
+
+			if (!isOpen) {
+				// Reset form on close
+				m_template_selection_index = -1;
+				strcpy_s(m_template_name, 60, "");
+				m_template_name_edited = false;
+			}
 		}
 	};
 	// =========================================================
@@ -804,6 +861,9 @@ namespace rdt::core {
 		case PanelType::ScenePanel:
 			m_impl = new ScenePanelImpl;
 			break;
+		case PanelType::EntityHierarchyPanel:
+			m_impl = new EntityHierarchyPanelImpl;
+			break;
 		case PanelType::ConsolePanel:
 			m_impl = new ConsolePanelImpl;
 			break;
@@ -825,11 +885,20 @@ namespace rdt::core {
 			break;
 		}
 
+		if (m_impl == nullptr) {
+			return;
+		}
+
+		m_impl->mID = type;
 		m_impl->ApplyConfigPreferences(m_config);
 	}
 
 	void Panel::Render()
 	{
+		if (!m_impl->isOpen) {
+			return;
+		}
+
 		Editor::ApplyGuiConfig(m_config);
 		m_impl->OnRender();
 	}
@@ -848,178 +917,11 @@ namespace rdt::core {
 	{
 		return m_type;
 	}
-
-	// ==============================================================================
-	struct Container::Impl {
-		std::vector<Panel*> m_panels;
-
-		Impl()
-		{
-		}
-
-		~Impl()
-		{
-		}
-
-		virtual void OnRenderContainer() {}
-
-		int FindPanel(PanelType type) {
-			int index = 0;
-			for (auto panel : m_panels) {
-				if (panel->GetType() == type) {
-					return index;
-				}
-				index++;
-			}
-
-			return -1;
-		}
-
-		void OnAddPanel(Panel* nPanel) {
-			if (FindPanel(nPanel->GetType()) >= 0) {
-				RDT_CORE_ERROR("Container::Impl - Tried to add duplicate panel: {}", nPanel->GetType());
-				return;
-			}
-
-			m_panels.push_back(nPanel);
-		}
-
-		void OnRemovePanel(PanelType type) {
-			int index = FindPanel(type);
-
-			if (index < 0) {
-				RDT_CORE_ERROR("Container::Impl - Tried to remove panel that isn't in this container: {}", type);
-				return;
-			}
-
-			m_panels.erase(m_panels.begin() + index);
-		}
-
-		const static ImGuiWindowFlags ContainerWindowFlags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove
-			| ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoScrollbar
-			| ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar;
-	};
-	// ==============================================================================
-	struct FillContainerImpl : public Container::Impl {
-		std::string name = "##" + std::string(typeid(this).name());
-
-		void OnRenderContainer() override final {
-
-			ImGui::Begin(name.c_str(), (bool*)0, ContainerWindowFlags);
-			ImGui::End();
-		}
-	};
-	// ==============================================================================
-	struct DockLeftContainerImpl : public Container::Impl {
-		std::string name = "##" + std::string(typeid(this).name());
-
-		void OnRenderContainer() override final {
-
-			ImGui::Begin(name.c_str(), (bool*)0, ContainerWindowFlags);
-			ImGui::End();
-		}
-	};
-	// ==============================================================================
-	struct DockTopContainerImpl : public Container::Impl {
-		std::string name = "##" + std::string(typeid(this).name());
-
-		void OnRenderContainer() override final {
-
-			ImGui::Begin(name.c_str(), (bool*)0, ContainerWindowFlags);
-			ImGui::End();
-		}
-	};
-	// ==============================================================================
-	struct DockBottomContainerImpl : public Container::Impl {
-		std::string name = "##" + std::string(typeid(this).name());
-
-		void OnRenderContainer() override final {
-
-			ImGui::Begin(name.c_str(), (bool*)0, ContainerWindowFlags);
-			ImGui::End();
-		}
-	};
-	// ==============================================================================
-	struct DockRightContainerImpl : public Container::Impl {
-		std::string name = "##" + std::string(typeid(this).name());
-
-		void OnRenderContainer() override final {
-
-			ImGui::Begin(name.c_str(), (bool*)0, ContainerWindowFlags);
-			ImGui::End();
-		}
-	};
-	// ==============================================================================
-
-	Container::Container(ContainerType type)
-	{
-		m_impl = nullptr;
-		SetContainerType(type);
-	}
-
-	Container::~Container()
-	{
-		if (m_impl != nullptr) {
-			delete m_impl;
-		}
-	}
 	
-	void Container::SetContainerType(ContainerType type)
+	void Panel::SetShow(bool shouldShow)
 	{
-		if (m_impl != nullptr) {
-			delete m_impl;
-		}
-
-		m_type = type;
-
-		switch (type) {
-		case ContainerType::DockFill:
-			m_impl = new FillContainerImpl;
-			break;
-		case ContainerType::DockLeft:
-			m_impl = new DockLeftContainerImpl;
-			break;
-		case ContainerType::DockTop:
-			m_impl = new DockTopContainerImpl;
-			break;
-		case ContainerType::DockBottom:
-			m_impl = new DockBottomContainerImpl;
-			break;
-		case ContainerType::DockRight:
-			m_impl = new DockRightContainerImpl;
-			break;
-		default:
-			m_impl = new Container::Impl;
-			break;
-		}
+		m_impl->isOpen = shouldShow;
 	}
-
-	ContainerType Container::GetType()
-	{
-		return m_type;
-	}
-
-	void Container::RenderContainer()
-	{
-		Editor::ApplyGuiConfig(m_config);
-		m_impl->OnRenderContainer();
-	}
-
-	void Container::AddToContainer(Panel* nPanel)
-	{
-		m_impl->OnAddPanel(nPanel);
-	}
-
-	void Container::RemoveFromContainer(PanelType type)
-	{
-		m_impl->OnRemovePanel(type);
-	}
-
-	PanelConfig& Container::GetConfig()
-	{
-		return m_config;
-	}
-
 	// ==============================================================================
 
 	/*
@@ -1032,28 +934,12 @@ namespace rdt::core {
 
 	PanelManager::PanelManager()
 	{
-		m_workspaces[CommonWorkspaces::Default];
-		m_workspaces[CommonWorkspaces::Fullscreen];
-		SetCurrentWorkspace(CommonWorkspaces::Default);
-
-		RegisterContainer(ContainerType::DockFill);
-		auto& fillConfig = GetHead()->container.GetConfig();
-		fillConfig.xPos = 0;
-		fillConfig.yPos = 0;
-		fillConfig.width = Renderer::GetWindowWidth();
-		fillConfig.height = Renderer::GetWindowHeight();
 	}
 
 	PanelManager::~PanelManager()
 	{
 		for (auto& [type, panel] : m_panels) {
 			delete panel;
-		}
-
-		for (auto& [id, workspace] : m_workspaces) {
-			for (auto& [type, container] : workspace) {
-				delete container;
-			}
 		}
 	}
 
@@ -1062,163 +948,14 @@ namespace rdt::core {
 		m_panels[type] = new Panel(type);
 	}
 
-	void PanelManager::AssignToContainer(PanelType panel, ContainerType container)
+	void PanelManager::OpenPanel(PanelType type)
 	{
-		if (m_panels.find(panel) == m_panels.end()) {
-			RDT_CORE_ERROR("PanelManager - Tried to place unregistered panel");
+		if (m_panels.find(type) == m_panels.end()) {
+			RDT_CORE_ERROR("Could not open panel of type: {}", type);
 			return;
 		}
 
-		// Remove panel from its presently bounded container
-		if (m_panel_locations.at(panel) != ContainerType::NotActive) {
-			RemoveFromContainer(panel);
-		}
-
-		// Update container tree if container node doesn't exist
-		if (!ContainerExists(container)) {
-			RegisterContainer(container);
-		}
-
-		// Add panel to container
-		GetCurrentWorkspace().at(container)->container.AddToContainer(m_panels.at(panel));
-		m_panel_locations.at(panel) = container;
-	}
-
-	void PanelManager::RemoveFromContainer(PanelType panel)
-	{
-		GetCurrentWorkspace().at(m_panel_locations.at(panel))->container.RemoveFromContainer(panel);
-		m_panel_locations.at(panel) = ContainerType::NotActive;
-	}
-
-	void PanelManager::SetCurrentWorkspace(int workspaceID)
-	{
-		if (m_workspaces.find(workspaceID) == m_workspaces.end()) {
-			RDT_CORE_ERROR("PanelManager - Could not find workspace with ID: {}", workspaceID);
-			return;
-		}
-
-		m_workspace_id = workspaceID;
-	}
-
-	Workspace& PanelManager::GetCurrentWorkspace()
-	{
-		return m_workspaces.at(m_workspace_id);
-	}
-
-	void PanelManager::RegisterContainer(ContainerType type)
-	{
-		auto& workspace = GetCurrentWorkspace();
-		if (ContainerExists(type)) {
-			RDT_CORE_ERROR("PanelManager - Tried to register duplicate container type: {}", type);
-			return;
-		}
-		
-		workspace[type] = new ContainerNode;
-		workspace.at(type)->SetContainerType(type);
-
-		if (type == ContainerType::DockFill) {
-			return;
-		}
-
-		auto& nConfig = GetContainerConfig(type);
-		if (type == ContainerType::DockLeft) {
-			nConfig.xPos = 0;
-			nConfig.yPos = 0;
-			nConfig.width = Renderer::GetWindowWidth() * 0.225f;
-			nConfig.height = Renderer::GetWindowHeight();
-			float dw = nConfig.width + PanelMargin;
-
-			if (ContainerExists(ContainerType::DockFill)) {
-				auto& oConfig = GetContainerConfig(ContainerType::DockFill);
-				oConfig.xPos += dw;
-				oConfig.width -= dw;
-				oConfig.update = true;
-			}
-
-			if (ContainerExists(ContainerType::DockTop)) {
-				auto& oConfig = GetContainerConfig(ContainerType::DockTop);
-				oConfig.xPos += dw;
-				oConfig.width -= dw;
-				oConfig.update = true;
-			}
-
-			if (ContainerExists(ContainerType::DockBottom)) {
-				auto& oConfig = GetContainerConfig(ContainerType::DockBottom);
-				oConfig.xPos += dw;
-				oConfig.width -= dw;
-				oConfig.update = true;
-			}
-
-			return;
-		}
-
-		if (type == ContainerType::DockTop) {
-
-			nConfig.xPos = 0;
-			nConfig.yPos = 0;
-
-			nConfig.height = Renderer::GetWindowHeight() * 0.10f;
-			float dh = nConfig.height + PanelMargin;
-			
-			if (ContainerExists(ContainerType::DockFill)) {
-				auto& oConfig = GetContainerConfig(ContainerType::DockFill);
-				
-				nConfig.width = oConfig.width;
-				nConfig.xPos = oConfig.xPos;
-
-				oConfig.yPos += dh;
-				oConfig.height -= dh;
-			}
-
-			return;
-		}
-
-		if (type == ContainerType::DockBottom) {
-
-			nConfig.xPos = 0;
-			nConfig.yPos = 0;
-
-			nConfig.height = Renderer::GetWindowHeight() * 0.25f;
-			float dh = nConfig.height + PanelMargin;
-
-			if (ContainerExists(ContainerType::DockFill)) {
-				auto& oConfig = GetContainerConfig(ContainerType::DockFill);
-				
-				nConfig.width = oConfig.width;
-				nConfig.xPos = oConfig.xPos;
-
-				oConfig.height -= dh;
-				nConfig.yPos = oConfig.yPos + oConfig.height + PanelMargin;
-			}
-
-			return;
-		}
-
-		if (type == ContainerType::DockRight) {
-			nConfig.xPos = 0;
-			nConfig.yPos = 0;
-			nConfig.width = Renderer::GetWindowWidth() * 0.225f;
-			nConfig.height = Renderer::GetWindowHeight();
-
-			float dw = nConfig.width + PanelMargin;
-
-			if (ContainerExists(ContainerType::DockFill)) {
-				auto& oConfig = GetContainerConfig(ContainerType::DockFill);
-
-				oConfig.width -= dw;
-				nConfig.xPos = oConfig.xPos + oConfig.width + PanelMargin;
-			}
-
-			if (ContainerExists(ContainerType::DockTop)) {
-				auto& oConfig = GetContainerConfig(ContainerType::DockTop);
-				oConfig.width -= dw;
-			}
-
-			if (ContainerExists(ContainerType::DockBottom)) {
-				auto& oConfig = GetContainerConfig(ContainerType::DockBottom);
-				oConfig.width -= dw;
-			}
-		}
+		m_panels.at(type)->SetShow(true);
 	}
 
 	const std::unordered_map<PanelType, void*>& PanelManager::GetMessages()
@@ -1230,55 +967,8 @@ namespace rdt::core {
 		return m_messages;
 	}
 
-	bool PanelManager::ContainerExists(ContainerType type)
-	{
-		return GetCurrentWorkspace().find(type) != GetCurrentWorkspace().end();
-	}
-
-	PanelConfig& PanelManager::GetContainerConfig(ContainerType type)
-	{
-		return GetCurrentWorkspace().at(type)->container.GetConfig();
-	}
-
-	ContainerNode* PanelManager::GetHead()
-	{
-		return GetCurrentWorkspace().at(DockFill);
-	}
-
-	ContainerType PanelManager::GetNextExpected(ContainerType current, ContainerType target, TreeDirection& next)
-	{
-		switch (current) {
-		case ContainerType::DockFill:
-			switch (target) {
-			case ContainerType::DockLeft:
-				next = TreeDirection::TD_LEFT;
-				return ContainerType::DockLeft;
-			case ContainerType::DockTop:
-				next = TreeDirection::TD_UP;
-				return ContainerType::DockTop;
-			case ContainerType::DockRight:
-				next = TreeDirection::TD_RIGHT;
-				return ContainerType::DockRight;
-			case ContainerType::DockBottom:
-				next = TreeDirection::TD_DOWN;
-				return ContainerType::DockBottom;
-			default:
-				next = TreeDirection::TD_NOMOVEMENT;
-				return ContainerType::NotActive;
-			}
-			break;
-		default:
-			next = TreeDirection::TD_NOMOVEMENT;
-			break;
-		}
-
-		return ContainerType::NotActive;
-	}
-
 	void PanelManager::RenderMDI()
 	{
-		auto& workspace = GetCurrentWorkspace();
-
 		for (auto& [type, panel] : m_panels) {
 			panel->Render();
 		}
@@ -1301,14 +991,12 @@ namespace rdt::core {
 		Panel Layout Macros
 	*/
 
-	
-
 	Editor::Editor()
 		: m_config(nullptr)
 	{
 		m_showTools = true;
 		
-		RegisterToMessageBus("EditorLayout");
+		RegisterToMessageBus("Editor");
 		SetTheme(Theme_Codz);
 
 		ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
@@ -1321,17 +1009,20 @@ namespace rdt::core {
 		m_gameWindow->SetGuiPositionY(88);
 		m_gameWindow->SetGuiPositionX((m_window_width / 2) - (m_gameWindow->GetGuiDimensions().x / 2));
 
-
-		m_panel_manager.RegisterContainer(ContainerType::DockTop);
-		m_panel_manager.RegisterContainer(ContainerType::DockLeft);
-		m_panel_manager.RegisterContainer(ContainerType::DockBottom);
-		m_panel_manager.RegisterContainer(ContainerType::DockRight);
-		
 		m_panel_manager.RegisterPanel(MenuBar);
 		m_panel_manager.RegisterPanel(DiagnosticsPanel);
 		m_panel_manager.RegisterPanel(ScenePanel);
 		m_panel_manager.RegisterPanel(GameWindowPanel);
 		m_panel_manager.RegisterPanel(ConsolePanel);
+		m_panel_manager.RegisterPanel(EntityHierarchyPanel);
+		m_panel_manager.RegisterPanel(TemplateWizard);
+
+		m_panel_manager.OpenPanel(MenuBar);
+		m_panel_manager.OpenPanel(DiagnosticsPanel);
+		m_panel_manager.OpenPanel(ScenePanel);
+		m_panel_manager.OpenPanel(GameWindowPanel);
+		m_panel_manager.OpenPanel(ConsolePanel);
+		m_panel_manager.OpenPanel(EntityHierarchyPanel);
 
 		/*m_panel_manager.RegisterPanel(MenuBar);
 		m_panel_manager.RegisterPanel(DiagnosticsPanel);
@@ -1353,6 +1044,14 @@ namespace rdt::core {
 	}
 	void Editor::OnMessage(Message msg)
 	{
+		switch (msg.type) {
+		case CM_OpenPanelRequest:
+			OnOpenPanelRequest((OpenPanelRequestData*)msg.data);
+			break;
+		case CM_ChangeSceneRequest:
+			OnChangeThemeRequest((ChangeThemeRequestData*)msg.data);
+			break;
+		}
 	}
 
 	void Editor::OnUpdate(const float deltaTime)
@@ -1539,29 +1238,16 @@ namespace rdt::core {
 
 	void Editor::ProcessMessages()
 	{
-		for (auto& [panelType, message] : m_panel_manager.GetMessages()) {
-
-			if (message == nullptr) {
-				continue;
-			}
-
-			switch (panelType) {
-			case MenuBar:
-				OnMenuBarMessage((MenuBarData*)message);
-				break;
-			}
-		}
 	}
 
-	void Editor::OnMenuBarMessage(MenuBarData* data)
+	void Editor::OnOpenPanelRequest(OpenPanelRequestData* data)
 	{
-		if (data->changeThemeRequest != ET_NAT) {
-			SetTheme(data->changeThemeRequest);
-		}
+		m_panel_manager.OpenPanel(data->panelToOpen);
+	}
 
-		if (data->openPanelRequest != PT_NAP) {
-			OpenPanel(data->openPanelRequest);
-		}
+	void Editor::OnChangeThemeRequest(ChangeThemeRequestData* data)
+	{
+		SetTheme(data->theme);
 	}
 
 	void Editor::OpenPanel(PanelType panel)
@@ -1726,8 +1412,8 @@ namespace rdt::core {
 			config.update = false;
 		}
 		else {
-			//ImGui::SetNextWindowSize(ImVec2(config.width, config.height), ImGuiCond_Appearing);
-			//ImGui::SetNextWindowPos(ImVec2(config.xPos, config.yPos), ImGuiCond_Appearing);
+			ImGui::SetNextWindowSize(ImVec2(config.width, config.height), ImGuiCond_FirstUseEver);
+			ImGui::SetNextWindowPos(ImVec2(config.xPos, config.yPos), ImGuiCond_FirstUseEver);
 		}
 	}
 }

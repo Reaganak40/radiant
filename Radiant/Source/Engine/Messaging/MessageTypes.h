@@ -14,7 +14,14 @@ namespace rdt {
 
 		MT_RequestScenePtr,
 		MT_SendScenePtr,
+
 		MT_SceneChanged,
+		MT_EndOfDefaultMessages,
+	};
+
+	enum CoreMessage {
+		CM_OpenPanelRequest = MT_EndOfDefaultMessages + 1,
+		CM_ChangeSceneRequest,
 	};
 
 	struct CollisionData {

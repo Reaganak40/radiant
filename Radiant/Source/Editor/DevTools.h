@@ -69,13 +69,16 @@ namespace rdt::core {
 		MenuBar,
 		DiagnosticsPanel,
 		ScenePanel,
+		EntityHierarchyPanel,
 		ConsolePanel,
 		GameWindowPanel,
 		GameWindowSettingsPanel,
 		TemplateWizard,
 		EntityWizard,
 	};
-	struct MenuBarData;
+
+	struct OpenPanelRequestData;
+	struct ChangeThemeRequestData;
 
 	struct PanelConfig {
 		float xPos = 0;
@@ -122,112 +125,18 @@ namespace rdt::core {
 			Gets the type of panel implementation for this instance
 		*/
 		PanelType GetType();
+
+		/*
+			Sets the flag to show the panel to true or false
+		*/
+		void SetShow(bool shouldShow);
 	};
 
 	// =====================================================================================
-	
-	enum ContainerType {
-		NotActive,
-		DockBorderTop,
-		DockTop,
-		DockFill,
-		DockBottom,
-		DockLeft,
-		DockRight,
-		DockBorderLeft,
-		DockBorderRight,
-		DockBorderBottom,
-		Floating,
-		DockEndOfOptions
-	};
-
-	class Container {
-	public:
-		struct Impl;
-	private:
-		Impl* m_impl;
-		ContainerType m_type;
-		PanelConfig m_config;
-	public:
-
-		Container(ContainerType type = DockEndOfOptions);
-		~Container();
-
-		/*
-			Sets the container type, defining its location and size
-			in the MDI application.
-		*/
-		void SetContainerType(ContainerType type);
-
-		/*
-			Returns the current type of this container.
-		*/
-		ContainerType GetType();
-
-		/*
-			Renders the container with ImGui and its child panels
-		*/
-		void RenderContainer();
-
-		/*
-			Adds a new panel to the container
-		*/
-		void AddToContainer(Panel* nPanel);
-
-		/*
-			Removes a currently bound panel of the given type.
-		*/
-		void RemoveFromContainer(PanelType type);
-
-		/*
-			Gets the panel configuration (editable)
-		*/
-		PanelConfig& GetConfig();
-
-	private:
-	};
-
-	struct ContainerNode {
-		Container container;
-		ContainerNode* nodeUp = nullptr;
-		ContainerNode* nodeDown = nullptr;
-		ContainerNode* nodeLeft = nullptr;
-		ContainerNode* nodeRight = nullptr;
-
-		void SetContainerType(ContainerType type) {
-			container.SetContainerType(type);
-		}
-
-		ContainerType GetType() {
-			return container.GetType();
-		}
-	};
-
-	enum CommonWorkspaces {
-		Default,
-		Fullscreen,
-	};
-
-	using Workspace = std::unordered_map<ContainerType, ContainerNode*>;
-
 	class PanelManager {
 	private:
 		std::unordered_map<PanelType, Panel*> m_panels;
-		std::unordered_map<PanelType, ContainerType> m_panel_locations;
-
-		std::unordered_map<int, Workspace> m_workspaces;
-		int m_workspace_id;
-
 		std::unordered_map<PanelType, void*> m_messages;
-
-		enum TreeDirection
-		{
-			TD_LEFT,
-			TD_RIGHT,
-			TD_UP,
-			TD_DOWN,
-			TD_NOMOVEMENT
-		};
 
 	public:
 		PanelManager();
@@ -240,14 +149,9 @@ namespace rdt::core {
 		void RegisterPanel(PanelType type);
 
 		/*
-			Sets the panel location and visibility
+			Opens a panel, launching its window, and showing itself in the MDI
 		*/
-		void AssignToContainer(PanelType panel, ContainerType container);
-
-		/*
-			Removes a panel from its currently bound container, making it inactive.
-		*/
-		void RemoveFromContainer(PanelType panel);
+		void OpenPanel(PanelType type);
 
 		/*
 			Renders all panels as a multiple document interface
@@ -259,41 +163,7 @@ namespace rdt::core {
 		*/
 		const std::unordered_map<PanelType, void*>& GetMessages();
 
-		/*
-			Registers a new container type to the current workspace
-		*/
-		void RegisterContainer(ContainerType type);
-
 	private:
-
-		/*
-			Switches the current workspace to the one with the registered workspace ID
-		*/
-		void SetCurrentWorkspace(int workspaceID);
-
-		/*
-			Returns the currently active workspace
-		*/
-		Workspace& GetCurrentWorkspace();
-
-
-		/*
-			Returns true if a container of the given type exists
-		*/
-		bool ContainerExists(ContainerType type);
-
-		/*
-			Gets the config for a container given its type
-		*/
-		PanelConfig& GetContainerConfig(ContainerType type);
-
-		/*
-			Gets the root of the container tree, which is always the DockFill
-			container.
-		*/
-		ContainerNode* GetHead();
-
-		ContainerType GetNextExpected(ContainerType current, ContainerType target, TreeDirection& next);
 	};
 
 	// =====================================================================================
@@ -338,6 +208,7 @@ namespace rdt::core {
 		void OnUpdate(const float deltaTime) override;
 		void OnRender() override;
 
+
 		void SetTheme(EditorTheme nTheme);
 		void SetSourcePath(const std::string& path);
 
@@ -364,7 +235,8 @@ namespace rdt::core {
 		
 		// ===============================================
 		void ProcessMessages();
-		void OnMenuBarMessage(MenuBarData* data);
+		void OnOpenPanelRequest(OpenPanelRequestData* data);
+		void OnChangeThemeRequest(ChangeThemeRequestData* data);
 		// ===============================================
 		void OpenPanel(PanelType panel);
 		// ===============================================
