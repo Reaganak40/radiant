@@ -9,7 +9,7 @@
 #include "Messaging/MessageBus.h"
 #include "Physics/Physics.h"
 #include "Gui/GuiManager.h"
-#include "Components/Scene/SceneManager.h"
+#include "OOComponents/Scene/SceneManager.h"
 #include "Physics/Ptag.h"
 #include "Utils/Timestep.h"
 
@@ -137,6 +137,7 @@ namespace rdt {
 		SystemManager::Initialize();
 
 		// Add Common Components
+		ComponentManager::RegisterComponent<EntityConfig>();
 		ComponentManager::RegisterComponent<Sprite>();
 		ComponentManager::RegisterComponent<RigidBody2D>();
 		ComponentManager::RegisterComponent<Renderable>();

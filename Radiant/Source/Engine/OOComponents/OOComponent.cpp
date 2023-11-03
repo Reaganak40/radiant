@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "Component.h"
+#include "OOComponent.h"
 #include "Logging/Log.h"
 
 namespace rdt::core {

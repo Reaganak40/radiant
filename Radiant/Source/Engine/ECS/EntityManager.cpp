@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "EntityManager.h"
 #include "SystemManager.h"
+#include "CommonComponents.h"
 #include "Logging/Log.h"
 
 namespace rdt {
@@ -121,9 +122,23 @@ namespace rdt {
 		}
 	}
 	
-	Entity EntityManager::RegisterEntity()
+	Entity EntityManager::RegisterEntity(const std::string& alias, Layer* owner)
 	{
-		return m_instance->m_impl->RegisterEntity();
+		Entity nID = m_instance->m_impl->RegisterEntity();
+
+		EntityConfig config;
+
+		if (alias.empty()) {
+			config.alias = "entity" + std::to_string(nID);
+		}
+		else {
+			config.alias = alias;
+		}
+		config.owner = owner;
+
+		EntityManager::AddComponent<EntityConfig>(nID, config);
+		
+		return nID;
 	}
 
 	void EntityManager::RemoveEntity(Entity eID)
@@ -148,6 +163,16 @@ namespace rdt {
 		}
 
 		return m_instance->m_impl->GetSignature(eID);
+	}
+
+	const char* EntityManager::GetEntityAlias(Entity entity)
+	{
+		if (!EntityExists(entity)) {
+			RDT_CORE_WARN("EntityManager - Tried to get alias of an unregistered entity [id: {}]", entity);
+			return nullptr;
+		}
+
+		return GetComponent<EntityConfig>(entity)->alias.c_str();
 	}
 
 	void EntityManager::AddToSignature(Entity eID, ComponentID cID)

@@ -1,7 +1,7 @@
 #pragma once
 #include "Core.h"
-#include "Components/Component.h"
-#include "Components/GameObject/GameObject.h"
+#include "OOComponents/OOComponent.h"
+#include "OOComponents/GameObject/GameObject.h"
 #include "Gui/Gui.h"
 #include "ECS/ECS.h"
 
@@ -48,11 +48,13 @@ namespace rdt {
 
 		/*
 			Registers a new entity to this layer. The layer is now
-			responsible for this entity. 
+			responsible for this entity.
+
+			Can provide an alias to this entity, otherwise it will be given a default name.
 			
 			NOTE: This entity definition will be freed upon completion of this function.
 		*/
-		void RegisterEntity(EntityDefinition* nEntity);
+		void RegisterEntity(EntityDefinition* nEntity, const std::string& alias = "");
 
 
 	public:

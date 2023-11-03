@@ -118,8 +118,13 @@ namespace rdt {
 		m_impl->m_GUIs.push_back(nGUI);
 	}
 
-	void Layer::RegisterEntity(EntityDefinition* nEntity)
+	void Layer::RegisterEntity(EntityDefinition* nEntity, const std::string& alias)
 	{
+		nEntity->SetEntityOwner(this);
+		if (!alias.empty()) {
+			nEntity->SetEntityAlias(alias);
+		}
+
 		m_impl->m_entities.push_back(EntityFactory::Create(nEntity)); // frees nEntity
 	}
 

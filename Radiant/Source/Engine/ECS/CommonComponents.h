@@ -11,6 +11,18 @@
 
 namespace rdt {
 
+	class Layer;
+
+	/*
+		Defines engine-specific configurations for an Entity,
+		this component is highly coupled with the EntityManager
+	*/
+	struct EntityConfig
+	{
+		std::string alias = "";
+		Layer* owner = nullptr;
+	};
+
 	/*
 		Defines the dimensionality of an entity, that is
 		its vertices, location in space and volume.

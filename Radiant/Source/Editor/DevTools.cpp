@@ -444,21 +444,47 @@ namespace rdt::core {
 		}
 	};
 	// =========================================================
-	struct ScenePanelImpl : public Panel::Impl {
+	struct LayerPanelImpl : public Panel::Impl {
+		std::string panel_header = "Layer: ";
+		float lastGameObjectPanelHeight = 0.0f;
+		Layer* layer = nullptr;
+		float nodeListMaxY = 350.0f;
 
-		void ApplyConfigPreferences(PanelConfig& config) override final {
-			config.width = PanelDefaults::ScenePanelGuiWidth;
-			config.height = PanelDefaults::ScenePanelGuiHeight;
+		enum NodeType {
+			LPNT_Entity,
+			LPNT_GameObject
+		};
 
-			config.xPos = 500;
-			config.yPos = 100;
+		struct Node {
+			float lastSize = 0.0f;
+			bool nodeOpen = false;
+			size_t itemCount = 0;
+			NodeType type;
+		};
+
+		// Index 0: Entity Node
+		// Index 1: Game Object Node
+		Node nodes[2];
+
+		LayerPanelImpl(Layer* ref)
+			: layer(ref) 
+		{
+			if (ref == nullptr) {
+				RDT_CORE_ERROR("LayerPanelImpl - Tried to use nullptr layer ref");
+				panel_header += "ERROR";
+				return;
+			} 
+			panel_header += typeid(*layer).name();
+
+			nodes[0].type = LPNT_Entity;
+			nodes[1].type = LPNT_GameObject;
 		}
 
-		void AddGameObjectPanel(GameObject* gobject) {
+		void AddGameObjectItem(GameObject* gobject) 
+		{
 			std::string name = typeid(*gobject).name();
 			std::string panel_header = name.substr(6, name.size() - 6) + ": " + gobject->GetName();
 
-			ImGui::Indent(10);
 			if (ImGui::CollapsingHeader(panel_header.c_str())) {
 
 				ImGui::Text("GameObjectID: %d", gobject->GetID());
@@ -476,24 +502,133 @@ namespace rdt::core {
 				else {
 					ImGui::Text("Not Registered to any realms.");
 				}
-
 			}
-			ImGui::Unindent(10);
+		}
+
+		void AddEntityItem(Entity entity) {
+			std::string panel_header = "Entity: ";
+			const char* alias = EntityManager::GetEntityAlias(entity);
+			if (alias == nullptr) {
+				alias = "ERROR";
+			}
+			panel_header += alias;
+			
+			if (ImGui::CollapsingHeader(panel_header.c_str())) {
+				ImGui::Text("This is information about an entity!.");
+			}
+		}
+
+		void AddGameObjectPanel() {
+
+			size_t itemCount = 0;
+			layer->GetGameObjects(&itemCount);
+			nodes[1].itemCount = itemCount;
+			RenderNode(nodes[1]);
+		}
+
+
+		void AddEntityPanel() {
+
+			nodes[0].itemCount = layer->GetEntities().size();
+			RenderNode(nodes[0]);
+		}
+
+		void RenderNode(Node& node) {
+
+			ImVec2 nodeChildWindowSize = ImVec2(ImGui::GetWindowSize().x * 0.90, node.lastSize);
+
+			if (!node.nodeOpen) {
+				nodeChildWindowSize.y = 25;
+			}
+			else if (node.lastSize == 0.0f) {
+				nodeChildWindowSize.y = Utils::Min(nodeListMaxY, (node.itemCount * 34.0f) + 25);
+			}
+
+			float indent = (ImGui::GetWindowSize().x - nodeChildWindowSize.x) / 2;
+			ImGui::SetCursorPosX(indent);
+			ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 3.0f);
+			ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 10);
+
+			std::string child1 = (panel_header + "- " + (node.type == LPNT_Entity ? "Entity" : "GameObject") + "Node");
+			if (ImGui::BeginChild(child1.c_str(), nodeChildWindowSize, false, ImGuiWindowFlags_NoScrollbar)) {
+
+				if (node.nodeOpen = ImGui::CollapsingHeader(((node.type == LPNT_Entity ? "Entities: " : "GameObjects: ") + std::to_string(node.itemCount)).c_str())) {
+					ImGui::Text(("Browse " + (std::string)(node.type == LPNT_Entity ? "Entities: " : "GameObjects: ")).c_str());
+					if (node.itemCount > 0) {
+
+						nodeChildWindowSize.x *= 0.95;
+						nodeChildWindowSize.y -= 75;
+						indent = (ImGui::GetWindowSize().x - nodeChildWindowSize.x) / 2;
+						ImGui::SetCursorPosX(indent);
+						std::string child2 = (panel_header + "- " + (node.type == LPNT_Entity ? "Entity" : "GameObject") + "List");
+						if (ImGui::BeginChild(child2.c_str(), nodeChildWindowSize)) {
+
+							switch (node.type) {
+							case LPNT_Entity:
+								for (auto entity : layer->GetEntities()) {
+									AddEntityItem(entity);
+								}
+								break;
+
+							case LPNT_GameObject:
+								{
+									size_t itemCount = 0;
+									GameObject** objects = layer->GetGameObjects(&itemCount);
+									for (size_t i = 0; i < itemCount; i++) {
+										AddGameObjectItem(objects[i]);
+									}
+								}
+								break;
+							}
+						}
+						node.lastSize = Utils::Min(nodeListMaxY, ImGui::GetCursorPosY() + 4 + 75);
+						ImGui::EndChild();
+					}
+				}
+			}
+			ImGui::EndChild();
+			ImGui::PopStyleVar(2);
+		}
+
+		void OnRender() override final {
+			if (ImGui::CollapsingHeader(panel_header.c_str())) {
+
+				AddEntityPanel();
+				AddGameObjectPanel();
+			}
+		}
+	};
+	// =========================================================
+	struct ScenePanelImpl : public Panel::Impl {
+
+		std::unordered_map<UniqueID, LayerPanelImpl*> m_layers;
+
+		~ScenePanelImpl()
+		{
+			for (auto& [layerID, layerPanel] : m_layers) {
+				delete layerPanel;
+			}
+		}
+
+		void ApplyConfigPreferences(PanelConfig& config) override final {
+			config.width = PanelDefaults::ScenePanelGuiWidth;
+			config.height = PanelDefaults::ScenePanelGuiHeight;
+
+			config.xPos = 500;
+			config.yPos = 100;
 		}
 
 		void AddLayerPanel(Layer* layer) {
-			std::string name = typeid(*layer).name();
-			std::string panel_header = "Layer: " + name.substr(6, name.size() - 6);
 
-			if (ImGui::CollapsingHeader(panel_header.c_str())) {
-
-				size_t count;
-				GameObject** objects = layer->GetGameObjects(&count);
-				for (size_t i = 0; i < count; i++) {
-					AddGameObjectPanel(objects[i]);
-				}
+			if (m_layers.find(layer->GetID()) == m_layers.end()) {
+				m_layers[layer->GetID()] = new LayerPanelImpl(layer);
 			}
 		}
+
+		void RenderLayerPanel(Layer* layer) {
+			m_layers.at(layer->GetID())->OnRender();
+		}
+
 		void OnRender() override final {
 
 			if (Panel_ImGuiBegin("Scene Hierarchy")) {
@@ -507,6 +642,7 @@ namespace rdt::core {
 					Layer** layers = Editor::m_scene->GetLayers(&count);
 					for (size_t i = 0; i < count; i++) {
 						AddLayerPanel(layers[i]);
+						RenderLayerPanel(layers[i]);
 					}
 				}
 			}
@@ -525,7 +661,7 @@ namespace rdt::core {
 			config.yPos = 900;
 		}
 		void OnRender() override final {
-			if (Panel_ImGuiBegin("Entity Hierarchy")) {
+			if (Panel_ImGuiBegin("Entity Component System")) {
 
 			}
 			ImGui::End();

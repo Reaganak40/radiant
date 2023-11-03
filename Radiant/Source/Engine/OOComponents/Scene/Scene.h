@@ -1,6 +1,6 @@
 #pragma once
 #include "Core.h"
-#include "Components/Component.h"
+#include "OOComponents/OOComponent.h"
 #include "Utils/UniqueID.h"
 #include "Layer.h"
 

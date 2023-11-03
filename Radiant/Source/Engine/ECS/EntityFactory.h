@@ -12,10 +12,12 @@ namespace rdt {
 	*/
 	class RADIANT_API EntityDefinition {
 	private:
-		Entity* mID;
+		struct Impl;
+		Impl* m_impl;
+
 	public:
-		EntityDefinition() : mID(new Entity(NO_ENTITY_ID)) {}
-		~EntityDefinition() { delete mID; }
+		EntityDefinition();
+		~EntityDefinition();
 
 		virtual void OnCreate() = 0;
 
@@ -23,6 +25,18 @@ namespace rdt {
 			Gets the entityID for this registered entity
 		*/
 		const Entity GetID() const;
+
+		/*
+			Sets the alias of the entity that is about to be registered.
+			Make sure this is called before Register()
+		*/
+		void SetEntityAlias(const std::string& alias);
+
+		/*
+			Sets the owner of the entity that is about to be registered.
+			Make sure this is called before Register()
+		*/
+		void SetEntityOwner(Layer* layer);
 
 	protected:
 		/*

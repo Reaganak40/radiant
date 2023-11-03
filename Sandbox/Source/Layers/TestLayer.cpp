@@ -45,8 +45,8 @@ TestLayer::TestLayer(const std::string& alias)
 
 	RegisterGameObject(new MyBeautifulObject("Object1"));
 
-	for (int i = 1; i < 15; i++) {
-		RegisterEntity(new PinkBox(100 * i, 100, 50, 50));
+	for (int i = 1; i < 17; i++) {
+		RegisterEntity(new PinkBox(100 * i, 100, 50, 50), "pinkbox" + std::to_string(i));
 	}
 }
 

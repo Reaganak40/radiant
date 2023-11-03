@@ -3,14 +3,48 @@
 #include "Polygon/Rect.h"
 
 namespace rdt {
+
+	struct EntityDefinition::Impl {
+		Entity mID = NO_ENTITY_ID;
+		std::string entityAlias = "";
+		Layer* entityOwner = nullptr;
+
+		Impl() {}
+		~Impl() {}
+
+		void OnRegister() {
+			mID = EntityManager::RegisterEntity(entityAlias, entityOwner);
+		}
+	};
+
+	EntityDefinition::EntityDefinition()
+		: m_impl(new EntityDefinition::Impl)
+	{
+	}
+
+	EntityDefinition::~EntityDefinition()
+	{
+		delete m_impl;
+	}
+
 	void EntityDefinition::Register()
 	{
-		*mID = EntityManager::RegisterEntity();
+		m_impl->OnRegister();
 	}
 
 	const Entity EntityDefinition::GetID() const
 	{
-		return *mID;
+		return m_impl->mID;
+	}
+
+	void EntityDefinition::SetEntityAlias(const std::string& alias)
+	{
+		m_impl->entityAlias = alias;
+	}
+
+	void EntityDefinition::SetEntityOwner(Layer* layer)
+	{
+		m_impl->entityOwner = layer;
 	}
 
 	Entity EntityFactory::Create(EntityDefinition* entityDef)

@@ -1,8 +1,8 @@
 #pragma once
 #include "Utils/UniqueID.h"
-#include "Components/GameObject/GameObject.h"
+#include "OOComponents/GameObject/GameObject.h"
 #include "Audio/SoundEngine.h"
-#include "Components/Scene/Scene.h"
+#include "OOComponents/Scene/Scene.h"
 
 namespace rdt {
 

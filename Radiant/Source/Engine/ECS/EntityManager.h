@@ -4,6 +4,8 @@
 #include "ComponentManager.h"
 
 namespace rdt {
+	class Layer;
+
 	class RADIANT_API EntityManager {
 	private:
 		struct Impl;
@@ -26,9 +28,17 @@ namespace rdt {
 		static void Destroy();
 
 		/*
-			Create a new entity by registering the returned EntityID
+			Create a new entity by registering the returned EntityID. An EnityConfig
+			component will automatically be added to this entity.
+
+			alias - the name of the entity, when alias string is empty, the EntityManager will provide
+			a name to it.
+
+			owner - a pointer to the layer that tracks this entity, nullptr indicates this entity
+			has no owner.
+
 		*/
-		static Entity RegisterEntity();
+		static Entity RegisterEntity(const std::string& alias = "", Layer* owner = nullptr);
 
 		/*
 			Removes a registered entity that is referenced by the eID
@@ -125,6 +135,11 @@ namespace rdt {
 
 			return &component->GetData(eID);
 		}
+
+		/*
+			Gets the alias of the provided entity.
+		*/
+		static const char* GetEntityAlias(Entity entity);
 
 	private:
 		/*
