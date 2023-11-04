@@ -178,6 +178,7 @@ namespace rdt::core {
 
 	enum EditorFont {
 		NunitoSans = 1,
+		NunitoSans_Bold,
 		ForkAwesome,
 	};
 

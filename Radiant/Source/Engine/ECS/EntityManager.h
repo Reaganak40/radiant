@@ -146,6 +146,12 @@ namespace rdt {
 		*/
 		static const char* GetEntityAlias(Entity entity);
 
+		/*
+			Returns a pointer to the layer that owns this entity,
+			or nullptr if it is not owned by anyone.
+		*/
+		static Layer* GetEntityOwner(Entity entity);
+
 	private:
 		/*
 			Adds this component to the entity's signature.

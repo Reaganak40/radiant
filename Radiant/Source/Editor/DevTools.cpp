@@ -696,9 +696,9 @@ namespace rdt::core {
 		
 		void RenderEntityTable() {
 			ImGuiTableFlags flags = ImGuiTableFlags_None;
-			flags |= ImGuiTableFlags_Borders;
+			flags |= ImGuiTableFlags_Borders | ImGuiTableFlags_ScrollY;
 
-			if (ImGui::BeginTable("EntityTable", 3, flags)) {
+			if (ImGui::BeginTable("EntityTable", 3, flags, ImVec2(0, 352))) {
 				ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed, 30);
 				ImGui::TableSetupColumn("Alias");
 				ImGui::TableSetupColumn("# of Components");
@@ -709,7 +709,6 @@ namespace rdt::core {
 				for (auto& [entity, entitySignature] : EntityManager::GetEntityMap()) {
 
 					ImGui::TableNextRow();
-
 					if (entity == selectedEntity) {
 						ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImColor(0.8f, 0.1f, 0.2f, 1.0f));
 					}
@@ -751,26 +750,91 @@ namespace rdt::core {
 
 					current_row++;
 				}
+
+				for (; current_row < 15; current_row++) {
+					ImGui::TableNextRow();
+					ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImColor(0.1f, 0.1f, 0.1f, 1.0f));
+					
+					ImGui::TableNextColumn();
+					ImGui::Text("");
+				}
 				ImGui::EndTable();
 			}
 		}
 		
-		
+		void RenderEditTool(void* data, const core::TraceData& info) {
+			
+			if (data == nullptr) {
+				ImGui::Text("ERROR");
+				return;
+			}
+			data = (unsigned char*)data + info.offset;
+
+			switch (info.type) {
+			case SupportedTraceType_color:
+			{
+				auto& color = ((Color*)data)->GetColor();
+				ImGui::Text("Red: %.2f, Green: %.2f, Blue: %.2f, Alpha: %.2f", color.x1, color.x2, color.x3, color.x4);
+			}
+				break;
+			default:
+				ImGui::Text("No support for this type!");
+				break;
+			}
+		}
+
+		void RenderEntityViewer()
+		{
+			std::string headerLabel = "Entity Viewer: ";
+			if (selectedEntity == NO_ENTITY_ID) {
+				headerLabel += "No Entity Selected";
+			}
+			else {
+				headerLabel += " [ID: " + std::to_string(selectedEntity) + "] " + EntityManager::GetEntityAlias(selectedEntity);
+			}
+
+			if (ImGui::TreeNodeEx((const void*)this, ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_DefaultOpen, headerLabel.c_str())) {
+
+				if (selectedEntity == NO_ENTITY_ID) {
+					ImGui::Text("Select an entity from the Entity List to view it here.");
+					return;
+				}
+
+				Layer* owner = EntityManager::GetEntityOwner(selectedEntity);
+				ImGui::PushFont(Editor::m_fonts[NunitoSans_Bold][18]);
+				ImGui::Text("Owned by Layer:");
+				ImGui::PopFont();
+				ImGui::SameLine();
+				ImGui::Text("%s", owner == nullptr ? "None" : typeid(*owner).name());
+
+				Signature signature = EntityManager::GetSignature(selectedEntity);
+
+				for (int index = 0; index < signature.size(); index++) {
+					if (signature[index]) {
+						std::string componentName = ComponentManager::GetComponenentName(index);
+						ImGui::PushFont(Editor::m_fonts[NunitoSans_Bold][18]);
+						ImGui::Text("%s", componentName.c_str());
+						ImGui::PopFont();
+
+						ImGui::Indent(10);
+						
+						void* entity_data = ComponentManager::GetData(index, selectedEntity);
+						for (auto& [memberName, typeDef] : ECSComponent::GetTraceData(componentName.c_str())) {
+							ImGui::Text(memberName.c_str());
+							ImGui::SameLine();
+							RenderEditTool(entity_data, typeDef);
+						}
+						
+						ImGui::Unindent(10);
+					}
+				}
+			}
+		}
 		void OnRender() override final {
 			if (Panel_ImGuiBegin("Entity Component System")) {
 
-				std::string headerLabel = "Entity Viewer: ";
-				if (selectedEntity == NO_ENTITY_ID) {
-					headerLabel += "No Entity Selected";
-				}
-				else {
-					headerLabel += std::to_string(selectedEntity);
-				}
-				if (ImGui::CollapsingHeader(headerLabel.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
-				}
-
-
 				RenderEntityTable();
+				RenderEntityViewer();
 			}
 			ImGui::End();
 		}
@@ -1454,8 +1518,12 @@ namespace rdt::core {
 		ttfFile = (fontFolder / fs::path("NunitoSans_7pt_Condensed-Medium.ttf")).generic_string();
 		GuiManager::LoadFont(NunitoSans, ttfFile);
 		GuiManager::SetDefaultFont(NunitoSans, 18);
-
 		AddFont(NunitoSans, ttfFile, std::vector<unsigned int>{18, 24, 36});
+
+		// Set the default font
+		ttfFile = (fontFolder / fs::path("NunitoSans_7pt_Condensed-Bold.ttf")).generic_string();
+		GuiManager::LoadFont(NunitoSans_Bold, ttfFile);
+		AddFont(NunitoSans_Bold, ttfFile, std::vector<unsigned int>{18, 24, 36});
 
 		// Load Icons from ForkAwesome
 		ttfFile = (fontFolder / fs::path(FONT_ICON_FILE_NAME_FK)).generic_string();

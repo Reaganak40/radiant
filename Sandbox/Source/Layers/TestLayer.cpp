@@ -24,8 +24,11 @@ public:
 		RigidBody2D rigidBody;
 		EntityManager::AddComponent<RigidBody2D>(eID, rigidBody);
 
+		static int i = 0;
 		Renderable renderable;
-		renderable.polygon_color = PINK;
+		renderable.polygon_color = i % 2 == 0 ? PINK : BLUE;
+		i++;
+
 		EntityManager::AddComponent<Renderable>(eID, renderable);
 
 		SystemManager::AddEntity<PhysicsSystem>(eID);

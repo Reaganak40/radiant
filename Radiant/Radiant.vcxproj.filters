@@ -688,6 +688,7 @@
     <ClCompile Include="Source\Engine\Physics\PhysicsSystem.cpp" />
     <ClCompile Include="Source\Engine\Graphics\RenderSystem.cpp" />
     <ClCompile Include="Source\Engine\ECS\EntityFactory.cpp" />
+    <ClCompile Include="Source\Engine\ECS\CommonComponents.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Resources\templates\gameObject.h.txt" />

@@ -10,6 +10,7 @@ namespace rdt {
 		virtual ~IComponentArray() = default;
 
 		virtual void RemoveData(Entity eID) = 0;
+		virtual void* GetDataPtr(Entity eID) = 0;
 	};
 
 	template <typename T>
@@ -64,6 +65,15 @@ namespace rdt {
 
 		bool HasEntity(Entity eID) {
 			return m_entity_map.find(eID) != m_entity_map.end();
+		}
+
+		void* GetDataPtr(Entity eID) override final {
+
+			if (!HasEntity(eID)) {
+				return nullptr;
+			}
+
+			return &m_data[m_entity_map.at(eID)];
 		}
 	};
 	// ====================================================================
@@ -131,6 +141,11 @@ namespace rdt {
 
 			signature.set(cID, true);
 		}
+
+		/*
+			Returns a non-type pointer this entity's data component
+		*/
+		static void* GetData(ComponentID cID, Entity entity);
 
 		/*
 			Returns the name of the component at the provided ComponentID

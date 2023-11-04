@@ -180,6 +180,16 @@ namespace rdt {
 		return GetComponent<EntityConfig>(entity)->alias.c_str();
 	}
 
+	Layer* EntityManager::GetEntityOwner(Entity entity)
+	{
+		if (!EntityExists(entity)) {
+			RDT_CORE_WARN("EntityManager - Tried to get owner of an unregistered entity [id: {}]", entity);
+			return nullptr;
+		}
+
+		return GetComponent<EntityConfig>(entity)->owner;
+	}
+
 	void EntityManager::AddToSignature(Entity eID, ComponentID cID)
 	{
 		m_instance->m_impl->AddToSignature(eID, cID);
