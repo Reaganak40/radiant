@@ -176,6 +176,12 @@ namespace rdt {
 		*/
 		static void OnRender();
 
+		/*
+			Returns a constant reference to the systems registered by the
+			SystemManager
+		*/
+		static const std::unordered_map<std::string, System*>& GetSystemMap();
+
 		friend class EntityManager;
 	private:
 		void RegisterSystemImpl(const char* name, System* nSystem);

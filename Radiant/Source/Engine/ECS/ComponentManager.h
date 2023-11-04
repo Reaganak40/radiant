@@ -132,6 +132,11 @@ namespace rdt {
 			signature.set(cID, true);
 		}
 
+		/*
+			Returns the name of the component at the provided ComponentID
+		*/
+		static const char* GetComponenentName(ComponentID cID);
+
 		friend class EntityManager;
 		friend class System;
 	private:

@@ -55,6 +55,11 @@ namespace rdt {
 		*/
 		static Signature GetSignature(Entity eID);
 
+		/*
+			Returns a constant reference to the registered entities.
+		*/
+		static const std::unordered_map<Entity, Signature>& GetEntityMap();
+
 
 		template<typename T>
 		static bool HasComponent(Entity eID)

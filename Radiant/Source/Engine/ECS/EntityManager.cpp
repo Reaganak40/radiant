@@ -165,6 +165,11 @@ namespace rdt {
 		return m_instance->m_impl->GetSignature(eID);
 	}
 
+	const std::unordered_map<Entity, Signature>& EntityManager::GetEntityMap()
+	{
+		return m_instance->m_impl->m_signatures;
+	}
+
 	const char* EntityManager::GetEntityAlias(Entity entity)
 	{
 		if (!EntityExists(entity)) {

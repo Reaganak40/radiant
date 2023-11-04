@@ -448,7 +448,7 @@ namespace rdt::core {
 		std::string panel_header = "Layer: ";
 		float lastGameObjectPanelHeight = 0.0f;
 		Layer* layer = nullptr;
-		float nodeListMaxY = 350.0f;
+		float nodeListMaxY = 500.0f;
 
 		enum NodeType {
 			LPNT_Entity,
@@ -514,7 +514,38 @@ namespace rdt::core {
 			panel_header += alias;
 			
 			if (ImGui::CollapsingHeader(panel_header.c_str())) {
-				ImGui::Text("This is information about an entity!.");
+
+				Signature signature = EntityManager::GetSignature(entity);
+				
+				if (ImGui::Button("Open in Entity Viewer")) {
+
+				}
+
+				ImGui::Indent(10);
+				ImGui::Text("Components (%d):", signature.count());
+
+
+				ImGui::Indent(10);
+				for (int index = 0; index < signature.size(); index++) {
+					if (signature[index]) {
+						std::string componentName = ComponentManager::GetComponenentName(index);
+						ImGui::Text("%s", componentName.c_str());
+					}
+				}
+				ImGui::Unindent(10);
+
+				std::vector<std::string> registeredSystems;
+				for (auto& [systemName, systemPtr] : SystemManager::GetSystemMap()) {
+					if (systemPtr->HasEntity(entity)) {
+						registeredSystems.push_back(systemName);
+					}
+				}
+				ImGui::Text("Systems (%d):", registeredSystems.size());
+				ImGui::Indent(10);
+				for (auto& name : registeredSystems) {
+					ImGui::Text("%s", name.c_str());
+				}
+				ImGui::Unindent(20);
 			}
 		}
 
@@ -547,7 +578,7 @@ namespace rdt::core {
 			float indent = (ImGui::GetWindowSize().x - nodeChildWindowSize.x) / 2;
 			ImGui::SetCursorPosX(indent);
 			ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 3.0f);
-			ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 10);
+			//ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, 10);
 
 			std::string child1 = (panel_header + "- " + (node.type == LPNT_Entity ? "Entity" : "GameObject") + "Node");
 			if (ImGui::BeginChild(child1.c_str(), nodeChildWindowSize, false, ImGuiWindowFlags_NoScrollbar)) {
@@ -587,7 +618,7 @@ namespace rdt::core {
 				}
 			}
 			ImGui::EndChild();
-			ImGui::PopStyleVar(2);
+			ImGui::PopStyleVar(1);
 		}
 
 		void OnRender() override final {
@@ -653,6 +684,8 @@ namespace rdt::core {
 	// =========================================================
 	struct EntityHierarchyPanelImpl : public Panel::Impl {
 
+		Entity selectedEntity = NO_ENTITY_ID;
+
 		void ApplyConfigPreferences(PanelConfig& config) override final {
 			config.width = PanelDefaults::EntityHierarchyPanelGuiWidth;
 			config.height = PanelDefaults::EntityHierarchyPanelGuiHeight;
@@ -660,9 +693,84 @@ namespace rdt::core {
 			config.xPos = 200;
 			config.yPos = 900;
 		}
+		
+		void RenderEntityTable() {
+			ImGuiTableFlags flags = ImGuiTableFlags_None;
+			flags |= ImGuiTableFlags_Borders;
+
+			if (ImGui::BeginTable("EntityTable", 3, flags)) {
+				ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed, 30);
+				ImGui::TableSetupColumn("Alias");
+				ImGui::TableSetupColumn("# of Components");
+				ImGui::TableHeadersRow();
+
+				int current_row = 0;
+
+				for (auto& [entity, entitySignature] : EntityManager::GetEntityMap()) {
+
+					ImGui::TableNextRow();
+
+					if (entity == selectedEntity) {
+						ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImColor(0.8f, 0.1f, 0.2f, 1.0f));
+					}
+					else {
+						if (current_row % 2 == 0) {
+							ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImColor(0.1f, 0.1f, 0.1f, 1.0f));
+						}
+						else {
+							ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImColor(0.2f, 0.2f, 0.2f, 1.0f));
+						}
+					}
+
+					ImGui::TableNextColumn();
+
+					char buffer[25];
+					bool hovered = false;
+					sprintf(buffer, "##EntityTableRow%d", current_row);
+
+					if (entity != selectedEntity) {
+						ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
+						ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
+						ImGui::Selectable(buffer, &hovered, ImGuiSelectableFlags_SpanAllColumns);
+						ImGui::PopStyleColor(2);
+						if (ImGui::IsItemClicked()) {
+							selectedEntity = entity;
+						}
+
+						ImGui::SameLine();
+					}
+
+					ImGui::Text("%d", entity);
+
+
+					ImGui::TableNextColumn();
+					ImGui::Text("%s", EntityManager::GetEntityAlias(entity));
+
+					ImGui::TableNextColumn();
+					ImGui::Text("%d", entitySignature.count());
+
+					current_row++;
+				}
+				ImGui::EndTable();
+			}
+		}
+		
+		
 		void OnRender() override final {
 			if (Panel_ImGuiBegin("Entity Component System")) {
 
+				std::string headerLabel = "Entity Viewer: ";
+				if (selectedEntity == NO_ENTITY_ID) {
+					headerLabel += "No Entity Selected";
+				}
+				else {
+					headerLabel += std::to_string(selectedEntity);
+				}
+				if (ImGui::CollapsingHeader(headerLabel.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
+				}
+
+
+				RenderEntityTable();
 			}
 			ImGui::End();
 		}

@@ -65,6 +65,18 @@ namespace rdt {
 		}
 	}
 
+	const char* ComponentManager::GetComponenentName(ComponentID cID)
+	{
+		for (auto& [name, componentID] : m_instance->m_impl->m_componentTypes) {
+			if (componentID == cID) {
+				return name.c_str();
+			}
+		}
+
+		RDT_CORE_WARN("ComponentManager - Could not find component with id: {}", cID);
+		return nullptr;
+	}
+
 	void ComponentManager::OnEntityRemoved(Entity eID)
 	{
 		m_instance->m_impl->OnEntityRemoved(eID);
