@@ -762,8 +762,24 @@ namespace rdt::core {
 			}
 		}
 		
-		void RenderEditTool(void* data, const core::TraceData& info) {
+		void RenderEditTool(const char* name, void* data, const core::TraceData& info) {
 			
+			auto next_sub_row = []() {
+				ImGui::TableNextRow();
+				ImGui::TableNextColumn();
+				ImGui::TableNextColumn();
+				};
+			auto title = [](const char* type, const char* name) {
+				ImGui::PushFont(Editor::m_fonts[NunitoSans_Bold][18]);
+				ImGui::Text(type);
+				ImGui::PopFont();
+				ImGui::SameLine();
+				ImGui::Text(name);
+				ImGui::SameLine();
+				ImGui::InvisibleButton("##rowheightadjustment", ImVec2(1, ImGui::GetFontSize() + (ImGui::GetStyle().FramePadding.y * 2)));
+				ImGui::TableNextColumn();
+				};
+
 			if (data == nullptr) {
 				ImGui::Text("ERROR");
 				return;
@@ -773,15 +789,20 @@ namespace rdt::core {
 			switch (info.type) {
 			case SupportedTraceType_color:
 			{
+				title("Color", name);
+
 				auto& color = ((Color*)data)->GetColor();
 				ImVec4 colVals = { color.x1, color.x2, color.x3, color.x4 };
 
 				ImGuiColorEditFlags flags = 0;
 				//flags |= ImGuiColorEditFlags_DisplayRGB;
 				static bool openColorPicker = false;
-				if (ImGui::ColorButton("Color", colVals, flags)) {
-					openColorPicker = true;
+				
+				ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+				if (ImGui::ColorEdit4("##editColor4", &colVals.x)) {
+					*((Color*)data) = Color(colVals.x, colVals.y, colVals.z, colVals.w);
 				}
+				ImGui::PopItemWidth();
 
 				if (openColorPicker) {
 					ImGui::SetNextWindowSize(ImVec2(270, 280), ImGuiCond_Appearing);
@@ -790,7 +811,6 @@ namespace rdt::core {
 						if (ImGui::ColorPicker4("##picker", &colVals.x, 0)) {
 							*((Color*)data) = Color(colVals.x, colVals.y, colVals.z, colVals.w);
 						}
-
 					}
 					ImGui::End();
 				}
@@ -798,43 +818,73 @@ namespace rdt::core {
 				break;
 
 			case SupportedTraceType_polygon:
-			{
-				ImGui::NewLine();
+			{	
+				title("Polygon", name);
+				
 				Vec2d coords = (*((std::shared_ptr<Polygon>*)data))->GetOrigin();
 				float vals[2] = { coords.x, coords.y };
 
 				ImGui::Text("Position:");
 				ImGui::SameLine();
 				float xAlign = ImGui::GetCursorPosX();
+				ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
 				if (ImGui::DragFloat2("##updateOrigin", vals, 2)) {
 					(*((std::shared_ptr<Polygon>*)data))->SetPosition({ vals[0], vals[1] });
 				}
+				ImGui::PopItemWidth();
 
+				next_sub_row();
 				vals[0] = (*((std::shared_ptr<Polygon>*)data))->GetWidth();
 				vals[1] = (*((std::shared_ptr<Polygon>*)data))->GetHeight();
 				ImGui::Text("Size:");
 				ImGui::SameLine();
 				ImGui::SetCursorPosX(xAlign);
+				ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
 				if (ImGui::DragFloat2("##updateSize", vals)) {
 					(*((std::shared_ptr<Polygon>*)data))->SetSize({ vals[0], vals[1] });
 				}
+				ImGui::PopItemWidth();
 			}
 			break;
 
 			case SupportedTraceType_uint:
 			{
+				title("unsigned int", name);
+
 				unsigned int val = *((unsigned int*)data);
 
 				int input = val;
-				if (ImGui::InputInt("##updateuint", &input)) {
+
+				ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+				char label[60];
+				sprintf_s(label, 60, "##updateuint_%s", name);
+				if (ImGui::InputInt(label, &input)) {
 					if (input >= 0) {
 						*((unsigned int*)data) = input;
 					}
 				}
+				ImGui::PopItemWidth();
 			}
 				break;
+
+			case SupportedTraceType_double:
+			{
+				title("double", name);
+
+				float val = (float)(*((double*)data));
+
+				char label[60];
+				sprintf_s(label, 60, "##updatedouble_%s", name);
+				ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+				if (ImGui::DragFloat(label, &val, 2)) {
+					*((double*)data) = (double)val;
+				}
+				ImGui::PopItemWidth();
+			}
+			break;
 			default:
-				ImGui::Text("No support for this type!");
+				title("(?)", name);
+				ImGui::Text("No introspection support!");
 				break;
 			}
 		}
@@ -868,20 +918,63 @@ namespace rdt::core {
 				for (int index = 0; index < signature.size(); index++) {
 					if (signature[index]) {
 						std::string componentName = ComponentManager::GetComponenentName(index);
-						ImGui::PushFont(Editor::m_fonts[NunitoSans_Bold][18]);
-						ImGui::Text("%s", componentName.c_str());
-						ImGui::PopFont();
+						
+						Editor::AddIcon(ICON_FK_CUBES);
+						ImGui::SameLine();
 
-						ImGui::Indent(10);
+						char checkboxLabel[60];
+						sprintf_s(checkboxLabel, 60, "##%s_enable", componentName.c_str());
+						bool isChecked = true;
+
+						ImGui::PushFont(Editor::m_fonts[NunitoSans_Bold][18]);
+
+						bool componentMenuOpen = ImGui::TreeNodeEx(componentName.c_str(), ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_AllowItemOverlap, componentName.c_str());
+						ImGui::PopFont();
+						ImGui::SameLine();
+						ImGui::SetCursorPosX(ImGui::GetWindowWidth() - ImGui::CalcTextSize("C").x - 13.5 - ImGui::GetStyle().ItemInnerSpacing.x);
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2.5);
+
+						ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+						ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.8f, 0.8f, 0.8f, 1.0f));
+						ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
+						ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+						ImGui::Checkbox(checkboxLabel, &isChecked);
+						ImGui::PopStyleVar();
+						ImGui::PopStyleColor(3);
+
+						if (componentMenuOpen) {
+							ImGui::Indent(10);
+							
+
+							
+
+							if (!ECSComponent::GetTraceData(componentName.c_str()).size()) {
+								ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
+								ImGui::Text("Could not find any tracable data.");
+								ImGui::Text("(Did you remember to call TRACE_COMPONENT_DATA() on its members?");
+								ImGui::PopStyleColor();
+							}
+							else {
+								char tableLabel[60];
+								sprintf_s(tableLabel, 60, "##%s_datatable", componentName.c_str());
+								if (ImGui::BeginTable(tableLabel, 2)) {
+									ImGui::TableSetupColumn("memberName", ImGuiTableColumnFlags_WidthFixed, ImGui::CalcTextSize("###################").x);
+									ImGui::TableSetupColumn("dataIntrospection");
+									
+									void* entity_data = ComponentManager::GetData(index, selectedEntity);
+									for (auto& [memberName, typeDef] : ECSComponent::GetTraceData(componentName.c_str())) {
+										ImGui::TableNextRow();
+										ImGui::TableNextColumn();
+										RenderEditTool(memberName.c_str(), entity_data, typeDef);
+									}
+									ImGui::EndTable();
+								}
+							}
 						
-						void* entity_data = ComponentManager::GetData(index, selectedEntity);
-						for (auto& [memberName, typeDef] : ECSComponent::GetTraceData(componentName.c_str())) {
-							ImGui::Text(memberName.c_str());
-							ImGui::SameLine();
-							RenderEditTool(entity_data, typeDef);
+							ImGui::Unindent(10);
+
+							//ImGui::Separator();
 						}
-						
-						ImGui::Unindent(10);
 					}
 				}
 			}
@@ -1495,6 +1588,7 @@ namespace rdt::core {
 			style.Colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
 			style.Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
 			style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.00f, 0.00f, 1.00f, 0.35f);
+			style.Colors[ImGuiCol_Separator] = ImVec4(1.0f, 1.0f, 1.0f, 0.65f);
 
 			Log::SetLogColor(LogLevel::L_TRACE, WHITE);
 
@@ -1545,6 +1639,7 @@ namespace rdt::core {
 			style.Colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
 			style.Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
 			style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.00f, 0.00f, 1.00f, 0.35f);
+			style.Colors[ImGuiCol_Separator] = ImVec4(1.0f, 1.0f, 1.0f, 0.65f);
 
 			Log::SetLogColor(LogLevel::L_TRACE, WHITE);
 			break;
@@ -1747,6 +1842,13 @@ namespace rdt::core {
 	{
 		ImGui::PopStyleColor();
 		ImGui::EndDisabled();
+	}
+
+	void Editor::AddIcon(const char* unicode, size_t size)
+	{
+		ImGui::PushFont(m_fonts[ForkAwesome][size]);
+		ImGui::Text(unicode);
+		ImGui::PopFont();
 	}
 
 	float Editor::GetButtonWidth(const char* label)

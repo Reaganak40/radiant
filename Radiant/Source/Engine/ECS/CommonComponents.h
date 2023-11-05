@@ -37,6 +37,7 @@ namespace rdt {
 			SupportedTraceType_stdstring,
 			SupportedTraceType_layerPtr,
 			SupportedTraceType_uint,
+			SupportedTraceType_double,
 			SupportedTraceType_color,
 			SupportedTraceType_polygon,
 			SupportedTraceType_NotSupported,
@@ -63,6 +64,10 @@ namespace rdt {
 
 			if (typeid(queryType) == typeid(std::shared_ptr<rdt::Polygon>)) {
 				return SupportedTraceType_polygon;
+			}
+
+			if (typeid(queryType) == typeid(double)) {
+				return SupportedTraceType_double;
 			}
 
 			return SupportedTraceType_NotSupported;
@@ -132,6 +137,11 @@ namespace rdt {
 	struct RigidBody2D : ECSComponent
 	{
 		double mass = 1;
+
+		RigidBody2D()
+		{
+			TRACE_COMPONENT_DATA(RigidBody2D, mass);
+		}
 	};
 
 	/*
@@ -145,9 +155,9 @@ namespace rdt {
 
 		Renderable()
 		{
+			TRACE_COMPONENT_DATA(Renderable, polygon_color);
 			TRACE_COMPONENT_DATA(Renderable, layer);
 			TRACE_COMPONENT_DATA(Renderable, texture);
-			TRACE_COMPONENT_DATA(Renderable, polygon_color);
 		}
 	};
 }

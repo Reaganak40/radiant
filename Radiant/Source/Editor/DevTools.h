@@ -228,6 +228,7 @@ namespace rdt::core {
 		static void InactiveButtonEnd();
 		static void InactiveTextBoxBegin();
 		static void InactiveTextBoxEnd();
+		static void AddIcon(const char* unicode, size_t size = 18);
 		static int MyTextCallback(ImGuiInputTextCallbackData* data);
 		static void ApplyGuiConfig(PanelConfig& config);
 		// ===========================================================
