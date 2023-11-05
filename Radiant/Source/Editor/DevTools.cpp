@@ -774,7 +774,63 @@ namespace rdt::core {
 			case SupportedTraceType_color:
 			{
 				auto& color = ((Color*)data)->GetColor();
-				ImGui::Text("Red: %.2f, Green: %.2f, Blue: %.2f, Alpha: %.2f", color.x1, color.x2, color.x3, color.x4);
+				ImVec4 colVals = { color.x1, color.x2, color.x3, color.x4 };
+
+				ImGuiColorEditFlags flags = 0;
+				//flags |= ImGuiColorEditFlags_DisplayRGB;
+				static bool openColorPicker = false;
+				if (ImGui::ColorButton("Color", colVals, flags)) {
+					openColorPicker = true;
+				}
+
+				if (openColorPicker) {
+					ImGui::SetNextWindowSize(ImVec2(270, 280), ImGuiCond_Appearing);
+					ImGuiWindowFlags flags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoResize;
+					if (ImGui::Begin("Edit Color ###ColorPickerWindow", &openColorPicker, flags)) {
+						if (ImGui::ColorPicker4("##picker", &colVals.x, 0)) {
+							*((Color*)data) = Color(colVals.x, colVals.y, colVals.z, colVals.w);
+						}
+
+					}
+					ImGui::End();
+				}
+			}
+				break;
+
+			case SupportedTraceType_polygon:
+			{
+				ImGui::NewLine();
+				Vec2d coords = (*((std::shared_ptr<Polygon>*)data))->GetOrigin();
+				float vals[2] = { coords.x, coords.y };
+
+				ImGui::Text("Position:");
+				ImGui::SameLine();
+				float xAlign = ImGui::GetCursorPosX();
+				if (ImGui::DragFloat2("##updateOrigin", vals, 2)) {
+					(*((std::shared_ptr<Polygon>*)data))->SetPosition({ vals[0], vals[1] });
+				}
+
+				vals[0] = (*((std::shared_ptr<Polygon>*)data))->GetWidth();
+				vals[1] = (*((std::shared_ptr<Polygon>*)data))->GetHeight();
+				ImGui::Text("Size:");
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(xAlign);
+				if (ImGui::DragFloat2("##updateSize", vals)) {
+					(*((std::shared_ptr<Polygon>*)data))->SetSize({ vals[0], vals[1] });
+				}
+			}
+			break;
+
+			case SupportedTraceType_uint:
+			{
+				unsigned int val = *((unsigned int*)data);
+
+				int input = val;
+				if (ImGui::InputInt("##updateuint", &input)) {
+					if (input >= 0) {
+						*((unsigned int*)data) = input;
+					}
+				}
 			}
 				break;
 			default:

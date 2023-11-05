@@ -38,6 +38,7 @@ namespace rdt {
 			SupportedTraceType_layerPtr,
 			SupportedTraceType_uint,
 			SupportedTraceType_color,
+			SupportedTraceType_polygon,
 			SupportedTraceType_NotSupported,
 		};
 
@@ -58,6 +59,10 @@ namespace rdt {
 
 			if (typeid(queryType) == typeid(rdt::Color)) {
 				return SupportedTraceType_color;
+			}
+
+			if (typeid(queryType) == typeid(std::shared_ptr<rdt::Polygon>)) {
+				return SupportedTraceType_polygon;
 			}
 
 			return SupportedTraceType_NotSupported;
@@ -114,6 +119,11 @@ namespace rdt {
 		// Contains a centeralized origin and 2D vertices
 		// NOTE: Pointer required because the number of vertices in arbitrary
 		std::shared_ptr<Polygon> polygon = nullptr; 
+
+		Sprite()
+		{
+			TRACE_COMPONENT_DATA(Sprite, polygon);
+		}
 	};
 
 	/*
