@@ -516,6 +516,8 @@
     <ClInclude Include="Source\Engine\ECS\ECS.h" />
     <ClInclude Include="Source\Engine\Graphics\RenderSystem.h" />
     <ClInclude Include="Source\Engine\ECS\EntityFactory.h" />
+    <ClInclude Include="Source\Engine\Graphics\Model.h" />
+    <ClInclude Include="Source\Engine\Utils\rdt_string.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Editor\DevTools.cpp">
@@ -689,6 +691,8 @@
     <ClCompile Include="Source\Engine\Graphics\RenderSystem.cpp" />
     <ClCompile Include="Source\Engine\ECS\EntityFactory.cpp" />
     <ClCompile Include="Source\Engine\ECS\CommonComponents.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\Model.cpp" />
+    <ClCompile Include="Source\Engine\Utils\rdt_string.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Resources\templates\gameObject.h.txt" />

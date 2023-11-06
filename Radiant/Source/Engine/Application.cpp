@@ -10,6 +10,7 @@
 #include "Physics/Physics.h"
 #include "Gui/GuiManager.h"
 #include "OOComponents/Scene/SceneManager.h"
+#include "Graphics/Model.h"
 #include "Physics/Ptag.h"
 #include "Utils/Timestep.h"
 
@@ -47,6 +48,7 @@ namespace rdt {
 		core::PtagManager::Initialize();
 		Physics::Initialize();
 		SceneManager::Initialize();
+		ModelManager::Initialize();
 		
 		AddECS();
 	}
@@ -64,6 +66,8 @@ namespace rdt {
 		core::PtagManager::Destroy();
 
 		RemoveECS();
+
+		ModelManager::Destroy();
 
 		Input::Destroy();
 		SoundEngine::Destroy();

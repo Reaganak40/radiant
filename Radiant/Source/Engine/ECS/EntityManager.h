@@ -1,3 +1,12 @@
+/*******************************************************************
+*	Module:  ECS
+*	File:    EntityManager.h
+*
+*	Author: Reagan Kelley
+*
+*   The file contains the EntityManager which creates new entities,
+*	manages there signatures, and lifetimes.
+*******************************************************************/
 #pragma once
 #include "Core.h"
 #include "ECSTypes.h"

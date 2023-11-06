@@ -1,3 +1,14 @@
+/*******************************************************************
+*	Module:  ECS
+*	File:    SystemManager.h
+*
+*	Author: Reagan Kelley
+*
+*   The file contains the the base class for System, which is used
+*	to instantiate unique systems by the client. Systems are
+*	maintained by the SystemManager, which is responsible for
+*   calling its Update function.
+*******************************************************************/
 #pragma once
 #include "Core.h"
 #include "ECSTypes.h"

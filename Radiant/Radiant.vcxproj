@@ -115,6 +115,7 @@
     <ClInclude Include="Source\Engine\Audio\SoundData.h" />
     <ClInclude Include="Source\Engine\Audio\SoundEngine.h" />
     <ClInclude Include="Source\Engine\Audio\SoundSource.h" />
+    <ClInclude Include="Source\Engine\Graphics\Model.h" />
     <ClInclude Include="Source\Engine\OOComponents\OOComponent.h" />
     <ClInclude Include="Source\Engine\Core.h" />
     <ClInclude Include="Source\Engine\ECS\CommonComponents.h" />
@@ -174,6 +175,7 @@
     <ClInclude Include="Source\Engine\Utils\ConfigReader.h" />
     <ClInclude Include="Source\Engine\Utils\Input.h" />
     <ClInclude Include="Source\Engine\Utils\MathTypes.h" />
+    <ClInclude Include="Source\Engine\Utils\rdt_string.h" />
     <ClInclude Include="Source\Engine\Utils\Timestep.h" />
     <ClInclude Include="Source\Engine\Utils\UniqueID.h" />
     <ClInclude Include="Source\Engine\Utils\Utils.h" />
@@ -248,6 +250,7 @@
     <ClCompile Include="Source\Engine\Audio\SoundEngine.cpp" />
     <ClCompile Include="Source\Engine\Audio\SoundSource.cpp" />
     <ClCompile Include="Source\Engine\ECS\CommonComponents.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\Model.cpp" />
     <ClCompile Include="Source\Engine\OOComponents\OOComponent.cpp" />
     <ClCompile Include="Source\Engine\OOComponents\GameObject\GameObject.cpp" />
     <ClCompile Include="Source\Engine\OOComponents\GameState.cpp" />
@@ -299,6 +302,7 @@
     <ClCompile Include="Source\Engine\Utils\ConfigReader.cpp" />
     <ClCompile Include="Source\Engine\Utils\Input.cpp" />
     <ClCompile Include="Source\Engine\Utils\MathTypes.cpp" />
+    <ClCompile Include="Source\Engine\Utils\rdt_string.cpp" />
     <ClCompile Include="Source\Engine\Utils\Timestep.cpp" />
     <ClCompile Include="Source\Engine\Utils\UniqueID.cpp" />
     <ClCompile Include="Source\Engine\Utils\Utils.cpp" />

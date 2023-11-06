@@ -177,7 +177,7 @@ namespace rdt {
 			return nullptr;
 		}
 
-		return GetComponent<EntityConfig>(entity)->alias.c_str();
+		return GetComponent<EntityConfig>(entity)->alias;
 	}
 
 	Layer* EntityManager::GetEntityOwner(Entity entity)

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "CommonComponents.h"
 #include "Logging/Log.h"
+#include "Graphics/Model.h"
 
 namespace rdt {
 	std::unordered_map<std::string, std::unordered_map<std::string, core::TraceData>> ECSComponent::ComponentDefinitions;
@@ -31,4 +32,45 @@ namespace rdt {
 
 		return ComponentDefinitions.at(ComponentName);
 	}
+
+	// ===============================================================================
+	EntityConfig::EntityConfig()
+	{
+		TRACE_COMPONENT_DATA(EntityConfig, owner);
+		TRACE_COMPONENT_DATA(EntityConfig, alias);
+
+		owner = nullptr;
+		alias = "";
+	}
+	// ===============================================================================
+	Sprite::Sprite()
+	{
+		TRACE_COMPONENT_DATA(Sprite, polygon);
+
+		polygon = nullptr;
+		model = NOT_A_MODEL;
+	}
+	void Sprite::SetModel(const std::string& modelName)
+	{
+		model = ModelManager::GetModelID(modelName);
+	}
+	// ===============================================================================
+	RigidBody2D::RigidBody2D()
+	{
+		TRACE_COMPONENT_DATA(RigidBody2D, mass);
+
+		mass = 1;
+	}
+	// ===============================================================================
+	Renderable::Renderable()
+	{
+		TRACE_COMPONENT_DATA(Renderable, polygon_color);
+		TRACE_COMPONENT_DATA(Renderable, layer);
+		TRACE_COMPONENT_DATA(Renderable, texture);
+
+		layer = 0;
+		texture = "";
+		polygon_color = BLACK;
+	}
+
 }

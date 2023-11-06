@@ -1,3 +1,13 @@
+/*******************************************************************
+*	Module:  ECS
+*	File:    ComponentManager.h
+*
+*	Author: Reagan Kelley
+*
+*   The file contains declarations and definitions for ECS 
+*   components. Components hold entity data, and posses unique
+*   IDs controlled by the ComponentManager for client access.
+*******************************************************************/
 #pragma once
 #include "Core.h"
 #include "ECSTypes.h"

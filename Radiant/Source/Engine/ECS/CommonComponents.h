@@ -1,14 +1,30 @@
+/*******************************************************************
+*	Module:  ECS  
+*	File:    CommonComponents.h
+*	
+*	Author: Reagan Kelley
+* 
+*   Common component data structs that are used by the engine,
+*	systems, and child applications.
+*******************************************************************/
 #pragma once
 #include "Core.h"
+
+// Forward Declarations
+namespace rdt {
+	using ModelID = unsigned int;
+	class Polygon;
+	class Layer;
+}
+
+// Required Definitions for Struct/Class Members
 #include "Utils/MathTypes.h"
 #include "Utils/Color.h"
-#include "Polygon/Polygon.h"
-#include "ECSTypes.h"
-/*
-	Common component data structs that are used by the engine,
-	systems, and child applications.
-*/
+#include "Utils/rdt_string.h"
 
+/*
+	Stringify name
+*/
 #define GET_NAME(name) #name
 
 /*
@@ -29,12 +45,13 @@ if(!is_ ## MemberVariable ## _defined) { \
 
 namespace rdt {
 
-	class Layer;
+	// STL dll-interfaces
+	EXPORT_STL(std::shared_ptr<Polygon>);
 
 	namespace core {
 
 		enum SupportedTraceType {
-			SupportedTraceType_stdstring,
+			SupportedTraceType_rdt_string,
 			SupportedTraceType_layerPtr,
 			SupportedTraceType_uint,
 			SupportedTraceType_double,
@@ -46,8 +63,8 @@ namespace rdt {
 		template<typename T>
 		SupportedTraceType ResolveSupportType(const T& queryType)
 		{
-			if (typeid(queryType) == typeid(std::string)) {
-				return SupportedTraceType_stdstring;
+			if (typeid(queryType) == typeid(rdt_string)) {
+				return SupportedTraceType_rdt_string;
 			}
 
 			if (typeid(queryType) == typeid(Layer*)) {
@@ -102,62 +119,60 @@ namespace rdt {
 		Defines engine-specific configurations for an Entity,
 		this component is highly coupled with the EntityManager
 	*/
-	struct EntityConfig : ECSComponent
+	struct RADIANT_API EntityConfig : ECSComponent
 	{
-		std::string alias = "";
-		Layer* owner = nullptr;
+		rdt_string alias;
+		Layer* owner;
 
-
-		EntityConfig()
-		{
-			TRACE_COMPONENT_DATA(EntityConfig, alias);
-			TRACE_COMPONENT_DATA(EntityConfig, owner);
-		}
+		EntityConfig();
 	};
 
 	/*
 		Defines the dimensionality of an entity, that is
 		its vertices, location in space and volume.
 	*/
-	struct Sprite : ECSComponent
+	struct RADIANT_API Sprite : ECSComponent
 	{
 		// Contains a centeralized origin and 2D vertices
 		// NOTE: Pointer required because the number of vertices in arbitrary
-		std::shared_ptr<Polygon> polygon = nullptr; 
+		std::shared_ptr<Polygon> polygon; 
+		ModelID model;
 
-		Sprite()
-		{
-			TRACE_COMPONENT_DATA(Sprite, polygon);
-		}
+		Sprite();
+
+		/*
+			Sets the sprite's modelID by querying the ModelManager
+		*/
+		void SetModel(const std::string& modelName);
+	};
+
+	// defines the locality and dimensions of an entity
+	struct RADIANT_API Transform : ECSComponent
+	{
+		Vec2d position;
+		float rotation;
+		Vec2d scale;
 	};
 
 	/*
 		Defines a physics object's properties
 	*/
-	struct RigidBody2D : ECSComponent
+	struct RADIANT_API RigidBody2D : ECSComponent
 	{
-		double mass = 1;
+		double mass;
 
-		RigidBody2D()
-		{
-			TRACE_COMPONENT_DATA(RigidBody2D, mass);
-		}
+		RigidBody2D();
 	};
 
 	/*
 		Defines a renderable object
 	*/
-	struct Renderable : ECSComponent
+	struct RADIANT_API Renderable : ECSComponent
 	{
-		unsigned int layer = 0;		 // The render layer to begin draw
-		std::string texture = "";    // texture alias to be applied to this render object
-		Color polygon_color = BLACK; // The shader color for the polygon
+		unsigned int layer;		// The render layer to begin draw
+		rdt_string texture;     // texture alias to be applied to this render object
+		Color polygon_color;    // The shader color for the polygon
 
-		Renderable()
-		{
-			TRACE_COMPONENT_DATA(Renderable, polygon_color);
-			TRACE_COMPONENT_DATA(Renderable, layer);
-			TRACE_COMPONENT_DATA(Renderable, texture);
-		}
+		Renderable();
 	};
 }
