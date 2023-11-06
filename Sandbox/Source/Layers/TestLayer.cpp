@@ -1,14 +1,14 @@
 #include "TestLayer.h"
 #include "GameObjects/TestQuad.h"
-#include "GameObjects/MyBeautifulObject.h"
 
 using namespace rdt;
 
-class PinkBox : public EntityDefinition, SpawnRect {
+class Platform : public EntityDefinition, SpawnRect
+{
 private:
 public:
 
-	PinkBox(double xPos, double yPos, double width, double height)
+	Platform(double xPos, double yPos, double width, double height)
 		: SpawnRect(xPos, yPos, width, height)
 	{
 	}
@@ -25,7 +25,8 @@ public:
 		EntityManager::AddComponent<RigidBody2D>(eID, rigidBody);
 
 		Renderable renderable;
-		renderable.polygon_color = PINK;
+		renderable.polygon_color = BLACK;
+
 		EntityManager::AddComponent<Renderable>(eID, renderable);
 
 		SystemManager::AddEntity<PhysicsSystem>(eID);
@@ -33,21 +34,49 @@ public:
 	}
 };
 
+class Person : public EntityDefinition, SpawnRect
+{
+private:
+	Color m_color;
+public:
+
+	Person(double xPos, double yPos, Color spriteColor)
+		: SpawnRect(xPos, yPos, 50, 100)
+	{
+		m_color = spriteColor;
+	}
+
+	void OnCreate() override final
+	{
+		Register();
+		Entity eID = GetID();
+
+		Sprite sprite = SpawnRect::CreateSprite();
+		EntityManager::AddComponent<Sprite>(eID, sprite);
+
+		RigidBody2D rigidBody;
+		EntityManager::AddComponent<RigidBody2D>(eID, rigidBody);
+
+		Renderable renderable;
+		renderable.polygon_color = m_color;
+
+		EntityManager::AddComponent<Renderable>(eID, renderable);
+
+		SystemManager::AddEntity<PhysicsSystem>(eID);
+		SystemManager::AddEntity<RenderSystem>(eID);
+	}
+
+};
+
+
 TestLayer::TestLayer(const std::string& alias)
 {
 	RegisterToMessageBus(alias);
 	CreateNewRealm();
 
-	TestQuad* quad3;
-	RegisterGameObject(quad3 = new TestQuad("quad3", { 160, 500 }));
-	quad3->RegisterToRealm(GetRealms()[0]);
-	quad3->RegisterToLayer(GetID());
+	RegisterEntity(new Platform(360, 100, 500, 50), "platform1");
+	RegisterEntity(new Person(360, 300, BLUE), "player");
 
-	RegisterGameObject(new MyBeautifulObject("Object1"));
-
-	for (int i = 1; i < 15; i++) {
-		RegisterEntity(new PinkBox(100 * i, 100, 50, 50));
-	}
 }
 
 TestLayer::~TestLayer()

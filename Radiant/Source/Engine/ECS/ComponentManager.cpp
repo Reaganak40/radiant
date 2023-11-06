@@ -37,6 +37,18 @@ namespace rdt {
 			return m_componentTypes.at(typeName);
 		}
 
+		void* GetData(ComponentID cID, Entity entity) {
+
+			for (auto& [componentName, id] : m_componentTypes) {
+				if (id == cID) {
+					return m_components.at(componentName)->GetDataPtr(entity);
+				}
+			}
+
+			RDT_CORE_WARN("ComponentManager - Could not find component '{}'", cID);
+			return nullptr;
+		}
+
 	};
 	// =================================================================
 
@@ -63,6 +75,23 @@ namespace rdt {
 			delete m_instance;
 			m_instance = nullptr;
 		}
+	}
+
+	void* ComponentManager::GetData(ComponentID cID, Entity entity)
+	{
+		return m_instance->m_impl->GetData(cID, entity);
+	}
+
+	const char* ComponentManager::GetComponenentName(ComponentID cID)
+	{
+		for (auto& [name, componentID] : m_instance->m_impl->m_componentTypes) {
+			if (componentID == cID) {
+				return name.c_str();
+			}
+		}
+
+		RDT_CORE_WARN("ComponentManager - Could not find component with id: {}", cID);
+		return nullptr;
 	}
 
 	void ComponentManager::OnEntityRemoved(Entity eID)

@@ -233,6 +233,10 @@ namespace rdt::core {
         else {
             for (auto& [id, window] : GetRenderWindows()) {
 
+                if (!window->ShouldShow()) {
+                    continue;
+                }
+
                 auto& fbo = m_frame_buffers.at(id);
                 window->OnBegin();
             
@@ -727,10 +731,14 @@ namespace rdt::core {
     void RendererGL::StartImGuiFrame()
     {
         if (m_GUIs.size() > 0 && !m_imgui_newFrameCalled) {
+
+            GuiManager::BeforeGuiNewFrame();
+
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
 
+            GuiManager::OnGuiNewFrame();
             m_imgui_newFrameCalled = true;
         }
     }

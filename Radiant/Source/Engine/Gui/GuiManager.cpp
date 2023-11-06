@@ -10,8 +10,10 @@ namespace rdt::core {
 	GuiManager::GuiManager()
 	{
 		LoadFontImpl(GUI_DEFAULT_FONT, "");
-		ImGuiIO& io = ImGui::GetIO();
-		m_fonts.at(GUI_DEFAULT_FONT).font_ptrs[GUI_DEFAULT_FONT_SIZE] = io.Fonts->AddFontDefault();
+
+		callDockOverViewport = false;
+		defaultFont = nullptr;
+		defaultFontDefined = false;
 	}
 
 	GuiManager::~GuiManager()
@@ -38,6 +40,57 @@ namespace rdt::core {
 		if (m_instance != nullptr) {
 			delete m_instance;
 			m_instance = nullptr;
+		}
+	}
+
+	bool GuiManager::FontExists(int magicWord)
+	{
+		return m_instance->m_fonts.find(magicWord) != m_instance->m_fonts.end(magicWord);
+	}
+
+	ImFont* GuiManager::GetFont(const int magicWord, const unsigned int fontSize)
+	{
+		if (!m_instance->defaultFontDefined) {
+			RDT_CORE_ERROR("GuiManager - Cannot get fonts until the default font is defined first.");
+			return nullptr;
+		}
+		return m_instance->GetFontImpl(magicWord, fontSize);
+	}
+
+	void GuiManager::EnableDockOverViewport(bool enable)
+	{
+		m_instance->callDockOverViewport = enable;
+	}
+
+	void GuiManager::OnGuiNewFrame()
+	{
+		if (m_instance->callDockOverViewport) {
+			ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+		}
+	}
+
+	void GuiManager::SetDefaultFont(const int magicWord, int size)
+	{
+		if (m_instance->defaultFontDefined) {
+			return;
+		}
+
+		if (magicWord == GUI_DEFAULT_FONT) {
+			ImGuiIO& io = ImGui::GetIO();
+			m_instance->m_fonts.at(GUI_DEFAULT_FONT).font_ptrs[GUI_DEFAULT_FONT_SIZE] = io.Fonts->AddFontDefault();
+		}
+
+		// Loads font first
+		m_instance->defaultFontDefined = true;
+		GetFont(magicWord, size);
+	}
+
+	void GuiManager::BeforeGuiNewFrameImpl()
+	{
+		if (!defaultFontDefined) {
+			ImGuiIO& io = ImGui::GetIO();
+			m_fonts.at(GUI_DEFAULT_FONT).font_ptrs[GUI_DEFAULT_FONT_SIZE] = io.Fonts->AddFontDefault();
+			defaultFontDefined = true;
 		}
 	}
 

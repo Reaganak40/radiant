@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "Core.h"
-#include "Components/Scene/Scene.h"
+#include "OOComponents/Scene/Scene.h"
 
 // For ApplicationConfig Struct
 #include "Utils/UniqueID.h"
@@ -82,7 +82,6 @@ namespace rdt {
 		*/
 		virtual void OnGameBegin() {}
 
-	private:
 	private:
 
 		/*

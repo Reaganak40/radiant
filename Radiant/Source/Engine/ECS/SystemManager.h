@@ -1,3 +1,14 @@
+/*******************************************************************
+*	Module:  ECS
+*	File:    SystemManager.h
+*
+*	Author: Reagan Kelley
+*
+*   The file contains the the base class for System, which is used
+*	to instantiate unique systems by the client. Systems are
+*	maintained by the SystemManager, which is responsible for
+*   calling its Update function.
+*******************************************************************/
 #pragma once
 #include "Core.h"
 #include "ECSTypes.h"
@@ -175,6 +186,12 @@ namespace rdt {
 			Calleds Update() on all render update systems
 		*/
 		static void OnRender();
+
+		/*
+			Returns a constant reference to the systems registered by the
+			SystemManager
+		*/
+		static const std::unordered_map<std::string, System*>& GetSystemMap();
 
 		friend class EntityManager;
 	private:

@@ -8,11 +8,18 @@ namespace rdt {
 		void* m_texture;
 		Vec2d m_textureSize;
 		float m_title_bar_offset;
+
+		bool m_shouldShow;
+
 	public:
 		RenderWindow();
 		~RenderWindow();
 
 		void AssignTexture(void* nTexture);
+
+		bool ShouldShow();
+
+		void SetShouldShow(bool shouldShow);
 
 		virtual void OnUpdate(const float deltaTime) {}
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "Components/Scene/Layer.h"
+#include "OOComponents/Scene/Layer.h"
 #include "Utils/Input.h"
 #include "Utils/ConfigReader.h"
 #include "Graphics/RenderWindow.h"
@@ -49,16 +49,121 @@ namespace rdt::core {
 
 	// =====================================================================================
 
-	class GameWindowPanel : public RenderWindow {
+	/*
+		ImGui Panel that contains the game viewport
+	*/	
+	class GameRenderWindow : public RenderWindow {
 	private:
 		bool update_pos;
 	public:
-		GameWindowPanel();
-		~GameWindowPanel();
+		GameRenderWindow();
+		~GameRenderWindow();
 
 		void OnBegin() override final;
 		void OnEnd() override final;
 		void TriggerUpdatePos();
+	};
+	// =====================================================================================
+	enum PanelType {
+		PT_NAP, // Not a Panel
+		MenuBar,
+		DiagnosticsPanel,
+		ScenePanel,
+		EntityHierarchyPanel,
+		ConsolePanel,
+		GameWindowPanel,
+		GameWindowSettingsPanel,
+		TemplateWizard,
+		EntityWizard,
+	};
+
+	struct OpenPanelRequestData;
+	struct ChangeThemeRequestData;
+
+	struct PanelConfig {
+		float xPos = 0;
+		float yPos = 0;
+		float width = 0;
+		float height = 0;
+		bool update = false;
+	};
+
+	class Panel {
+	public:
+		struct Impl;
+	private:
+		Impl* m_impl;
+		PanelType m_type;
+		PanelConfig m_config;
+	public:
+
+		Panel(PanelType type = PT_NAP);
+
+		~Panel();
+
+		/*
+			Creates a new Panel of the provided type
+		*/
+		void SetPanelType(PanelType type);
+
+		/*
+			Call ImGui pipeline to render Panel
+		*/
+		void Render();
+
+		/*
+			Get the ouput data of the panel 
+		*/
+		void* GetData();
+
+		/*
+			Gets the panel configuration (editable)
+		*/
+		PanelConfig& GetConfig();
+
+		/*
+			Gets the type of panel implementation for this instance
+		*/
+		PanelType GetType();
+
+		/*
+			Sets the flag to show the panel to true or false
+		*/
+		void SetShow(bool shouldShow);
+	};
+
+	// =====================================================================================
+	class PanelManager {
+	private:
+		std::unordered_map<PanelType, Panel*> m_panels;
+		std::unordered_map<PanelType, void*> m_messages;
+
+	public:
+		PanelManager();
+		~PanelManager();
+
+		/*
+			Registers/Creates a new Panel instance of the provided type.
+			Only 1 panel allowed per type.
+		*/
+		void RegisterPanel(PanelType type);
+
+		/*
+			Opens a panel, launching its window, and showing itself in the MDI
+		*/
+		void OpenPanel(PanelType type);
+
+		/*
+			Renders all panels as a multiple document interface
+		*/
+		void RenderMDI();
+
+		/*
+			Gets the current broadcasted data from each panel.
+		*/
+		const std::unordered_map<PanelType, void*>& GetMessages();
+
+	private:
 	};
 
 	// =====================================================================================
@@ -68,10 +173,12 @@ namespace rdt::core {
 	enum EditorTheme {
 		Theme_Codz,
 		Nightingale,
+		ET_NAT, // Not a theme
 	};
 
 	enum EditorFont {
 		NunitoSans = 1,
+		NunitoSans_Bold,
 		ForkAwesome,
 	};
 
@@ -79,75 +186,29 @@ namespace rdt::core {
 	/*
 		Editor Layout Implementation
 	*/
-	class EditorLayout : public GuiTemplate, public Messenger {
+	class Editor : public GuiTemplate, public Messenger {
+	public:
+		static std::string sourcePath;
+		static std::string templatePath;
+		static Scene* m_scene;
+		static std::unordered_map<EditorFont, std::unordered_map<unsigned int, ImFont*>> m_fonts;
+		static GameRenderWindow* m_gameWindow;
+		static int m_gameWindowId;
 	private:
-		/*
-			Development dependables
-		*/
-		Scene* m_scene;
-		std::string sourcePath;
-		std::string templatePath;
+		PanelManager m_panel_manager;
+		ConfigReader* m_config;
 		bool first_render;
-		float m_menu_bar_height;
-
-		bool m_templateWizardLaunched;
-		int m_template_selection_index;
-		char m_template_name[60];
-		bool m_template_name_edited;
-
 		bool m_showTools;
 		const std::vector<InputState> controls_ShowTools1{ CTRL_KEY_DOWN };
 		const std::vector<InputState> controls_ShowTools2{ T_KEY_PRESS };
-
-		std::unordered_map<EditorFont, std::unordered_map<unsigned int, ImFont*>> m_fonts;
-		
-		std::string m_last_log;
-
-		ConfigReader* m_config;
-
-		/*
-			Gui Layout data structures
-		*/
-		enum Dock {
-			DockLeft,
-			DockRight,
-			DockTop,
-			DockBottom
-		};
-
-		struct GuiConfig {
-			float xPos = 0;
-			float yPos = 0;
-			float width = 0;
-			float height = 0;
-			bool update = false;
-		};
-
-		enum TemplateType {
-			T_GameObject,
-			T_Layer,
-			T_Scene,
-		};
-
-		/*
-			Panels
-		*/
-		GameWindowPanel* m_game_window_panel;
-		int m_gameWindowId;
-
-		GuiConfig m_diagnostics_panel;
-		GuiConfig m_scene_panel;
-		GuiConfig m_template_wizard;
-		GuiConfig m_game_window_settings_panel;
-		GuiConfig m_console_panel;
-
 	public:
-		EditorLayout();
-		~EditorLayout();
+		Editor();
+		~Editor();
 
 		void OnMessage(Message msg) override final;
 		void OnUpdate(const float deltaTime) override;
 		void OnRender() override;
+
 
 		void SetTheme(EditorTheme nTheme);
 		void SetSourcePath(const std::string& path);
@@ -157,51 +218,33 @@ namespace rdt::core {
 		void AddConfigPtr(ConfigReader* ptr);
 		void ApplyConfig();
 
+		// ===========================================================
+		/* Utility functions used by many panels */
+
+		static float GetButtonWidth(const char* label);
+		static float GetButtonHeight(const char* label);
+		static void AddCenteredText(const std::string& text);
+		static void InactiveButtonBegin();
+		static void InactiveButtonEnd();
+		static void InactiveTextBoxBegin();
+		static void InactiveTextBoxEnd();
+		static void AddIcon(const char* unicode, size_t size = 18);
+		static int MyTextCallback(ImGuiInputTextCallbackData* data);
+		static void ApplyGuiConfig(PanelConfig& config);
+		// ===========================================================
+
 	private:
+		
+		// ===============================================
+		void ProcessMessages();
+		void OnOpenPanelRequest(OpenPanelRequestData* data);
+		void OnChangeThemeRequest(ChangeThemeRequestData* data);
+		// ===============================================
+		void OpenPanel(PanelType panel);
+		// ===============================================
+
 		void OnFirstRender();
 		void AddFont(EditorFont name, std::string& ttfFile, const std::vector<unsigned int>& sizes);
-		void ApplyGuiConfig(GuiConfig& config);
 		void SetScenePtr(Scene* ptr);
-		void AddCenteredText(const std::string& text);
-		void InactiveButtonBegin();
-		void InactiveButtonEnd();
-		void InactiveTextBoxBegin();
-		void InactiveTextBoxEnd();
-		void CreateFileFromTemplate(TemplateType type, const std::string& name);
-		float GetButtonWidth(const char* label);
-		float GetButtonHeight(const char* label);
-
-		bool ValidTemplateName(const std::string& name, std::string& errorMsg);
-		static int MyTextCallback(ImGuiInputTextCallbackData* data);
-
-		/*
-			Returns the docking x-position for the Gui to be docked in the
-			provided direction with the given margin.
-		*/
-		float GetDockPosX(Dock docking, float guiWidth, float margin = 0);
-
-		/*
-			Returns the docking y-position for the Gui to be docked in the
-			provided direction with the given margin.
-		*/
-		float GetDockPosY(Dock docking, float guiHeight, float margin = 0);
-
-
-		// =======================================================
-		void RenderMenuBar();
-		// =======================================================
-		void RenderDiagnosticsPanel();
-		// =======================================================
-		void RenderScenePanel();
-		void AddLayerPanel(Layer* layer);
-		void AddGameObjectPanel(GameObject* gobject);
-		// =======================================================
-		void RenderGameWindowSettingsPanel();
-		// =======================================================
-		void RenderConsolePanel();
-		// =======================================================
-		void RenderTemplateWizard();
-		// =======================================================
-
 	};
 }

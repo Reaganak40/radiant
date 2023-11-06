@@ -11,6 +11,7 @@ namespace rdt {
 		m_gui_pos.x = (Renderer::GetWindowWidth() / 2) - (m_gui_width / 2);
 		m_gui_pos.y = (Renderer::GetWindowHeight() / 2) - (m_gui_height / 2);
 		m_title_bar_offset = 30;
+		m_shouldShow = false;
 	}
 	RenderWindow::~RenderWindow()
 	{
@@ -74,5 +75,13 @@ namespace rdt {
 	void RenderWindow::AssignTexture(void* nTexture)
 	{
 		m_texture = nTexture;
+	}
+	bool RenderWindow::ShouldShow()
+	{
+		return m_shouldShow;
+	}
+	void RenderWindow::SetShouldShow(bool shouldShow)
+	{
+		m_shouldShow = shouldShow;
 	}
 }

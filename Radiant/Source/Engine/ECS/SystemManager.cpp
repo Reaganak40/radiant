@@ -186,6 +186,11 @@ namespace rdt {
 		}
 	}
 
+	const std::unordered_map<std::string, System*>& SystemManager::GetSystemMap()
+	{
+		return m_instance->m_impl->m_systems;
+	}
+
 	void SystemManager::RegisterSystemImpl(const char* name, System* nSystem)
 	{
 		m_impl->RegisterSystem(name, nSystem);
