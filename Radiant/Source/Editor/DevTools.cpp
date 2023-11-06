@@ -725,7 +725,7 @@ namespace rdt::core {
 
 					char buffer[25];
 					bool hovered = false;
-					sprintf(buffer, "##EntityTableRow%d", current_row);
+					sprintf_s(buffer, 25, "##EntityTableRow%d", current_row);
 
 					if (entity != selectedEntity) {
 						ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
@@ -948,7 +948,7 @@ namespace rdt::core {
 
 							
 
-							if (!ECSComponent::GetTraceData(componentName.c_str()).size()) {
+							if (!ComponentTraceTracker::GetTraceData(componentName.c_str()).size()) {
 								ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
 								ImGui::Text("Could not find any tracable data.");
 								ImGui::Text("(Did you remember to call TRACE_COMPONENT_DATA() on its members?");
@@ -962,7 +962,7 @@ namespace rdt::core {
 									ImGui::TableSetupColumn("dataIntrospection");
 									
 									void* entity_data = ComponentManager::GetData(index, selectedEntity);
-									for (auto& [memberName, typeDef] : ECSComponent::GetTraceData(componentName.c_str())) {
+									for (auto& [memberName, typeDef] : ComponentTraceTracker::GetTraceData(componentName.c_str())) {
 										ImGui::TableNextRow();
 										ImGui::TableNextColumn();
 										RenderEditTool(memberName.c_str(), entity_data, typeDef);

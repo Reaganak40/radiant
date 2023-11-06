@@ -95,24 +95,31 @@ namespace rdt {
 			size_t offset;
 		};
 		
+		/*
+			This should be hidden from client, used only by the editor.
+		*/
+		struct ComponentTraceTracker {
+			static std::unordered_map<std::string, std::unordered_map<std::string, core::TraceData>> ComponentDefinitions;
+			static void AddDefinition(const char* component, const char* memberName, core::SupportedTraceType type, size_t offset);
+			
+			/*
+				Gets the member data of this component that have been marked for tracing
+			*/
+			static std::unordered_map<std::string, core::TraceData>& GetTraceData(const char* ComponentName);
+		};
 	}
+
 
 	struct RADIANT_API ECSComponent
 	{
-	private:
-
-		static std::unordered_map<std::string, std::unordered_map<std::string, core::TraceData>> ComponentDefinitions;
-
 	protected:
-
+		/*
+			DO NOT CALL THIS! Call TRACE_COMPONENT_DATA(Component, Member) instead.
+		*/
 		void DEFINE_MEMBER(const char* component, const char* memberName, core::SupportedTraceType type, size_t offset);
 
 	public:
 
-		/*
-			Gets the member data of this component that have been marked for tracing
-		*/
-		static std::unordered_map<std::string, core::TraceData>& GetTraceData(const char* ComponentName);
 	};
 
 	/*

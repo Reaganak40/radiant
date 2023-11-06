@@ -3,10 +3,9 @@
 #include "Logging/Log.h"
 #include "Graphics/Model.h"
 
-namespace rdt {
-	std::unordered_map<std::string, std::unordered_map<std::string, core::TraceData>> ECSComponent::ComponentDefinitions;
 
-	void ECSComponent::DEFINE_MEMBER(const char* component, const char* memberName, core::SupportedTraceType type, size_t offset)
+namespace rdt::core {
+	void ComponentTraceTracker::AddDefinition(const char* component, const char* memberName, SupportedTraceType type, size_t offset)
 	{
 		if (type == core::SupportedTraceType_NotSupported) {
 			RDT_CORE_ERROR("Could not define memmber '{}' of component '{}', could not resolve type.", memberName, component);
@@ -23,7 +22,7 @@ namespace rdt {
 		ComponentDefinitions.at(component)[memberName] = { type, offset };
 	}
 
-	std::unordered_map<std::string, core::TraceData>& ECSComponent::GetTraceData(const char* ComponentName)
+	std::unordered_map<std::string, core::TraceData>& ComponentTraceTracker::GetTraceData(const char* ComponentName)
 	{
 		if (ComponentDefinitions.find(ComponentName) == ComponentDefinitions.end()) {
 			RDT_CORE_WARN("Could not find traced data for component '{}'", ComponentName);
@@ -32,6 +31,16 @@ namespace rdt {
 
 		return ComponentDefinitions.at(ComponentName);
 	}
+}
+
+namespace rdt {
+	std::unordered_map<std::string, std::unordered_map<std::string, core::TraceData>> core::ComponentTraceTracker::ComponentDefinitions;
+
+	void ECSComponent::DEFINE_MEMBER(const char* component, const char* memberName, core::SupportedTraceType type, size_t offset)
+	{
+		core::ComponentTraceTracker::AddDefinition(component, memberName, type, offset);
+	}
+
 
 	// ===============================================================================
 	EntityConfig::EntityConfig()
@@ -40,7 +49,6 @@ namespace rdt {
 		TRACE_COMPONENT_DATA(EntityConfig, alias);
 
 		owner = nullptr;
-		alias = "";
 	}
 	// ===============================================================================
 	Sprite::Sprite()
@@ -69,8 +77,6 @@ namespace rdt {
 		TRACE_COMPONENT_DATA(Renderable, texture);
 
 		layer = 0;
-		texture = "";
 		polygon_color = BLACK;
 	}
-
 }
