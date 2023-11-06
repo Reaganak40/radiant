@@ -115,7 +115,9 @@
     <ClInclude Include="Source\Engine\Audio\SoundData.h" />
     <ClInclude Include="Source\Engine\Audio\SoundEngine.h" />
     <ClInclude Include="Source\Engine\Audio\SoundSource.h" />
+    <ClInclude Include="Source\Engine\Graphics\Animation.h" />
     <ClInclude Include="Source\Engine\Graphics\Model.h" />
+    <ClInclude Include="Source\Engine\Graphics\Texture\TextureAtlas.h" />
     <ClInclude Include="Source\Engine\OOComponents\OOComponent.h" />
     <ClInclude Include="Source\Engine\Core.h" />
     <ClInclude Include="Source\Engine\ECS\CommonComponents.h" />
@@ -250,7 +252,9 @@
     <ClCompile Include="Source\Engine\Audio\SoundEngine.cpp" />
     <ClCompile Include="Source\Engine\Audio\SoundSource.cpp" />
     <ClCompile Include="Source\Engine\ECS\CommonComponents.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\Mesh.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Model.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\Texture\TextureAtlas.cpp" />
     <ClCompile Include="Source\Engine\OOComponents\OOComponent.cpp" />
     <ClCompile Include="Source\Engine\OOComponents\GameObject\GameObject.cpp" />
     <ClCompile Include="Source\Engine\OOComponents\GameState.cpp" />

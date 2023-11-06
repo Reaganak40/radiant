@@ -1,3 +1,13 @@
+/*******************************************************************
+*	Module:  Graphics
+*	File:    Model.h
+*
+*	Author: Reagan Kelley
+*
+*   Models describe the features of an entity, its geometry before
+*	any transformations. Models are accesses and maintained by the
+*	ModelManager.
+*******************************************************************/
 #pragma once
 #include "Utils/MathTypes.h"
 

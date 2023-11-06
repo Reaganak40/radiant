@@ -1,23 +1,37 @@
+/*******************************************************************
+*	Module:  Graphics
+*	File:    TextureManager.h
+*
+*	Author: Reagan Kelley
+*
+*   TextureManager is a core singleton that controls the creation,
+*	management, and destruction of textures and texture atlases.
+*******************************************************************/
 #pragma once
 #include "Core.h"
-#include "Texture.h"
-#include "../Mesh.h"
 
-namespace rdt::core {
-	class RendererGL;
-	class RenderLayer;
+// Forward Declarations
+namespace rdt {
+	using TextureID = unsigned int;   // Unique Identifier for a Texture
+	struct AtlasProfile;
+	class TextureAtlas;
+	class Texture;
+
+	namespace core {
+		class RendererGL;
+		class RenderLayer;
+		struct Mesh;
+	}
 }
+
+#define RDT_NULL_TEXTURE_ID 0
 
 namespace rdt {
 
 	class RADIANT_API TextureManager {
 	private:
 		struct Impl;
-		Impl* m_impl;
-		
-		TextureManager();
-		~TextureManager();
-		static TextureManager* m_instance;
+		static Impl* m_impl;
 
 	public:
 		/*
@@ -31,22 +45,50 @@ namespace rdt {
 		static void Destroy();
 
 		/*
-			Loads a texture from a png file. Returns the texture reference for
-			more specifications or calling it in the renderer API.
+			Loads a texture from a png file. Returns the TextureID for future
+			lookups.
 		*/
-		static Texture& LoadTextureFromPNG(const std::string& name, const std::string& filepath) {
-			return m_instance->LoadTextureFromPNGImpl(name, filepath);
-		}
+		static TextureID LoadTextureFromPNG(const std::string& name, const std::string& filepath);
 
-		static Texture* GetTexture(const std::string& name) { return m_instance->GetTextureImpl(name); }
+		/*
+			Returns the TextureID belonging to the provided name/alias. Returns 0
+			if not found.
+		*/
+		static TextureID GetTextureID(const std::string& name);
 
+		/*
+			Returns true if a texture with the provided ID exists.
+		*/
+		static bool TextureExists(TextureID tID);
+
+		/*
+			Assigns a texture atlas to the indicated texture. Returns a reference
+			to it, so it can be further configurated and compiled.
+		*/
+		static TextureAtlas& InitTextureAtlas(TextureID tID);
+
+		friend class TextureAtlas;
 		friend class core::RendererGL;
 		friend class core::RenderLayer;
-
+		friend struct core::Mesh;
 	private:
-		Texture& LoadTextureFromPNGImpl(const std::string& name, const std::string& filepath);
-		Texture* GetTextureImpl(const std::string& name);
 		
+		/*
+			Sets an atlas profile to indicate that it is not using
+			an atlas. (will use the full dimensions of the texture)
+		*/
+		static AtlasProfile NOT_USING_ATLAS();
+
+		/*
+			Returns a reference to a texture through its textureID
+		*/
+		static Texture& GetTexture(TextureID tID);
+
+		/*
+			Returns the name/alias of a texture through its TextureID
+		*/
+		static const char* GetAlias(TextureID tID);
+
 		/*
 			Applies the provided texture to the vertices of the provided rectangle. If the texture
 			has a texture atlas, the atlasCoords will be applied to get the correct sprite in the
@@ -54,6 +96,7 @@ namespace rdt {
 			Returns true if the texture slots changed.
 		*/
 		static bool ApplyTextureAtlas(Texture* texture, const Vec2i& atlasCoords, std::vector<core::Vertex>& rectVertices, bool flipHorizontal = false);
+		
 		static std::array<unsigned int, MAX_TEXTURES>& GetTextureSlots();
 
 		void AddNoneTexture();

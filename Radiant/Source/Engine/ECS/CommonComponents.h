@@ -182,4 +182,9 @@ namespace rdt {
 
 		Renderable();
 	};
+
+	struct RADIANT_API Animator : ECSComponent
+	{
+		
+	};
 }

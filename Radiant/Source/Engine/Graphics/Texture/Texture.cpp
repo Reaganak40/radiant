@@ -13,11 +13,7 @@ namespace rdt {
 		m_texture_slot = UNASSIGNED_TEXTURE;
 
 		has_texture_atlas = false;
-		m_tileWidth = 0.0f;
-		m_tileHeight = 0.0f;
-		m_numRows = 0;
-		m_numCols = 0;
-		m_tile_gap = 0;
+		
 
 	}
 
@@ -26,24 +22,22 @@ namespace rdt {
 		glDeleteTextures(1, &m_textureID);
 	}
 
-	void Texture::DefineTextureAtlas(unsigned int tileWidth, unsigned int tileHeight, unsigned int numRows, unsigned int numCols, unsigned int tileGap)
+	int Texture::GetImageWidth()
 	{
-		has_texture_atlas = true;
-		m_tileWidth = (float)tileWidth;
-		m_tileHeight = (float)tileHeight;
-		m_numRows = numRows;
-		m_numCols = numCols;
-		m_tile_gap = tileGap;
+		return m_image_width;
 	}
+
+	int Texture::GetImageHeight()
+	{
+		return m_image_height;
+	}
+
 
 	void Texture::LoadTexture(const std::string& textureFilePath)
 	{
 		unsigned char* imageBuffer;
 
-		if (!Utils::PathExists(textureFilePath)) {
-			printf("Warning: Could not load texture. File not found!\n");
-			return;
-		}
+		// Precondition: filepath already been verified
 
 		//stbi_set_flip_vertically_on_load(1);
 

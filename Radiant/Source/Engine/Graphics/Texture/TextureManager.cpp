@@ -1,16 +1,33 @@
 #include "pch.h"
 #include "TextureManager.h"
 
+#include "Texture.h"
+#include "TextureAtlas.h"
+#include "Utils/Utils.h"
+#include "Logging/Log.h"
+
 namespace rdt {
-	using namespace core;
+
+	constexpr AtlasProfile ATLAS_PROFILE_ENTIRE_TEXTURE = { 0.0f, 0.0f, 1.0f, 1.0f };
 
 	struct TextureManager::Impl {
-		std::unordered_map<std::string, Texture> m_textures;
+
+		// Texture Storage and Lookup
+		std::unordered_map<std::string, TextureID> aliasToID;
+		std::unordered_map<TextureID, Texture> m_textures;
+
+		// Texture Atlases
+		std::unordered_map<TextureID, std::shared_ptr<TextureAtlas>> m_atlases;
+
 		std::array<unsigned int, MAX_TEXTURES> m_texture_slots;
 		TextureSlot m_next_slot;
 
+		TextureID idCounter = 0;
+
 		Impl()
 		{
+			AddNoneTexture();
+
 			m_texture_slots.fill(UNASSIGNED_TEXTURE);
 			m_next_slot = 2;
 		}
@@ -19,62 +36,137 @@ namespace rdt {
 		{
 		}
 
+		bool TextureExists(const std::string& name) {
+			return aliasToID.find(name) != aliasToID.end();
+		}
+
+		bool TextureExists(TextureID tID) {
+			return m_textures.find(tID) != m_textures.end();
+		}
+
+		TextureID GenerateID() {
+			return ++idCounter;
+		}
+
 		void AddNoneTexture()
 		{
-			m_textures["None"] = Texture();
-			m_textures.at("None").SetToNone();
+			aliasToID["None"] = RDT_NULL_TEXTURE_ID;
+			m_textures[RDT_NULL_TEXTURE_ID];
+			m_textures.at(RDT_NULL_TEXTURE_ID).SetToNone();
+
 			m_textures.at("None").Bind(NONE_TEXTURE);
 			m_texture_slots[NONE_TEXTURE] = NONE_TEXTURE;
 		}
 
-		Texture& LoadTextureFromPNG(const std::string& name, const std::string& filepath)
+		TextureID LoadTextureFromPNG(const std::string& name, const std::string& filepath)
 		{
-			if (m_textures.find(name) == m_textures.end()) {
-				m_textures[name] = Texture();
-				m_textures.at(name).LoadTexture(filepath);
+			if (TextureExists(name)) {
+				RDT_CORE_WARN("TextureManager - Tried to load duplicate texture {}", name);
+				return RDT_NULL_TEXTURE_ID;
 			}
 
-			return m_textures.at(name);
+			if (!Utils::PathExists(filepath)) {
+				RDT_CORE_WARN("TextureManager - Texture file '{}' not found.", filepath);
+				return RDT_NULL_TEXTURE_ID;
+			}
+
+			TextureID nID = GenerateID();
+			aliasToID[name] = nID;
+			
+			m_textures[nID];
+			m_textures.at(nID).LoadTexture(filepath);
+
+			return nID;
 		}
 
-		Texture* GetTexture(const std::string& name)
+		TextureID GetTextureID(const std::string& name)
 		{
-			if (m_textures.find(name) == m_textures.end()) {
-				printf("Warning: Could not find texture [%s]\n", name.c_str());
-				return nullptr;
+			if (!TextureExists(name)) {
+				return RDT_NULL_TEXTURE_ID;
 			}
 
-			return &m_textures.at(name);
+			return aliasToID.at(name);
+		}
+
+		Texture& GetTexure(TextureID tID)
+		{
+			return m_textures.at(tID);
+		}
+
+		const char* GetAlias(TextureID tID) {
+			for (auto& [name, id] : aliasToID) {
+				if (id == tID) {
+					return name.c_str();
+				}
+			}
+
+			return "TextureNotFound";
+		}
+
+		TextureAtlas& InitTextureAtlas(TextureID tID)
+		{
+			if (!TextureExists(tID)) {
+				tID = RDT_NULL_TEXTURE_ID;
+			}
+
+			if (m_atlases.find(tID) == m_atlases.end()) {
+				m_atlases[tID] = std::make_shared<TextureAtlas>(tID);
+			}
+
+			return *m_atlases.at(tID);
 		}
 	};
 
 	// ======================================================================
-
-	TextureManager* TextureManager::m_instance = nullptr;
-
-	TextureManager::TextureManager()
-		: m_impl(new TextureManager::Impl)
-	{
-		AddNoneTexture();
-	}
-
-	TextureManager::~TextureManager()
-	{
-		delete m_impl;
-	}
+	TextureManager::Impl* TextureManager::m_impl = nullptr;
 
 	void TextureManager::Initialize()
 	{
 		Destroy();
-		m_instance = new TextureManager;
+		m_impl = new TextureManager::Impl;
 	}
 
 	void TextureManager::Destroy()
 	{
-		if (m_instance != nullptr) {
-			delete m_instance;
-			m_instance = nullptr;
+		if (m_impl != nullptr) {
+			delete m_impl;
+			m_impl = nullptr;
 		}
+	}
+
+	TextureID TextureManager::LoadTextureFromPNG(const std::string& name, const std::string& filepath)
+	{
+		return m_impl->LoadTextureFromPNG(name, filepath);
+	}
+
+	TextureID TextureManager::GetTextureID(const std::string& name)
+	{
+		return m_impl->GetTextureID(name);
+	}
+
+	bool TextureManager::TextureExists(TextureID tID)
+	{
+		return m_impl->TextureExists(tID);
+	}
+
+	TextureAtlas& TextureManager::InitTextureAtlas(TextureID tID)
+	{
+		return m_impl->InitTextureAtlas(tID);
+	}
+
+	AtlasProfile TextureManager::NOT_USING_ATLAS()
+	{
+		return ATLAS_PROFILE_ENTIRE_TEXTURE;
+	}
+
+	Texture& TextureManager::GetTexture(TextureID tID)
+	{
+		return m_impl->GetTexure(tID);
+	}
+
+	const char* TextureManager::GetAlias(TextureID tID)
+	{
+		return m_impl->GetAlias(tID);
 	}
 
 	bool TextureManager::ApplyTextureAtlas(Texture* texture, const Vec2i& atlasCoords, std::vector<Vertex>& rectVertices, bool flipHorizontal)
@@ -146,6 +238,14 @@ namespace rdt {
 	TextureSlot TextureManager::GetNextSlot()
 	{
 		return m_impl->m_next_slot++;
+	}
+
+	void TextureManager::NOT_USING_ATLAS(AtlasProfile& profile)
+	{
+		profile[0] = 0.0f;
+		profile[1] = 0.0f;
+		profile[2] = 1.0f;
+		profile[3] = 1.0f;
 	}
 
 	Texture& TextureManager::LoadTextureFromPNGImpl(const std::string& name, const std::string& filepath)

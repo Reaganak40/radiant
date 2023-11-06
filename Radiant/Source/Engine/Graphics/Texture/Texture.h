@@ -4,15 +4,15 @@
 #include "Utils/UniqueID.h"
 #include "Utils/MathTypes.h"
 
-typedef unsigned int TextureSlot;
-typedef unsigned int TextureID;
-
 #define MAX_TEXTURES 30
 #define UNASSIGNED_TEXTURE 125
 #define NONE_TEXTURE 1
 
 namespace rdt {
-	class RADIANT_API Texture {
+	typedef unsigned int TextureSlot;
+	using TextureID = unsigned int;   // Unique Identifier for a Texture
+
+	class Texture {
 	private:
 		TextureID m_textureID;
 		TextureSlot m_texture_slot;
@@ -21,24 +21,15 @@ namespace rdt {
 		int m_image_height;
 		int m_bits_per_pixel;
 
-		bool has_texture_atlas;
-		float m_tileWidth;
-		float m_tileHeight;
-		unsigned int m_numRows;
-		unsigned int m_numCols;
-		unsigned int m_tile_gap;
-
-
 	public:
 		Texture();
 		~Texture();
 
 		inline TextureID GetID() { return m_textureID; }
 
-		/*
-			Adds a texture atlas to the texture, which can be used for reference tile maps.
-		*/
-		void DefineTextureAtlas(unsigned int tileWidth, unsigned int tileHeight, unsigned int numRows, unsigned int numCols, unsigned int tileGap);
+		int GetImageWidth();
+
+		int GetImageHeight();
 
 		friend class TextureManager;
 
