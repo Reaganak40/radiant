@@ -10,14 +10,21 @@
 *	and the render pipeline.
 *******************************************************************/
 #pragma once
-#include "Utils/MathTypes.h"
-#include "Texture/TextureAtlas.h"
 
 // Forward Declarations
 namespace rdt {
 	using UniqueID = unsigned int;
 	using TextureID = unsigned int;   // Unique Identifier for a Texture
+	using ModelID = unsigned int;
+
+	struct Transform;
 }
+
+// Required Definitions for Struct/Class Members
+#include "Utils/MathTypes.h"
+#include "Texture/TextureAtlas.h"
+
+
 namespace rdt::core {
 
 	struct Vertex {
@@ -31,15 +38,28 @@ namespace rdt::core {
 	};
 
 	struct Mesh {
-		UniqueID m_UUID;
-		std::vector<Vertex> vertices;
-		std::vector<unsigned int> indices;
-		unsigned int layer;
+		ModelID modelID;
 		TextureID textureID;
 		AtlasProfile atlasProfile;
+
+		Vec2f position;
+		float rotation;
+		Vec2f scale;
+
 		bool flipTexture;
+		Vec4f fillColor;
+		unsigned int layer;
 
 		Mesh();
-		~Mesh();
+
+		/*
+			Resets a mesh back to its default constructor
+		*/
+		void Reset();
+
+		/*
+			Applied a transform to the mesh
+		*/
+		void UseTransform(const Transform& transform);
 	};
 }

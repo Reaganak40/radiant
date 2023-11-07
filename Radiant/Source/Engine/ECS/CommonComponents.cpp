@@ -3,6 +3,7 @@
 #include "Logging/Log.h"
 #include "Graphics/Model.h"
 #include "Graphics/Animation.h"
+#include "Graphics/Texture/TextureManager.h"
 
 namespace rdt::core {
 	void ComponentTraceTracker::AddDefinition(const char* component, const char* memberName, SupportedTraceType type, size_t offset)
@@ -56,11 +57,18 @@ namespace rdt {
 		TRACE_COMPONENT_DATA(Sprite, polygon);
 
 		polygon = nullptr;
-		model = NOT_A_MODEL;
+		model = RDT_NULL_MODEL_ID;
 	}
 	void Sprite::SetModel(const std::string& modelName)
 	{
 		model = ModelManager::GetModelID(modelName);
+	}
+	// ===============================================================================
+	rdt::Transform::Transform()
+	{
+		position = Vec2d::Zero();
+		rotation = 0;
+		scale = Vec2d::Zero();
 	}
 	// ===============================================================================
 	RigidBody2D::RigidBody2D()
@@ -72,12 +80,15 @@ namespace rdt {
 	// ===============================================================================
 	Renderable::Renderable()
 	{
-		TRACE_COMPONENT_DATA(Renderable, polygon_color);
+		TRACE_COMPONENT_DATA(Renderable, fillColor);
 		TRACE_COMPONENT_DATA(Renderable, layer);
 		TRACE_COMPONENT_DATA(Renderable, texture);
 
 		layer = 0;
-		polygon_color = BLACK;
+		fillColor = BLACK;
+		texture = RDT_NULL_TEXTURE_ID;
+		flipTexture = false;
+		atlasProfile = TextureManager::NOT_USING_ATLAS();
 	}
 	// ================================================================================
 	rdt::Animator::Animator()

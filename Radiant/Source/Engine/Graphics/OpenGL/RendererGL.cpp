@@ -1,10 +1,13 @@
 #include "pch.h"
 #include "RendererGL.h"
 #include "Gui/GuiManager.h"
+#include "Graphics/Texture/TextureManager.h"
 
-#include "Logging/Log.h"
+#include "Graphics/Camera.h"
+#include "Graphics/RenderWindow.h"
 #include "Utils/Utils.h"
 
+#include "Logging/Log.h"
 #include "ErrorHandling.h"
 
 namespace rdt::core {
@@ -205,6 +208,10 @@ namespace rdt::core {
     {
         bool update_slots = false;
 
+        for (auto& mesh : GetBackBuffer()) {
+            m_layers[mesh.layer].AddMesh(mesh, DrawFilled);
+        }
+
         /*
             Step 1: Run the command queue, sorting meshes into layers.
         */
@@ -354,24 +361,26 @@ namespace rdt::core {
             ASSERT(false);
         }
 
+        m_working_mesh.Reset();
+        m_current_render_type = DrawFilled;
+
         while (m_layers.size() <= layer) {
             m_layers.push_back(RenderLayer());
             m_layers.back().SetDefaultShader(m_shaders[0]->GetID());
         }
 
-        m_current_layer = layer;
-        m_current_render_type = DrawFilled;
-        m_polygon_texture = TextureManager::GetTexture("None");
-        m_should_flip_texture = false;
-        m_polygon_color = WHITE;
-        m_polygon_rotation = 0.0f;
-        
         begin_called = true;
     }
 
     void RendererGL::EndImpl()
     {
+        if (!begin_called) {
+            RDT_CORE_ERROR("Renderer - Unmatched End(), did you forget to called Renderer::Begin()?");
+            ASSERT(false);
+        }
+
         begin_called = false;
+        SubmitMesh(m_working_mesh);
     }
 
     void RendererGL::SetRenderTypeImpl(core::RenderType type)

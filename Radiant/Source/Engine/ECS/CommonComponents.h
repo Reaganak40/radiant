@@ -26,6 +26,7 @@ namespace rdt {
 #include "Utils/Timestep.h"
 #include "Utils/Color.h"
 #include "Utils/rdt_string.h"
+#include "Graphics/Texture/TextureAtlas.h"
 
 /*
 	Stringify name
@@ -164,6 +165,8 @@ namespace rdt {
 		Vec2d position;
 		float rotation;
 		Vec2d scale;
+
+		Transform();
 	};
 
 	/*
@@ -183,8 +186,9 @@ namespace rdt {
 	{
 		unsigned int layer;		    // The render layer to begin draw
 		TextureID texture;		    // The texture to use
+		bool flipTexture;			// If texture should be flipped
 		AtlasProfile atlasProfile;	// the texture coords to use
-		Color polygon_color;        // The shader color for the polygon
+		Color fillColor;			// The shader color for the polygon
 
 		Renderable();
 	};

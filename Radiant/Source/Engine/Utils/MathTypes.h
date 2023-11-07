@@ -134,7 +134,14 @@ namespace rdt {
 				Returns a zero vector.
 			*/
 		static Vec2f Zero();
+
+		Vec2f operator=(const Vec2d& other) {
+			x = (float)other.x;
+			y = (float)other.y;
+			return (*this);
+		}
 	};
+	
 
 
 	/*

@@ -1,25 +1,48 @@
+/*******************************************************************
+*	Module:  Graphics (API)
+*	File:    Renderer.h
+*
+*	Author: Reagan Kelley
+*
+*	The Render singleton is an API that allows the client and engine
+*	communicate with the interior rendering framework. Can be
+*	used to create render command queues, to setup and draw
+*	frames.
+*******************************************************************/
 #pragma once
 #include "Core.h"
 
-// For Render API
-#include "Polygon/Polygon.h"
-#include "Polygon/Rect.h"
-#include "Polygon/Line.h"
-#include "Mesh.h"
-#include "Utils/Color.h"
-#include "Texture/TextureManager.h"
-#include "RenderTypes.h"
-#include "Gui/Gui.h"
-#include "RenderWindow.h"
+// Forward Declarations
+namespace rdt {
+	
+	namespace core 
+	{
+		class Mesh;
+		enum RenderType;
+	}
+	
+	struct Mesh;
+	using MeshBuffer = std::vector<core::Mesh>;
+	using ModelID = unsigned int;
 
-#include "Camera.h"
+
+	enum ColorType;
+
+	struct Transform;
+
+	class GuiTemplate;
+	class RenderWindow;
+	class Color;
+	class Camera;
+	class Line;
+}
 
 namespace rdt {
 
 	class RADIANT_API Renderer {
 	private:
 		struct Impl;
-		Impl* m_impl;
+		static Impl* m_impl;
 
 	protected:
 		Renderer();
@@ -34,6 +57,12 @@ namespace rdt {
 			Sets the fullscreen flag to true (enabled), or false (disabled)
 		*/
 		void SetFullscreenFlag(bool isFullscreen);
+
+
+		/*
+			Gets the buffer that should be used in the current render call.
+		*/
+		MeshBuffer& GetBackBuffer();
 
 	private:
 		static Renderer* m_instance;
@@ -116,12 +145,52 @@ namespace rdt {
 		/*
 			Runs the draw command queue, drawing all objects to the screen.
 		*/
-		static void Render() { m_instance->RenderImpl(); }
+		static void Render();
 
 		/*
 			Polls render events and flushes the command queue and buffers.
 		*/
 		static void OnEndFrame() { m_instance->OnEndFrameImpl(); }
+
+		/*
+			Starts a new render command session context.
+		*/
+		static void Begin(unsigned int layer = 0);
+
+		/*
+			Ends the current render command session context.
+		*/
+		static void End();
+		
+		/*
+			Sets the model to use for this draw call
+		*/
+		static void SetModel(ModelID modelID);
+
+		/*
+			Sets the transform to be applied to the target model.
+		*/
+		static void SetTransform(const Transform& transform);
+
+		/*
+			Sets the texture to be applied to the mesh's model.
+		*/
+		static void SetTexture(TextureID texture);
+
+		/*
+			Sets the atlas profile to be applied to the texture.
+		*/
+		static void SetAtlasProfile(const AtlasProfile& profile);
+
+		/*
+			Horizontally flips the texture
+		*/
+		static void FlipTextureHorizontal();
+
+		/*
+			Sets the filled color of the mesh's model.
+		*/
+		static void SetFillColor(const Color& color);
 
 		/*
 			Utility function for quickly drawing a Rect to the screen.
@@ -138,21 +207,6 @@ namespace rdt {
 			unsigned int layer = 0) {
 			m_instance->DrawLineImpl(start, end, color, layer);
 		}
-
-		/*
-			Starts a new render command session context.
-		*/
-		static void Begin(unsigned int layer = 0) { m_instance->BeginImpl(layer); }
-
-		/*
-			Ends the current render command session context.
-		*/
-		static void End() { m_instance->EndImpl(); }
-
-		/*
-			Sets the model to use for this draw call
-		*/
-		static void SetModel(ModelID modelID);
 
 		/*
 			Sets the render condition for the current context.
@@ -195,7 +249,7 @@ namespace rdt {
 		/*
 			Sets the draw color for polygons, which will be used on the next polygon.
 		*/
-		static void SetPolygonColor(const Color& color) { m_instance->SetPolygonColorImpl(color); }
+		static void SetPolygonColor(const Color& color);
 
 		/*
 			Sets the draw color for polygons, which will be used on the next polygon.
@@ -315,16 +369,17 @@ namespace rdt {
 		virtual void OnUpdateImpl(const float deltaTime) = 0;
 		virtual void RenderImpl() = 0;
 		virtual void OnEndFrameImpl() = 0;
-		virtual void DrawRectImpl(const Vec2d& origin, const Vec2d& size, const Color& color, unsigned int layer = 0) = 0;
-		virtual void DrawLineImpl(const Vec2d& start, const Vec2d& end, const Color& color, unsigned int layer = 0) = 0;
-		virtual void BeginImpl(unsigned int layer) = 0;
-		virtual void EndImpl() = 0;
 
+		virtual void BeginImpl(unsigned int layer) = 0;
 		virtual void SetRenderTypeImpl(core::RenderType type) = 0;
 		virtual void AddPolygonImpl(const Polygon& polygon, const Vec2f& offset) = 0;
 		virtual void AddRectImpl(const Vec2d& origin, const Vec2d& size, const Vec2f& offset) = 0;
 		virtual void AddLineImpl(const Line& line) = 0;
+		virtual void DrawRectImpl(const Vec2d& origin, const Vec2d& size, const Color& color, unsigned int layer = 0) = 0;
 		virtual void SetLineColorImpl(const Color& color) = 0;
+		virtual void DrawLineImpl(const Vec2d& start, const Vec2d& end, const Color& color, unsigned int layer = 0) = 0;
+		virtual void EndImpl() = 0;
+
 		virtual void SetPolygonColorImpl(const Color& color) = 0;
 		virtual void SetPolygonRotationImpl(const float radians) = 0;
 		virtual void SetPolygonTextureImpl(const std::string& texName, unsigned int atlasX = 0, unsigned int atlasY = 0) = 0;

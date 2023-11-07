@@ -109,6 +109,7 @@ namespace rdt {
             Returns the distance between two points.
         */
         double RADIANT_API GetDistance(const Vec2d& pointA, const Vec2d& pointB);
+        float RADIANT_API GetDistance(const Vec2f& pointA, const Vec2f& pointB);
 
         /*
             Returns the manhattan distance between two points.
@@ -124,11 +125,13 @@ namespace rdt {
             Returns in radians the theta between these two points.
         */
         double RADIANT_API GetRotation(const Vec2d& origin, const Vec2d& point);
+        float RADIANT_API GetRotation(const Vec2f& origin, const Vec2f& point);
 
         /*
             Rotates 'point' by dr about the origin.
         */
         void RotatePoint(const Vec2d& origin, Vec2d& point, const double dr);
+        void RotatePoint(const Vec2f& origin, Vec2f& point, const float dr);
 
         /*
             Returns an angle in degrees into radians
@@ -159,5 +162,16 @@ namespace rdt {
             Writes the content to the file at filepath
         */
         void WriteFile(const std::string& filepath, const std::string& content);
+
+        /*
+            Scales a line (start, end) by the given scale. Returns the
+            new end point.
+        */
+        Vec2f Scale(Vec2f start, Vec2f end, Vec2f scale);
+
+        /*
+            Translates a point by the give translation
+        */
+        void Translate(Vec2f& point, const Vec2f& translation);
     }
 }

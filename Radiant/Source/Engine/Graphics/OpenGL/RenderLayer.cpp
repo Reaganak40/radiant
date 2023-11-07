@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "RenderLayer.h"
 #include "Graphics/Texture/TextureManager.h"
+#include "Graphics/Model.h"
+#include "Utils/Utils.h"
 
 namespace rdt::core {
 	RenderLayer::RenderLayer()
@@ -19,25 +21,13 @@ namespace rdt::core {
 		m_default_shader = nDefaultShaderID;
 	}
 
-	void RenderLayer::AddMesh(Mesh& nMesh, const RenderType type)
+	void RenderLayer::AddMesh(Mesh& nMesh)
 	{
-		switch (type) {
-		case DrawFilled:
-		{
-			TextureID tID = nMesh.texture == nullptr ? 0 : nMesh.texture->GetID();
-			if (m_textured_meshes.find(tID) == m_textured_meshes.end()) {
-				m_textured_meshes[tID] = {};
-			}
-			m_textured_meshes.at(tID).push_back(&nMesh);
+		if (m_meshes.find(nMesh.textureID) == m_meshes.end()) {
+			m_meshes[nMesh.textureID];
 		}
-			break;
-		case DrawOutline:
-			m_outline_meshes.push_back(&nMesh);
-			break;
-		case DrawLine:
-			m_line_meshes.push_back(&nMesh);
-			break;
-		}
+
+		m_meshes.at(nMesh.textureID).push_back(nMesh);
 	}
 
 	void RenderLayer::CompileBatches()
@@ -46,7 +36,7 @@ namespace rdt::core {
 		int unitIndex = 0;
 
 		// Add batches for with textures
-		for (auto& [tID, meshes] : m_textured_meshes) {
+		for (auto& [tID, meshes] : m_meshes) {
 			if (meshes.size() == 0) {
 				continue;
 			}
@@ -56,6 +46,14 @@ namespace rdt::core {
 			}
 
 			for (auto& mesh : meshes) {
+
+				std::vector<Vec2f> vertices;
+				std::vector<unsigned int> indices;
+				ModelManager::CopyVertices(mesh.modelID, vertices);
+				ModelManager::CopyIndices(mesh.modelID, indices);
+
+				ApplyTransform(mesh, vertices);
+
 				if (TextureManager::ApplyTextureAtlas(mesh->texture, mesh->texAtlasCoords, mesh->vertices, mesh->flipTexture)) {
 					m_updated_texture_slots = true;
 				}
@@ -133,5 +131,19 @@ namespace rdt::core {
 		m_batches.push_back(glRenderUnit());
 		m_batches.back().InitBuffers();
 		m_batches.back().shaderID = m_default_shader;
+	}
+
+	void RenderLayer::ApplyTransform(const Mesh& mesh, std::vector<Vec2f>& vertices)
+	{
+		// Scale, Rotate, Translate
+		for (auto& vertex : vertices) {
+			vertex = Utils::Scale(Vec2f::Zero(), vertex, mesh.scale);
+
+			if (mesh.rotation != 0.0f) {
+				Utils::RotatePoint(Vec2f::Zero(), vertex, mesh.rotation);
+			}
+
+			Utils::Translate(vertex, mesh.position);
+		}
 	}
 }

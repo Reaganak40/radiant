@@ -13,7 +13,7 @@
 
 namespace rdt {
 
-#define NOT_A_MODEL 0
+#define RDT_NULL_MODEL_ID 0
 	using ModelID = unsigned int;
 
 	enum Common {
@@ -40,6 +40,9 @@ namespace rdt {
 
 		template<>
 		void DefineCommon<RECT>() { DefineCommonRect(); }
+
+		std::vector<Vec2f>& GetVertices();
+		std::vector<unsigned int>& GetIndices();
 
 	private:
 		void Reset();
@@ -73,10 +76,26 @@ namespace rdt {
 		*/
 		static ModelID GetModelID(const std::string& modelName);
 
+
+		/*
+			Returns true if a model is registered with the given modelID
+		*/
+		static bool ModelExists(ModelID model);
+
 		/*
 			Takes in a json file defining 1 or more models and registers them to the
 			ModelManager.
 		*/
 		static void LoadModelJson(const std::string& file_json);
+
+		/*
+			Gets the specified model and copies its vertex data to the out reference
+		*/
+		static void CopyVertices(ModelID model, std::vector<Vec2f>& outVertices);
+
+		/*
+			Gets the specified model and copies its index data to the out reference
+		*/
+		static void CopyIndices(ModelID model, std::vector<unsigned int>& outVertices);
 	};
 }

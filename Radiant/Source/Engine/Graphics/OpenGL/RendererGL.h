@@ -12,17 +12,17 @@
 #include "GeoMode.h"
 #include "RenderCache.h"
 
+#include "Graphics/Mesh.h"
+
 namespace rdt::core {
 
-	class RADIANT_API RendererGL : public Renderer {
+	class RendererGL : public Renderer {
 	private:
 
 		// Window management
 		GLFWwindow* m_window;
 		GLFWmonitor* m_monitor;
 		
-#pragma warning(push)
-#pragma warning(disable: 4251)
 		std::string m_window_name;
 
 		int m_window_width;
@@ -33,6 +33,9 @@ namespace rdt::core {
 		//			  Renderer API dependables
 		// 
 		// *****************************************************
+		bool begin_called;
+		Mesh m_working_mesh; // Used to create meshes in the render processes
+
 		struct DrawCommand {
 			UniqueID meshIdentifier;
 			core::RenderType renderType;
@@ -42,21 +45,11 @@ namespace rdt::core {
 				: meshIdentifier(nMeshIdentifier), renderType(nRenderType) {}
 		};
 
-		unsigned int m_current_layer;
 		core::RenderType m_current_render_type;
 		core::RenderCache m_render_cache;
 		std::queue<DrawCommand> m_command_queue;
 
-		bool begin_called;
-		// Assignable mesh attributes
-		Color m_polygon_color;
-		Texture* m_polygon_texture;
-		bool m_should_flip_texture;
-		Vec2i m_polygon_texture_coords;
-		float m_polygon_rotation;
-
 		Color m_line_color;
-
 		Color m_clear_color;
 
 		// *****************************************************
@@ -103,8 +96,6 @@ namespace rdt::core {
 		// For ImGui instances.
 		std::vector<GuiTemplate*> m_GUIs;
 		bool m_imgui_newFrameCalled;
-
-#pragma warning(pop)
 
 	public:
 		RendererGL();

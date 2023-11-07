@@ -2,8 +2,12 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
-#include "Graphics/Mesh.h"
 #include "Graphics/RenderTypes.h"
+
+// Forward Declarations
+namespace rdt::core {
+	struct Mesh;
+}
 
 namespace rdt::core {
 	
@@ -48,16 +52,13 @@ namespace rdt::core {
 		}
 	};
 
-
 	class RenderLayer {
 	private:
 		ShaderID m_default_shader;
 		std::vector<glRenderUnit> m_batches;
 		unsigned int m_batchCount;
 
-		std::unordered_map<TextureID, std::vector<Mesh*>> m_textured_meshes;
-		std::vector<Mesh*> m_outline_meshes;
-		std::vector<Mesh*> m_line_meshes;
+		std::unordered_map<TextureID, std::vector<Mesh>> m_meshes;
 
 		bool m_updated_texture_slots;
 	public:
@@ -72,7 +73,7 @@ namespace rdt::core {
 		/*
 			Adds a mesh that is intended to be draw at this layer.
 		*/
-		void AddMesh(Mesh& nMesh, const RenderType type);
+		void AddMesh(Mesh& nMesh);
 
 		/*
 			Sorts the meshes and compiles them into opengl render batches.
@@ -101,5 +102,10 @@ namespace rdt::core {
 
 	private:
 		void PushRenderUnit();
+
+		/*
+			Uses the transform data in the mesh to position, scale, and rotation the vertices
+		*/
+		void ApplyTransform(const Mesh& mesh, std::vector<Vec2f>& vertices);
 	};
 }

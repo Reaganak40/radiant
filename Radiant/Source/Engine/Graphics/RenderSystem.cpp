@@ -25,24 +25,32 @@ void rdt::RenderSystem::Update(float deltaTime)
 	auto renderables = GetComponent<Renderable>();
 	auto sprites = GetComponent<Sprite>();
 	auto animators = GetComponent<Animator>();
+	auto transforms = GetComponent<Transform>();
 
 	for (auto& entity : GetEntities()) {
 
-		if (!renderables->HasEntity(entity)) {
+		if (!renderables->HasEntity(entity) ||
+			!sprites->HasEntity(entity)     ||
+			!transforms->HasEntity(entity)) 
+		{
 			continue;
 		}
-		if (!sprites->HasEntity(entity)) {
-			continue;
-		}
-
 		Renderable& renderable = renderables->GetData(entity);
 		Sprite& sprite = sprites->GetData(entity);
+		Transform& transform = transforms->GetData(entity);
 
 		if (animators->HasEntity(entity)) {
 			ApplyAnimator(renderable, animators->GetData(entity));
 		}
 
 		Renderer::Begin(renderable.layer);
+		Renderer::SetModel(sprite.model);
+		Renderer::SetTransform(transform);
+		Renderer::SetTexture(renderable.texture);
+
+		if (renderable.)
+		Renderer::FlipTextureHorizontal()
+
 		Renderer::SetPolygonColor(renderable.polygon_color);
 		Renderer::AddPolygon(*sprite.polygon);
 		Renderer::End();
@@ -55,6 +63,6 @@ void rdt::RenderSystem::ApplyAnimator(Renderable& renderable, Animator& animator
 		return;
 	}
 
-	renderable.texture = AnimationManager::GetAnimation(animator.animationID)->GetTextureID();
-	renderable.atlasProfile = AnimationManager::GetAnimation(animator.animationID)->GetFrameAt(animator.currentFrame);
+	renderable.texture = AnimationManager::GetAnimationTexture(animator.animationID);
+	renderable.atlasProfile = AnimationManager::GetFrame(animator.animationID, animator.currentFrame);
 }

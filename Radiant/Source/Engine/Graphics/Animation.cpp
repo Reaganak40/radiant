@@ -138,4 +138,22 @@ namespace rdt {
 	{
 		return m_impl->GetAnimation(aID);
 	}
+	TextureID AnimationManager::GetAnimationTexture(AnimationID aID)
+	{
+		auto animation = GetAnimation(aID);
+		if (animation == nullptr) {
+			return RDT_NULL_TEXTURE_ID;
+		}
+
+		return animation->GetTextureID();
+	}
+	AtlasProfile AnimationManager::GetFrame(AnimationID aID, AnimationIndex aIndex)
+	{
+		auto animation = GetAnimation(aID);
+		if (animation == nullptr) {
+			return TextureManager::NOT_USING_ATLAS();
+		}
+
+		return animation->GetFrameAt(aIndex);
+	}
 }

@@ -74,6 +74,12 @@ namespace rdt {
 		*/
 		static std::shared_ptr<TextureAtlas> GetTextureAtlas(TextureID tID);
 
+		/*
+			Sets an atlas profile to indicate that it is not using
+			an atlas. (will use the full dimensions of the texture)
+		*/
+		static AtlasProfile NOT_USING_ATLAS();
+
 		friend class Animation;
 		friend class AnimationManager;
 		friend class TextureAtlas;
@@ -82,11 +88,6 @@ namespace rdt {
 		friend struct core::Mesh;
 	private:
 		
-		/*
-			Sets an atlas profile to indicate that it is not using
-			an atlas. (will use the full dimensions of the texture)
-		*/
-		static AtlasProfile NOT_USING_ATLAS();
 
 		/*
 			Returns a reference to a texture through its textureID

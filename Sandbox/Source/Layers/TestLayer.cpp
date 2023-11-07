@@ -25,7 +25,7 @@ public:
 		EntityManager::AddComponent<RigidBody2D>(eID, rigidBody);
 
 		Renderable renderable;
-		renderable.polygon_color = BLACK;
+		renderable.fillColor = BLACK;
 
 		EntityManager::AddComponent<Renderable>(eID, renderable);
 
@@ -58,7 +58,7 @@ public:
 		EntityManager::AddComponent<RigidBody2D>(eID, rigidBody);
 
 		Renderable renderable;
-		renderable.polygon_color = m_color;
+		renderable.fillColor = m_color;
 
 		EntityManager::AddComponent<Renderable>(eID, renderable);
 

@@ -125,6 +125,11 @@ namespace rdt {
             return sqrt(pow(pointB.x - pointA.x, 2) + pow(pointB.y - pointA.y, 2));
         }
 
+        float RADIANT_API GetDistance(const Vec2f& pointA, const Vec2f& pointB)
+        {
+            return sqrt(pow(pointB.x - pointA.x, 2) + pow(pointB.y - pointA.y, 2));
+        }
+
         Vec2d GetManhattanDistance(const Vec2d& pointA, const Vec2d& pointB)
         {
             return pointB - pointA;
@@ -138,7 +143,21 @@ namespace rdt {
         {
             return std::atan2(point.y - origin.y, point.x - origin.x);
         }
+
+        float RADIANT_API GetRotation(const Vec2f& origin, const Vec2f& point)
+        {
+            return std::atan2f(point.y - origin.y, point.x - origin.x);
+        }
+
         void RotatePoint(const Vec2d& origin, Vec2d& point, const double dr)
+        {
+            double magnitude = GetDistance(origin, point);
+            double theta = GetRotation(origin, point) + dr;
+            point.x = origin.x + (magnitude * std::cos(theta));
+            point.y = origin.y + (magnitude * std::sin(theta));
+        }
+
+        void RotatePoint(const Vec2f& origin, Vec2f& point, const float dr)
         {
             double magnitude = GetDistance(origin, point);
             double theta = GetRotation(origin, point) + dr;
@@ -204,5 +223,25 @@ namespace rdt {
             ofile << content;
             ofile.close();
         }
+
+        Vec2f Scale(Vec2f start, Vec2f end, Vec2f scale)
+        {
+            float dist = Utils::GetDistance(start, end);
+            float scalar = sqrtf((scale.x * scale.x) + (scale.y * scale.y));
+            dist *= scalar;
+
+            float theta = Utils::GetRotation(start, end);
+            float dx = dist * cos(theta);
+            float dy = dist * sin(theta);
+
+            return Vec2f(start.x + dx, start.y + dy);
+
+        }
+        void Translate(Vec2f& point, const Vec2f& translation)
+        {
+            point.x += translation.x;
+            point.y += translation.y;
+        }
+  
     }
 }

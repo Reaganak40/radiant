@@ -27,6 +27,16 @@ namespace rdt {
 		m_indices.push_back(0);
 	}
 
+	std::vector<Vec2f>& Model::GetVertices()
+	{
+		return m_vertices;
+	}
+
+	std::vector<unsigned int>& Model::GetIndices()
+	{
+		return m_indices;
+	}
+
 	void Model::Reset()
 	{
 		m_vertices.clear();
@@ -49,7 +59,7 @@ namespace rdt {
 		{
 			if (nameToModelID.find(name) != nameToModelID.end()) {
 				RDT_CORE_WARN("ModelManager - Could not register model '{}', already exists.", name);
-				return NOT_A_MODEL;
+				return RDT_NULL_MODEL_ID;
 			}
 
 			ModelID nID = ++idGenerator;
@@ -61,10 +71,26 @@ namespace rdt {
 		ModelID GetModelID(const std::string& name) {
 			if (nameToModelID.find(name) == nameToModelID.end()) {
 				RDT_CORE_WARN("ModelManager - Could not find model '{}'", name);
-				return NOT_A_MODEL;
+				return RDT_NULL_MODEL_ID;
 			}
 
 			return nameToModelID.at(name);
+		}
+		
+		bool ModelExists(ModelID mID) {
+			return m_models.find(mID) != m_models.end();
+		}
+
+		void CopyVertices(ModelID model, std::vector<Vec2f>& outVertices)
+		{
+			auto& vertices = m_models.at(model).GetVertices();
+			std::copy(vertices.begin(), vertices.end(), outVertices);
+		}
+
+		void CopyIndices(ModelID model, std::vector<unsigned int>& outIndices)
+		{
+			auto& indices = m_models.at(model).GetIndices();
+			std::copy(indices.begin(), indices.end(), outIndices);
 		}
 	};
 
@@ -101,8 +127,27 @@ namespace rdt {
 		return m_instance->m_impl->GetModelID(modelName);
 	}
 
+	bool ModelManager::ModelExists(ModelID model)
+	{
+		return m_instance->m_impl->ModelExists(model);
+	}
+
 	void ModelManager::LoadModelJson(const std::string& file_json)
 	{
 		// TODO
+	}
+	void ModelManager::CopyVertices(ModelID model, std::vector<Vec2f>& outVertices)
+	{
+		if (!ModelExists(model)) {
+			return;
+		}
+		m_instance->m_impl->CopyVertices(model, outVertices);
+	}
+	void ModelManager::CopyIndices(ModelID model, std::vector<unsigned int>& outVertices)
+	{
+		if (!ModelExists(model)) {
+			return;
+		}
+		m_instance->m_impl->CopyIndices(model, outVertices);
 	}
 }

@@ -26,7 +26,7 @@ namespace rdt {
 	using AnimationID = unsigned int;    // Unique Identifier for an Animation object.
 	using AnimationIndex = unsigned int; // Indicates the index of an animation sequence
 
-	class RADIANT_API Animation {
+	class Animation {
 	private:
 		std::shared_ptr<TextureAtlas> m_atlas;
 		std::vector<AtlasProfile> m_frames;
@@ -77,7 +77,14 @@ namespace rdt {
 
 	public:
 		
+		/*
+			Creates a new context of the AnimationManager singleton
+		*/
 		static void Initialize();
+
+		/*
+			Destroys the current AnimationManager singleton instance.
+		*/
 		static void Destroy();
 
 		/*
@@ -92,10 +99,25 @@ namespace rdt {
 		*/
 		static AnimationID GetAnimationID(const std::string& name);
 
+		
+
+		/*
+			Returns the textureID for the texture that is being used by the
+			provided AniamtionID.
+		*/
+		static TextureID GetAnimationTexture(AnimationID aID);
+
+		/*
+			Gets the AtlasProfile (frame), for an animation at the given
+			index. If animation is not found or index out of range, returns
+			the entire texture (full texture coordinates).
+		*/
+		static AtlasProfile GetFrame(AnimationID aID, AnimationIndex aIndex);
+
+	private:
 		/*
 			Returns the shared pointer of an instantiated animation object.
 		*/
 		static std::shared_ptr<Animation> GetAnimation(AnimationID aID);
-
 	};
 }
