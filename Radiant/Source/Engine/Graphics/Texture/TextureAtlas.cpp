@@ -125,4 +125,8 @@ namespace rdt {
 
 		return m_sprite_lookup.at(spriteIdentifier);
 	}
+	TextureID TextureAtlas::GetTextureID()
+	{
+		return m_texture;
+	}
 }

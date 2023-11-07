@@ -2,7 +2,7 @@
 #include "CommonComponents.h"
 #include "Logging/Log.h"
 #include "Graphics/Model.h"
-
+#include "Graphics/Animation.h"
 
 namespace rdt::core {
 	void ComponentTraceTracker::AddDefinition(const char* component, const char* memberName, SupportedTraceType type, size_t offset)
@@ -78,5 +78,11 @@ namespace rdt {
 
 		layer = 0;
 		polygon_color = BLACK;
+	}
+	// ================================================================================
+	rdt::Animator::Animator()
+	{
+		animationID = RDT_NULL_ANIMATION_ID;
+		currentFrame = 0;
 	}
 }

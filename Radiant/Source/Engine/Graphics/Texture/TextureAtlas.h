@@ -91,5 +91,10 @@ namespace rdt {
 		*/
 		AtlasProfile GetProfile(int spriteIdentifier);
 
+		/*
+			Gets the ID of the texture this atlas defines.
+		*/
+		TextureID GetTextureID();
+
 	};
 }

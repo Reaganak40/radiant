@@ -115,6 +115,14 @@ namespace rdt {
 
 			return *m_atlases.at(tID);
 		}
+
+		std::shared_ptr<TextureAtlas> GetTextureAtlas(TextureID tID)
+		{
+			if (m_atlases.find(tID) == m_atlases.end()) {
+				return nullptr;
+			}
+			return m_atlases.at(tID);
+		}
 	};
 
 	// ======================================================================
@@ -152,6 +160,11 @@ namespace rdt {
 	TextureAtlas& TextureManager::InitTextureAtlas(TextureID tID)
 	{
 		return m_impl->InitTextureAtlas(tID);
+	}
+
+	std::shared_ptr<TextureAtlas> TextureManager::GetTextureAtlas(TextureID tID)
+	{
+		return m_impl->GetTextureAtlas(tID);
 	}
 
 	AtlasProfile TextureManager::NOT_USING_ATLAS()
@@ -238,23 +251,5 @@ namespace rdt {
 	TextureSlot TextureManager::GetNextSlot()
 	{
 		return m_impl->m_next_slot++;
-	}
-
-	void TextureManager::NOT_USING_ATLAS(AtlasProfile& profile)
-	{
-		profile[0] = 0.0f;
-		profile[1] = 0.0f;
-		profile[2] = 1.0f;
-		profile[3] = 1.0f;
-	}
-
-	Texture& TextureManager::LoadTextureFromPNGImpl(const std::string& name, const std::string& filepath)
-	{
-		return m_impl->LoadTextureFromPNG(name, filepath);
-	}
-
-	Texture* TextureManager::GetTextureImpl(const std::string& name)
-	{
-		return m_impl->GetTexture(name);
 	}
 }

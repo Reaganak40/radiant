@@ -1,5 +1,5 @@
 /*******************************************************************
-*	Module:  Graphics
+*	Module:  Graphics (API)
 *	File:    TextureManager.h
 *
 *	Author: Reagan Kelley
@@ -24,6 +24,7 @@ namespace rdt {
 	}
 }
 
+// Indicates that no texture is identified with this ID.
 #define RDT_NULL_TEXTURE_ID 0
 
 namespace rdt {
@@ -67,6 +68,14 @@ namespace rdt {
 		*/
 		static TextureAtlas& InitTextureAtlas(TextureID tID);
 
+		/*
+			Returns a shared pointer to an already initialized texture atlas
+			for the given the texture. Otherwise, returns nullptr.
+		*/
+		static std::shared_ptr<TextureAtlas> GetTextureAtlas(TextureID tID);
+
+		friend class Animation;
+		friend class AnimationManager;
 		friend class TextureAtlas;
 		friend class core::RendererGL;
 		friend class core::RenderLayer;

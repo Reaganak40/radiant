@@ -13,12 +13,17 @@
 // Forward Declarations
 namespace rdt {
 	using ModelID = unsigned int;
+	using TextureID = unsigned int;   // Unique Identifier for a Texture
+	using AnimationID = unsigned int;    // Unique Identifier for an Animation object.
+	using AnimationIndex = unsigned int; // Indicates the index of an animation sequence
+
 	class Polygon;
 	class Layer;
 }
 
 // Required Definitions for Struct/Class Members
 #include "Utils/MathTypes.h"
+#include "Utils/Timestep.h"
 #include "Utils/Color.h"
 #include "Utils/rdt_string.h"
 
@@ -176,15 +181,25 @@ namespace rdt {
 	*/
 	struct RADIANT_API Renderable : ECSComponent
 	{
-		unsigned int layer;		// The render layer to begin draw
-		rdt_string texture;     // texture alias to be applied to this render object
-		Color polygon_color;    // The shader color for the polygon
+		unsigned int layer;		    // The render layer to begin draw
+		TextureID texture;		    // The texture to use
+		AtlasProfile atlasProfile;	// the texture coords to use
+		Color polygon_color;        // The shader color for the polygon
 
 		Renderable();
 	};
 
+	/*
+		Defines the animation of a sprite. Animators refernece
+		animation objects, which utilize a texture. That texture
+		will override a renderable component's texture.
+	*/
 	struct RADIANT_API Animator : ECSComponent
 	{
-		
+		AnimationID animationID;		// What animation to use
+		AnimationIndex currentFrame;	// What frame in animation to use
+		Timer timer;					// time left until next frame
+
+		Animator();
 	};
 }

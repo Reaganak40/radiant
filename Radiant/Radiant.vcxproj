@@ -116,6 +116,7 @@
     <ClInclude Include="Source\Engine\Audio\SoundEngine.h" />
     <ClInclude Include="Source\Engine\Audio\SoundSource.h" />
     <ClInclude Include="Source\Engine\Graphics\Animation.h" />
+    <ClInclude Include="Source\Engine\Graphics\AnimationSystem.h" />
     <ClInclude Include="Source\Engine\Graphics\Model.h" />
     <ClInclude Include="Source\Engine\Graphics\Texture\TextureAtlas.h" />
     <ClInclude Include="Source\Engine\OOComponents\OOComponent.h" />
@@ -252,6 +253,8 @@
     <ClCompile Include="Source\Engine\Audio\SoundEngine.cpp" />
     <ClCompile Include="Source\Engine\Audio\SoundSource.cpp" />
     <ClCompile Include="Source\Engine\ECS\CommonComponents.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\Animation.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\AnimationSystem.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Mesh.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Model.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Texture\TextureAtlas.cpp" />

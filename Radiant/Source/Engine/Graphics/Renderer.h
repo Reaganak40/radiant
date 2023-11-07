@@ -150,6 +150,11 @@ namespace rdt {
 		static void End() { m_instance->EndImpl(); }
 
 		/*
+			Sets the model to use for this draw call
+		*/
+		static void SetModel(ModelID modelID);
+
+		/*
 			Sets the render condition for the current context.
 		*/
 		static void SetRenderType(core::RenderType type) { m_instance->SetRenderTypeImpl(type); }
