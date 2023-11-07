@@ -13,11 +13,13 @@
 #include "Graphics/Model.h"
 #include "Physics/Ptag.h"
 #include "Utils/Timestep.h"
+#include "ResourceManager/ResourceManager.h"
 
 // ECS
 #include "Engine/ECS/ECS.h"
 #include "Engine/Physics/PhysicsSystem.h"
 #include "Engine/Graphics/RenderSystem.h"
+#include "Engine/Graphics/AnimationSystem.h"
 
 // DevTools
 #include "Editor/DevTools.h"
@@ -45,12 +47,13 @@ namespace rdt {
 		Renderer::Initialize();
 		MessageBus::Initialize();
 		SoundEngine::Initialize();
-		core::PtagManager::Initialize();
 		Physics::Initialize();
 		SceneManager::Initialize();
 		ModelManager::Initialize();
-		
+		ResourceManager::Initialize();
+
 		AddECS();
+		ResourceManager::LoadDefaultResources();
 	}
 
 	Application::~Application()
@@ -60,7 +63,7 @@ namespace rdt {
 #ifdef RDT_USE_DEV_TOOLS
 		core::DevLayer::Destroy();
 #endif
-
+		ResourceManager::Destroy();
 		SceneManager::Destroy();
 		Physics::Destroy();
 		core::PtagManager::Destroy();
@@ -143,12 +146,16 @@ namespace rdt {
 		// Add Common Components
 		ComponentManager::RegisterComponent<EntityConfig>();
 		ComponentManager::RegisterComponent<Sprite>();
+		ComponentManager::RegisterComponent<Transform>();
 		ComponentManager::RegisterComponent<RigidBody2D>();
 		ComponentManager::RegisterComponent<Renderable>();
+		ComponentManager::RegisterComponent<Animator>();
 
 		// Add Common Systems
 		SystemManager::RegisterSystem<PhysicsSystem>();
+		SystemManager::RegisterSystem<AnimationSystem>();
 		SystemManager::RegisterSystem<RenderSystem>();
+
 	}
 
 	void Application::RemoveECS()

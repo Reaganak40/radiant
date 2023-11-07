@@ -33,6 +33,8 @@ namespace rdt::core {
 
 	void RenderLayer::CompileBatches()
 	{
+		m_updated_texture_slots = true;
+
 		auto getTexCoords = [](int tci, const AtlasProfile& profile) {
 
 			Vec2f res;
@@ -49,19 +51,7 @@ namespace rdt::core {
 				res.x = profile.normalizedStartX + profile.normalizedWidth;
 				res.y = profile.normalizedStartY;
 				break;
-			case 3:
-				res.x = profile.normalizedStartX + profile.normalizedWidth;
-				res.y = profile.normalizedStartY;
-				break;
 			case 4:
-				res.x = profile.normalizedStartX;
-				res.y = profile.normalizedStartY;
-				break;
-			case 5:
-				res.x = profile.normalizedStartX;
-				res.y = profile.normalizedStartY + profile.normalizedHeight;
-				break;
-			default:
 				res.x = profile.normalizedStartX;
 				res.y = profile.normalizedStartY;
 				break;
@@ -92,7 +82,7 @@ namespace rdt::core {
 				for (auto& position : vertex_positions) {
 
 					Vec2f texCoords = getTexCoords(texture_coordinate_index, mesh.atlasProfile);
-					texture_coordinate_index = (texture_coordinate_index + 1) % 6;
+					texture_coordinate_index = (texture_coordinate_index + 1) % 4;
 					float texIndex = (float)TextureManager::GetTexture(tID).CurrentTextureSlot();
 					
 					vertices.push_back(Vertex(Vec3f(position.x, position.y), mesh.fillColor, texCoords, texIndex));
@@ -113,7 +103,7 @@ namespace rdt::core {
 
 	unsigned int RenderLayer::GetBatchCount()
 	{
-		return m_batchCount;
+		return m_batches.size();
 	}
 
 	std::vector<glRenderUnit>& RenderLayer::GetRenderUnits()

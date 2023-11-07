@@ -13,7 +13,7 @@
 namespace rdt::core {
 	RendererGL::RendererGL()
         : m_window(nullptr), m_window_name(""), m_window_width(0), m_window_height(0), m_vertex_array(nullptr),
-        m_current_vbo(0), m_current_ibo(0), m_current_shader(0), m_current_render_type(DrawFilled),
+        m_current_vbo(0), m_current_ibo(0), m_current_fbo(0), m_current_shader(0), m_current_render_type(DrawFilled),
         m_current_mode(FillMode)
 	{
 		RDT_CORE_INFO("Renderer is using OpenGL");
@@ -209,6 +209,10 @@ namespace rdt::core {
             Step 1: Sort meshes into layers.
         */
         for (auto& mesh : GetBackBuffer()) {
+
+            if (m_layers.find(mesh.layer) == m_layers.end()) {
+                AddRenderLayer(mesh.layer);
+            }
             m_layers[mesh.layer].AddMesh(mesh);
         }
 
@@ -369,7 +373,7 @@ namespace rdt::core {
                 UpdateTextureUniforms();
             }
 
-            auto units = layer.GetRenderUnits();
+            auto& units = layer.GetRenderUnits();
             for (unsigned int i = 0; i < layer.GetBatchCount(); i++) {
                 auto& unit = units.at(i);
 
@@ -442,6 +446,12 @@ namespace rdt::core {
             glViewport(nViewport.posX, nViewport.posY, nViewport.width, nViewport.height);
             m_current_viewport = nViewport;
         }
+    }
+
+    void RendererGL::AddRenderLayer(unsigned int layer)
+    {
+        m_layers[layer];
+        m_layers.at(layer).SetDefaultShader(m_shaders[0]->GetID());
     }
 
     void RendererGL::AddDefaultShader()

@@ -21,7 +21,7 @@ namespace rdt {
 	namespace core {
 		class RendererGL;
 		class RenderLayer;
-		class Vertex;
+		struct Vertex;
 		struct Mesh;
 	}
 }

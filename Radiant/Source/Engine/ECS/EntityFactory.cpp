@@ -102,4 +102,13 @@ namespace rdt {
 		res.polygon = m_impl->CreatePtr();
 		return res;
 	}
+	Transform SpawnRect::CreateTransform()
+	{
+		Transform transform;
+		transform.position = m_impl->spawnPos;
+		transform.rotation = 0;
+		transform.scale = m_impl->size;
+
+		return transform;
+	}
 }

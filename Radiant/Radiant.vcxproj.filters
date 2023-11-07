@@ -521,6 +521,7 @@
     <ClInclude Include="Source\Engine\Graphics\Animation.h" />
     <ClInclude Include="Source\Engine\Graphics\Texture\TextureAtlas.h" />
     <ClInclude Include="Source\Engine\Graphics\AnimationSystem.h" />
+    <ClInclude Include="Source\Engine\ResourceManager\ResourceManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Editor\DevTools.cpp">
@@ -700,6 +701,7 @@
     <ClCompile Include="Source\Engine\Graphics\Mesh.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Animation.cpp" />
     <ClCompile Include="Source\Engine\Graphics\AnimationSystem.cpp" />
+    <ClCompile Include="Source\Engine\ResourceManager\ResourceManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Resources\templates\gameObject.h.txt" />

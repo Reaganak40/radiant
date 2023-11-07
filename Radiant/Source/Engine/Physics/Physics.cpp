@@ -308,6 +308,8 @@ namespace rdt {
     void Physics::Initialize()
     {
         Destroy();
+
+        core::PtagManager::Initialize();
         GetInstance();
     }
 

@@ -26,10 +26,9 @@ namespace rdt {
 
 		Impl()
 		{
-			AddNoneTexture();
-
 			m_texture_slots.fill(UNASSIGNED_TEXTURE);
 			m_next_slot = 2;
+			AddNoneTexture();
 		}
 
 		~Impl()
@@ -50,12 +49,12 @@ namespace rdt {
 
 		void AddNoneTexture()
 		{
-			/*aliasToID["None"] = RDT_NULL_TEXTURE_ID;
+			aliasToID["None"] = RDT_NULL_TEXTURE_ID;
 			m_textures[RDT_NULL_TEXTURE_ID];
 			m_textures.at(RDT_NULL_TEXTURE_ID).SetToNone();
 
-			m_textures.at("None").Bind(NONE_TEXTURE);
-			m_texture_slots[NONE_TEXTURE] = NONE_TEXTURE;*/
+			m_textures.at(RDT_NULL_TEXTURE_ID).Bind(NONE_TEXTURE);
+			m_texture_slots[NONE_TEXTURE] = NONE_TEXTURE;
 		}
 
 		TextureID LoadTextureFromPNG(const std::string& name, const std::string& filepath)

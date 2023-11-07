@@ -13,10 +13,10 @@ namespace rdt {
 
 	void Model::DefineCommonRect()
 	{
-		m_vertices.push_back({ 0.0f, 0.0f });
-		m_vertices.push_back({ 1.0f, 0.0f });
-		m_vertices.push_back({ 1.0f, 1.0f });
-		m_vertices.push_back({ 0.0f, 1.0f });
+		m_vertices.push_back({ -0.5f, -0.5f });
+		m_vertices.push_back({  0.5f, -0.5f });
+		m_vertices.push_back({  0.5f,  0.5f });
+		m_vertices.push_back({ -0.5f,  0.5f });
 
 		m_indices.push_back(0);
 		m_indices.push_back(1);
@@ -55,7 +55,7 @@ namespace rdt {
 		Impl() {}
 		~Impl() {}
 
-		ModelID Register(const std::string& name, const Model& model)
+		ModelID Register(const std::string& name)
 		{
 			if (nameToModelID.find(name) != nameToModelID.end()) {
 				RDT_CORE_WARN("ModelManager - Could not register model '{}', already exists.", name);
@@ -64,7 +64,7 @@ namespace rdt {
 
 			ModelID nID = ++idGenerator;
 			nameToModelID[name] = nID;
-			m_models[nID] = model;
+			m_models[nID];
 			return nID;
 		}
 
@@ -116,9 +116,9 @@ namespace rdt {
 		}
 	}
 
-	ModelID ModelManager::RegisterModel(const std::string& modelName, const Model& model)
+	ModelID ModelManager::RegisterModel(const std::string& modelName)
 	{
-		return m_instance->m_impl->Register(modelName, model);
+		return m_instance->m_impl->Register(modelName);
 	}
 	ModelID ModelManager::GetModelID(const std::string& modelName)
 	{
@@ -147,5 +147,9 @@ namespace rdt {
 			assert(false);
 		}
 		return m_instance->m_impl->GetIndices(model);
+	}
+	Model& ModelManager::GetModel(ModelID model)
+	{
+		return m_instance->m_impl->m_models.at(model);
 	}
 }

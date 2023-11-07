@@ -149,6 +149,7 @@ namespace rdt::core {
 		void SetMode(GeoMode mode);
 		void SetViewport(const glViewportData& nViewport);
 
+		void AddRenderLayer(unsigned int layer);
 		void AddDefaultShader();
 		void UpdateTextureUniforms();
 		void StartImGuiFrame();

@@ -16,7 +16,7 @@ public:
 		appConfig.appName = "Sandbox";
 		appConfig.windowWidth = 1280;
 		appConfig.windowHeight = 720;
-		appConfig.backgroundColor = WHITE;
+		appConfig.backgroundColor = GREEN;
 		appConfig.cameraAspectRatio = AR_16_9;
 		SetApplicationConfig(appConfig);
 	}

@@ -31,7 +31,7 @@ namespace rdt {
 		MeshBuffer m_mesh_buffers[2];
 		unsigned int current_buffer = 0;
 
-		bool begin_called;
+		bool begin_called = false;
 		core::Mesh m_working_mesh; // Used to create meshes in the render processes
 
 		Impl()
@@ -65,6 +65,7 @@ namespace rdt {
 
 			m_working_mesh.Reset();
 			m_working_mesh.layer = layer;
+			begin_called = true;
 		}
 
 		void End() {

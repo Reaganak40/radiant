@@ -19,13 +19,17 @@ public:
 		Entity eID = GetID();
 
 		Sprite sprite = SpawnRect::CreateSprite();
+		sprite.model = ModelManager::GetModelID("common::rect");
 		EntityManager::AddComponent<Sprite>(eID, sprite);
+
+		Transform transform = SpawnRect::CreateTransform();
+		EntityManager::AddComponent<Transform>(eID, transform);
 
 		RigidBody2D rigidBody;
 		EntityManager::AddComponent<RigidBody2D>(eID, rigidBody);
 
 		Renderable renderable;
-		renderable.fillColor = BLACK;
+		renderable.fillColor = BLUE;
 
 		EntityManager::AddComponent<Renderable>(eID, renderable);
 
@@ -74,8 +78,10 @@ TestLayer::TestLayer(const std::string& alias)
 	RegisterToMessageBus(alias);
 	CreateNewRealm();
 
-	RegisterEntity(new Platform(360, 100, 500, 50), "platform1");
-	RegisterEntity(new Person(360, 300, BLUE), "player");
+	RegisterEntity(new Platform(360, 200, 500, 50), "platform1");
+	//RegisterEntity(new Person(360, 300, BLUE), "player");
+
+
 
 }
 

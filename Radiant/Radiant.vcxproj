@@ -173,6 +173,7 @@
     <ClInclude Include="Source\Engine\OOComponents\Scene\Layer.h" />
     <ClInclude Include="Source\Engine\OOComponents\Scene\Scene.h" />
     <ClInclude Include="Source\Engine\OOComponents\Scene\SceneManager.h" />
+    <ClInclude Include="Source\Engine\ResourceManager\ResourceManager.h" />
     <ClInclude Include="Source\Engine\Utils\BitSet.h" />
     <ClInclude Include="Source\Engine\Utils\Color.h" />
     <ClInclude Include="Source\Engine\Utils\ConfigReader.h" />
@@ -304,6 +305,7 @@
     <ClCompile Include="Source\Engine\OOComponents\Scene\Layer.cpp" />
     <ClCompile Include="Source\Engine\OOComponents\Scene\Scene.cpp" />
     <ClCompile Include="Source\Engine\OOComponents\Scene\SceneManager.cpp" />
+    <ClCompile Include="Source\Engine\ResourceManager\ResourceManager.cpp" />
     <ClCompile Include="Source\Engine\Utils\BitSet.cpp" />
     <ClCompile Include="Source\Engine\Utils\Color.cpp" />
     <ClCompile Include="Source\Engine\Utils\ConfigReader.cpp" />

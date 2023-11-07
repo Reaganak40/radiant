@@ -51,7 +51,7 @@ namespace rdt {
 
 	// ======================================================================
 
-	class ModelManager {
+	class RADIANT_API ModelManager {
 	private:
 		struct Impl;
 		Impl* m_impl;
@@ -69,7 +69,7 @@ namespace rdt {
 			Adds a model to the ModelManager that can be accessed later using its name,
 			or its return ModelID.
 		*/
-		static ModelID RegisterModel(const std::string& modelName, const Model& model);
+		static ModelID RegisterModel(const std::string& modelName);
 
 		/*
 			Gets the modelID for a model by its modelName
@@ -97,5 +97,13 @@ namespace rdt {
 			Gets the specified model and copies its index data to the out reference
 		*/
 		static std::vector<unsigned int>& GetIndices(ModelID model);
+
+		friend class ResourceManager;
+	private:
+
+		/*
+			Returns a reference to the model specified by the modelID
+		*/
+		static Model& GetModel(ModelID model);
 	};
 }
