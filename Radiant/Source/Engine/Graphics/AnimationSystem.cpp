@@ -34,7 +34,7 @@ namespace rdt {
 				if (animator.timer.Update(deltaTime)) {
 					animator.currentFrame++;
 
-					if (animator.currentFrame >= AnimationManager::GetAnimation(animator.animationID)->FrameCount()) {
+					if (animator.currentFrame >= AnimationManager::GetFrameCount(animator.animationID)) {
 						animator.currentFrame = 0;
 					}
 

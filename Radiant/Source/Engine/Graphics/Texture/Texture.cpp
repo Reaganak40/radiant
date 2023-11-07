@@ -11,10 +11,6 @@ namespace rdt {
 	{
 		glGenTextures(1, &m_textureID);
 		m_texture_slot = UNASSIGNED_TEXTURE;
-
-		has_texture_atlas = false;
-		
-
 	}
 
 	Texture::~Texture()

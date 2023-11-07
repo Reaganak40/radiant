@@ -14,27 +14,27 @@
 
 // Forward Declarations
 namespace rdt {
-	
 	namespace core 
 	{
 		class Mesh;
 		enum RenderType;
 	}
-	
 	struct Mesh;
 	using MeshBuffer = std::vector<core::Mesh>;
 	using ModelID = unsigned int;
-
-
+	using UniqueID = unsigned int;
+	using TextureID = unsigned int;   // Unique Identifier for a Texture
 	enum ColorType;
-
 	struct Transform;
-
+	struct AtlasProfile;
+	struct Vec2d;
+	struct Vec2i;
 	class GuiTemplate;
 	class RenderWindow;
 	class Color;
 	class Camera;
 	class Line;
+	class Polygon;
 }
 
 namespace rdt {
@@ -118,7 +118,7 @@ namespace rdt {
 			Update renderer internals if encountered a window resize event. Returns
 			the aspect ratio.
 		*/
-		static Vec2i OnWindowResize() { return m_instance->OnWindowResizeImpl(); }
+		static Vec2i OnWindowResize();
 
 		/*
 			Adds a new render window to the rendering context. The renderer will draw
@@ -193,83 +193,9 @@ namespace rdt {
 		static void SetFillColor(const Color& color);
 
 		/*
-			Utility function for quickly drawing a Rect to the screen.
-		*/
-		static void DrawRect(const Vec2d& origin, const Vec2d& size, const Color& color,
-			unsigned int layer = 0) {
-			m_instance->DrawRectImpl(origin, size, color, layer);
-		}
-
-		/*
-			Utility function for quickly drawing a Line to the screen.
-		*/
-		static void DrawLine(const Vec2d& start, const Vec2d& end, const Color& color,
-			unsigned int layer = 0) {
-			m_instance->DrawLineImpl(start, end, color, layer);
-		}
-
-		/*
 			Sets the render condition for the current context.
 		*/
 		static void SetRenderType(core::RenderType type) { m_instance->SetRenderTypeImpl(type); }
-
-		/*
-			Adds a polygon to the render queue to be drawn next frame. Use optional
-			offset to move the origin of the polygon an arbitary distance from its
-			current location.
-		*/
-		static void AddPolygon(const Polygon& polygon, const Vec2f& offset = Vec2f::Zero()) { m_instance->AddPolygonImpl(polygon, offset); }
-
-		/*
-			Adds a rect polygon to the next draw frame. This effectively calls
-			AddPolygon but without the need for a stored polygon reference.
-		*/
-		static void AddRect(const Vec2d& origin, const Vec2d& size, const Vec2f& offset = Vec2f::Zero()) { m_instance->AddRectImpl(origin, size, offset); }
-
-		/*
-			Adds a line to the render queue to be drawn next frame.
-		*/
-		static void AddLine(const Line& line) { m_instance->AddLineImpl(line); }
-
-		/*
-			Sets the draw color for lines, which will be used on the next line.
-		*/
-		static void SetLineColor(const Color& color) { m_instance->SetLineColorImpl(color); }
-
-		/*
-			Sets the draw color for lines, which will be used on the next line.
-		*/
-		static void SetLineColor(ColorType color) { m_instance->SetLineColorImpl(color); }
-
-		/*
-			Applies a post (applied later) rotation to the next polygon when it is drawn.
-		*/
-		static void SetPolygonRotation(const float radians) { m_instance->SetPolygonRotationImpl(radians); }
-
-		/*
-			Sets the draw color for polygons, which will be used on the next polygon.
-		*/
-		static void SetPolygonColor(const Color& color);
-
-		/*
-			Sets the draw color for polygons, which will be used on the next polygon.
-		*/
-		static void SetPolygonColor(ColorType color) { m_instance->SetPolygonColorImpl(color); }
-
-		/*
-			Sets the textureID for the next polygon. This ID should correspond with
-			an already loaded texture in the TextureManager. If the texture has a
-			defined atlas, provide the tile coordinate index.
-
-			This currently only works for Rects.
-		*/
-		static void SetPolygonTexture(const std::string& texName, unsigned int atlasX = 0, unsigned int atlasY = 0) { m_instance->SetPolygonTextureImpl(texName, atlasX, atlasY); }
-
-
-		/*
-			Flips the texture coordinates for the next polygon, horizontally.
-		*/
-		static void FlipPolygonTextureHorizontal(bool flip = true) { m_instance->FlipPolygonTextureHorizontalImpl(flip); }
 
 		/*
 			Attaches a Gui instance, which will be drawn at the end of the draw command queue.
@@ -330,7 +256,7 @@ namespace rdt {
 		/*
 		Returns the world coordinates from provided screen coordinates on the camera.
 		*/
-		static Vec2d ScreenToWorldCoordinates(const Vec2d& ScreenCoords, int renderWindowIndex = -1) { return m_instance->ScreenToWorldCoordinatesImpl(ScreenCoords, renderWindowIndex); }
+		static Vec2d ScreenToWorldCoordinates(const Vec2d& ScreenCoords, int renderWindowIndex = -1);
 
 		// *****************************************************
 		// 
@@ -347,7 +273,7 @@ namespace rdt {
 			If not using default viewport, specify the render window by its id/index to get the 
 			coordinate offset from that window.
 		*/
-		static Vec2d _TranslateMouseCoordsToViewport(const Vec2d& mouseCoords, int renderWindowIndex = -1) { return m_instance->_TranslateMouseCoordsToViewportImpl(mouseCoords, renderWindowIndex); }
+		static Vec2d _TranslateMouseCoordsToViewport(const Vec2d& mouseCoords, int renderWindowIndex = -1);
 
 	protected:
 		// Implementation Functions to be implemented by the proper platform.
@@ -363,27 +289,14 @@ namespace rdt {
 		virtual void EnableFullscreenImpl() = 0;
 		virtual void DisableFullscreenImpl() = 0;
 
-
 		virtual void ClearImpl() = 0;
 		virtual void OnBeginFrameImpl() = 0;
 		virtual void OnUpdateImpl(const float deltaTime) = 0;
 		virtual void RenderImpl() = 0;
 		virtual void OnEndFrameImpl() = 0;
 
-		virtual void BeginImpl(unsigned int layer) = 0;
 		virtual void SetRenderTypeImpl(core::RenderType type) = 0;
-		virtual void AddPolygonImpl(const Polygon& polygon, const Vec2f& offset) = 0;
-		virtual void AddRectImpl(const Vec2d& origin, const Vec2d& size, const Vec2f& offset) = 0;
-		virtual void AddLineImpl(const Line& line) = 0;
-		virtual void DrawRectImpl(const Vec2d& origin, const Vec2d& size, const Color& color, unsigned int layer = 0) = 0;
-		virtual void SetLineColorImpl(const Color& color) = 0;
-		virtual void DrawLineImpl(const Vec2d& start, const Vec2d& end, const Color& color, unsigned int layer = 0) = 0;
-		virtual void EndImpl() = 0;
 
-		virtual void SetPolygonColorImpl(const Color& color) = 0;
-		virtual void SetPolygonRotationImpl(const float radians) = 0;
-		virtual void SetPolygonTextureImpl(const std::string& texName, unsigned int atlasX = 0, unsigned int atlasY = 0) = 0;
-		virtual void FlipPolygonTextureHorizontalImpl(bool flip) = 0;
 		virtual void AttachGuiImpl(GuiTemplate* gui) = 0;
 		virtual void DetachGuiImpl(const GuiTemplate* gui) = 0;
 

@@ -13,6 +13,7 @@
 // Forward Declarations
 namespace rdt {
 	using TextureID = unsigned int;   // Unique Identifier for a Texture
+	typedef unsigned int TextureSlot;
 	struct AtlasProfile;
 	class TextureAtlas;
 	class Texture;
@@ -20,12 +21,14 @@ namespace rdt {
 	namespace core {
 		class RendererGL;
 		class RenderLayer;
+		class Vertex;
 		struct Mesh;
 	}
 }
 
 // Indicates that no texture is identified with this ID.
 #define RDT_NULL_TEXTURE_ID 0
+#define MAX_TEXTURES 30
 
 namespace rdt {
 
@@ -88,7 +91,6 @@ namespace rdt {
 		friend struct core::Mesh;
 	private:
 		
-
 		/*
 			Returns a reference to a texture through its textureID
 		*/
@@ -99,14 +101,6 @@ namespace rdt {
 		*/
 		static const char* GetAlias(TextureID tID);
 
-		/*
-			Applies the provided texture to the vertices of the provided rectangle. If the texture
-			has a texture atlas, the atlasCoords will be applied to get the correct sprite in the
-			tile map.
-			Returns true if the texture slots changed.
-		*/
-		static bool ApplyTextureAtlas(Texture* texture, const Vec2i& atlasCoords, std::vector<core::Vertex>& rectVertices, bool flipHorizontal = false);
-		
 		static std::array<unsigned int, MAX_TEXTURES>& GetTextureSlots();
 
 		void AddNoneTexture();

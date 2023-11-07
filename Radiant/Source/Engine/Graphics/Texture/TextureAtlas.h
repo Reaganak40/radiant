@@ -13,8 +13,10 @@
 // Forward Declarations
 namespace rdt {
 	using TextureID = unsigned int;   // Unique Identifier for a Texture
-	class Vec2i;
 }
+
+// Required Definitions for Struct/Class Members
+#include "Utils/MathTypes.h"
 
 namespace rdt {
 

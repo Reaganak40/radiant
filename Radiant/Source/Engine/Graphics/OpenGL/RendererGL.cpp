@@ -13,7 +13,7 @@
 namespace rdt::core {
 	RendererGL::RendererGL()
         : m_window(nullptr), m_window_name(""), m_window_width(0), m_window_height(0), m_vertex_array(nullptr),
-        m_current_vbo(0), m_current_ibo(0), m_current_shader(0), m_current_layer(0), m_current_render_type(DrawFilled),
+        m_current_vbo(0), m_current_ibo(0), m_current_shader(0), m_current_render_type(DrawFilled),
         m_current_mode(FillMode)
 	{
 		RDT_CORE_INFO("Renderer is using OpenGL");
@@ -23,11 +23,8 @@ namespace rdt::core {
             RDT_CORE_FATAL("Could not initliaze glfw.");
             ASSERT(false);
         }
-
-        m_polygon_color = BLACK;
-        m_line_color = BLACK;
+        
         m_imgui_newFrameCalled = false;
-        begin_called = false;
 	}
 
 	RendererGL::~RendererGL()
@@ -208,25 +205,16 @@ namespace rdt::core {
     {
         bool update_slots = false;
 
-        for (auto& mesh : GetBackBuffer()) {
-            m_layers[mesh.layer].AddMesh(mesh, DrawFilled);
-        }
-
         /*
-            Step 1: Run the command queue, sorting meshes into layers.
+            Step 1: Sort meshes into layers.
         */
-        while (!m_command_queue.empty()) {
-            DrawCommand command = m_command_queue.front();
-            Mesh& mesh = m_render_cache.GetMesh(command.meshIdentifier);
-
-            m_layers[mesh.layer].AddMesh(mesh, command.renderType);
-            m_command_queue.pop();
+        for (auto& mesh : GetBackBuffer()) {
+            m_layers[mesh.layer].AddMesh(mesh);
         }
 
         /*
             Step 2: DrawContext for default viewport or render windows.
         */
-
         if (UsingDefaultViewport()) {
             Clear(m_default_viewport, BLACK);
 
@@ -266,7 +254,6 @@ namespace rdt::core {
             SetFBO(0);
         }
 
-
         /*
             Step 3: Run the GUI render queue.
         */
@@ -284,6 +271,11 @@ namespace rdt::core {
 
         /* Swap front and back buffers */
         glfwSwapBuffers(m_window);
+
+        // Reset the buffers of each layer.
+        for (auto& [layer_index, layer] : m_layers) {
+            layer.Flush();
+        }
     }
 
     void RendererGL::OnEndFrameImpl()
@@ -293,280 +285,13 @@ namespace rdt::core {
 
         m_render_cache.OnEndFrame();
 
-        // Reset the buffers of each layer.
-        for (auto& layer : m_layers) {
-            layer.Flush();
-        }
-
         m_selected_cameras.clear();
     }
 
-    void RendererGL::DrawRectImpl(const Vec2d& origin, const Vec2d& size, const Color& color, unsigned int layer)
-    {
-        // Use the rect cache for efficiency
-        std::shared_ptr<Rect> rect;
-
-        if ((rect = m_render_cache.GetFreeRect()) == nullptr) {
-            m_render_cache.AddRectToCache(std::shared_ptr<Rect>(new Rect(origin, size.x, size.y)));
-            rect = m_render_cache.GetFreeRect();
-        }
-        else {
-            rect->SetPosition(origin);
-            rect->SetSize(size);
-        }
-
-        Color old_color = m_polygon_color;
-
-        // Use draw API
-        BeginImpl(layer);
-        SetPolygonColorImpl(color);
-        SetRenderTypeImpl(DrawFilled);
-        AddPolygonImpl(*rect, Vec2f::Zero());
-        EndImpl();
-
-        // Go back to saved settings
-        m_polygon_color = old_color;
-    }
-
-    void RendererGL::DrawLineImpl(const Vec2d& start, const Vec2d& end, const Color& color, unsigned int layer)
-    {
-        // Use the line cache for efficiency
-        std::shared_ptr<Line> line;
-
-        if ((line = m_render_cache.GetFreeLine()) == nullptr) {
-            m_render_cache.AddLineToCache(std::shared_ptr<Line>(new Line(start, end)));
-            line = m_render_cache.GetFreeLine();
-        }
-        else {
-            line->SetStart(start);
-            line->SetEnd(end);
-        }
-
-        Color old_line_color = m_line_color;
-
-        // Use draw API
-        BeginImpl(layer);
-        SetLineColorImpl(color);
-        SetRenderTypeImpl(RenderType::DrawLine);
-        AddLineImpl(*line);
-        EndImpl();
-
-        m_line_color = old_line_color;
-    }
-
-    void RendererGL::BeginImpl(unsigned int layer)
-    {
-        if (begin_called) {
-            RDT_CORE_ERROR("Renderer - Called Begin() twice in the same context. Did you forget to call Renderer::End()?");
-            ASSERT(false);
-        }
-
-        m_working_mesh.Reset();
-        m_current_render_type = DrawFilled;
-
-        while (m_layers.size() <= layer) {
-            m_layers.push_back(RenderLayer());
-            m_layers.back().SetDefaultShader(m_shaders[0]->GetID());
-        }
-
-        begin_called = true;
-    }
-
-    void RendererGL::EndImpl()
-    {
-        if (!begin_called) {
-            RDT_CORE_ERROR("Renderer - Unmatched End(), did you forget to called Renderer::Begin()?");
-            ASSERT(false);
-        }
-
-        begin_called = false;
-        SubmitMesh(m_working_mesh);
-    }
 
     void RendererGL::SetRenderTypeImpl(core::RenderType type)
     {
-        if (!begin_called) {
-            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
-            ASSERT(false);
-        }
-
         m_current_render_type = type;
-    }
-
-    void RendererGL::AddPolygonImpl(const Polygon& polygon, const Vec2f& offset)
-    {
-        if (!begin_called) {
-            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
-            ASSERT(false);
-        }
-
-        Mesh& pMesh = m_render_cache.GetMesh(polygon.GetUUID());
-        const std::vector<Vec2d>* polygonVertices = nullptr;
-
-        if (pMesh.indices.size() != polygon.GetIndices().size()) {
-            pMesh.indices = polygon.GetIndices();
-        }
-
-        int index = 0;
-        
-
-        Polygon* util_poly = nullptr;
-        if (m_polygon_rotation != 0.0f) {
-            util_poly = new Polygon(polygon);
-            util_poly->SetRotation(m_polygon_rotation);
-            polygonVertices = &util_poly->GetVertices();
-        }
-        else {
-            polygonVertices = &polygon.GetVertices();
-        }
-
-        for (const auto& vertex : (*polygonVertices)) {
-            if (pMesh.vertices.size() == index) {
-
-                pMesh.vertices.push_back(
-                    Vertex(
-                        Vec3f((float)vertex.x, (float)vertex.y), m_polygon_color.GetColor(),
-                        { 0, 0 }, UNASSIGNED_TEXTURE
-                    )
-                );
-            }
-            else {
-                pMesh.vertices[index].position = Vec3f((float)vertex.x, (float)vertex.y);
-                pMesh.vertices[index].color = m_polygon_color.GetColor();
-                pMesh.vertices[index].texCoords = { 0, 0 };
-                pMesh.vertices[index].texIndex = UNASSIGNED_TEXTURE;
-            }
-            index++;
-        }
-
-        pMesh.layer = m_current_layer;
-        pMesh.texture = m_polygon_texture;
-        pMesh.flipTexture = m_should_flip_texture;
-        pMesh.texAtlasCoords = m_polygon_texture_coords;
-
-        if (offset.x != 0.0f || offset.y != 0.0f) {
-            for (auto& vertex : pMesh.vertices) {
-                vertex.position.x += offset.x;
-                vertex.position.y += offset.y;
-            }
-        }
-
-        m_command_queue.push(DrawCommand(polygon.GetUUID(), m_current_render_type));
-
-        if (util_poly != nullptr) {
-            delete util_poly;
-        }
-    }
-
-    void RendererGL::AddRectImpl(const Vec2d& origin, const Vec2d& size, const Vec2f& offset)
-    {
-        if (!begin_called) {
-            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
-            ASSERT(false);
-        }
-
-        // Use the rect cache for efficiency
-        std::shared_ptr<Rect> rect;
-
-        if ((rect = m_render_cache.GetFreeRect()) == nullptr) {
-            m_render_cache.AddRectToCache(std::shared_ptr<Rect>(new Rect(origin, size.x, size.y)));
-            rect = m_render_cache.GetFreeRect();
-        }
-        else {
-            rect->SetPosition(origin);
-            rect->SetSize(size);
-        }
-
-        // Use draw API
-        AddPolygonImpl(*rect, offset);
-    }
-
-    void RendererGL::AddLineImpl(const Line& line)
-    {
-        if (!begin_called) {
-            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
-            ASSERT(false);
-        }
-
-        Mesh& pMesh = m_render_cache.GetMesh(line.GetUUID());
-
-        if (pMesh.indices.size() != line.GetIndices().size()) {
-            pMesh.indices = line.GetIndices();
-        }
-
-        int index = 0;
-        for (const auto& vertex : line.GetVertices()) {
-            if (pMesh.vertices.size() == index) {
-
-                pMesh.vertices.push_back(
-                    Vertex(
-                        Vec3f((float)vertex.x, (float)vertex.y), m_line_color.GetColor(),
-                        { 0, 0 }, UNASSIGNED_TEXTURE
-                    )
-                );
-            }
-            else {
-                pMesh.vertices[index].position = Vec3f((float)vertex.x, (float)vertex.y);
-                pMesh.vertices[index].color = m_line_color.GetColor();
-                pMesh.vertices[index].texCoords = { 0, 0 };
-                pMesh.vertices[index].texIndex = UNASSIGNED_TEXTURE;
-            }
-            index++;
-        }
-
-        pMesh.layer = m_current_layer;
-        pMesh.texture = nullptr;
-        pMesh.texAtlasCoords = Vec2i::Zero();
-
-        m_command_queue.push(DrawCommand(line.GetUUID(), m_current_render_type));
-    }
-
-    void RendererGL::SetLineColorImpl(const Color& color)
-    {
-        if (!begin_called) {
-            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
-            ASSERT(false);
-        }
-        m_line_color = color;
-    }
-
-    void RendererGL::SetPolygonColorImpl(const Color& color)
-    {
-        if (!begin_called) {
-            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
-            ASSERT(false);
-        }
-        m_polygon_color = color;
-    }
-
-    void RendererGL::SetPolygonRotationImpl(const float radians)
-    {
-        if (!begin_called) {
-            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
-            ASSERT(false);
-        }
-        m_polygon_rotation = radians;
-    }
-
-    void RendererGL::SetPolygonTextureImpl(const std::string& texName, unsigned int atlasX, unsigned int atlasY)
-    {
-        if (!begin_called) {
-            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
-            ASSERT(false);
-        }
-
-        m_polygon_texture = TextureManager::GetTexture(texName);
-        m_polygon_texture_coords.x = atlasX;
-        m_polygon_texture_coords.y = atlasY;
-    }
-
-    void RendererGL::FlipPolygonTextureHorizontalImpl(bool flip)
-    {
-        if (!begin_called) {
-            RDT_CORE_ERROR("Renderer - No context created, did you forget to called Renderer::Begin()?");
-            ASSERT(false);
-        }
-        m_should_flip_texture = flip;
     }
 
     void RendererGL::AttachGuiImpl(GuiTemplate* gui)
@@ -637,7 +362,7 @@ namespace rdt::core {
         m_shaders[0]->SetUniform<glm::mat4>("uMVP", mvp);
         Clear(m_current_viewport, GetCamera().GetBackgroundColor());
         
-        for (auto& layer : m_layers) {
+        for (auto& [layer_index, layer] : m_layers) {
             layer.CompileBatches();
 
             if (layer.TextureSlotsChanged()) {

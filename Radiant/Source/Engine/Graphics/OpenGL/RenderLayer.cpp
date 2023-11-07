@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "RenderLayer.h"
+#include "Graphics/Texture/Texture.h"
 #include "Graphics/Texture/TextureManager.h"
 #include "Graphics/Model.h"
 #include "Utils/Utils.h"
@@ -32,10 +33,45 @@ namespace rdt::core {
 
 	void RenderLayer::CompileBatches()
 	{
+		auto getTexCoords = [](int tci, const AtlasProfile& profile) {
+
+			Vec2f res;
+			switch (tci) {
+			case 0:
+				res.x = profile.normalizedStartX;
+				res.y = profile.normalizedStartY + profile.normalizedHeight;
+				break;
+			case 1:
+				res.x = profile.normalizedStartX + profile.normalizedWidth;
+				res.y = profile.normalizedStartY + profile.normalizedHeight;
+				break;
+			case 2:
+				res.x = profile.normalizedStartX + profile.normalizedWidth;
+				res.y = profile.normalizedStartY;
+				break;
+			case 3:
+				res.x = profile.normalizedStartX + profile.normalizedWidth;
+				res.y = profile.normalizedStartY;
+				break;
+			case 4:
+				res.x = profile.normalizedStartX;
+				res.y = profile.normalizedStartY;
+				break;
+			case 5:
+				res.x = profile.normalizedStartX;
+				res.y = profile.normalizedStartY + profile.normalizedHeight;
+				break;
+			default:
+				res.x = profile.normalizedStartX;
+				res.y = profile.normalizedStartY;
+				break;
+			}
+
+			return res;
+
+			};
 
 		int unitIndex = 0;
-
-		// Add batches for with textures
 		for (auto& [tID, meshes] : m_meshes) {
 			if (meshes.size() == 0) {
 				continue;
@@ -47,50 +83,27 @@ namespace rdt::core {
 
 			for (auto& mesh : meshes) {
 
-				std::vector<Vec2f> vertices;
-				std::vector<unsigned int> indices;
-				ModelManager::CopyVertices(mesh.modelID, vertices);
-				ModelManager::CopyIndices(mesh.modelID, indices);
+				std::vector<Vec2f> vertex_positions(ModelManager::ModelExists(mesh.modelID) ? ModelManager::GetVertices(mesh.modelID) : std::vector<Vec2f>());
+				std::vector<unsigned int> indices(ModelManager::ModelExists(mesh.modelID) ? ModelManager::GetIndices(mesh.modelID) : std::vector<unsigned int>());
+				ApplyTransform(mesh, vertex_positions);
 
-				ApplyTransform(mesh, vertices);
+				std::vector<Vertex> vertices;
+				int texture_coordinate_index = 0;
+				for (auto& position : vertex_positions) {
 
-				if (TextureManager::ApplyTextureAtlas(mesh->texture, mesh->texAtlasCoords, mesh->vertices, mesh->flipTexture)) {
-					m_updated_texture_slots = true;
+					Vec2f texCoords = getTexCoords(texture_coordinate_index, mesh.atlasProfile);
+					texture_coordinate_index = (texture_coordinate_index + 1) % 6;
+					float texIndex = (float)TextureManager::GetTexture(tID).CurrentTextureSlot();
+					
+					vertices.push_back(Vertex(Vec3f(position.x, position.y), mesh.fillColor, texCoords, texIndex));
 				}
-				m_batches[unitIndex].m_VBO->PushToBatch(mesh->vertices);
-				m_batches[unitIndex].m_IBO->PushToBatch(mesh->indices, mesh->vertices.size());
+
+				m_batches[unitIndex].m_VBO->PushToBatch(vertices);
+				m_batches[unitIndex].m_IBO->PushToBatch(indices, vertices.size());
 			}
 			m_batches[unitIndex].type = DrawFilled;
 			unitIndex++;
 		}
-		
-		// Add polygon outline batch
-		if (m_outline_meshes.size() > 0) {
-			if (m_batches.size() <= unitIndex) {
-				PushRenderUnit();
-			}
-			for (auto& mesh : m_outline_meshes) {
-				m_batches[unitIndex].m_VBO->PushToBatch(mesh->vertices);
-				m_batches[unitIndex].m_IBO->PushToBatch(mesh->indices, mesh->vertices.size());
-			}
-			m_batches[unitIndex].type = DrawOutline;
-			unitIndex++;
-		}
-
-		// Add line batch
-		if (m_line_meshes.size() > 0) {
-			if (m_batches.size() <= unitIndex) {
-				PushRenderUnit();
-			}
-			for (auto& mesh : m_line_meshes) {
-				m_batches[unitIndex].m_VBO->PushToBatch(mesh->vertices);
-				m_batches[unitIndex].m_IBO->PushToBatch(mesh->indices, mesh->vertices.size());
-			}
-			m_batches[unitIndex].type = DrawLine;
-			unitIndex++;
-		}
-
-		m_batchCount = unitIndex;
 	}
 
 	bool RenderLayer::TextureSlotsChanged()
@@ -112,11 +125,7 @@ namespace rdt::core {
 	{
 		m_updated_texture_slots = false;
 
-		for (auto& [tID, meshes] : m_textured_meshes) {
-			m_textured_meshes.at(tID).clear();
-		}
-		m_outline_meshes.clear();
-		m_line_meshes.clear();
+		m_meshes.clear();
 
 		for (auto& unit : m_batches) {
 			unit.m_IBO->Flush();

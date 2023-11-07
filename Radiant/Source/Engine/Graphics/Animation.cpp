@@ -153,7 +153,14 @@ namespace rdt {
 		if (animation == nullptr) {
 			return TextureManager::NOT_USING_ATLAS();
 		}
-
 		return animation->GetFrameAt(aIndex);
+	}
+	size_t AnimationManager::GetFrameCount(AnimationID aID)
+	{
+		auto animation = GetAnimation(aID);
+		if (animation == nullptr) {
+			return 0;
+		}
+		return animation->FrameCount();
 	}
 }

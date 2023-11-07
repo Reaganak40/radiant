@@ -114,6 +114,11 @@ namespace rdt {
 		*/
 		static AtlasProfile GetFrame(AnimationID aID, AnimationIndex aIndex);
 
+		/*
+			Returns the number of frames in an animation.
+		*/
+		static size_t GetFrameCount(AnimationID aID);
+
 	private:
 		/*
 			Returns the shared pointer of an instantiated animation object.

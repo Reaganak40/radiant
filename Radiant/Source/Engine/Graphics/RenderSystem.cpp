@@ -47,12 +47,8 @@ void rdt::RenderSystem::Update(float deltaTime)
 		Renderer::SetModel(sprite.model);
 		Renderer::SetTransform(transform);
 		Renderer::SetTexture(renderable.texture);
-
-		if (renderable.)
-		Renderer::FlipTextureHorizontal()
-
-		Renderer::SetPolygonColor(renderable.polygon_color);
-		Renderer::AddPolygon(*sprite.polygon);
+		if (renderable.flipTexture) { Renderer::FlipTextureHorizontal(); }
+		Renderer::SetFillColor(renderable.fillColor);
 		Renderer::End();
 	}
 }

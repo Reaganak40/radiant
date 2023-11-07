@@ -91,11 +91,11 @@ namespace rdt {
 		/*
 			Gets the specified model and copies its vertex data to the out reference
 		*/
-		static void CopyVertices(ModelID model, std::vector<Vec2f>& outVertices);
+		static std::vector<Vec2f>& GetVertices(ModelID model);
 
 		/*
 			Gets the specified model and copies its index data to the out reference
 		*/
-		static void CopyIndices(ModelID model, std::vector<unsigned int>& outVertices);
+		static std::vector<unsigned int>& GetIndices(ModelID model);
 	};
 }

@@ -22,8 +22,5 @@ void TestQuad::OnBind()
 
 void TestQuad::OnRender()
 {
-	Renderer::Begin();
-	Renderer::SetPolygonColor(GREEN);
-	Renderer::AddPolygon(Physics::GetPolygon(GetRealmID(), GetModelID()));
-	Renderer::End();
+	return;
 }

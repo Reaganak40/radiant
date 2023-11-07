@@ -124,6 +124,11 @@ namespace rdt {
 		delete m_impl;
 		m_impl = nullptr;
 	}
+	Vec2i Renderer::OnWindowResize()
+	{
+		return m_instance->OnWindowResizeImpl();
+	}
+
 	int Renderer::AddRenderWindow(RenderWindow* nRenderWindow)
 	{
 		int id = m_instance->m_impl->GetNextRenderWindowID();
@@ -184,11 +189,6 @@ namespace rdt {
 		m_impl->m_working_mesh.fillColor = color.GetColor();
 	}
 
-	void Renderer::SetPolygonColor(const Color& color)
-	{
-		m_instance->SetPolygonColorImpl(color);
-	}
-
 	Camera& Renderer::GetCamera()
 	{
 		return m_instance->m_impl->m_camera;
@@ -216,6 +216,7 @@ namespace rdt {
 		const Polygon& cameraRect = m_instance->m_impl->m_camera.GetCameraBoundaryBox();
 		return Collision::CheckCollisionSAT(cameraRect, polygon);;
 	}
+
 	bool Renderer::IsInView(const Vec2d& rectOrigin, const Vec2d& rectSize)
 	{
 		using namespace core;
@@ -224,11 +225,21 @@ namespace rdt {
 		const Polygon& cameraRect = m_instance->m_impl->m_camera.GetCameraBoundaryBox();
 		return Collision::CheckCollisionSAT(cameraRect, rect);;
 	}
+
+	Vec2d Renderer::ScreenToWorldCoordinates(const Vec2d& ScreenCoords, int renderWindowIndex)
+	{
+		return m_instance->ScreenToWorldCoordinatesImpl(ScreenCoords, renderWindowIndex);
+	}
+
 	void Renderer::_FlushPolygon(const UniqueID UUID)
 	{
 		if (m_instance == nullptr) {
 			return;
 		}
 		m_instance->_FlushPolygonImpl(UUID);
+	}
+	Vec2d Renderer::_TranslateMouseCoordsToViewport(const Vec2d& mouseCoords, int renderWindowIndex)
+	{
+		return m_instance->_TranslateMouseCoordsToViewportImpl(mouseCoords, renderWindowIndex);
 	}
 }

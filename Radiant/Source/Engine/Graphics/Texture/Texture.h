@@ -4,7 +4,6 @@
 #include "Utils/UniqueID.h"
 #include "Utils/MathTypes.h"
 
-#define MAX_TEXTURES 30
 #define UNASSIGNED_TEXTURE 125
 #define NONE_TEXTURE 1
 
@@ -26,18 +25,18 @@ namespace rdt {
 		~Texture();
 
 		inline TextureID GetID() { return m_textureID; }
+		const TextureSlot CurrentTextureSlot() { return m_texture_slot; }
 
 		int GetImageWidth();
 
 		int GetImageHeight();
 
-		friend class TextureManager;
 
+		friend class TextureManager;
 	private:
 		void LoadTexture(const std::string& textureFilePath);
 		void SetToNone();
 
 		void Bind(TextureSlot slot);
-		const TextureSlot CurrentTextureSlot() { return m_texture_slot; }
 	};
 }

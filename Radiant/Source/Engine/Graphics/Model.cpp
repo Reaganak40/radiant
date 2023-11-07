@@ -81,16 +81,14 @@ namespace rdt {
 			return m_models.find(mID) != m_models.end();
 		}
 
-		void CopyVertices(ModelID model, std::vector<Vec2f>& outVertices)
+		std::vector<Vec2f>& GetVertices(ModelID model)
 		{
-			auto& vertices = m_models.at(model).GetVertices();
-			std::copy(vertices.begin(), vertices.end(), outVertices);
+			return m_models.at(model).GetVertices();
 		}
 
-		void CopyIndices(ModelID model, std::vector<unsigned int>& outIndices)
+		std::vector<unsigned int>& GetIndices(ModelID model)
 		{
-			auto& indices = m_models.at(model).GetIndices();
-			std::copy(indices.begin(), indices.end(), outIndices);
+			return m_models.at(model).GetIndices();
 		}
 	};
 
@@ -136,18 +134,18 @@ namespace rdt {
 	{
 		// TODO
 	}
-	void ModelManager::CopyVertices(ModelID model, std::vector<Vec2f>& outVertices)
+	std::vector<Vec2f>& ModelManager::GetVertices(ModelID model)
 	{
 		if (!ModelExists(model)) {
-			return;
+			assert(false);
 		}
-		m_instance->m_impl->CopyVertices(model, outVertices);
+		return m_instance->m_impl->GetVertices(model);
 	}
-	void ModelManager::CopyIndices(ModelID model, std::vector<unsigned int>& outVertices)
+	std::vector<unsigned int>& ModelManager::GetIndices(ModelID model)
 	{
 		if (!ModelExists(model)) {
-			return;
+			assert(false);
 		}
-		m_instance->m_impl->CopyIndices(model, outVertices);
+		return m_instance->m_impl->GetIndices(model);
 	}
 }

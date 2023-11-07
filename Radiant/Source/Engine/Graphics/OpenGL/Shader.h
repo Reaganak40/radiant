@@ -1,5 +1,5 @@
 #pragma once
-#include "Graphics/Texture/Texture.h"
+#include "Graphics/Texture/TextureManager.h"
 #include "pch.h"
 
 namespace rdt::core {
