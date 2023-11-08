@@ -16,6 +16,9 @@ namespace rdt {
 	using TextureID = unsigned int;   // Unique Identifier for a Texture
 	using AnimationID = unsigned int;    // Unique Identifier for an Animation object.
 	using AnimationIndex = unsigned int; // Indicates the index of an animation sequence
+	using RealmID = unsigned int;
+	using ColliderID = unsigned int;
+
 	class Polygon;
 	class Layer;
 }
@@ -181,6 +184,8 @@ namespace rdt {
 		Vec2d scale;
 
 		Transform();
+
+		void Translate(float deltaTime, const Vec2d velocity);
 	};
 
 	/*
@@ -188,9 +193,22 @@ namespace rdt {
 	*/
 	struct RADIANT_API RigidBody2D : ECSComponent
 	{
+		RealmID realmID;
+		ColliderID colliderID;
+
+		bool use_gravity;
+		Vec2d velocity;
+		Vec2d acceleration;
+
 		double mass;
 
 		RigidBody2D();
+
+		/*
+			Updates the velocity vector by the given timestep, applies
+			changes in velocity with any provided external forces.
+		*/
+		void UpdateVelocity(float deltaTime, Vec2d externalForces = Vec2d::Zero());
 	};
 
 	/*

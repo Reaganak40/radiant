@@ -4,6 +4,7 @@
 #include "Graphics/Model.h"
 #include "Graphics/Animation.h"
 #include "Graphics/Texture/TextureManager.h"
+#include "Utils/Utils.h"
 
 namespace rdt::core {
 	void ComponentTraceTracker::AddDefinition(const char* component, const char* memberName, SupportedTraceType type, size_t offset)
@@ -70,16 +71,26 @@ namespace rdt {
 		TRACE_COMPONENT_DATA(Transform, rotation);
 		TRACE_COMPONENT_DATA(Transform, scale);
 
-		position = Vec2d::Zero();
 		rotation = 0;
-		scale = Vec2d::Zero();
+	}
+	void Transform::Translate(float deltaTime, const Vec2d velocity)
+	{
+		position += (deltaTime * velocity);
 	}
 	// ===============================================================================
 	RigidBody2D::RigidBody2D()
 	{
 		TRACE_COMPONENT_DATA(RigidBody2D, mass);
+		TRACE_COMPONENT_DATA(RigidBody2D, velocity);
 
 		mass = 1;
+	}
+	void RigidBody2D::UpdateVelocity(float deltaTime, Vec2d externalForces)
+	{
+		velocity += deltaTime * (acceleration + externalForces);
+
+		velocity.x = Utils::ApplyEpsilon(velocity.x);
+		velocity.y = Utils::ApplyEpsilon(velocity.y);
 	}
 	// ===============================================================================
 	Renderable::Renderable()

@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "PhysicsSystem.h"
+#include "Physics.h"
+#include "ECS/ECS.h"
 
 namespace rdt {
 	PhysicsSystem::PhysicsSystem()
@@ -9,6 +11,7 @@ namespace rdt {
 		// Components utilized by this system
 		ComponentManager::UpdateSignature<RigidBody2D>(nSignature);
 		ComponentManager::UpdateSignature<Sprite>(nSignature);
+		ComponentManager::UpdateSignature<Transform>(nSignature);
 
 		SetSignature(nSignature);
 	}
@@ -19,7 +22,21 @@ namespace rdt {
 
 	void PhysicsSystem::Update(float deltaTime)
 	{
-		auto& entities = System::GetEntities();
 		auto rigidBodies = System::GetComponent<RigidBody2D>();
+		auto transforms = System::GetComponent<Transform>();
+		auto sprites = System::GetComponent<Sprite>();
+
+		for (auto entity : GetEntities()) {
+			if (!rigidBodies->HasEntity(entity) ||
+				!transforms->HasEntity(entity) ||
+				!sprites->HasEntity(entity)){
+				continue;
+			}
+
+			auto& rigidBody = rigidBodies->GetData(entity);
+			Physics::AddEntityToRealm(rigidBody.realmID, entity);
+		}
+
+		Physics::OnUpdate(deltaTime);
 	}
 }

@@ -174,6 +174,7 @@ namespace rdt {
         /*
             Translates a point by the give translation
         */
+        void Translate(Vec2d& point, const Vec2d& translation);
         void Translate(Vec2f& point, const Vec2f& translation);
     }
 }

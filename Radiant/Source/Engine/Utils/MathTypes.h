@@ -144,6 +144,8 @@ namespace rdt {
 			return (*this);
 		}
 
+		operator Vec2d() const;
+
 	};
 	
 

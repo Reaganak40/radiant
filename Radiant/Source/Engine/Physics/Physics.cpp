@@ -8,9 +8,9 @@ namespace rdt {
     using namespace core;
 
     struct Physics::Impl {
-        std::unordered_map<UniqueID, core::Realm*> m_realms;
-        std::set<UniqueID> m_active_realms;
-        Polygon m_bad_poly;
+
+        RealmID idCounter = 0;
+        std::unordered_map<RealmID, core::Realm> m_realms;
 
         Impl()
         {
@@ -20,6 +20,47 @@ namespace rdt {
         ~Impl()
         {
 
+        }
+
+        RealmID GenerateID() {
+            return ++idCounter;
+        }
+
+        RealmID CreateRealm() {
+            RealmID nID = GenerateID();
+            m_realms[nID];
+            return nID;
+        }
+
+        bool RealmExists(RealmID realm) {
+            return m_realms.find(realm) != m_realms.end();
+        }
+
+        void SetRealmActive(const UniqueID realmID, bool active)
+        {
+            if (!RealmExists(realmID)) {
+                RDT_WARN("Physics:: Could not find realm [id:{}] to activate.", realmID);
+                return;
+            }
+
+            m_realms.at(realmID).SetActive(active);
+        }
+
+        bool AddEntityToRealm(const RealmID realm, const Entity entity)
+        {
+            if (!RealmExists(realm)) {
+                return false;
+            }
+
+            m_realms.at(realm).PushEntity(entity);
+            return true;
+        }
+
+        void UpdateRealms(const float deltaTime)
+        {
+            for (auto& [id, realm] : m_realms) {
+                realm.OnUpdate(deltaTime);
+            }
         }
 
         const Polygon& GetPolygon(const UniqueID realmID, const UniqueID objectID)
@@ -284,41 +325,54 @@ namespace rdt {
     };
 
     // ================================================================================
+    Physics::Impl* Physics::m_impl = nullptr;
 
-    Physics* Physics::m_instance = nullptr;
-
-    Physics::Physics()
-        : m_impl(new Physics::Impl)
-    {
-    }
-
-    Physics::~Physics()
-    {
-        delete m_impl;
-    }
-
-    Physics* Physics::GetInstance()
-    {
-        if (m_instance == nullptr) {
-            m_instance = new Physics;
-        }
-
-        return m_instance;
-    }
     void Physics::Initialize()
     {
         Destroy();
 
         core::PtagManager::Initialize();
-        GetInstance();
+        m_impl = new Physics::Impl;
     }
 
     void Physics::Destroy()
     {
-        if (m_instance != nullptr) {
-            delete m_instance;
-            m_instance = nullptr;
+        if (m_impl != nullptr) {
+            delete m_impl;
+            m_impl = nullptr;
         }
+
+        core::PtagManager::Destroy();
+    }
+
+    void Physics::OnUpdate(const float deltaTime)
+    {
+        m_impl->UpdateRealms(deltaTime);
+    }
+
+    RealmID Physics::CreateRealm()
+    {
+        return m_impl->CreateRealm();
+    }
+
+    bool Physics::RealmExists(const RealmID realm)
+    {
+        return m_impl->RealmExists(realm);
+    }
+
+    bool Physics::AddEntityToRealm(const RealmID realm, const Entity entity)
+    {
+        return false;
+    }
+
+    void Physics::ActivateRealm(const RealmID realmID)
+    {
+        m_impl->SetRealmActive(realmID, true);
+    }
+
+    void Physics::DeactivateRealm(const RealmID realmID)
+    {
+        m_impl->SetRealmActive(realmID, false);
     }
 
     void Physics::OnUpdateImpl(const float deltaTime)
@@ -335,18 +389,6 @@ namespace rdt {
         }
     }
 
-    UniqueID Physics::CreateRealmImpl()
-    {
-        Realm* nRealm = new Realm;
-        m_impl->m_realms[nRealm->GetUUID()] = nRealm;
-
-        return nRealm->GetUUID();
-    }
-
-    void Physics::ActivateRealmImpl(const UniqueID realmID)
-    {
-        m_impl->m_active_realms.insert(realmID);
-    }
 
     void Physics::DeactivateRealmImpl(const UniqueID realmID)
     {

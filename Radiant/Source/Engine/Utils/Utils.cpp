@@ -236,6 +236,11 @@ namespace rdt {
 
             return Vec2f(scale.x * dx, scale.y * dy);
         }
+        void Translate(Vec2d& point, const Vec2d& translation)
+        {
+            point.x += translation.x;
+            point.y += translation.y;
+        }
         void Translate(Vec2f& point, const Vec2f& translation)
         {
             point.x += translation.x;

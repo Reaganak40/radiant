@@ -10,6 +10,12 @@
 *******************************************************************/
 #pragma once
 #include "Core.h"
+
+// Forward Delcarations
+namespace rdt::core {
+	class Realm;
+}
+
 #include "ECSTypes.h"
 #include "Logging/Log.h"
 
@@ -164,6 +170,8 @@ namespace rdt {
 
 		friend class EntityManager;
 		friend class System;
+		friend class core::Realm;
+
 	private:
 		template<typename T>
 		static void AddToComponent(Entity eID, const T& nData)

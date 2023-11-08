@@ -135,4 +135,9 @@ namespace rdt {
         return { 0.0f, 0.0f };
     }
 
+    Vec2f::operator Vec2d() const
+    {
+        return Vec2d(x, y);
+    }
+
 }

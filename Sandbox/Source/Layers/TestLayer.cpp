@@ -3,14 +3,16 @@
 
 using namespace rdt;
 
-class Platform : public EntityDefinition, SpawnRect
+class RectObject : public EntityDefinition, SpawnRect
 {
 private:
+	Color m_color;
 public:
 
-	Platform(double xPos, double yPos, double width, double height)
+	RectObject(double xPos, double yPos, double width, double height, Color nColor = BLACK)
 		: SpawnRect(xPos, yPos, width, height)
 	{
+		m_color = nColor;
 	}
 
 	void OnCreate() override final
@@ -29,39 +31,6 @@ public:
 		EntityManager::AddComponent<RigidBody2D>(eID, rigidBody);
 
 		Renderable renderable;
-		renderable.fillColor = BLUE;
-
-		EntityManager::AddComponent<Renderable>(eID, renderable);
-
-		SystemManager::AddEntity<PhysicsSystem>(eID);
-		SystemManager::AddEntity<RenderSystem>(eID);
-	}
-};
-
-class Person : public EntityDefinition, SpawnRect
-{
-private:
-	Color m_color;
-public:
-
-	Person(double xPos, double yPos, Color spriteColor)
-		: SpawnRect(xPos, yPos, 50, 100)
-	{
-		m_color = spriteColor;
-	}
-
-	void OnCreate() override final
-	{
-		Register();
-		Entity eID = GetID();
-
-		Sprite sprite = SpawnRect::CreateSprite();
-		EntityManager::AddComponent<Sprite>(eID, sprite);
-
-		RigidBody2D rigidBody;
-		EntityManager::AddComponent<RigidBody2D>(eID, rigidBody);
-
-		Renderable renderable;
 		renderable.fillColor = m_color;
 
 		EntityManager::AddComponent<Renderable>(eID, renderable);
@@ -69,7 +38,6 @@ public:
 		SystemManager::AddEntity<PhysicsSystem>(eID);
 		SystemManager::AddEntity<RenderSystem>(eID);
 	}
-
 };
 
 
@@ -78,11 +46,8 @@ TestLayer::TestLayer(const std::string& alias)
 	RegisterToMessageBus(alias);
 	CreateNewRealm();
 
-	RegisterEntity(new Platform(360, 200, 500, 50), "platform1");
-	//RegisterEntity(new Person(360, 300, BLUE), "player");
-
-
-
+	RegisterEntity(new RectObject(360, 200, 500, 50), "platform1");
+	RegisterEntity(new RectObject(400, 300, 50, 100, BLUE), "player");
 }
 
 TestLayer::~TestLayer()

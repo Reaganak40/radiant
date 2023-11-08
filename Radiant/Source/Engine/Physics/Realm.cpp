@@ -3,6 +3,11 @@
 #include "Collision.h"
 #include "Messaging/MessageTypes.h"
 
+#include "ECS/ECS.h"
+#include "Utils/Utils.h"
+
+#include "Collider.h"
+
 namespace rdt::core {
 
     Realm::Realm()
@@ -15,49 +20,79 @@ namespace rdt::core {
         FreeUniqueID(m_ID);
     }
 
+    void Realm::PushEntity(Entity nEntity)
+    {
+        m_entities.push_back(nEntity);
+    }
+
+    void Realm::Flush()
+    {
+        m_entities.clear();
+    }
+
+    void Realm::SetActive(bool active)
+    {
+        is_active = active;
+    }
+
     void Realm::OnUpdate(const float deltaTime)
     {
-        for (auto& [id1, object1] : m_objects) {
+        if (!is_active) {
+            return;
+        }
 
-            object1.translation.UpdateVelocity(deltaTime);
+        // Entities have already been verified to hold all these components
+        auto rigidbodies = ComponentManager::GetComponent<RigidBody2D>();
+        auto transforms = ComponentManager::GetComponent<Transform>();
+        auto sprites = ComponentManager::GetComponent<Sprite>();
 
-            bool collisionDetected = false;
+        // Create CollisionObjects made from each entity's collider and transform
+        std::unordered_map<Entity, CollisionObject> entityCollisionData;
+        auto getCollisionData = [&](Entity entity) -> CollisionObject& {
+            if (entityCollisionData.find(entity) == entityCollisionData.end()) {
+                entityCollisionData[entity];
+                auto& rigidbody = rigidbodies->GetData(entity);
+                auto& transform = transforms->GetData(entity);
+                ColliderManager::GetCollider(rigidbody.colliderID).ApplyTransform(transform, entityCollisionData.at(entity).vertices);
+            }
 
-            if (!object1.HasProperties(NoCollision)) {
+            return entityCollisionData.at(entity);
+            };
 
-                for (auto& [id2, object2] : m_objects) {
-                    if (id1 == id2) {
-                        continue;
-                    }
+        // Update velocities
+        for (auto entity : m_entities) {
+            auto& rigidbody = rigidbodies->GetData(entity);
 
-                    std::vector<UniqueID> sharedTags;
-                    if (object1.GetSharedTags(object2, sharedTags)) {
-                        bool skip = false;
-                        for (auto tagID : sharedTags) {
-                            if (PtagManager::GetTag(tagID).HasProperties(NoCollision)) {
-                                skip = true;
-                                break;
-                            }
-                        }
-                        if (skip) {
-                            continue;
-                        }
-                    }
-                    
+            Vec2d externalForce;
+            if (rigidbody.use_gravity) {
+                externalForce = m_gravity;
+            }
+            rigidbody.UpdateVelocity(deltaTime, externalForce);
+        }
 
-                    if (Collision::CheckCollision(object1, object2, deltaTime)) {
-                        MessageBus::AddToQueue(m_object_mIDs[id2], m_object_mIDs[id1], MT_Collision, new CollisionData(id2));
-                        collisionDetected = true;
-                    }
+        // Cycle entities checking for collisions
+        for (auto entity1 : m_entities) {
+            
+            auto& collisionObject1 = getCollisionData(entity1);
+
+            for (auto entity2 : m_entities) {
+                if (entity1 == entity2) {
+                    continue;
+                }
+
+                auto& collisionObject2 = getCollisionData(entity2);
+                if (Collision::CheckCollision(collisionObject1, collisionObject2, deltaTime)) {
+
                 }
             }
+        }
 
-
-            if (object1.HasProperties(NoCollision) || !collisionDetected || !object1.HasProperties(ppBouncy)) {
-                object1.translation.Translate(*object1.m_polygon, deltaTime);
-            }
+        // Do final translation
+        for (auto entity : m_entities) {
+            transforms->GetData(entity).Translate(deltaTime, rigidbodies->GetData(entity).velocity);
         }
 	}
+
     void Realm::OnEndFrame()
     {
         for (auto& [id, object] : m_objects) {

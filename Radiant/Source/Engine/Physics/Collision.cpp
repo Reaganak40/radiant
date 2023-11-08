@@ -24,6 +24,11 @@ namespace rdt::core {
 		return false;
 	}
 
+	bool Collision::CheckCollision(CollisionObject& source, const CollisionObject& suspect, const float deltaTime)
+	{
+		return false;
+	}
+
 	bool Collision::CheckCollisionSAT(const Polygon& A, const Polygon& B)
 	{
 		/*

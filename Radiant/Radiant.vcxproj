@@ -157,6 +157,7 @@
     <ClInclude Include="Source\Engine\Messaging\MessageBus.h" />
     <ClInclude Include="Source\Engine\Messaging\MessageTypes.h" />
     <ClInclude Include="Source\Engine\Messaging\Messenger.h" />
+    <ClInclude Include="Source\Engine\Physics\Collider.h" />
     <ClInclude Include="Source\Engine\Physics\Collision.h" />
     <ClInclude Include="Source\Engine\Physics\Physics.h" />
     <ClInclude Include="Source\Engine\Physics\PhysicsSystem.h" />
@@ -289,6 +290,7 @@
     <ClCompile Include="Source\Engine\Messaging\Message.cpp" />
     <ClCompile Include="Source\Engine\Messaging\MessageBus.cpp" />
     <ClCompile Include="Source\Engine\Messaging\Messenger.cpp" />
+    <ClCompile Include="Source\Engine\Physics\Collider.cpp" />
     <ClCompile Include="Source\Engine\Physics\Collision.cpp" />
     <ClCompile Include="Source\Engine\Physics\Physics.cpp" />
     <ClCompile Include="Source\Engine\Physics\PhysicsSystem.cpp" />

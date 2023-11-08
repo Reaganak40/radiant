@@ -7,6 +7,9 @@
 
 namespace rdt::core {
 
+	struct CollisionObject {
+		std::vector<Vec2d> vertices;
+	};
 	class Collision {
 	private:
 	public:
@@ -19,6 +22,12 @@ namespace rdt::core {
 			true if there was a collision.
 		*/
 		static bool CheckCollision(Pobject& source, const Pobject& suspect, const float deltaTime);
+
+		/*
+			Takes two physics objects and chooses the best collision test for the two, returns
+			true if there was a collision.
+		*/
+		static bool CheckCollision(CollisionObject& source, const CollisionObject& suspect, const float deltaTime);
 
 		/*
 			Test for collision betwen two polygons using seperated axis theorem.

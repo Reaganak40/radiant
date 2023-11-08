@@ -48,13 +48,13 @@ namespace rdt {
 
 		/*
 			Registers a new entity to this layer. The layer is now
-			responsible for this entity.
+			responsible for this entity. Returns the entity's ID
 
 			Can provide an alias to this entity, otherwise it will be given a default name.
 			
 			NOTE: This entity definition will be freed upon completion of this function.
 		*/
-		void RegisterEntity(EntityDefinition* nEntity, const std::string& alias = "");
+		Entity RegisterEntity(EntityDefinition* nEntity, const std::string& alias = "");
 
 
 	public:
