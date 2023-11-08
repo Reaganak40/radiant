@@ -161,10 +161,8 @@
     <ClInclude Include="Source\Engine\Physics\Collision.h" />
     <ClInclude Include="Source\Engine\Physics\Physics.h" />
     <ClInclude Include="Source\Engine\Physics\PhysicsSystem.h" />
-    <ClInclude Include="Source\Engine\Physics\Pobject.h" />
     <ClInclude Include="Source\Engine\Physics\Ptag.h" />
     <ClInclude Include="Source\Engine\Physics\Realm.h" />
-    <ClInclude Include="Source\Engine\Physics\Translation.h" />
     <ClInclude Include="Source\Engine\Polygon\Circle.h" />
     <ClInclude Include="Source\Engine\Polygon\Line.h" />
     <ClInclude Include="Source\Engine\Polygon\Polygon.h" />
@@ -294,10 +292,8 @@
     <ClCompile Include="Source\Engine\Physics\Collision.cpp" />
     <ClCompile Include="Source\Engine\Physics\Physics.cpp" />
     <ClCompile Include="Source\Engine\Physics\PhysicsSystem.cpp" />
-    <ClCompile Include="Source\Engine\Physics\Pobject.cpp" />
     <ClCompile Include="Source\Engine\Physics\Ptag.cpp" />
     <ClCompile Include="Source\Engine\Physics\Realm.cpp" />
-    <ClCompile Include="Source\Engine\Physics\Translation.cpp" />
     <ClCompile Include="Source\Engine\Polygon\Circle.cpp" />
     <ClCompile Include="Source\Engine\Polygon\Line.cpp" />
     <ClCompile Include="Source\Engine\Polygon\Polygon.cpp" />

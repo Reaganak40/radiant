@@ -39,9 +39,12 @@ rdt::Vec2d rdt::Collider::GetSize(Vec2d scale)
 	return m_size * scale;
 }
 
-rdt::Vec2d rdt::Collider::GetMidpoint(Vec2d scale)
+rdt::Vec2d rdt::Collider::GetMidpoint(const Transform& transform)
 {
-	return m_midpoint * scale;
+	Vec2d transformed_midpoint = Utils::Scale(Vec2f::Zero(), m_midpoint, transform.scale);
+	Utils::RotatePoint(Vec2d::Zero(), transformed_midpoint, transform.rotation);
+	Utils::Translate(transformed_midpoint, transform.position);
+	return transformed_midpoint;
 }
 
 void rdt::Collider::WarningUndefinedShape()

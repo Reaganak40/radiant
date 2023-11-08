@@ -48,7 +48,7 @@ namespace rdt::core {
 
         // Create CollisionObjects made from each entity's collider and transform
         std::unordered_map<Entity, CollisionObject> entityCollisionData;
-        auto getCollisionData = [&](Entity entity) -> CollisionObject& {
+        auto getCollisionObject = [&](Entity entity) -> CollisionObject& {
             if (entityCollisionData.find(entity) == entityCollisionData.end()) {
                 entityCollisionData[entity];
 
@@ -65,7 +65,7 @@ namespace rdt::core {
                 collisionData.transform = &transform;
                 collisionData.rigidBody = &rigidbody;
                 collisionData.size = collider.GetSize(transform.scale);
-                collisionData.midpoint = collider.GetMidpoint(transform.scale);
+                collisionData.midpoint = collider.GetMidpoint(transform);
             }
 
             return entityCollisionData.at(entity);
@@ -85,14 +85,14 @@ namespace rdt::core {
         // Cycle entities checking for collisions
         for (auto entity1 : m_entities) {
 
-            auto& collisionObject1 = getCollisionData(entity1);
+            auto& collisionObject1 = getCollisionObject(entity1);
 
             for (auto entity2 : m_entities) {
                 if (entity1 == entity2) {
                     continue;
                 }
 
-                auto& collisionObject2 = getCollisionData(entity2);
+                auto& collisionObject2 = getCollisionObject(entity2);
                 if (Collision::CheckCollision(collisionObject1, collisionObject2, deltaTime)) {
                     // TODO: Notify/send collision data
                 }

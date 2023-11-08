@@ -3,8 +3,6 @@
 #include "Polygon/Rect.h"
 #include "Polygon/Circle.h"
 
-#include "Pobject.h"
-
 #include "ECS/CommonComponents.h"
 
 namespace rdt::core {
@@ -14,28 +12,23 @@ namespace rdt::core {
 	*/
 	struct CollisionObject {
 		std::vector<Vec2d> vertices;
-		bool isRect = false;
-		bool isAxisAligned = false;
-		bool resolveCollision = false;
 
 		Transform* transform = nullptr;
 		RigidBody2D* rigidBody = nullptr;
 
 		Vec2d size;
 		Vec2d midpoint;
+
+		bool isRect = false;
+		bool isAxisAligned = false;
+		bool resolveCollision = false;
+		bool m_collision_detected = false;
 	};
 	class Collision {
 	private:
 	public:
 		Collision() {}
 		~Collision() {}
-
-
-		/*
-			Takes two physics objects and chooses the best collision test for the two, returns
-			true if there was a collision.
-		*/
-		static bool CheckCollision(Pobject& source, const Pobject& suspect, const float deltaTime);
 
 		/*
 			Takes two physics objects and chooses the best collision test for the two, returns
@@ -56,22 +49,12 @@ namespace rdt::core {
 		/*
 			Tests for collisions of two rects on the same axis using AABB theorem.
 		*/
-		static bool CheckCollisionAABB(const Pobject& A, const Pobject& B);
-
-		/*
-			Tests for collisions of two rects on the same axis using AABB theorem.
-		*/
 		static bool CheckCollisionAABB(const CollisionObject& source, const CollisionObject& suspect);
 
 		/*
 			Resolves static collisions, and returns true if there was collision resolution.
 		*/
 		static bool StaticCollisionDiags(Polygon& dynamicPoly, Polygon& staticPoly);
-
-		/*
-			Detects and resolves collisions between two rectangles using swept AABB algorithm.
-		*/
-		static bool SweptAABB(Pobject& source, const Pobject& suspect, const float deltaTime);
 
 		/*
 			Detects and resolves collisions between two rectangles using swept AABB algorithm.

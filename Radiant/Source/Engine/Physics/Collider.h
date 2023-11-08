@@ -79,9 +79,10 @@ namespace rdt {
 		Vec2d GetSize(Vec2d scale = Vec2d(1, 1));
 
 		/*
-			Returns the centered point of the collider shape. Option to scale it.
+			Returns the centered point of the collider shape, according to the given
+			transform.
 		*/
-		Vec2d GetMidpoint(Vec2d scale = Vec2d(1, 1));
+		Vec2d GetMidpoint(const Transform& transform);
 
 	private:
 		void WarningUndefinedShape();

@@ -15,14 +15,8 @@ namespace rdt {
 	struct RigidBody2D;
 }
 
-
 // Required Definitions for Struct/Class Members
 #include "ECS/EntityManager.h"
-
-#include "Polygon/Polygon.h"
-#include "Utils/UniqueID.h"
-#include "Pobject.h"
-#include "Messaging/MessageBus.h"
 
 namespace rdt::core {
 
@@ -61,9 +55,5 @@ namespace rdt::core {
 			Sets the y-gravitational vector
 		*/
 		void SetGravity(double mps2);
-	private:
-
-		
-		friend class Physics;
 	};
 }

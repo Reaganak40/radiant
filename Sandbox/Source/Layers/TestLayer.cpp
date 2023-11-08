@@ -59,7 +59,6 @@ TestLayer::TestLayer(const std::string& alias)
 		rigidbody->realmID = mRealm;
 		rigidbody->colliderID = rectCollider;
 		rigidbody->use_gravity = true;
-		rigidbody->max_velocity = Vec2d(300, 300);
 	}
 }
 

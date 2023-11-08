@@ -78,12 +78,15 @@ namespace rdt {
 	void Transform::Translate(float deltaTime, const Vec2d velocity)
 	{
 		position += (deltaTime * velocity);
+		position.x = Utils::ApplyEpsilon(position.x);
+		position.y = Utils::ApplyEpsilon(position.y);
 	}
 	// ===============================================================================
 	RigidBody2D::RigidBody2D()
 	{
 		TRACE_COMPONENT_DATA(RigidBody2D, mass);
 		TRACE_COMPONENT_DATA(RigidBody2D, velocity);
+		TRACE_COMPONENT_DATA(RigidBody2D, acceleration);
 
 		realmID = RDT_NULL_REALM_ID;
 		colliderID = RDT_NULL_COLLIDER_ID;
@@ -94,9 +97,6 @@ namespace rdt {
 	void RigidBody2D::UpdateVelocity(float deltaTime, Vec2d externalForces)
 	{
 		velocity += deltaTime * (acceleration + externalForces);
-
-		velocity.x = Utils::ApplyEpsilon(velocity.x);
-		velocity.y = Utils::ApplyEpsilon(velocity.y);
 
 		if (max_velocity.x != 0 && max_velocity.y != 0) {
 			if (abs(velocity.x) > max_velocity.x) {

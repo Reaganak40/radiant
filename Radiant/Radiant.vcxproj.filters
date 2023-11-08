@@ -261,16 +261,10 @@
     <ClInclude Include="Source\Engine\Physics\Physics.h">
       <Filter>Source\Engine\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Engine\Physics\Pobject.h">
-      <Filter>Source\Engine\Physics</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Engine\Physics\Ptag.h">
       <Filter>Source\Engine\Physics</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Physics\Realm.h">
-      <Filter>Source\Engine\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Engine\Physics\Translation.h">
       <Filter>Source\Engine\Physics</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Polygon\Circle.h">
@@ -618,16 +612,10 @@
     <ClCompile Include="Source\Engine\Physics\Physics.cpp">
       <Filter>Source\Engine\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Physics\Pobject.cpp">
-      <Filter>Source\Engine\Physics</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Engine\Physics\Ptag.cpp">
       <Filter>Source\Engine\Physics</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine\Physics\Realm.cpp">
-      <Filter>Source\Engine\Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Engine\Physics\Translation.cpp">
       <Filter>Source\Engine\Physics</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine\Polygon\Circle.cpp">
