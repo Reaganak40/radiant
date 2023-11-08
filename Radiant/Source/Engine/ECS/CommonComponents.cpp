@@ -66,6 +66,10 @@ namespace rdt {
 	// ===============================================================================
 	rdt::Transform::Transform()
 	{
+		TRACE_COMPONENT_DATA(Transform, position);
+		TRACE_COMPONENT_DATA(Transform, rotation);
+		TRACE_COMPONENT_DATA(Transform, scale);
+
 		position = Vec2d::Zero();
 		rotation = 0;
 		scale = Vec2d::Zero();

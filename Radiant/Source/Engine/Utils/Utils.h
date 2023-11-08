@@ -138,6 +138,8 @@ namespace rdt {
         */
         float RADIANT_API DegreesToRadians(float degrees);
 
+        float RADIANT_API RadiansToDegrees(float radians);
+
         /*
             Returns the absolute path to the current working directory.
         */

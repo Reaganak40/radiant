@@ -787,6 +787,85 @@ namespace rdt::core {
 			data = (unsigned char*)data + info.offset;
 
 			switch (info.type) {
+			case SupportedTraceType_angle:
+			{
+				title("Angle", name);
+
+				char combo_label[40];
+				sprintf_s(combo_label, 40, "##angleUnitOption_%s", name);
+				int selection = Editor::GetComboxBoxResult(combo_label);
+
+				float val = ((Angle*)data)->radians;
+				char label[30];
+				sprintf_s(label, 30, "##editAngle_%s", name);
+
+				if (selection <= 0) {
+					if (ImGui::SliderFloat(label, &val, 0.0f, 2 * M_PI)) {
+						((Angle*)data)->radians = val;
+					}
+				}
+				else {
+					val = Utils::RadiansToDegrees(val);
+					if (ImGui::SliderFloat(label, &val, 0.0f, 360)) {
+						((Angle*)data)->radians = Utils::DegreesToRadians(val);
+					}
+				}
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() - 5);
+
+				const char* options[] = { "  radians", "  degrees" };
+				ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+				Editor::AddComboBox(combo_label, options, 2, "  radians");
+				ImGui::PopItemWidth();
+			}
+			break;
+			case SupportedTraceType_float:
+			{
+				title("float", name);
+
+				float val = *((float*)data);
+				char label[30];
+				sprintf_s(label, 30, "##editfloat_%s", name);
+				ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+				if (ImGui::DragFloat(label, &val, 2)) {
+					*((float*)data) = val;
+				}
+				ImGui::PopItemWidth();
+
+			}
+			break;
+			case SupportedTraceType_vec2d:
+			{
+				title("Vec2d", name);
+
+				float valX = (float)((Vec2d*)data)->x;
+				float valY = (float)((Vec2d*)data)->y;
+
+				ImGui::Text("x:");
+				ImGui::SameLine();
+				float xAlign = ImGui::GetCursorPosX();
+
+				char label[30];
+				sprintf_s(label, 30, "##editX_%s", name);
+				ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+				if (ImGui::DragFloat(label, &valX, 2)) {
+					((Vec2d*)data)->x = (double)valX;
+				}
+				ImGui::PopItemWidth();
+				next_sub_row();
+
+				ImGui::Text("y:");
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(xAlign);
+				ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+				sprintf_s(label, 30, "##editY_%s", name);
+				if (ImGui::DragFloat(label, &valY, 2)) {
+					((Vec2d*)data)->y = (double)valY;
+				}
+				ImGui::PopItemWidth();
+
+			}
+				break;
 			case SupportedTraceType_color:
 			{
 				title("Color", name);
@@ -824,6 +903,7 @@ namespace rdt::core {
 				Vec2d coords = (*((std::shared_ptr<Polygon>*)data))->GetOrigin();
 				float vals[2] = { coords.x, coords.y };
 
+
 				ImGui::Text("Position:");
 				ImGui::SameLine();
 				float xAlign = ImGui::GetCursorPosX();
@@ -831,9 +911,9 @@ namespace rdt::core {
 				if (ImGui::DragFloat2("##updateOrigin", vals, 2)) {
 					(*((std::shared_ptr<Polygon>*)data))->SetPosition({ vals[0], vals[1] });
 				}
-				ImGui::PopItemWidth();
-
+				ImGui::PopItemWidth();		
 				next_sub_row();
+
 				vals[0] = (*((std::shared_ptr<Polygon>*)data))->GetWidth();
 				vals[1] = (*((std::shared_ptr<Polygon>*)data))->GetHeight();
 				ImGui::Text("Size:");
@@ -1443,6 +1523,7 @@ namespace rdt::core {
 	std::unordered_map<EditorFont, std::unordered_map<unsigned int, ImFont*>> Editor::m_fonts;
 	GameRenderWindow* Editor::m_gameWindow = nullptr;
 	int Editor::m_gameWindowId = -1;
+	std::unordered_map<std::string, int> Editor::m_combo_selections = std::unordered_map<std::string, int>();
 
 	/*
 		Panel Layout Macros
@@ -1842,6 +1923,49 @@ namespace rdt::core {
 	{
 		ImGui::PopStyleColor();
 		ImGui::EndDisabled();
+	}
+
+	int Editor::AddComboBox(const char* combo_label, const char** options, unsigned int optionCount, const char* preview)
+	{
+		if (m_combo_selections.find(combo_label) == m_combo_selections.end()) {
+			m_combo_selections[combo_label] = -1;
+		}
+		auto& selection_index = m_combo_selections.at(combo_label);
+
+		const char* preview_label;
+		if (preview == nullptr) {
+			preview_label = options[0];
+		}
+		else {
+			preview_label = selection_index < 0 ? preview : options[selection_index];
+		}
+
+		if (ImGui::BeginCombo(combo_label, preview_label))
+		{
+			for (int n = 0; n < optionCount; n++)
+			{
+				const bool is_selected = (selection_index == n);
+				if (ImGui::Selectable(options[n], is_selected)) {
+					selection_index = n;
+				}
+
+				// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+				if (is_selected)
+					ImGui::SetItemDefaultFocus();
+			}
+			ImGui::EndCombo();
+		}
+
+		return selection_index;
+	}
+
+	int Editor::GetComboxBoxResult(const char* label)
+	{
+		if (m_combo_selections.find(label) == m_combo_selections.end()) {
+			m_combo_selections[label] = -1;
+		}
+
+		return m_combo_selections.at(label);
 	}
 
 	void Editor::AddIcon(const char* unicode, size_t size)

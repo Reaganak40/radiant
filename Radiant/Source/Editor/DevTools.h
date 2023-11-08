@@ -201,6 +201,9 @@ namespace rdt::core {
 		bool m_showTools;
 		const std::vector<InputState> controls_ShowTools1{ CTRL_KEY_DOWN };
 		const std::vector<InputState> controls_ShowTools2{ T_KEY_PRESS };
+
+		static std::unordered_map<std::string, int> m_combo_selections;
+
 	public:
 		Editor();
 		~Editor();
@@ -228,6 +231,8 @@ namespace rdt::core {
 		static void InactiveButtonEnd();
 		static void InactiveTextBoxBegin();
 		static void InactiveTextBoxEnd();
+		static int GetComboxBoxResult(const char* label);
+		static int AddComboBox(const char* label, const char** options, unsigned int optionCount, const char* preview = nullptr);
 		static void AddIcon(const char* unicode, size_t size = 18);
 		static int MyTextCallback(ImGuiInputTextCallbackData* data);
 		static void ApplyGuiConfig(PanelConfig& config);

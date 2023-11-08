@@ -153,4 +153,16 @@ namespace rdt {
 		Returns an absolute vector with all positive values.
 	*/
 	Vec2i Vabs(Vec2i vector);
+
+	/*
+		Wrapper for angle computation
+	*/
+	struct Angle {
+		float radians = 0;
+
+		Angle operator=(const float other) {
+			radians = other;
+			return (*this);
+		}
+	};
 }

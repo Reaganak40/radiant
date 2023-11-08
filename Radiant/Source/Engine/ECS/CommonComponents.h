@@ -16,7 +16,6 @@ namespace rdt {
 	using TextureID = unsigned int;   // Unique Identifier for a Texture
 	using AnimationID = unsigned int;    // Unique Identifier for an Animation object.
 	using AnimationIndex = unsigned int; // Indicates the index of an animation sequence
-
 	class Polygon;
 	class Layer;
 }
@@ -61,8 +60,11 @@ namespace rdt {
 			SupportedTraceType_layerPtr,
 			SupportedTraceType_uint,
 			SupportedTraceType_double,
+			SupportedTraceType_float,
 			SupportedTraceType_color,
 			SupportedTraceType_polygon,
+			SupportedTraceType_vec2d,
+			SupportedTraceType_angle,
 			SupportedTraceType_NotSupported,
 		};
 
@@ -91,6 +93,18 @@ namespace rdt {
 
 			if (typeid(queryType) == typeid(double)) {
 				return SupportedTraceType_double;
+			}
+
+			if (typeid(queryType) == typeid(Vec2d)) {
+				return SupportedTraceType_vec2d;
+			}
+
+			if (typeid(queryType) == typeid(float)) {
+				return SupportedTraceType_float;
+			}
+
+			if (typeid(queryType) == typeid(Angle)) {
+				return SupportedTraceType_angle;
 			}
 
 			return SupportedTraceType_NotSupported;
@@ -163,7 +177,7 @@ namespace rdt {
 	struct RADIANT_API Transform : ECSComponent
 	{
 		Vec2d position;
-		float rotation;
+		Angle rotation;
 		Vec2d scale;
 
 		Transform();

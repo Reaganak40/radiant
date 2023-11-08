@@ -170,6 +170,11 @@ namespace rdt {
             return degrees * ((float)M_PI) / 180.0f;
         }
 
+        float RADIANT_API RadiansToDegrees(float radians)
+        {
+            return radians * 180 / ((float)M_PI);
+        }
+
         std::string GetCWD()
         {
             char buff[FILENAME_MAX]; //create string buffer to hold path

@@ -32,7 +32,7 @@ namespace rdt::core {
 	void Mesh::UseTransform(const Transform& transform)
 	{
 		position = transform.position;
-		rotation = transform.rotation;
+		rotation = transform.rotation.radians;
 		scale = transform.scale;
 	}
 }
