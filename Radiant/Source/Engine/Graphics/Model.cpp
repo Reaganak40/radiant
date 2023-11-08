@@ -2,6 +2,9 @@
 #include "Model.h"
 #include "Logging/Log.h"
 
+#include "ECS/CommonComponents.h"
+#include "Utils/Utils.h"
+
 namespace rdt {
 	Model::Model()
 	{
@@ -13,10 +16,10 @@ namespace rdt {
 
 	void Model::DefineCommonRect()
 	{
-		m_vertices.push_back({ -0.5f, -0.5f });
-		m_vertices.push_back({  0.5f, -0.5f });
-		m_vertices.push_back({  0.5f,  0.5f });
-		m_vertices.push_back({ -0.5f,  0.5f });
+		m_vertices.push_back({ 0.0f, 0.0f });
+		m_vertices.push_back({ 1.0f, 0.0f });
+		m_vertices.push_back({ 1.0f, 1.0f });
+		m_vertices.push_back({ 0.0f, 1.0f });
 
 		m_indices.push_back(0);
 		m_indices.push_back(1);
@@ -35,6 +38,15 @@ namespace rdt {
 	std::vector<unsigned int>& Model::GetIndices()
 	{
 		return m_indices;
+	}
+
+	void Model::ApplyTransform(const Transform& transform, std::vector<Vec2f>& vertices)
+	{
+		for (const auto& vertex : m_vertices) {
+			vertices.push_back(Utils::Scale(Vec2f::Zero(), vertex, transform.scale));
+			Utils::RotatePoint(Vec2f::Zero(), vertices.back(), transform.rotation);
+			Utils::Translate(vertices.back(), transform.position);
+		}
 	}
 
 	void Model::Reset()
@@ -148,6 +160,15 @@ namespace rdt {
 		}
 		return m_instance->m_impl->GetIndices(model);
 	}
+	void ModelManager::ApplyTransform(ModelID model, const Transform& transform, std::vector<Vec2f>& vertices)
+	{
+		if (!ModelExists(model)) {
+			return;
+		}
+
+		GetModel(model).ApplyTransform(transform, vertices);
+	}
+
 	Model& ModelManager::GetModel(ModelID model)
 	{
 		return m_instance->m_impl->m_models.at(model);

@@ -23,7 +23,7 @@ namespace rdt {
 // Required Definitions for Struct/Class Members
 #include "Utils/MathTypes.h"
 #include "Texture/TextureAtlas.h"
-
+#include "ECS/CommonComponents.h"
 
 namespace rdt::core {
 
@@ -41,11 +41,7 @@ namespace rdt::core {
 		ModelID modelID;
 		TextureID textureID;
 		AtlasProfile atlasProfile;
-
-		Vec2f position;
-		float rotation;
-		Vec2f scale;
-
+		Transform transform;
 		bool flipTexture;
 		Vec4f fillColor;
 		unsigned int layer;
@@ -56,10 +52,5 @@ namespace rdt::core {
 			Resets a mesh back to its default constructor
 		*/
 		void Reset();
-
-		/*
-			Applied a transform to the mesh
-		*/
-		void UseTransform(const Transform& transform);
 	};
 }

@@ -11,6 +11,11 @@
 #pragma once
 #include "Utils/MathTypes.h"
 
+// Forward Declarations
+namespace rdt {
+	struct Transform;
+}
+
 namespace rdt {
 
 #define RDT_NULL_MODEL_ID 0
@@ -43,6 +48,12 @@ namespace rdt {
 
 		std::vector<Vec2f>& GetVertices();
 		std::vector<unsigned int>& GetIndices();
+
+		/*
+			Takes a transform, and an out reference, and returns the model
+			vertices according to that transform.
+		*/
+		void ApplyTransform(const Transform& transform, std::vector<Vec2f>& vertices);
 
 	private:
 		void Reset();
@@ -97,6 +108,12 @@ namespace rdt {
 			Gets the specified model and copies its index data to the out reference
 		*/
 		static std::vector<unsigned int>& GetIndices(ModelID model);
+
+		/*
+			Takes a transform, and an out reference, and returns the model
+			vertices according to that transform.
+		*/
+		static void ApplyTransform(ModelID model, const Transform& transform, std::vector<Vec2f>& vertices);
 
 		friend class ResourceManager;
 	private:

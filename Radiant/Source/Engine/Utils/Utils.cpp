@@ -231,16 +231,10 @@ namespace rdt {
 
         Vec2f Scale(Vec2f start, Vec2f end, Vec2f scale)
         {
-            float dist = Utils::GetDistance(start, end);
-            float scalar = sqrtf((scale.x * scale.x) + (scale.y * scale.y));
-            dist *= scalar;
+            float dx = end.x - start.x;
+            float dy = end.y - start.y;
 
-            float theta = Utils::GetRotation(start, end);
-            float dx = dist * cos(theta);
-            float dy = dist * sin(theta);
-
-            return Vec2f(start.x + dx, start.y + dy);
-
+            return Vec2f(scale.x * dx, scale.y * dy);
         }
         void Translate(Vec2f& point, const Vec2f& translation)
         {

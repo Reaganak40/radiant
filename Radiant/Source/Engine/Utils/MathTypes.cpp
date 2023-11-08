@@ -72,6 +72,11 @@ namespace rdt {
         return Vec2i(abs(vector.x), abs(vector.y));
     }
 
+    Vec2d::operator Vec2f() const
+    {
+        return Vec2f(x, y);
+    }
+
     double Vec2d::Magnitude() const
     {
         return sqrt((x * x) + (y * y));

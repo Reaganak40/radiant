@@ -19,20 +19,9 @@ namespace rdt::core {
 		atlasProfile = TextureManager::NOT_USING_ATLAS();
 		flipTexture = false;
 
-		position = Vec2f::Zero();
-		rotation = 0.0f;
-		scale = Vec2f::Zero();
-
 		fillColor.x1 = 0.0f;
 		fillColor.x2 = 0.0f;
 		fillColor.x3 = 0.0f;
 		fillColor.x4 = 1.0f;
-	}
-
-	void Mesh::UseTransform(const Transform& transform)
-	{
-		position = transform.position;
-		rotation = transform.rotation.radians;
-		scale = transform.scale;
 	}
 }

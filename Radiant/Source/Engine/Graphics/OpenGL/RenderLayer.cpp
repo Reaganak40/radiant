@@ -5,6 +5,8 @@
 #include "Graphics/Model.h"
 #include "Utils/Utils.h"
 
+#include "ECS/CommonComponents.h"
+
 namespace rdt::core {
 	RenderLayer::RenderLayer()
 	{
@@ -72,10 +74,9 @@ namespace rdt::core {
 			}
 
 			for (auto& mesh : meshes) {
-
-				std::vector<Vec2f> vertex_positions(ModelManager::ModelExists(mesh.modelID) ? ModelManager::GetVertices(mesh.modelID) : std::vector<Vec2f>());
+				std::vector<Vec2f> vertex_positions;
+				ModelManager::ApplyTransform(mesh.modelID, mesh.transform, vertex_positions);
 				std::vector<unsigned int> indices(ModelManager::ModelExists(mesh.modelID) ? ModelManager::GetIndices(mesh.modelID) : std::vector<unsigned int>());
-				ApplyTransform(mesh, vertex_positions);
 
 				std::vector<Vertex> vertices;
 				int texture_coordinate_index = 0;
@@ -130,19 +131,5 @@ namespace rdt::core {
 		m_batches.push_back(glRenderUnit());
 		m_batches.back().InitBuffers();
 		m_batches.back().shaderID = m_default_shader;
-	}
-
-	void RenderLayer::ApplyTransform(const Mesh& mesh, std::vector<Vec2f>& vertices)
-	{
-		// Scale, Rotate, Translate
-		for (auto& vertex : vertices) {
-			vertex = Utils::Scale(Vec2f::Zero(), vertex, mesh.scale);
-
-			if (mesh.rotation != 0.0f) {
-				Utils::RotatePoint(Vec2f::Zero(), vertex, mesh.rotation);
-			}
-
-			Utils::Translate(vertex, mesh.position);
-		}
 	}
 }

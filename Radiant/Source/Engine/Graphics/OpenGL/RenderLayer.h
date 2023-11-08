@@ -102,10 +102,5 @@ namespace rdt::core {
 
 	private:
 		void PushRenderUnit();
-
-		/*
-			Uses the transform data in the mesh to position, scale, and rotation the vertices
-		*/
-		void ApplyTransform(const Mesh& mesh, std::vector<Vec2f>& vertices);
 	};
 }

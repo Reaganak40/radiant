@@ -167,7 +167,7 @@ namespace rdt {
 
 	void Renderer::SetTransform(const Transform& transform)
 	{
-		m_impl->m_working_mesh.UseTransform(transform);
+		m_impl->m_working_mesh.transform = transform;
 	}
 
 	void Renderer::SetTexture(TextureID texture)

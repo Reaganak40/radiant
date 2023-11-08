@@ -2,6 +2,7 @@
 #include "Core.h"
 
 namespace rdt {
+	struct Vec2f;
 
 	struct RADIANT_API Vec2d {
 		double x, y;
@@ -32,6 +33,8 @@ namespace rdt {
 			y *= multiplier;
 			return (*this);
 		}
+
+		operator Vec2f() const;
 
 		/*
 			Returns the magnitude of this vector.
@@ -140,6 +143,7 @@ namespace rdt {
 			y = (float)other.y;
 			return (*this);
 		}
+
 	};
 	
 
@@ -164,5 +168,7 @@ namespace rdt {
 			radians = other;
 			return (*this);
 		}
+
+		operator float() const { return radians; }
 	};
 }

@@ -16,7 +16,7 @@
 namespace rdt {
 	namespace core 
 	{
-		class Mesh;
+		struct Mesh;
 		enum RenderType;
 	}
 	struct Mesh;
