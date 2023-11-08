@@ -42,7 +42,7 @@ namespace rdt {
 			return;
 		}
 
-		m_impl->m_cached_polygon = Physics::RemoveObject(m_impl->m_realmID, m_impl->m_model_ID);
+		//m_impl->m_cached_polygon = Physics::RemoveObject(m_impl->m_realmID, m_impl->m_model_ID);
 		m_impl->m_model_ID = 0;
 	}
 
@@ -57,7 +57,7 @@ namespace rdt {
 			return false;
 		}
 
-		return Renderer::IsInView(Physics::GetPolygon(GetRealmID(), GetModelID()));
+		//return Renderer::IsInView(Physics::GetPolygon(GetRealmID(), GetModelID()));
 	}
 
 
@@ -127,7 +127,7 @@ namespace rdt {
 			polygon = m_impl->m_cached_polygon;
 		}
 
-		m_impl->m_model_ID = Physics::CreateObject(m_impl->m_realmID, GetMessageID(), polygon);
+		//m_impl->m_model_ID = Physics::CreateObject(m_impl->m_realmID, GetMessageID(), polygon);
 	}
 
 	void GameObject::OnMessage(Message msg)

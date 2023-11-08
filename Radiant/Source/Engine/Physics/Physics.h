@@ -39,12 +39,6 @@ namespace rdt {
 		static void OnUpdate(const float deltaTime);
 
 		/*
-			Performs end of frame routines for the physics API.
-		*/
-		static void OnEndFrame() { m_instance->OnEndFrameImpl(); }
-
-
-		/*
 			Creates a new self-contained realm to add physical objects to.
 		*/
 		static RealmID CreateRealm();
@@ -71,111 +65,6 @@ namespace rdt {
 		*/
 		static bool AddEntityToRealm(const RealmID realm, const Entity entity);
 
-		/*
-			Adds an object to the physical world. Returns its UUID for future lookups. 
-		*/
-		static UniqueID CreateObject(const UniqueID realmID, const MessageID messageID, std::shared_ptr<Polygon> polygon) { return m_instance->CreateObjectImpl(realmID, messageID, polygon); }
-
-		/*
-			Removes an object from the physical world. Returns its polygon for easy reintroduction if desired.
-		*/
-		static std::shared_ptr<Polygon> RemoveObject(const UniqueID realmID, const UniqueID objectID) { return m_instance->RemoveObjectImpl(realmID, objectID); }
-
-		/*
-			Sets an existing objects properties in the physical world.
-		*/
-		static void SetObjectProperties(const UniqueID realmID, const UniqueID objectID, PhysicalProperties nProperties) {
-			m_instance->SetObjectPropertiesImpl(realmID, objectID, nProperties);
-		}
-
-		/*
-			Removes an existing objects properties in the physical world.
-		*/
-		static void RemoveObjectProperties(const UniqueID realmID, const UniqueID objectID, PhysicalProperties rProperties) {
-			m_instance->RemoveObjectPropertiesImpl(realmID, objectID, rProperties);
-		}
-
-		/*
-			Returns true if the queried object has any of the specified properties.
-		*/
-		static bool QueryObjectProperties(const UniqueID realmID, const UniqueID objectID, PhysicalProperties propertyQuery) {
-			return m_instance->QueryObjectPropertiesImpl(realmID, objectID, propertyQuery);
-		}
-
-		/*
-			Gets a const reference to the polygon indiciated by the Unique identifier.
-		*/
-		static const Polygon& GetPolygon(const UniqueID realmID, const UniqueID objectID) { return m_instance->GetPolygonImpl(realmID, objectID); }
-
-
-		static void CreatePtag(const std::string& tagName, PhysicalProperties tagProperties = NoProperties) { m_instance->CreatePtagImpl(tagName, tagProperties); }
-
-		/*
-			Adds a tag to the physics object, which will be used to interact with other objects.
-		*/
-		static void AddPTag(const UniqueID realmID, const UniqueID objectID, const std::string& tagName) { m_instance->AddPTagImpl(tagName, realmID, objectID); }
-		
-		/*
-			Adds a graviational force to the realm, measured by its accelration ("meters" per second squared)
-		*/
-		static void SetGravity(const UniqueID realmID, double mps2) { m_instance->SetGravityImpl(realmID, mps2); }
-		/*
-			Sets the friction magnitude of the specified object. [0 to 1], where 0 is
-			no friction, and 1 is maximum friction.
-		*/
-		static void SetFriction(const UniqueID realmID, const UniqueID objectID, const double friction) { m_instance->SetFrictionImpl(realmID, objectID, friction); }
-
-		/*
-			Sets the accerlation vector to the new provided vector.
-		*/
-		static void SetAcceleration(const UniqueID realmID, const UniqueID objectID, const Vec2d& nAcceleration) { m_instance->SetAccelerationImpl(realmID, objectID, nAcceleration); }
-		
-		/*
-			Sets the acceleration vector in the x-direction
-		*/
-		static void SetAccelerationX(const UniqueID realmID, const UniqueID objectID, const double nX) { m_instance->SetAccelerationXImpl(realmID, objectID, nX); }
-		
-		/*
-			Sets the acceleration vector in the y-direction
-		*/
-		static void SetAccelerationY(const UniqueID realmID, const UniqueID objectID, const double nY) { m_instance->SetAccelerationYImpl(realmID, objectID, nY); }
-
-		/*
-			Sets a maximum velocity for the specified object.
-		*/
-		static void SetMaximumVelocity(const UniqueID realmID, const UniqueID objectID, const Vec2d& nMaxVelocity) { m_instance->SetMaximumVelocityImpl(realmID, objectID, nMaxVelocity); }
-
-		/*
-			Sets the current velocity for the spciefied object.
-		*/
-		static void SetVelocity(const UniqueID realmID, const UniqueID objectID, Vec2d velocity) { m_instance->SetVelocityImpl(realmID, objectID, velocity); }
-
-		/*
-			Manually sets the current position of an object, effectively teleporting it.
-		*/
-		static void SetPosition(const UniqueID realmID, const UniqueID objectID, const Vec2d& nPosition) { m_instance->SetPositionImpl(realmID, objectID, nPosition); }
-		
-		/*
-			Manually sets the current rotation of an object.
-		*/
-		static void SetRotation(const UniqueID realmID, const UniqueID objectID, const double nRadians) { m_instance->SetRotationImpl(realmID, objectID, nRadians); }
-
-		/*
-			Set the hitbox size of the physics object. This is by scale where 1x1 makes the hitbox
-			the same as the shape of the polygon, and less than that shrinks the hitbox.
-		*/
-		static void SetHitBoxSize(const UniqueID realmID, const UniqueID objectID, const Vec2d& nSize) {
-			m_instance->SetHitBoxSizeImpl(realmID, objectID, nSize);
-		}
-		/*
-			Gets the current velocity of the queried object.
-		*/
-		static Vec2d GetVelocity(const UniqueID realmID, const UniqueID objectID) { return m_instance->GetVelocityImpl(realmID, objectID); }
-
-		/*
-			Gets the current position of the queried object
-		*/
-		static Vec2d GetPosition(const UniqueID realmID, const UniqueID objectID) { return m_instance->GetPositionImpl(realmID, objectID); }
 
 		friend class PhysicsSystem;
 private:

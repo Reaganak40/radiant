@@ -492,11 +492,11 @@ namespace rdt::core {
 					ImGui::Text("RealmID: %d", gobject->GetRealmID());
 					ImGui::Text("ModelID: %d", gobject->GetModelID());
 
-					Vec2d pos = Physics::GetPosition(gobject->GetRealmID(), gobject->GetModelID());
-					ImGui::Text("Position: (%.2f, %.2f)", pos.x, pos.y);
+					//Vec2d pos = Physics::GetPosition(gobject->GetRealmID(), gobject->GetModelID());
+					//ImGui::Text("Position: (%.2f, %.2f)", pos.x, pos.y);
 
-					Vec2d vel = Physics::GetVelocity(gobject->GetRealmID(), gobject->GetModelID());
-					ImGui::Text("Velocity: (%.2f, %.2f)", vel.x, vel.y);
+					//Vec2d vel = Physics::GetVelocity(gobject->GetRealmID(), gobject->GetModelID());
+					//ImGui::Text("Velocity: (%.2f, %.2f)", vel.x, vel.y);
 
 				}
 				else {

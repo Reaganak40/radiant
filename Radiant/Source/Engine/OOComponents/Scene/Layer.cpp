@@ -189,9 +189,10 @@ namespace rdt {
 		m_impl->m_attached = attach;
 	}
 
-	void Layer::CreateNewRealm()
+	RealmID Layer::CreateNewRealm()
 	{
 		m_impl->m_realms.push_back(Physics::CreateRealm());
+		return m_impl->m_realms.back();
 	}
 
 	void Layer::DestroyGameObject(MessageID mID)

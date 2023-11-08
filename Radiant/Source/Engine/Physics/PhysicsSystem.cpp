@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "PhysicsSystem.h"
+#include "Collider.h"
 #include "Physics.h"
 #include "ECS/ECS.h"
 
@@ -33,8 +34,11 @@ namespace rdt {
 				continue;
 			}
 
+
 			auto& rigidBody = rigidBodies->GetData(entity);
-			Physics::AddEntityToRealm(rigidBody.realmID, entity);
+			if (ColliderManager::ColliderExists(rigidBody.colliderID)) {
+				Physics::AddEntityToRealm(rigidBody.realmID, entity);
+			}
 		}
 
 		Physics::OnUpdate(deltaTime);

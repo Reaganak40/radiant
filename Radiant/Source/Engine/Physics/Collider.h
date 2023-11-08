@@ -10,6 +10,7 @@
 *	Collider and the ColliderManager.
 *******************************************************************/
 #pragma once
+#include "Core.h"
 
 // Forward Declarations
 namespace rdt {
@@ -22,7 +23,7 @@ namespace rdt {
 // Required Definitions for Struct/Class Members
 #include "Utils/MathTypes.h"
 
-#define RDT_NULL_COLLIDER_PROFILE_ID
+#define RDT_NULL_COLLIDER_ID 0
 
 namespace rdt {
 
@@ -35,12 +36,15 @@ namespace rdt {
 	class Collider {
 	private:
 		std::vector<Vec2f> m_vertices;
+		Vec2d m_size;
+		Vec2d m_midpoint;
 
+		bool m_is_rect;
+		bool m_is_axis_aligned;
 	public:
 
 		Collider();
 		~Collider();
-
 
 		/*
 			Adds a hitbox shape at the given origin (normalized), and size (normalized). Origin
@@ -58,30 +62,73 @@ namespace rdt {
 		*/
 		void ApplyTransform(const Transform& transform, std::vector<Vec2d>& vertices);
 
+		/*
+			Returns true if this collider is a Rect hitbox (capatible of AABB and other
+			rect collision algorithms)
+		*/
+		bool IsRect();
+
+		/*
+			Returns true if the hitbox has all axis aligned edges
+		*/
+		bool IsAxisAligned();
+
+		/*
+			Returns the width and height dimensions of the collider. Option to scale it.
+		*/
+		Vec2d GetSize(Vec2d scale = Vec2d(1, 1));
+
+		/*
+			Returns the centered point of the collider shape. Option to scale it.
+		*/
+		Vec2d GetMidpoint(Vec2d scale = Vec2d(1, 1));
+
 	private:
 		void WarningUndefinedShape();
 
 		void AddRect(const Vec2f& origin, const Vec2f& size);
 	};
 
-	class ColliderManager {
+	class RADIANT_API ColliderManager {
 		struct Impl;
 		static Impl* m_impl;
 
 	public:
 
+		/*
+			Creates a new instance of the ColliderManager singleton
+		*/
 		static void Initialize();
-		
+
+		/*
+			Frees the singleton instance
+		*/
 		static void Destroy();
 
+		/*
+			Gets the colliderID belonging to the the given alias,
+			returns 0 if it is not found.
+		*/
+		static ColliderID GetColliderID(const std::string& alias);
 
-		friend class core::Realm;
-	private:
+		/*
+			Returns true if the collider with the given ID exists
+		*/
 
 		static bool ColliderExists(ColliderID cpID);
+		friend class core::Realm;
+		friend class ResourceManager;
+	private:
 
-		static ColliderID AddCollider(const Collider& profile);
 
+		/*
+			Registers a collider under the given alias, returns the new collider's ID
+		*/
+		static ColliderID RegisterColider(const std::string& name);
+
+		/*
+			Gets a collider through the given ID
+		*/
 		static Collider& GetCollider(ColliderID cpID);
 	};
 }

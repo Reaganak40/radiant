@@ -198,6 +198,8 @@ namespace rdt {
 
 		bool use_gravity;
 		Vec2d velocity;
+
+		Vec2d max_velocity;
 		Vec2d acceleration;
 
 		double mass;
@@ -209,6 +211,11 @@ namespace rdt {
 			changes in velocity with any provided external forces.
 		*/
 		void UpdateVelocity(float deltaTime, Vec2d externalForces = Vec2d::Zero());
+		
+		/*
+			Gets the dx/dy of the given deltaTime, based on velocity.
+		*/
+		Vec2d GetChangeInPosition(const float deltaTime);
 	};
 
 	/*

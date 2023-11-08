@@ -2,6 +2,7 @@
 #include "ResourceManager.h"
 
 #include "Graphics/Model.h"
+#include "Physics/Collider.h"
 
 struct rdt::ResourceManager::Impl {
 	
@@ -34,10 +35,9 @@ void rdt::ResourceManager::Destroy()
 
 void rdt::ResourceManager::LoadDefaultResources()
 {
+	auto& rectModel = ModelManager::GetModel(ModelManager::RegisterModel("common.model.rect"));
+	rectModel.AddShape<ModelShape::MS_RECT>();
 
-	auto& rectModel = ModelManager::GetModel(ModelManager::RegisterModel("common::rect"));
-	rectModel.DefineCommon<Common::RECT>();
-
-	rectModel = ModelManager::GetModel(1);
-
+	auto& rectCollider = ColliderManager::GetCollider(ColliderManager::RegisterColider("common.collider.rect"));
+	rectCollider.AddShape<ColliderShape::CCS_Rect>(Vec2f::Zero(), Vec2f(1.0f, 1.0f));
 }

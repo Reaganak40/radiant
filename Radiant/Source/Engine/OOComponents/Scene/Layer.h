@@ -131,14 +131,13 @@ namespace rdt {
 			Initalized a new realm from the physics engine and appends it to the vector
 			of realms to be used by game objects.
 		*/
-		void CreateNewRealm();
+		RealmID CreateNewRealm();
 
 		/*
 			Looks for a game object in this layer's scope with a matching messageID, releases
 			it from the scene and destroys the object.
 		*/
 		void DestroyGameObject(MessageID mID);
-
 	private:
 
 		/*

@@ -1,5 +1,4 @@
 #include "Sandbox2D.h"
-#include "GameObjects/TestQuad.h"
 
 using namespace rdt;
 

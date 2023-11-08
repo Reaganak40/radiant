@@ -1,5 +1,4 @@
 #include "TestLayer.h"
-#include "GameObjects/TestQuad.h"
 
 using namespace rdt;
 
@@ -21,7 +20,7 @@ public:
 		Entity eID = GetID();
 
 		Sprite sprite = SpawnRect::CreateSprite();
-		sprite.model = ModelManager::GetModelID("common::rect");
+		sprite.model = ModelManager::GetModelID("common.model.rect");
 		EntityManager::AddComponent<Sprite>(eID, sprite);
 
 		Transform transform = SpawnRect::CreateTransform();
@@ -44,10 +43,24 @@ public:
 TestLayer::TestLayer(const std::string& alias)
 {
 	RegisterToMessageBus(alias);
-	CreateNewRealm();
+	RealmID mRealm = CreateNewRealm();
 
-	RegisterEntity(new RectObject(360, 200, 500, 50), "platform1");
-	RegisterEntity(new RectObject(400, 300, 50, 100, BLUE), "player");
+	ColliderID rectCollider = ColliderManager::GetColliderID("common.collider.rect");
+	{
+		Entity entity = RegisterEntity(new RectObject(360, 200, 500, 50), "platform1");
+		auto rigidbody = EntityManager::GetComponent<RigidBody2D>(entity);
+		rigidbody->realmID = mRealm;
+		rigidbody->colliderID = rectCollider;
+	}
+
+	{
+		Entity entity = RegisterEntity(new RectObject(400, 800, 50, 100, BLUE), "player");
+		auto rigidbody = EntityManager::GetComponent<RigidBody2D>(entity);
+		rigidbody->realmID = mRealm;
+		rigidbody->colliderID = rectCollider;
+		rigidbody->use_gravity = true;
+		rigidbody->max_velocity = Vec2d(300, 300);
+	}
 }
 
 TestLayer::~TestLayer()
@@ -56,6 +69,8 @@ TestLayer::~TestLayer()
 
 void TestLayer::OnAttach()
 {
+	Physics::ActivateRealm(GetRealms()[0]);
+
 	// TODO: Bind GameObjects and GUIs
 	BindAll();
 }

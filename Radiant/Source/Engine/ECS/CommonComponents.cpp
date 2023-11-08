@@ -5,6 +5,8 @@
 #include "Graphics/Animation.h"
 #include "Graphics/Texture/TextureManager.h"
 #include "Utils/Utils.h"
+#include "Physics/Physics.h"
+#include "Physics/Collider.h"
 
 namespace rdt::core {
 	void ComponentTraceTracker::AddDefinition(const char* component, const char* memberName, SupportedTraceType type, size_t offset)
@@ -83,6 +85,10 @@ namespace rdt {
 		TRACE_COMPONENT_DATA(RigidBody2D, mass);
 		TRACE_COMPONENT_DATA(RigidBody2D, velocity);
 
+		realmID = RDT_NULL_REALM_ID;
+		colliderID = RDT_NULL_COLLIDER_ID;
+
+		use_gravity = false;
 		mass = 1;
 	}
 	void RigidBody2D::UpdateVelocity(float deltaTime, Vec2d externalForces)
@@ -91,6 +97,19 @@ namespace rdt {
 
 		velocity.x = Utils::ApplyEpsilon(velocity.x);
 		velocity.y = Utils::ApplyEpsilon(velocity.y);
+
+		if (max_velocity.x != 0 && max_velocity.y != 0) {
+			if (abs(velocity.x) > max_velocity.x) {
+				velocity.x = velocity.x > 0 ? max_velocity.x : -max_velocity.x;
+			}
+			if (abs(velocity.y) > max_velocity.y) {
+				velocity.y = velocity.y > 0 ? max_velocity.y : -max_velocity.y;
+			}
+		}
+	}
+	Vec2d RigidBody2D::GetChangeInPosition(const float deltaTime)
+	{
+		return velocity * deltaTime;
 	}
 	// ===============================================================================
 	Renderable::Renderable()

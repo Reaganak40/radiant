@@ -21,8 +21,8 @@ namespace rdt {
 #define RDT_NULL_MODEL_ID 0
 	using ModelID = unsigned int;
 
-	enum Common {
-		RECT
+	enum ModelShape {
+		MS_RECT
 	};
 
 	// ==========================================================
@@ -40,11 +40,11 @@ namespace rdt {
 		Model();
 		~Model();
 
-		template<Common T>
-		void DefineCommon() { }
+		template<ModelShape T>
+		void AddShape() { }
 
 		template<>
-		void DefineCommon<RECT>() { DefineCommonRect(); }
+		void AddShape<MS_RECT>() { DefineCommonRect(); }
 
 		std::vector<Vec2f>& GetVertices();
 		std::vector<unsigned int>& GetIndices();

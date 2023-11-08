@@ -5,10 +5,24 @@
 
 #include "Pobject.h"
 
+#include "ECS/CommonComponents.h"
+
 namespace rdt::core {
 
+	/*
+		Intermediary object use for collision algorithms
+	*/
 	struct CollisionObject {
 		std::vector<Vec2d> vertices;
+		bool isRect = false;
+		bool isAxisAligned = false;
+		bool resolveCollision = false;
+
+		Transform* transform = nullptr;
+		RigidBody2D* rigidBody = nullptr;
+
+		Vec2d size;
+		Vec2d midpoint;
 	};
 	class Collision {
 	private:
@@ -45,14 +59,24 @@ namespace rdt::core {
 		static bool CheckCollisionAABB(const Pobject& A, const Pobject& B);
 
 		/*
+			Tests for collisions of two rects on the same axis using AABB theorem.
+		*/
+		static bool CheckCollisionAABB(const CollisionObject& source, const CollisionObject& suspect);
+
+		/*
 			Resolves static collisions, and returns true if there was collision resolution.
 		*/
 		static bool StaticCollisionDiags(Polygon& dynamicPoly, Polygon& staticPoly);
 
 		/*
-			Detects and resolves collisions between two rectangles using swept  AABB algorithm.
+			Detects and resolves collisions between two rectangles using swept AABB algorithm.
 		*/
 		static bool SweptAABB(Pobject& source, const Pobject& suspect, const float deltaTime);
+
+		/*
+			Detects and resolves collisions between two rectangles using swept AABB algorithm.
+		*/
+		static bool SweptAABB(CollisionObject& source, const CollisionObject& suspect, const float deltaTime);
 
 		static bool PointVsRect(const Vec2d& point, Rect& rect);
 		

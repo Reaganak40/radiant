@@ -26,6 +26,18 @@ namespace rdt::core {
 
 	bool Collision::CheckCollision(CollisionObject& source, const CollisionObject& suspect, const float deltaTime)
 	{
+		if (source.isRect && (suspect.isRect)) {
+
+			if (source.isAxisAligned && suspect.isAxisAligned) {
+
+				if (!source.resolveCollision) {
+					return CheckCollisionAABB(source, suspect);
+				}
+
+				return SweptAABB(source, suspect, deltaTime);
+			}
+		}
+
 		return false;
 	}
 
@@ -133,6 +145,12 @@ namespace rdt::core {
 			(A_vertices[2].y < B_vertices[1].y || B_vertices[2].y < A_vertices[1].y));
 	}
 
+	bool Collision::CheckCollisionAABB(const CollisionObject& source, const CollisionObject& suspect)
+	{
+		return !((source.vertices[1].x < suspect.vertices[0].x || suspect.vertices[1].x < source.vertices[0].x) ||
+			(source.vertices[2].y < suspect.vertices[1].y || suspect.vertices[2].y < source.vertices[1].y));
+	}
+
 	bool Collision::StaticCollisionDiags(Polygon& dynamicPoly, Polygon& staticPoly)
 	{
 		Polygon* poly1;
@@ -238,6 +256,36 @@ namespace rdt::core {
 			else {
 				source.translation.m_current_velocity += contactNormal * Vabs(source.translation.m_current_velocity) * (1 - contactTime);
 			}
+			return true;
+		}
+
+		return false;
+	}
+
+	bool Collision::SweptAABB(CollisionObject& source, const CollisionObject& suspect, const float deltaTime)
+	{
+		if (source.rigidBody->velocity == Vec2d::Zero()) {
+			return false;
+		}
+
+		Vec2d ray = source.rigidBody->GetChangeInPosition(deltaTime);
+		Vec2d sp = suspect.vertices[3];
+		Vec2d ep = suspect.vertices[1];
+
+		sp.x = ceil(sp.x - source.size.x / 2);
+		sp.y = ceil(sp.y + source.size.y / 2);
+
+		ep.x = ceil(ep.x + source.size.x / 2);
+		ep.y = ceil(ep.y - source.size.y / 2);
+
+		Vec2d start = source.midpoint;
+		Vec2d contactPoint;
+		Vec2d contactNormal;
+		float contactTime = 1.0f;
+
+		if (RayVsRect(start, ray, sp, ep, contactPoint, contactNormal, contactTime)) {
+
+			source.rigidBody->velocity += contactNormal * Vabs(source.rigidBody->velocity) * (1 - contactTime);
 			return true;
 		}
 

@@ -210,10 +210,7 @@ namespace rdt {
 
 	void Application::UpdateWorld()
 	{
-		// Updates all active physical objects.
-		Physics::OnUpdate(m_impl->m_timestep.deltaTime);
 		SystemManager::OnWorldUpdate(m_impl->m_timestep.deltaTime);
-
 	}
 
 	void Application::PollMessages2()
