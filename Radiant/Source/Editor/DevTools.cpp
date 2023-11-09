@@ -6,6 +6,7 @@
 #include "Graphics/Renderer.h"
 #include "Physics/Physics.h"
 #include "Physics/Collider.h"
+#include "Graphics/Model.h"
 
 #include "Utils/Utils.h"
 
@@ -789,6 +790,37 @@ namespace rdt::core {
 			data = (unsigned char*)data + info.offset;
 
 			switch (info.type) {
+			case SupportedTraceType_bool:
+			{
+				title("Bool", name);
+				bool val = *((bool*)data);
+
+				ImGui::Text("Enable:");
+				ImGui::SameLine();
+				
+				char checkbox_label[40];
+				sprintf_s(checkbox_label, 40, "##checkboxLabel_%s", name);
+				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+				if (ImGui::Checkbox(checkbox_label, &val)) {
+					*((bool*)data) = val;
+				}
+				ImGui::PopStyleVar();
+				
+			}
+				break;
+			case SupportedTraceType_modelID:
+			{
+				title("ModelID", name);
+
+				ModelID model = *((ModelID*)data);
+				const char* model_name = ModelManager::GetModelAlias(model);
+				ImGui::Text("Name:");
+				ImGui::SameLine();
+				ImGui::PushFont(Editor::m_fonts[NunitoSans_Bold][18]);
+				ImGui::Text(model_name);
+				ImGui::PopFont();
+			}
+				break;
 			case SupportedTraceType_colliderID:
 			{
 				title("ColliderID", name);
@@ -872,29 +904,33 @@ namespace rdt::core {
 				float valX = (float)((Vec2d*)data)->x;
 				float valY = (float)((Vec2d*)data)->y;
 
+				// X label
+				float xStart = ImGui::GetCursorPosX();
 				ImGui::Text("x:");
 				ImGui::SameLine();
-				float xAlign = ImGui::GetCursorPosX();
+				float itemWidth = (ImGui::GetContentRegionAvail().x - (ImGui::GetCursorPosX() - xStart)) / 2;
 
+				// Edit X
 				char label[30];
 				sprintf_s(label, 30, "##editX_%s", name);
-				ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+				ImGui::PushItemWidth(itemWidth);
 				if (ImGui::DragFloat(label, &valX, 2)) {
 					((Vec2d*)data)->x = (double)valX;
 				}
 				ImGui::PopItemWidth();
-				next_sub_row();
 
-				ImGui::Text("y:");
+				// Y label
 				ImGui::SameLine();
-				ImGui::SetCursorPosX(xAlign);
-				ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+				ImGui::Text("y:");
+
+				// Edit Y
+				ImGui::SameLine();
 				sprintf_s(label, 30, "##editY_%s", name);
+				ImGui::PushItemWidth(itemWidth);
 				if (ImGui::DragFloat(label, &valY, 2)) {
 					((Vec2d*)data)->y = (double)valY;
 				}
 				ImGui::PopItemWidth();
-
 			}
 				break;
 			case SupportedTraceType_color:
@@ -1032,20 +1068,24 @@ namespace rdt::core {
 							continue;
 						}
 
+						// Component Icon
 						Editor::AddIcon(ICON_FK_CUBES);
 						ImGui::SameLine();
+						float headerStartX = ImGui::GetCursorPosX();
 
+						// Component Collapsing Header
 						char checkboxLabel[60];
 						sprintf_s(checkboxLabel, 60, "##%s_enable", componentName.c_str());
-
 						ImGui::PushFont(Editor::m_fonts[NunitoSans_Bold][18]);
-
 						bool componentMenuOpen = ImGui::TreeNodeEx(componentName.c_str(), ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_AllowItemOverlap, componentName.c_str());
 						ImGui::PopFont();
+						
+						// Set component enable button position
 						ImGui::SameLine();
-						ImGui::SetCursorPosX(ImGui::GetWindowWidth() - ImGui::CalcTextSize("C").x - 13.5f - ImGui::GetStyle().ItemInnerSpacing.x);
+						ImGui::SetCursorPosX(headerStartX + ImGui::GetItemRectSize().x - (ImGui::CalcTextSize("C").x + 13.5f + ImGui::GetStyle().ItemInnerSpacing.x));
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2.5);
 
+						// Component enable button
 						bool isChecked = EntityManager::IsComponentEnabled(selectedEntity, index);
 						ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
 						ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.8f, 0.8f, 0.8f, 1.0f));
@@ -1062,6 +1102,7 @@ namespace rdt::core {
 						ImGui::PopStyleVar();
 						ImGui::PopStyleColor(3);
 
+						// If component collapsing header is open
 						if (componentMenuOpen) {
 							ImGui::Indent(10);
 
@@ -1079,10 +1120,10 @@ namespace rdt::core {
 									ImGui::TableSetupColumn("dataIntrospection");
 									
 									void* entity_data = ComponentManager::GetData(index, selectedEntity);
-									for (auto& [memberName, typeDef] : ComponentTraceTracker::GetTraceData(componentName.c_str())) {
+									for (auto& type_definition : ComponentTraceTracker::GetTraceData(componentName.c_str())) {
 										ImGui::TableNextRow();
 										ImGui::TableNextColumn();
-										RenderEditTool(memberName.c_str(), entity_data, typeDef);
+										RenderEditTool(type_definition.name, entity_data, type_definition);
 									}
 									ImGui::EndTable();
 								}

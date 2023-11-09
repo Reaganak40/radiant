@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "EntityFactory.h"
 #include "Polygon/Rect.h"
+#include "Graphics/Model.h"
 
 namespace rdt {
 
@@ -99,7 +100,7 @@ namespace rdt {
 	Sprite SpawnRect::CreateSprite()
 	{
 		Sprite res;
-		res.polygon = m_impl->CreatePtr();
+		res.model = RDT_NULL_MODEL_ID;
 		return res;
 	}
 	Transform SpawnRect::CreateTransform()

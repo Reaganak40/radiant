@@ -85,6 +85,8 @@ namespace rdt {
 			SupportedTraceType_vec2d,
 			SupportedTraceType_angle,
 			SupportedTraceType_colliderID,
+			SupportedTraceType_modelID,
+			SupportedTraceType_bool,
 			SupportedTraceType_NotSupported,
 		};
 
@@ -129,10 +131,15 @@ namespace rdt {
 				return SupportedTraceType_angle;
 			}
 
+			if (typeid(queryType) == typeid(bool)) {
+				return SupportedTraceType_bool;
+			}
+
 			return SupportedTraceType_NotSupported;
 		}
 
 		struct TraceData {
+			const char* name;
 			SupportedTraceType type;
 			size_t offset;
 		};
@@ -141,13 +148,13 @@ namespace rdt {
 			This should be hidden from client, used only by the editor.
 		*/
 		struct ComponentTraceTracker {
-			static std::unordered_map<std::string, std::unordered_map<std::string, core::TraceData>> ComponentDefinitions;
+			static std::unordered_map<std::string, std::vector<core::TraceData>> ComponentDefinitions;
 			static void AddDefinition(const char* component, const char* memberName, core::SupportedTraceType type, size_t offset);
 			
 			/*
 				Gets the member data of this component that have been marked for tracing
 			*/
-			static std::unordered_map<std::string, core::TraceData>& GetTraceData(const char* ComponentName);
+			static std::vector<core::TraceData>& GetTraceData(const char* ComponentName);
 		};
 	}
 
@@ -194,9 +201,6 @@ namespace rdt {
 	*/
 	struct RADIANT_API Sprite : ECSComponent
 	{
-		// Contains a centeralized origin and 2D vertices
-		// NOTE: Pointer required because the number of vertices in arbitrary
-		std::shared_ptr<Polygon> polygon; 
 		ModelID model;
 
 		Sprite();

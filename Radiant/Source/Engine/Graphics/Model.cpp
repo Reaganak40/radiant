@@ -61,7 +61,7 @@ namespace rdt {
 	struct ModelManager::Impl {
 
 		ModelID idGenerator = 0;
-		std::unordered_map<std::string, ModelID> nameToModelID;
+		std::unordered_map<std::string, ModelID> aliasToId;
 		std::unordered_map<ModelID, Model> m_models;
 
 		Impl() {}
@@ -69,24 +69,24 @@ namespace rdt {
 
 		ModelID Register(const std::string& name)
 		{
-			if (nameToModelID.find(name) != nameToModelID.end()) {
+			if (aliasToId.find(name) != aliasToId.end()) {
 				RDT_CORE_WARN("ModelManager - Could not register model '{}', already exists.", name);
 				return RDT_NULL_MODEL_ID;
 			}
 
 			ModelID nID = ++idGenerator;
-			nameToModelID[name] = nID;
+			aliasToId[name] = nID;
 			m_models[nID];
 			return nID;
 		}
 
 		ModelID GetModelID(const std::string& name) {
-			if (nameToModelID.find(name) == nameToModelID.end()) {
+			if (aliasToId.find(name) == aliasToId.end()) {
 				RDT_CORE_WARN("ModelManager - Could not find model '{}'", name);
 				return RDT_NULL_MODEL_ID;
 			}
 
-			return nameToModelID.at(name);
+			return aliasToId.at(name);
 		}
 		
 		bool ModelExists(ModelID mID) {
@@ -101,6 +101,17 @@ namespace rdt {
 		std::vector<unsigned int>& GetIndices(ModelID model)
 		{
 			return m_models.at(model).GetIndices();
+		}
+
+		const char* GetModelAlias(ModelID model)
+		{
+			for (auto& [name, id] : aliasToId) {
+				if (model == id) {
+					return name.c_str();
+				}
+			}
+
+			return "NoNameFound";
 		}
 	};
 
@@ -167,6 +178,11 @@ namespace rdt {
 		}
 
 		GetModel(model).ApplyTransform(transform, vertices);
+	}
+
+	const char* ModelManager::GetModelAlias(ModelID model)
+	{
+		return m_instance->m_impl->GetModelAlias(model);
 	}
 
 	Model& ModelManager::GetModel(ModelID model)

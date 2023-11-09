@@ -115,6 +115,13 @@ namespace rdt {
 		*/
 		static void ApplyTransform(ModelID model, const Transform& transform, std::vector<Vec2f>& vertices);
 
+		/*
+			Returns the name/alias of a model through its modelID, otherwise
+			returns NoNameFound
+		*/
+		static const char* GetModelAlias(ModelID model);
+
+
 		friend class ResourceManager;
 	private:
 

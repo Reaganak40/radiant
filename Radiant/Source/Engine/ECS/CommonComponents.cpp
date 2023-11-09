@@ -19,14 +19,10 @@ namespace rdt::core {
 			ComponentDefinitions[component];
 		}
 
-		if (ComponentDefinitions.at(component).find(memberName) != ComponentDefinitions.at(component).end()) {
-			return;
-		}
-
-		ComponentDefinitions.at(component)[memberName] = { type, offset };
+		ComponentDefinitions.at(component).push_back({ memberName, type, offset });
 	}
 
-	std::unordered_map<std::string, core::TraceData>& ComponentTraceTracker::GetTraceData(const char* ComponentName)
+	std::vector<core::TraceData>& ComponentTraceTracker::GetTraceData(const char* ComponentName)
 	{
 		if (ComponentDefinitions.find(ComponentName) == ComponentDefinitions.end()) {
 			RDT_CORE_WARN("Could not find traced data for component '{}'", ComponentName);
@@ -40,12 +36,16 @@ namespace rdt::core {
 		if (type == "ColliderID") {
 			return SupportedTraceType_colliderID;
 		}
+
+		if (type == "ModelID") {
+			return SupportedTraceType_modelID;
+		}
 		return SupportedTraceType_NotSupported;
 	}
 }
 
 namespace rdt {
-	std::unordered_map<std::string, std::unordered_map<std::string, core::TraceData>> core::ComponentTraceTracker::ComponentDefinitions;
+	std::unordered_map<std::string, std::vector<core::TraceData>> core::ComponentTraceTracker::ComponentDefinitions;
 
 	void ECSComponent::DEFINE_MEMBER(const char* component, const char* memberName, core::SupportedTraceType type, size_t offset)
 	{
@@ -68,9 +68,8 @@ namespace rdt {
 	// ===============================================================================
 	Sprite::Sprite()
 	{
-		TRACE_COMPONENT_DATA(Sprite, polygon);
+		TRACE_COMPONENT_DATA(Sprite, model, ModelID);
 
-		polygon = nullptr;
 		model = RDT_NULL_MODEL_ID;
 	}
 	void Sprite::SetModel(const std::string& modelName)
@@ -81,8 +80,8 @@ namespace rdt {
 	rdt::Transform::Transform()
 	{
 		TRACE_COMPONENT_DATA(Transform, position);
-		TRACE_COMPONENT_DATA(Transform, rotation);
 		TRACE_COMPONENT_DATA(Transform, scale);
+		TRACE_COMPONENT_DATA(Transform, rotation);
 
 		rotation = 0;
 	}
@@ -95,11 +94,11 @@ namespace rdt {
 	// ===============================================================================
 	RigidBody2D::RigidBody2D()
 	{
-		TRACE_COMPONENT_DATA(RigidBody2D, mass);
 		TRACE_COMPONENT_DATA(RigidBody2D, velocity);
 		TRACE_COMPONENT_DATA(RigidBody2D, acceleration);
+		TRACE_COMPONENT_DATA(RigidBody2D, use_gravity);
 		TRACE_COMPONENT_DATA(RigidBody2D, colliderID, ColliderID);
-
+		TRACE_COMPONENT_DATA(RigidBody2D, mass);
 
 		realmID = RDT_NULL_REALM_ID;
 		colliderID = RDT_NULL_COLLIDER_ID;
