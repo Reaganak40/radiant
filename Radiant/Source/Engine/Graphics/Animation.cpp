@@ -87,7 +87,7 @@ namespace rdt {
 			aliasToID[name] = nID;
 			m_animations[nID] = std::make_shared<Animation>(texture);
 
-			nID;
+			return nID;
 		}
 
 		AnimationID GetAnimationID(const std::string& name) {

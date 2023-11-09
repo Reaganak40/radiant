@@ -1,9 +1,15 @@
 #pragma once
+
+// Forward Declarations
+namespace rdt {
+	struct DebugComponent;
+	using Entity = unsigned int;
+}
+
 #include "OOComponents/Scene/Layer.h"
 #include "Utils/Input.h"
 #include "Utils/ConfigReader.h"
 #include "Graphics/RenderWindow.h"
-
 namespace rdt::core {
 
 	enum DevMessages {
@@ -203,6 +209,7 @@ namespace rdt::core {
 		const std::vector<InputState> controls_ShowTools2{ T_KEY_PRESS };
 
 		static std::unordered_map<std::string, int> m_combo_selections;
+		static std::unordered_map<std::string, bool> m_checkbox_selections;
 
 	public:
 		Editor();
@@ -235,6 +242,8 @@ namespace rdt::core {
 		static int AddComboBox(const char* label, const char** options, unsigned int optionCount, const char* preview = nullptr);
 		static void AddIcon(const char* unicode, size_t size = 18);
 		static int MyTextCallback(ImGuiInputTextCallbackData* data);
+		static bool* GetCheckboxSelection(const std::string& checkbox_label);
+		static DebugComponent* GetDebugComponent(Entity entity);
 		static void ApplyGuiConfig(PanelConfig& config);
 		// ===========================================================
 

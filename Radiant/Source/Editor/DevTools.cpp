@@ -5,6 +5,8 @@
 #include "Messaging/MessageTypes.h"
 #include "Graphics/Renderer.h"
 #include "Physics/Physics.h"
+#include "Physics/Collider.h"
+
 #include "Utils/Utils.h"
 
 #include "Gui/GuiManager.h"
@@ -566,7 +568,7 @@ namespace rdt::core {
 
 		void RenderNode(Node& node) {
 
-			ImVec2 nodeChildWindowSize = ImVec2(ImGui::GetWindowSize().x * 0.90, node.lastSize);
+			ImVec2 nodeChildWindowSize = ImVec2(ImGui::GetWindowSize().x * 0.90f, node.lastSize);
 
 			if (!node.nodeOpen) {
 				nodeChildWindowSize.y = 25;
@@ -587,8 +589,8 @@ namespace rdt::core {
 					ImGui::Text(("Browse " + (std::string)(node.type == LPNT_Entity ? "Entities: " : "GameObjects: ")).c_str());
 					if (node.itemCount > 0) {
 
-						nodeChildWindowSize.x *= 0.95;
-						nodeChildWindowSize.y -= 75;
+						nodeChildWindowSize.x *= 0.95f;
+						nodeChildWindowSize.y -= 75.0f;
 						indent = (ImGui::GetWindowSize().x - nodeChildWindowSize.x) / 2;
 						ImGui::SetCursorPosX(indent);
 						std::string child2 = (panel_header + "- " + (node.type == LPNT_Entity ? "Entity" : "GameObject") + "List");
@@ -746,7 +748,7 @@ namespace rdt::core {
 					ImGui::Text("%s", EntityManager::GetEntityAlias(entity));
 
 					ImGui::TableNextColumn();
-					ImGui::Text("%d", entitySignature.count());
+					ImGui::Text("%d", entitySignature.count() - RDT_NUM_HIDDEN_COMPONENTS);
 
 					current_row++;
 				}
@@ -787,6 +789,35 @@ namespace rdt::core {
 			data = (unsigned char*)data + info.offset;
 
 			switch (info.type) {
+			case SupportedTraceType_colliderID:
+			{
+				title("ColliderID", name);
+
+				ColliderID colliderID = *((ColliderID*)data);
+				
+				const char* collider_name = ColliderManager::GetColliderAlias(colliderID);
+				ImGui::Text("Name:");
+				ImGui::SameLine();
+				ImGui::PushFont(Editor::m_fonts[NunitoSans_Bold][18]);
+				ImGui::Text(collider_name);
+				ImGui::PopFont();
+
+				next_sub_row();
+				ImGui::Text("Show Hitbox:");
+				ImGui::SameLine();
+
+				DebugComponent* dc = Editor::GetDebugComponent(selectedEntity);
+				
+				char checkbox_label[40];
+				sprintf_s(checkbox_label, 40, "##checkboxLabel_%s", name);
+				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+				if(ImGui::Checkbox(checkbox_label, &dc->show_collider_hitbox)) {
+
+				}
+				ImGui::PopStyleVar();
+
+			}
+				break;
 			case SupportedTraceType_angle:
 			{
 				title("Angle", name);
@@ -800,7 +831,7 @@ namespace rdt::core {
 				sprintf_s(label, 30, "##editAngle_%s", name);
 
 				if (selection <= 0) {
-					if (ImGui::SliderFloat(label, &val, 0.0f, 2 * M_PI)) {
+					if (ImGui::SliderFloat(label, &val, 0.0f, 2 * (float)M_PI)) {
 						((Angle*)data)->radians = val;
 					}
 				}
@@ -895,13 +926,12 @@ namespace rdt::core {
 				}
 			}
 				break;
-
 			case SupportedTraceType_polygon:
 			{	
 				title("Polygon", name);
 				
 				Vec2d coords = (*((std::shared_ptr<Polygon>*)data))->GetOrigin();
-				float vals[2] = { coords.x, coords.y };
+				float vals[2] = { (float)coords.x, (float)coords.y };
 
 
 				ImGui::Text("Position:");
@@ -914,8 +944,8 @@ namespace rdt::core {
 				ImGui::PopItemWidth();		
 				next_sub_row();
 
-				vals[0] = (*((std::shared_ptr<Polygon>*)data))->GetWidth();
-				vals[1] = (*((std::shared_ptr<Polygon>*)data))->GetHeight();
+				vals[0] = (float)(*((std::shared_ptr<Polygon>*)data))->GetWidth();
+				vals[1] = (float)(*((std::shared_ptr<Polygon>*)data))->GetHeight();
 				ImGui::Text("Size:");
 				ImGui::SameLine();
 				ImGui::SetCursorPosX(xAlign);
@@ -926,7 +956,6 @@ namespace rdt::core {
 				ImGui::PopItemWidth();
 			}
 			break;
-
 			case SupportedTraceType_uint:
 			{
 				title("unsigned int", name);
@@ -946,7 +975,6 @@ namespace rdt::core {
 				ImGui::PopItemWidth();
 			}
 				break;
-
 			case SupportedTraceType_double:
 			{
 				title("double", name);
@@ -999,34 +1027,43 @@ namespace rdt::core {
 					if (signature[index]) {
 						std::string componentName = ComponentManager::GetComponenentName(index);
 						
+						// Don't show hidden component
+						if (ComponentManager::IsHiddenComponent(componentName)) {
+							continue;
+						}
+
 						Editor::AddIcon(ICON_FK_CUBES);
 						ImGui::SameLine();
 
 						char checkboxLabel[60];
 						sprintf_s(checkboxLabel, 60, "##%s_enable", componentName.c_str());
-						bool isChecked = true;
 
 						ImGui::PushFont(Editor::m_fonts[NunitoSans_Bold][18]);
 
 						bool componentMenuOpen = ImGui::TreeNodeEx(componentName.c_str(), ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_AllowItemOverlap, componentName.c_str());
 						ImGui::PopFont();
 						ImGui::SameLine();
-						ImGui::SetCursorPosX(ImGui::GetWindowWidth() - ImGui::CalcTextSize("C").x - 13.5 - ImGui::GetStyle().ItemInnerSpacing.x);
+						ImGui::SetCursorPosX(ImGui::GetWindowWidth() - ImGui::CalcTextSize("C").x - 13.5f - ImGui::GetStyle().ItemInnerSpacing.x);
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2.5);
 
+						bool isChecked = EntityManager::IsComponentEnabled(selectedEntity, index);
 						ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
 						ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.8f, 0.8f, 0.8f, 1.0f));
 						ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
 						ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
-						ImGui::Checkbox(checkboxLabel, &isChecked);
+						if (ImGui::Checkbox(checkboxLabel, &isChecked)) {
+							if (isChecked) {
+								EntityManager::EnableComponent(selectedEntity, index);
+							}
+							else {
+								EntityManager::DisableComponent(selectedEntity, index);
+							}
+						}
 						ImGui::PopStyleVar();
 						ImGui::PopStyleColor(3);
 
 						if (componentMenuOpen) {
 							ImGui::Indent(10);
-							
-
-							
 
 							if (!ComponentTraceTracker::GetTraceData(componentName.c_str()).size()) {
 								ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
@@ -1330,9 +1367,9 @@ namespace rdt::core {
 	// =========================================================
 	struct EntityWizardImpl : public Panel::Impl {
 
-		bool m_entityWizardLaunched;
+		bool m_entityWizardLaunched = false;
+		bool m_template_name_edited = false;
 		char m_entity_name[60];
-		bool m_template_name_edited;
 
 		void OnRender() override final {
 			if (!m_entityWizardLaunched) {
@@ -1524,6 +1561,8 @@ namespace rdt::core {
 	GameRenderWindow* Editor::m_gameWindow = nullptr;
 	int Editor::m_gameWindowId = -1;
 	std::unordered_map<std::string, int> Editor::m_combo_selections = std::unordered_map<std::string, int>();
+	std::unordered_map<std::string, bool> Editor::m_checkbox_selections = std::unordered_map<std::string, bool>();
+
 
 	/*
 		Panel Layout Macros
@@ -1794,6 +1833,11 @@ namespace rdt::core {
 		SetTheme(data->theme);
 	}
 
+	DebugComponent* Editor::GetDebugComponent(Entity entity)
+	{
+		return EntityManager::GetComponent<DebugComponent>(entity);
+	}
+
 	void Editor::OpenPanel(PanelType panel)
 	{
 	}
@@ -1942,7 +1986,7 @@ namespace rdt::core {
 
 		if (ImGui::BeginCombo(combo_label, preview_label))
 		{
-			for (int n = 0; n < optionCount; n++)
+			for (unsigned int n = 0; n < optionCount; n++)
 			{
 				const bool is_selected = (selection_index == n);
 				if (ImGui::Selectable(options[n], is_selected)) {
@@ -2009,5 +2053,13 @@ namespace rdt::core {
 			ImGui::SetNextWindowSize(ImVec2(config.width, config.height), ImGuiCond_FirstUseEver);
 			ImGui::SetNextWindowPos(ImVec2(config.xPos, config.yPos), ImGuiCond_FirstUseEver);
 		}
+	}
+	bool* Editor::GetCheckboxSelection(const std::string& checkbox_label)
+	{
+		if (m_checkbox_selections.find(checkbox_label) == m_checkbox_selections.end()) {
+			m_checkbox_selections[checkbox_label] = false;
+		}
+
+		return &m_checkbox_selections.at(checkbox_label);
 	}
 }

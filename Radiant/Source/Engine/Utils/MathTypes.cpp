@@ -74,7 +74,7 @@ namespace rdt {
 
     Vec2d::operator Vec2f() const
     {
-        return Vec2f(x, y);
+        return Vec2f((float)x, (float)y);
     }
 
     double Vec2d::Magnitude() const

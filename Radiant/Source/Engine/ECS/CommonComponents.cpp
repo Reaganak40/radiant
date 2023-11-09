@@ -35,6 +35,13 @@ namespace rdt::core {
 
 		return ComponentDefinitions.at(ComponentName);
 	}
+	SupportedTraceType ResolveSupportTypeFromString(const std::string& type)
+	{
+		if (type == "ColliderID") {
+			return SupportedTraceType_colliderID;
+		}
+		return SupportedTraceType_NotSupported;
+	}
 }
 
 namespace rdt {
@@ -45,7 +52,6 @@ namespace rdt {
 		core::ComponentTraceTracker::AddDefinition(component, memberName, type, offset);
 	}
 
-
 	// ===============================================================================
 	EntityConfig::EntityConfig()
 	{
@@ -53,6 +59,11 @@ namespace rdt {
 		TRACE_COMPONENT_DATA(EntityConfig, alias);
 
 		owner = nullptr;
+	}
+	// ===============================================================================
+	rdt::DebugComponent::DebugComponent()
+	{
+		show_collider_hitbox = false;
 	}
 	// ===============================================================================
 	Sprite::Sprite()
@@ -87,6 +98,8 @@ namespace rdt {
 		TRACE_COMPONENT_DATA(RigidBody2D, mass);
 		TRACE_COMPONENT_DATA(RigidBody2D, velocity);
 		TRACE_COMPONENT_DATA(RigidBody2D, acceleration);
+		TRACE_COMPONENT_DATA(RigidBody2D, colliderID, ColliderID);
+
 
 		realmID = RDT_NULL_REALM_ID;
 		colliderID = RDT_NULL_COLLIDER_ID;

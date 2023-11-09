@@ -4,13 +4,13 @@
 namespace rdt {
 
 	struct ComponentManager::Impl {
-		ComponentID m_componentCounter;
+		ComponentID idCounter;
 		std::unordered_map<std::string, ComponentID> m_componentTypes;
 		std::unordered_map<std::string, IComponentArray*> m_components;
 
 		Impl()
 		{
-			m_componentCounter = 0;
+			idCounter = 0;
 		}
 
 		~Impl()
@@ -25,6 +25,10 @@ namespace rdt {
 			for (auto& [id, component] : m_components) {
 				component->RemoveData(eID);
 			}
+		}
+
+		ComponentID GenerateID() {
+			return idCounter++;
 		}
 
 		ComponentID GetComponentID(const char* typeName)
@@ -46,6 +50,23 @@ namespace rdt {
 			}
 
 			RDT_CORE_WARN("ComponentManager - Could not find component '{}'", cID);
+			return nullptr;
+		}
+
+		void RegisterComponent(const char* typeName, IComponentArray* component)
+		{
+			m_componentTypes[typeName] = GenerateID();
+			m_components[typeName] = component;
+		}
+
+		IComponentArray* GetComponentByID(ComponentID cID)
+		{
+			for (auto& [componentName, id] : m_componentTypes) {
+				if (id == cID) {
+					return m_components.at(componentName);
+				}
+			}
+
 			return nullptr;
 		}
 
@@ -94,6 +115,21 @@ namespace rdt {
 		return nullptr;
 	}
 
+	bool ComponentManager::IsHiddenComponent(const std::string& name)
+	{
+		return (name == "struct rdt::EntityConfig") || (name == "struct rdt::DebugComponent");
+	}
+
+	size_t ComponentManager::GetComponentCount()
+	{
+		return m_instance->m_impl->idCounter;
+	}
+
+	IComponentArray* ComponentManager::GetComponentByID(ComponentID cID)
+	{
+		return m_instance->m_impl->GetComponentByID(cID);
+	}
+
 	void ComponentManager::OnEntityRemoved(Entity eID)
 	{
 		m_instance->m_impl->OnEntityRemoved(eID);
@@ -106,13 +142,12 @@ namespace rdt {
 
 	bool ComponentManager::MaxComponentsReached()
 	{
-		return m_impl->m_componentCounter == MAX_COMPONENTS;
+		return m_impl->idCounter == MAX_COMPONENTS;
 	}
 
 	void ComponentManager::RegisterComponentImpl(const char* typeName, IComponentArray* component)
 	{
-		m_impl->m_componentTypes[typeName] = m_impl->m_componentCounter++;
-		m_impl->m_components[typeName] = component;
+		m_impl->RegisterComponent(typeName, component);
 	}
 
 	void* ComponentManager::GetComponentImpl(const char* typeName)

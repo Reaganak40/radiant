@@ -137,6 +137,10 @@ namespace rdt {
 		config.owner = owner;
 
 		EntityManager::AddComponent<EntityConfig>(nID, config);
+
+#ifdef RDT_USE_DEV_TOOLS
+		EntityManager::AddComponent<DebugComponent>(nID);
+#endif
 		
 		return nID;
 	}
@@ -188,6 +192,38 @@ namespace rdt {
 		}
 
 		return GetComponent<EntityConfig>(entity)->owner;
+	}
+
+	void EntityManager::DisableComponent(Entity eID, ComponentID cID)
+	{
+		if (cID < ComponentManager::GetComponentCount()) {
+			auto ptr = ComponentManager::GetComponentByID(cID);
+			if (ptr) {
+				ptr->SetEntityVisible(eID, false);
+			}
+		}
+	}
+
+	void EntityManager::EnableComponent(Entity eID, ComponentID cID)
+	{
+		if (cID < ComponentManager::GetComponentCount()) {
+			auto ptr = ComponentManager::GetComponentByID(cID);
+			if (ptr) {
+				ptr->SetEntityVisible(eID, true);
+			}
+		}
+	}
+
+	bool EntityManager::IsComponentEnabled(Entity eID, ComponentID cID)
+	{
+		if (cID < ComponentManager::GetComponentCount()) {
+			auto ptr = ComponentManager::GetComponentByID(cID);
+			if (ptr) {
+				return !ptr->IsEntityDisabled(eID);
+			}
+		}
+
+		return false;
 	}
 
 	void EntityManager::AddToSignature(Entity eID, ComponentID cID)

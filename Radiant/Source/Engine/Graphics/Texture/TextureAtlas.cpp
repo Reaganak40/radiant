@@ -12,8 +12,8 @@ namespace rdt {
 		: m_definitions(nullptr), m_texture(RDT_NULL_TEXTURE_ID), m_textureWidth(0), m_textureHeight(0)
 	{
 		hasLayout = false;
-		m_tileWidth = 0.0f;
-		m_tileHeight = 0.0f;
+		m_tileWidth = 0;
+		m_tileHeight = 0;
 		m_numRows = 0;
 		m_numCols = 0;
 		m_tile_gap = 0;
@@ -109,8 +109,8 @@ namespace rdt {
 		}
 
 		AtlasProfile res;
-		res.normalizedStartX = (m_tileWidth + m_tile_gap + m_tile_gap) * atlasX / m_textureWidth;
-		res.normalizedStartY = (m_tileHeight + m_tile_gap + m_tile_gap) * atlasY / m_textureHeight;
+		res.normalizedStartX = (m_tileWidth + m_tile_gap + m_tile_gap) * (float)atlasX / m_textureWidth;
+		res.normalizedStartY = (m_tileHeight + m_tile_gap + m_tile_gap) * (float)atlasY / m_textureHeight;
 		res.normalizedWidth = (m_tileWidth + m_tile_gap + m_tile_gap) / m_textureWidth;
 		res.normalizedHeight = (m_tileHeight + m_tile_gap + m_tile_gap) / m_textureHeight;
 

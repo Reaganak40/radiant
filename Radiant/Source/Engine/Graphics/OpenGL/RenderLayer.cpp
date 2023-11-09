@@ -102,7 +102,7 @@ namespace rdt::core {
 		return m_updated_texture_slots;
 	}
 
-	unsigned int RenderLayer::GetBatchCount()
+	size_t RenderLayer::GetBatchCount()
 	{
 		return m_batches.size();
 	}

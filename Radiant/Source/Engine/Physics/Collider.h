@@ -115,12 +115,16 @@ namespace rdt {
 		/*
 			Returns true if the collider with the given ID exists
 		*/
-
 		static bool ColliderExists(ColliderID cpID);
+		
+		/*
+			Gets the name for the colldier with the given ID
+		*/
+		static const char* GetColliderAlias(ColliderID cID);
+		
 		friend class core::Realm;
 		friend class ResourceManager;
 	private:
-
 
 		/*
 			Registers a collider under the given alias, returns the new collider's ID

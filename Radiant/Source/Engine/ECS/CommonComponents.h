@@ -41,7 +41,7 @@ namespace rdt {
 	be accessed in the editor. This should be called in the contstructor
 	of a component child class.
 */
-#define TRACE_COMPONENT_DATA(ComponentName, MemberVariable) \
+#define TRACE_COMPONENT_DATA2(ComponentName, MemberVariable) \
 static bool is_ ## MemberVariable ## _defined = false; \
 if(!is_ ## MemberVariable ## _defined) { \
 	const char* memberName = GET_NAME(MemberVariable);\
@@ -51,6 +51,21 @@ if(!is_ ## MemberVariable ## _defined) { \
 	DEFINE_MEMBER(componentName, memberName, type, offset);\
 	is_ ## MemberVariable ## _defined = true;\
 }
+
+#define TRACE_COMPONENT_DATA3(ComponentName, MemberVariable, MemberVariableType) \
+static bool is_ ## MemberVariable ## _defined = false; \
+if(!is_ ## MemberVariable ## _defined) { \
+	const char* memberName = GET_NAME(MemberVariable);\
+	const char* componentName = typeid(*this).name();\
+	core::SupportedTraceType type = core::ResolveSupportTypeFromString(GET_NAME(MemberVariableType));\
+	size_t offset = offsetof(ComponentName, MemberVariable);\
+	DEFINE_MEMBER(componentName, memberName, type, offset);\
+	is_ ## MemberVariable ## _defined = true;\
+}
+
+#define EXPAND(x) x
+#define GET_MACRO(_1,_2,_3,NAME,...) NAME
+#define TRACE_COMPONENT_DATA(...) EXPAND(GET_MACRO(__VA_ARGS__, TRACE_COMPONENT_DATA3, TRACE_COMPONENT_DATA2)(__VA_ARGS__))
 
 namespace rdt {
 
@@ -69,8 +84,11 @@ namespace rdt {
 			SupportedTraceType_polygon,
 			SupportedTraceType_vec2d,
 			SupportedTraceType_angle,
+			SupportedTraceType_colliderID,
 			SupportedTraceType_NotSupported,
 		};
+
+		SupportedTraceType ResolveSupportTypeFromString(const std::string& type);
 
 		template<typename T>
 		SupportedTraceType ResolveSupportType(const T& queryType)
@@ -156,6 +174,18 @@ namespace rdt {
 		Layer* owner;
 
 		EntityConfig();
+	};
+	
+	/*
+		For entity debugging, highly used by the editor for
+		debug tracing and functionality. DebugComponent is
+		stripped away on release.
+	*/
+	struct RADIANT_API DebugComponent : ECSComponent
+	{
+		bool show_collider_hitbox;
+
+		DebugComponent();
 	};
 
 	/*

@@ -27,6 +27,8 @@ namespace rdt {
 
 		virtual void RemoveData(Entity eID) = 0;
 		virtual void* GetDataPtr(Entity eID) = 0;
+		virtual void SetEntityVisible(Entity eID, bool visible) = 0;
+		virtual bool IsEntityDisabled(Entity eID) = 0;
 	};
 
 	template <typename T>
@@ -34,6 +36,7 @@ namespace rdt {
 	private:
 
 		std::unordered_map<Entity, size_t> m_entity_map;
+		std::unordered_map<Entity, size_t> m_disabled_entites;
 
 		std::vector<Entity> m_entities;
 		std::vector<T> m_data;
@@ -59,19 +62,43 @@ namespace rdt {
 			Entity.
 		*/
 		void RemoveData(Entity eID) override final {
-			if (m_entity_map.find(eID) == m_entity_map.end()) {
-				RDT_CORE_WARN("Component - Could not remove data, entity not found [eID: {}]", eID);
+			if (!HasEntity(eID) && !IsEntityDisabled(eID)) {
 				return;
 			}
 
 			size_t index = m_entity_map.at(eID);
 			m_data.erase(m_data.begin() + index);
 			m_entities.erase(m_entities.begin() + index);
-			m_entity_map.erase(eID);
+
+			if (HasEntity(eID)) {
+				m_entity_map.erase(eID);
+			}
+			else if (IsEntityDisabled(eID)) {
+				m_disabled_entites.erase(eID);
+			}
+
 
 			// Update the data index location of all entities using this component
 			for (size_t i = index; i < m_entities.size(); i++) {
 				m_entity_map.at(m_entities[i]) = i;
+			}
+		}
+
+		/*
+			Enabled/Disables the entity, determining its data access to systems. 
+		*/
+		void SetEntityVisible(Entity eID, bool visible) override final {
+			if (!visible) {
+				if (HasEntity(eID)) {
+					m_disabled_entites[eID] = m_entity_map.at(eID);
+					m_entity_map.erase(eID);
+				}
+			}
+			else {
+				if (IsEntityDisabled(eID)) {
+					m_entity_map[eID] = m_disabled_entites.at(eID);
+					m_disabled_entites.erase(eID);
+				}
 			}
 		}
 
@@ -83,13 +110,20 @@ namespace rdt {
 			return m_entity_map.find(eID) != m_entity_map.end();
 		}
 
+		bool IsEntityDisabled(Entity eID) override final {
+			return m_disabled_entites.find(eID) != m_disabled_entites.end();
+		}
+
 		void* GetDataPtr(Entity eID) override final {
 
-			if (!HasEntity(eID)) {
-				return nullptr;
+			if (HasEntity(eID)) {
+				return &m_data[m_entity_map.at(eID)];
+			}
+			else if (IsEntityDisabled(eID)) {
+				return &m_data[m_disabled_entites.at(eID)];
 			}
 
-			return &m_data[m_entity_map.at(eID)];
+			return nullptr;
 		}
 	};
 	// ====================================================================
@@ -141,7 +175,6 @@ namespace rdt {
 			return m_instance->GetComponentIDImpl(typeName);
 		}
 
-
 		/*
 			Updates the provided signature to include the component T
 		*/
@@ -168,11 +201,22 @@ namespace rdt {
 		*/
 		static const char* GetComponenentName(ComponentID cID);
 
+		/*
+			Returns true if the given component name is for a component that is hidden from the client.
+		*/
+		static bool IsHiddenComponent(const std::string& name);
+
+		/*
+			Returns the number of components registered to the manager.
+		*/
+		static size_t GetComponentCount();
+
 		friend class EntityManager;
 		friend class System;
 		friend class core::Realm;
 
 	private:
+
 		template<typename T>
 		static void AddToComponent(Entity eID, const T& nData)
 		{
@@ -209,6 +253,12 @@ namespace rdt {
 
 			return (Component<T>*)m_instance->GetComponentImpl(typeName);
 		}
+
+		/*
+			Returns the base pointer of a component that matches the componentID,
+			returns nullptr otherwise.
+		*/
+		static IComponentArray* GetComponentByID(ComponentID cID);
 
 		/*
 			Removes this entity from all components

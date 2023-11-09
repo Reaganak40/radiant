@@ -12,6 +12,14 @@
 #include "ECSTypes.h"
 #include "ComponentManager.h"
 
+#define RDT_NULL_ENTITY_ID 0
+
+#ifdef RDT_USE_DEV_TOOLS
+	#define RDT_NUM_HIDDEN_COMPONENTS 2
+#else
+	#define RDT_NUM_HIDDEN_COMPONENTS 1
+#endif
+
 namespace rdt {
 	class Layer;
 
@@ -90,7 +98,8 @@ namespace rdt {
 		}
 
 		/*
-			Adds a componenet to this entity, modifying its signature
+			Adds a componenet to this entity, modifying its signature,
+			stores the component data in the component manager.
 		*/
 		template<typename T>
 		static void AddComponent(Entity eID, const T& nData = T())
@@ -107,6 +116,10 @@ namespace rdt {
 			ComponentManager::AddToComponent<T>(eID, nData);
 		}
 
+		/*
+			Removes a component from this entity, modifying its signature,
+			and removing its component data from the component manager.
+		*/
 		template<typename T>
 		static void RemoveComponent(Entity eID)
 		{
@@ -160,6 +173,22 @@ namespace rdt {
 			or nullptr if it is not owned by anyone.
 		*/
 		static Layer* GetEntityOwner(Entity entity);
+
+		/*
+			Maintains the entity signature but disables the use
+			of the entity's component data.
+		*/
+		static void DisableComponent(Entity eID, ComponentID cID);
+
+		/*
+			Reintroduced this component, and restoring data access.
+		*/
+		static void EnableComponent(Entity eID, ComponentID cID);
+
+		/*
+			Returns true if the given component is in use.
+		*/
+		static bool IsComponentEnabled(Entity eID, ComponentID cID);
 
 	private:
 		/*

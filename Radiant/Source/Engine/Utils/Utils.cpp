@@ -127,7 +127,7 @@ namespace rdt {
 
         float RADIANT_API GetDistance(const Vec2f& pointA, const Vec2f& pointB)
         {
-            return sqrt(pow(pointB.x - pointA.x, 2) + pow(pointB.y - pointA.y, 2));
+            return sqrtf(pow(pointB.x - pointA.x, 2) + pow(pointB.y - pointA.y, 2));
         }
 
         Vec2d GetManhattanDistance(const Vec2d& pointA, const Vec2d& pointB)
@@ -159,8 +159,8 @@ namespace rdt {
 
         void RotatePoint(const Vec2f& origin, Vec2f& point, const float dr)
         {
-            double magnitude = GetDistance(origin, point);
-            double theta = GetRotation(origin, point) + dr;
+            float magnitude = GetDistance(origin, point);
+            float theta = GetRotation(origin, point) + dr;
             point.x = origin.x + (magnitude * std::cos(theta));
             point.y = origin.y + (magnitude * std::sin(theta));
         }

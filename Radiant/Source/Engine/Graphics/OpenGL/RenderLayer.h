@@ -88,7 +88,7 @@ namespace rdt::core {
 		/*
 			Returns the current number of batched render units.
 		*/
-		unsigned int GetBatchCount();
+		size_t GetBatchCount();
 
 		/*
 			Gets the compiled render units.

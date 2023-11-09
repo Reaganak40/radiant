@@ -107,6 +107,17 @@ struct rdt::ColliderManager::Impl {
 		m_profiles[nID] = profile;
 		return nID;
 	}
+
+	const char* GetColliderAlias(ColliderID cID)
+	{
+		for (auto& [name, id] : aliasToID) {
+			if (id == cID) {
+				return name.c_str();
+			}
+		}
+
+		return "NameNotFound";
+	}
 };
 // ============================================================================
 rdt::ColliderManager::Impl* rdt::ColliderManager::m_impl = nullptr;
@@ -137,6 +148,11 @@ rdt::ColliderID rdt::ColliderManager::GetColliderID(const std::string& alias)
 bool rdt::ColliderManager::ColliderExists(ColliderID cpID)
 {
 	return m_impl->ColliderExists(cpID);
+}
+
+const char* rdt::ColliderManager::GetColliderAlias(ColliderID cID)
+{
+	return m_impl->GetColliderAlias(cID);
 }
 
 rdt::ColliderID rdt::ColliderManager::RegisterColider(const std::string& name)

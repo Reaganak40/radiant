@@ -143,6 +143,10 @@ namespace rdt {
 
 		// Add Common Components
 		ComponentManager::RegisterComponent<EntityConfig>();
+
+#ifdef RDT_USE_DEV_TOOLS
+		ComponentManager::RegisterComponent<DebugComponent>();
+#endif
 		ComponentManager::RegisterComponent<Sprite>();
 		ComponentManager::RegisterComponent<Transform>();
 		ComponentManager::RegisterComponent<RigidBody2D>();
