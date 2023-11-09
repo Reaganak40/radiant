@@ -19,6 +19,7 @@ namespace rdt {
 	using RealmID = unsigned int;
 	using ColliderID = unsigned int;
 
+	enum PhysicalProperties;
 	class Polygon;
 	class Layer;
 }
@@ -195,6 +196,7 @@ namespace rdt {
 	{
 		RealmID realmID;
 		ColliderID colliderID;
+		PhysicalProperties physicalProperties;
 
 		bool use_gravity;
 		Vec2d velocity;
@@ -216,6 +218,12 @@ namespace rdt {
 			Gets the dx/dy of the given deltaTime, based on velocity.
 		*/
 		Vec2d GetChangeInPosition(const float deltaTime);
+
+		/*
+			Returns true if the provided physical property matches the
+			physical properties of this rigidbody in any way.
+		*/
+		bool HasProperties(PhysicalProperties propertyQuery);
 	};
 
 	/*

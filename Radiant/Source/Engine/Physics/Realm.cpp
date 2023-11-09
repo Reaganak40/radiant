@@ -101,7 +101,9 @@ namespace rdt::core {
 
         // Do final translation
         for (auto entity : m_entities) {
-            transforms->GetData(entity).Translate(deltaTime, rigidbodies->GetData(entity).velocity);
+            if (!getCollisionObject(entity).m_object_moved) {
+                transforms->GetData(entity).Translate(deltaTime, rigidbodies->GetData(entity).velocity);
+            }
         }
     }
 

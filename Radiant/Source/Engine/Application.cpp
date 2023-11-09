@@ -11,7 +11,6 @@
 #include "Gui/GuiManager.h"
 #include "OOComponents/Scene/SceneManager.h"
 #include "Graphics/Model.h"
-#include "Physics/Ptag.h"
 #include "Utils/Timestep.h"
 #include "ResourceManager/ResourceManager.h"
 
@@ -66,7 +65,6 @@ namespace rdt {
 		ResourceManager::Destroy();
 		SceneManager::Destroy();
 		Physics::Destroy();
-		core::PtagManager::Destroy();
 
 		RemoveECS();
 

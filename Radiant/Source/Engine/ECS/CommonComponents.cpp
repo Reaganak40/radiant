@@ -90,6 +90,7 @@ namespace rdt {
 
 		realmID = RDT_NULL_REALM_ID;
 		colliderID = RDT_NULL_COLLIDER_ID;
+		physicalProperties = PhysicalProperty_None;
 
 		use_gravity = false;
 		mass = 1;
@@ -110,6 +111,10 @@ namespace rdt {
 	Vec2d RigidBody2D::GetChangeInPosition(const float deltaTime)
 	{
 		return velocity * deltaTime;
+	}
+	bool RigidBody2D::HasProperties(PhysicalProperties propertyQuery)
+	{
+		return bool(physicalProperties & propertyQuery);
 	}
 	// ===============================================================================
 	Renderable::Renderable()

@@ -3,6 +3,7 @@
 #include "Utils/MathTypes.h"
 #include "Utils/Utils.h"
 #include "Utils/Input.h"
+#include "Physics.h"
 
 namespace rdt::core {
 	
@@ -189,8 +190,25 @@ namespace rdt::core {
 
 		if (RayVsRect(start, ray, sp, ep, contactPoint, contactNormal, contactTime)) {
 
-			source.rigidBody->velocity += contactNormal * Vabs(source.rigidBody->velocity) * (1 - contactTime);
-			source.m_collision_detected = true;
+			if (source.rigidBody->HasProperties(PhysicalProperty_Bouncy)) {
+				source.transform->Translate(deltaTime * contactTime, source.rigidBody->velocity);
+
+				if (abs(contactNormal.x) > 0) {
+					source.rigidBody->velocity.x *= -1.0;
+					source.rigidBody->acceleration.x *= -1.0;
+				}
+				if (abs(contactNormal.y) > 0) {
+					source.rigidBody->velocity.y *= -1.0;
+					source.rigidBody->acceleration.y *= -1.0;
+				}
+
+				source.transform->Translate(deltaTime * (1 - contactTime), source.rigidBody->velocity);
+				source.m_object_moved = true;
+			}
+			else {
+				source.rigidBody->velocity += contactNormal * Vabs(source.rigidBody->velocity) * (1 - contactTime);
+			}
+
 			return true;
 		}
 

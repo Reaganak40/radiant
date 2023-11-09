@@ -14,6 +14,35 @@ namespace rdt {
 namespace rdt {
 	using RealmID = unsigned int;
 
+	// =======================================================================================
+	enum PhysicalProperties {
+		PhysicalProperty_None = 0,	   // No special physical properties
+		PhysicalProperty_NoCollision = (1 << 0), // Do not detect or resolve any collisions
+		PhysicalProperty_Bouncy = (1 << 1), // When colliding with an object, bounce back.
+		PhysicalProperty_DontResolve = (1 << 2), // Detect but do not resolve collisions
+	};
+
+	inline PhysicalProperties operator|(PhysicalProperties a, PhysicalProperties b)
+	{
+		return static_cast<PhysicalProperties>(static_cast<int>(a) | static_cast<int>(b));
+	}
+
+	inline PhysicalProperties& operator |=(PhysicalProperties& a, PhysicalProperties b)
+	{
+		return a = a | b;
+	}
+
+	inline PhysicalProperties operator^(PhysicalProperties a, PhysicalProperties b)
+	{
+		return static_cast<PhysicalProperties>(static_cast<int>(a) ^ static_cast<int>(b));
+	}
+
+	inline PhysicalProperties operator^=(PhysicalProperties& a, PhysicalProperties b)
+	{
+		return a = a ^ b;
+	}
+	// =======================================================================================
+
 	class RADIANT_API Physics {
 	private:
 		struct Impl;

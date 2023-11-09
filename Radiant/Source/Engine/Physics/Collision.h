@@ -22,7 +22,7 @@ namespace rdt::core {
 		bool isRect = false;
 		bool isAxisAligned = false;
 		bool resolveCollision = false;
-		bool m_collision_detected = false;
+		bool m_object_moved = false;
 	};
 	class Collision {
 	private:

@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "Physics.h"
-#include "Ptag.h"
 #include "Collider.h"
 #include "Collision.h"
 #include "Utils/Input.h"
@@ -73,7 +72,6 @@ namespace rdt {
     {
         Destroy();
 
-        core::PtagManager::Initialize();
         ColliderManager::Initialize();
 
         m_impl = new Physics::Impl;
@@ -87,7 +85,6 @@ namespace rdt {
         }
 
         ColliderManager::Destroy();
-        core::PtagManager::Destroy();
     }
 
     void Physics::OnUpdate(const float deltaTime)

@@ -59,6 +59,7 @@ TestLayer::TestLayer(const std::string& alias)
 		rigidbody->realmID = mRealm;
 		rigidbody->colliderID = rectCollider;
 		rigidbody->use_gravity = true;
+		rigidbody->physicalProperties |= PhysicalProperty_Bouncy;
 	}
 }
 
