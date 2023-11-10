@@ -40,6 +40,11 @@ namespace rdt::core {
 		if (type == "ModelID") {
 			return SupportedTraceType_modelID;
 		}
+
+		if (type == "TextureID") {
+			return SupportedTraceType_textureID;
+		}
+
 		return SupportedTraceType_NotSupported;
 	}
 }
@@ -133,7 +138,7 @@ namespace rdt {
 	{
 		TRACE_COMPONENT_DATA(Renderable, fillColor);
 		TRACE_COMPONENT_DATA(Renderable, layer);
-		TRACE_COMPONENT_DATA(Renderable, texture);
+		TRACE_COMPONENT_DATA(Renderable, texture, TextureID);
 
 		layer = 0;
 		fillColor = BLACK;

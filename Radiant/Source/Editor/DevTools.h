@@ -4,6 +4,7 @@
 namespace rdt {
 	struct DebugComponent;
 	using Entity = unsigned int;
+	using glTextureID = unsigned int;
 }
 
 #include "OOComponents/Scene/Layer.h"
@@ -245,6 +246,7 @@ namespace rdt::core {
 		static bool* GetCheckboxSelection(const std::string& checkbox_label);
 		static DebugComponent* GetDebugComponent(Entity entity);
 		static void ApplyGuiConfig(PanelConfig& config);
+		static glTextureID GetImGuiTextureData(TextureID tID, int& imageWidth, int& imageHeight);
 		// ===========================================================
 
 	private:

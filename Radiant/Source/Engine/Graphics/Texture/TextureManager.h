@@ -19,10 +19,9 @@ namespace rdt {
 
 	namespace core {
 		class RendererGL;
-		class RenderLayer;
 		struct Vertex;
-		struct Mesh;
 		class glDrawCall;
+		class Editor;
 	}
 }
 
@@ -66,6 +65,11 @@ namespace rdt {
 		static TextureID GetTextureID(const std::string& name);
 
 		/*
+			Returns the name of the texture registered with this textureID
+		*/
+		static const char* GetTextureAlias(TextureID tID);
+
+		/*
 			Returns true if a texture with the provided ID exists.
 		*/
 		static bool TextureExists(TextureID tID);
@@ -92,9 +96,8 @@ namespace rdt {
 		friend class AnimationManager;
 		friend class TextureAtlas;
 		friend class core::RendererGL;
-		friend class core::RenderLayer;
-		friend struct core::Mesh;
 		friend class core::glDrawCall;
+		friend class core::Editor;
 	private:
 		
 		/*
@@ -110,7 +113,7 @@ namespace rdt {
 		/*
 			Returns the current texture slot map configuration
 		*/
-		static TextureSlotMap& GetTextureSlots();
+		static TextureSlotMap& GetTextureSlotMap();
 
 		/*
 			Binds the texture indicated by the provided ID to a texture slot.
@@ -119,7 +122,8 @@ namespace rdt {
 		static bool BindTexture(TextureID tID);
 
 		/*
-			Gets the texture slot this texture is bound to.
+			Gets the texture slot for a texure through its textureID.
+			Returns RDT_NULL_TEXTURE_SLOT if not found.
 		*/
 		static TextureSlot GetTextureSlot(TextureID tID);
 

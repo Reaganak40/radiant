@@ -19,14 +19,15 @@ namespace rdt {
 		// Texture Atlases
 		std::unordered_map<TextureID, std::shared_ptr<TextureAtlas>> m_atlases;
 
-		std::array<unsigned int, MAX_TEXTURES> m_texture_slots;
+		// OpenGL texture slot map
+		TextureSlotMap m_texture_slots;
 		TextureSlot m_next_slot;
 
 		TextureID idCounter = 0;
 
 		Impl()
 		{
-			m_texture_slots.fill(UNASSIGNED_TEXTURE);
+			m_texture_slots.fill(RDT_NULL_TEXTURE_SLOT);
 			m_next_slot = 2;
 			AddNoneTexture();
 		}
@@ -53,8 +54,8 @@ namespace rdt {
 			m_textures[RDT_NULL_TEXTURE_ID];
 			m_textures.at(RDT_NULL_TEXTURE_ID).SetToNone();
 
-			m_textures.at(RDT_NULL_TEXTURE_ID).Bind(NONE_TEXTURE);
-			m_texture_slots[NONE_TEXTURE] = NONE_TEXTURE;
+			m_textures.at(RDT_NULL_TEXTURE_ID).Bind(RDT_NONE_TEXTURE);
+			m_texture_slots[RDT_NONE_TEXTURE] = RDT_NONE_TEXTURE;
 		}
 
 		TextureID LoadTextureFromPNG(const std::string& name, const std::string& filepath)
@@ -86,6 +87,17 @@ namespace rdt {
 
 			return aliasToID.at(name);
 		}
+
+		const char* GetTextureAlias(TextureID tID)
+		{
+			for (auto& [name, id] : aliasToID) {
+				if (id == tID) {
+					return name.c_str();
+				}
+			}
+			return "NoNameFound";
+		}
+
 
 		Texture& GetTexure(TextureID tID)
 		{
@@ -126,7 +138,7 @@ namespace rdt {
 		TextureSlot GetNextSlot() {
 
 			unsigned int checkStart = m_next_slot;
-			while (m_texture_slots[m_next_slot] != UNASSIGNED_TEXTURE) {
+			while (m_texture_slots[m_next_slot] != RDT_NULL_TEXTURE_SLOT) {
 				m_next_slot++;
 
 				if (m_next_slot >= MAX_TEXTURES) {
@@ -134,7 +146,7 @@ namespace rdt {
 				}
 
 				if (m_next_slot == checkStart) {
-					return UNASSIGNED_TEXTURE;
+					return RDT_NULL_TEXTURE_SLOT;
 				}
 			}
 
@@ -153,15 +165,15 @@ namespace rdt {
 				return false;
 			}
 
-			if (UNASSIGNED_TEXTURE == m_textures.at(tID).CurrentTextureSlot()) {
+			if (RDT_NULL_TEXTURE_SLOT == m_textures.at(tID).CurrentTextureSlot()) {
 				TextureSlot nSlot = GetNextSlot();
 
-				if (nSlot == UNASSIGNED_TEXTURE) {
+				if (nSlot == RDT_NULL_TEXTURE_SLOT) {
 					return false;
 				}
 
 				m_texture_slots[nSlot] = nSlot;
-				m_textures.at(tID).Bind(GetNextSlot());
+				m_textures.at(tID).Bind(nSlot);
 				return true;
 			}
 			return false;
@@ -170,7 +182,7 @@ namespace rdt {
 		TextureSlot GetTextureSlot(TextureID tID)
 		{
 			if (!TextureExists(tID)) {
-				return UNASSIGNED_TEXTURE;
+				return RDT_NULL_TEXTURE_SLOT;
 			}
 
 			return m_textures.at(tID).CurrentTextureSlot();
@@ -204,6 +216,11 @@ namespace rdt {
 		return m_impl->GetTextureID(name);
 	}
 
+	const char* TextureManager::GetTextureAlias(TextureID tID)
+	{
+		return m_impl->GetTextureAlias(tID);
+	}
+
 	bool TextureManager::TextureExists(TextureID tID)
 	{
 		return m_impl->TextureExists(tID);
@@ -234,7 +251,7 @@ namespace rdt {
 		return m_impl->GetAlias(tID);
 	}
 
-	std::array<unsigned int, MAX_TEXTURES>& TextureManager::GetTextureSlots()
+	std::array<unsigned int, MAX_TEXTURES>& TextureManager::GetTextureSlotMap()
 	{
 		return m_impl->m_texture_slots;
 	}

@@ -62,25 +62,32 @@ namespace rdt {
 			Entity.
 		*/
 		void RemoveData(Entity eID) override final {
-			if (!HasEntity(eID) && !IsEntityDisabled(eID)) {
-				return;
-			}
 
-			size_t index = m_entity_map.at(eID);
-			m_data.erase(m_data.begin() + index);
-			m_entities.erase(m_entities.begin() + index);
-
+			size_t index = 0;
 			if (HasEntity(eID)) {
+				size_t index = m_entity_map.at(eID);
 				m_entity_map.erase(eID);
 			}
 			else if (IsEntityDisabled(eID)) {
+				size_t index = m_disabled_entites.at(eID);
 				m_disabled_entites.erase(eID);
 			}
+			else {
+				return;
+			}
 
+			m_data.erase(m_data.begin() + index);
+			m_entities.erase(m_entities.begin() + index);
 
 			// Update the data index location of all entities using this component
 			for (size_t i = index; i < m_entities.size(); i++) {
-				m_entity_map.at(m_entities[i]) = i;
+
+				if (HasEntity(m_entities[i])) {
+					m_entity_map.at(m_entities[i]) = i;
+				}
+				else {
+					m_disabled_entites.at(m_entities[i]) = i;
+				}
 			}
 		}
 

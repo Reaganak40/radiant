@@ -7,9 +7,11 @@ using namespace rdt;
 Sandbox::Sandbox()
 {
 	RegisterToMessageBus("Sandbox");
+
+	TextureManager::LoadTextureFromPNG("bullet", "Resources/bullet.png");
+
 	AddLayer(new Sandbox2D);
 	AddLayer(new TestLayer);
-
 }
 
 Sandbox::~Sandbox()

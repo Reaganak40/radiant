@@ -86,6 +86,7 @@ namespace rdt {
 			SupportedTraceType_angle,
 			SupportedTraceType_colliderID,
 			SupportedTraceType_modelID,
+			SupportedTraceType_textureID,
 			SupportedTraceType_bool,
 			SupportedTraceType_NotSupported,
 		};

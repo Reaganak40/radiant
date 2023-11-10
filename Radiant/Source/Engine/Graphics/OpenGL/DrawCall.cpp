@@ -11,6 +11,7 @@ rdt::core::glDrawCall::glDrawCall()
 	vboID = RDT_NULL_VERTEX_BUFFER_ID;
 	iboID = RDT_NULL_INDEX_BUFFER_ID;
 	shaderID = RDT_NULL_SHADER_ID;
+	m_slot = RDT_NULL_TEXTURE_SLOT;
 
 	m_VBO = nullptr;
 	m_IBO = nullptr;
@@ -19,10 +20,6 @@ rdt::core::glDrawCall::glDrawCall()
 }
 rdt::core::glDrawCall::~glDrawCall()
 {
-	if (m_VBO != nullptr) {
-		delete m_VBO;
-		delete m_IBO;
-	}
 }
 
 void rdt::core::glDrawCall::InitBuffers()
@@ -30,8 +27,8 @@ void rdt::core::glDrawCall::InitBuffers()
 	if (m_VBO != nullptr) {
 		return;
 	}
-	m_VBO = new VertexBuffer;
-	m_IBO = new IndexBuffer;
+	m_VBO = std::make_shared<VertexBuffer>();
+	m_IBO = std::make_shared<IndexBuffer>();
 	vboID = m_VBO->GetID();
 	iboID = m_IBO->GetID();
 }
@@ -60,7 +57,7 @@ void rdt::core::glDrawCall::SetShader(ShaderID nShader)
 
 void rdt::core::glDrawCall::AssignTexture(TextureID texture)
 {
-	m_slot = TextureManager::GetTexture(texture).CurrentTextureSlot();
+	m_slot = TextureManager::GetTextureSlot(texture);
 	m_texture = texture;
 }
 
@@ -147,7 +144,7 @@ void rdt::core::DrawCallAllocator::AddMesh(const Mesh& mesh)
 
 	// Add mesh to layer.texture draw call
 	for (auto& drawCall: m_layers.at(mesh.layer).m_draw_calls) {
-		if (drawCall.GetAssignedTexture() == mesh.layer) {
+		if (drawCall.GetAssignedTexture() == mesh.textureID) {
 			drawCall.AddMesh(mesh);
 			return;
 		}

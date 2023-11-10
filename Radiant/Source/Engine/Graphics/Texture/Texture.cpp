@@ -10,7 +10,7 @@ namespace rdt {
 		: m_ID(0), m_image_height(0), m_image_width(0), m_bits_per_pixel(0)
 	{
 		glGenTextures(1, &m_ID);
-		m_texture_slot = UNASSIGNED_TEXTURE;
+		m_texture_slot = RDT_NULL_TEXTURE_SLOT;
 	}
 
 	Texture::~Texture()

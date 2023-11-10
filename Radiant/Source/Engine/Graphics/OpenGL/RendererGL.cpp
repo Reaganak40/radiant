@@ -473,7 +473,7 @@ namespace rdt::core {
     void RendererGL::UpdateTextureUniforms()
     {
         SetShader(m_shaders[0]->GetID());
-        m_shaders[0]->SetUniform<std::array<TextureID, MAX_TEXTURES>>("uTextures", TextureManager::GetTextureSlots());
+        m_shaders[0]->SetUniform<std::array<TextureID, MAX_TEXTURES>>("uTextures", TextureManager::GetTextureSlotMap());
     }
     void RendererGL::StartImGuiFrame()
     {

@@ -122,6 +122,17 @@ TestLayer::TestLayer(const std::string& alias)
 		rigidbody->use_gravity = true;
 		rigidbody->physicalProperties |= PhysicalProperty_Bouncy;
 	}
+
+	{
+		Entity entity = RegisterEntity(new RectObject(1200, 200, 100, 100, WHITE), "bullet");
+		auto rigidbody = EntityManager::GetComponent<RigidBody2D>(entity);
+		rigidbody->realmID = mRealm;
+		rigidbody->colliderID = rectCollider;
+		rigidbody->use_gravity = false;
+
+		auto renderable = EntityManager::GetComponent<Renderable>(entity);
+		renderable->texture = TextureManager::GetTextureID("bullet");
+	}
 }
 
 TestLayer::~TestLayer()

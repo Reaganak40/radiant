@@ -28,8 +28,8 @@ namespace rdt::core {
 		VBO_ID vboID;
 		IBO_ID iboID;
 		ShaderID shaderID;
-		VertexBuffer* m_VBO;
-		IndexBuffer* m_IBO;
+		std::shared_ptr<VertexBuffer> m_VBO;
+		std::shared_ptr<IndexBuffer> m_IBO;
 
 		TextureID m_texture;
 		TextureSlot m_slot;
@@ -96,7 +96,7 @@ namespace rdt::core {
 	};
 	class DrawCallAllocator {
 	private:
-		std::unordered_map<unsigned int, glDrawCallBucket> m_layers;
+		std::map<unsigned int, glDrawCallBucket> m_layers;
 		std::vector<glDrawCall*> m_draw_order;
 		ShaderID m_default_shader;
 	public:

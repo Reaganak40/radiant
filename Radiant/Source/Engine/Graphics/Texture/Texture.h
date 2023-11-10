@@ -9,8 +9,8 @@
 *******************************************************************/
 #pragma once
 
-#define UNASSIGNED_TEXTURE 125
-#define NONE_TEXTURE 1
+#define RDT_NULL_TEXTURE_SLOT 125
+#define RDT_NONE_TEXTURE 1
 
 namespace rdt {
 	using TextureSlot = unsigned int;

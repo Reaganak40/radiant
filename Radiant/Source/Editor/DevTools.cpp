@@ -7,6 +7,9 @@
 #include "Physics/Physics.h"
 #include "Physics/Collider.h"
 #include "Graphics/Model.h"
+#include "Graphics/Texture/TextureManager.h"
+#include "Graphics/Texture/Texture.h"
+
 
 #include "Utils/Utils.h"
 
@@ -765,6 +768,27 @@ namespace rdt::core {
 			}
 		}
 		
+		void ShowSetTexturePanel(bool* isOpen) {
+			char texSelectionLabel[60];
+			sprintf_s(texSelectionLabel, 60, "Set Texture for Entity [id:%d] ###SetTexturePanel", selectedEntity);
+
+			ImGui::SetNextWindowSize(ImVec2(300, 350), ImGuiCond_Appearing);
+
+			ImGuiWindowFlags setTexturePanelFlags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar;
+			if (ImGui::Begin(texSelectionLabel, isOpen, setTexturePanelFlags)) {
+				if (ImGui::BeginMenuBar()) {
+					if (ImGui::BeginMenu("File")) {
+						if (ImGui::MenuItem("Load Texture (.png)")) {
+						}
+						ImGui::EndMenu();
+					}
+
+					ImGui::EndMenuBar();
+				}
+			}
+			ImGui::End();
+		}
+
 		void RenderEditTool(const char* name, void* data, const core::TraceData& info) {
 			
 			auto next_sub_row = []() {
@@ -790,6 +814,51 @@ namespace rdt::core {
 			data = (unsigned char*)data + info.offset;
 
 			switch (info.type) {
+			case SupportedTraceType_textureID:
+			{
+				title("TextureID", name);
+
+				
+				static bool showTextureSelection = false;
+
+				TextureID texture = *((TextureID*)data);
+				const char* texture_name = TextureManager::GetTextureAlias(texture);
+				ImGui::Text("Using:");
+				ImGui::SameLine();
+				ImGui::PushFont(Editor::m_fonts[NunitoSans_Bold][18]);
+				ImGui::Text(texture_name);
+				ImGui::PopFont();
+				
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - Editor::GetButtonWidth("Browse        "));
+				if (ImGui::Button("Browse        ")) {
+					showTextureSelection = true;
+				}
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() - ImGui::CalcTextSize("C").x - ImGui::GetStyle().FramePadding.x - ImGui::GetStyle().ItemSpacing.x * 2);
+				Editor::AddIcon(ICON_FK_FILE_IMAGE_O);
+
+				next_sub_row();
+
+				// Show what texture looks like
+				Vec2i img_size = Vec2i::Zero();
+				glTextureID glTexID = Editor::GetImGuiTextureData(texture, img_size.x, img_size.y);
+				img_size.y = ((ImGui::GetContentRegionAvail().x - 2) * img_size.y) / img_size.x;
+				img_size.x = ImGui::GetContentRegionAvail().x - 2;
+
+				ImVec2 uv_min = ImVec2(0.0f, 0.0f);                 // Top-left
+				ImVec2 uv_max = ImVec2(1.0f, 1.0f);                 // Lower-right
+				ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);   // No tint
+				ImVec4 border_col = ImGui::GetStyleColorVec4(ImGuiCol_Border);
+
+				ImGui::Image((void*)(intptr_t)glTexID, ImVec2(img_size.x, img_size.y), uv_min, uv_max, tint_col, border_col);
+				
+				if (showTextureSelection) {
+					ShowSetTexturePanel(&showTextureSelection);
+				}
+			}
+			break;
 			case SupportedTraceType_bool:
 			{
 				title("Bool", name);
@@ -1900,6 +1969,18 @@ namespace rdt::core {
 				RDT_CORE_WARN("Could not find theme associated with id: {}", themeVal);
 			}
 		}
+	}
+
+	glTextureID Editor::GetImGuiTextureData(TextureID tID, int& imageWidth, int& imageHeight)
+	{
+		if (!TextureManager::TextureExists(tID)) {
+			return 0;
+		}
+
+		auto& tex = TextureManager::GetTexture(tID);
+		imageWidth = tex.GetImageWidth();
+		imageHeight = tex.GetImageHeight();
+		return tex.GetID();
 	}
 
 	void Editor::OnFirstRender()
