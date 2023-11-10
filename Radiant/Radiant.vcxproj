@@ -118,6 +118,7 @@
     <ClInclude Include="Source\Engine\Graphics\Animation.h" />
     <ClInclude Include="Source\Engine\Graphics\AnimationSystem.h" />
     <ClInclude Include="Source\Engine\Graphics\Model.h" />
+    <ClInclude Include="Source\Engine\Graphics\OpenGL\DrawCall.h" />
     <ClInclude Include="Source\Engine\Graphics\Texture\TextureAtlas.h" />
     <ClInclude Include="Source\Engine\OOComponents\OOComponent.h" />
     <ClInclude Include="Source\Engine\Core.h" />
@@ -138,7 +139,6 @@
     <ClInclude Include="Source\Engine\Graphics\OpenGL\GeoMode.h" />
     <ClInclude Include="Source\Engine\Graphics\OpenGL\IndexBuffer.h" />
     <ClInclude Include="Source\Engine\Graphics\OpenGL\RenderCache.h" />
-    <ClInclude Include="Source\Engine\Graphics\OpenGL\RenderLayer.h" />
     <ClInclude Include="Source\Engine\Graphics\OpenGL\RendererGL.h" />
     <ClInclude Include="Source\Engine\Graphics\OpenGL\Shader.h" />
     <ClInclude Include="Source\Engine\Graphics\OpenGL\VertexArray.h" />
@@ -256,6 +256,7 @@
     <ClCompile Include="Source\Engine\Graphics\AnimationSystem.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Mesh.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Model.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\OpenGL\DrawCall.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Texture\TextureAtlas.cpp" />
     <ClCompile Include="Source\Engine\OOComponents\OOComponent.cpp" />
     <ClCompile Include="Source\Engine\OOComponents\GameObject\GameObject.cpp" />
@@ -270,7 +271,6 @@
     <ClCompile Include="Source\Engine\Graphics\OpenGL\GeoMode.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\IndexBuffer.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\RenderCache.cpp" />
-    <ClCompile Include="Source\Engine\Graphics\OpenGL\RenderLayer.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\RendererGL.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\Shader.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\VertexArray.cpp" />

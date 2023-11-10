@@ -20,9 +20,10 @@ namespace rdt {
 #include "IndexBuffer.h"
 #include "FrameBuffer.h"
 #include "Shader.h"
-#include "RenderLayer.h"
 #include "GeoMode.h"
 #include "RenderCache.h"
+
+#include "DrawCall.h"
 
 #include "Graphics/Mesh.h"
 #include "Utils/Color.h"
@@ -71,9 +72,6 @@ namespace rdt::core {
 		// Use only one VAO
 		core::VertexArray* m_vertex_array;
 
-		// Each layer contains render units (specified draw calls).
-		std::map<unsigned int, RenderLayer> m_layers;
-
 		// Keep shaders independent from render units.
 		std::vector<Shader*> m_shaders;
 
@@ -96,6 +94,8 @@ namespace rdt::core {
 		// For ImGui instances.
 		std::vector<GuiTemplate*> m_GUIs;
 		bool m_imgui_newFrameCalled;
+
+		DrawCallAllocator m_drawCallAllocator;
 
 	public:
 		RendererGL();
@@ -123,6 +123,9 @@ namespace rdt::core {
 		
 		/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 		void RenderImpl() override final;
+		void MeshToDrawCalls();
+		void DrawContext();
+		void Draw(glDrawCall* drawCall);
 		/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 		void OnEndFrameImpl() override final;
@@ -140,7 +143,6 @@ namespace rdt::core {
 		/* ***********************************************
 			    OpenGL Rendering Helper Functions
 		** ***********************************************/
-		void DrawContext();
 
 		void SetFBO(FBO_ID fbo);
 		void SetVBO(VBO_ID vbo);
@@ -149,7 +151,6 @@ namespace rdt::core {
 		void SetMode(GeoMode mode);
 		void SetViewport(const glViewportData& nViewport);
 
-		void AddRenderLayer(unsigned int layer);
 		void AddDefaultShader();
 		void UpdateTextureUniforms();
 		void StartImGuiFrame();

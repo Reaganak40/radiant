@@ -12,7 +12,6 @@
 
 // Forward Declarations
 namespace rdt {
-	using TextureID = unsigned int;   // Unique Identifier for a Texture
 	typedef unsigned int TextureSlot;
 	struct AtlasProfile;
 	class TextureAtlas;
@@ -23,14 +22,20 @@ namespace rdt {
 		class RenderLayer;
 		struct Vertex;
 		struct Mesh;
+		class glDrawCall;
 	}
 }
 
 // Indicates that no texture is identified with this ID.
 #define RDT_NULL_TEXTURE_ID 0
+
+// Max textures supported at a given time
 #define MAX_TEXTURES 30
 
 namespace rdt {
+	
+	using TextureID = unsigned int;   // Unique Identifier for a Texture
+	using TextureSlotMap = std::array<unsigned int, MAX_TEXTURES>;
 
 	class RADIANT_API TextureManager {
 	private:
@@ -89,6 +94,7 @@ namespace rdt {
 		friend class core::RendererGL;
 		friend class core::RenderLayer;
 		friend struct core::Mesh;
+		friend class core::glDrawCall;
 	private:
 		
 		/*
@@ -101,11 +107,22 @@ namespace rdt {
 		*/
 		static const char* GetAlias(TextureID tID);
 
-		static std::array<unsigned int, MAX_TEXTURES>& GetTextureSlots();
+		/*
+			Returns the current texture slot map configuration
+		*/
+		static TextureSlotMap& GetTextureSlots();
+
+		/*
+			Binds the texture indicated by the provided ID to a texture slot.
+			Returns true if the texure slot map has changed. 
+		*/
+		static bool BindTexture(TextureID tID);
+
+		/*
+			Gets the texture slot this texture is bound to.
+		*/
+		static TextureSlot GetTextureSlot(TextureID tID);
 
 		void AddNoneTexture();
-
-		TextureSlot GetNextSlot();
-
 	};
 }

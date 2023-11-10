@@ -10,6 +10,8 @@
 #include "Logging/Log.h"
 #include "ErrorHandling.h"
 
+#include "Graphics/RenderTypes.h"
+
 namespace rdt::core {
 	RendererGL::RendererGL()
         : m_window(nullptr), m_window_name(""), m_window_width(0), m_window_height(0), m_vertex_array(nullptr),
@@ -203,18 +205,10 @@ namespace rdt::core {
 
     void RendererGL::RenderImpl()
     {
-        bool update_slots = false;
-
         /*
-            Step 1: Sort meshes into layers.
+            Step 1: Sort meshes into draw calls.
         */
-        for (auto& mesh : GetBackBuffer()) {
-
-            if (m_layers.find(mesh.layer) == m_layers.end()) {
-                AddRenderLayer(mesh.layer);
-            }
-            m_layers[mesh.layer].AddMesh(mesh);
-        }
+        MeshToDrawCalls();
 
         /*
             Step 2: DrawContext for default viewport or render windows.
@@ -276,11 +270,60 @@ namespace rdt::core {
         /* Swap front and back buffers */
         glfwSwapBuffers(m_window);
 
-        // Reset the buffers of each layer.
-        for (auto& [layer_index, layer] : m_layers) {
-            layer.Flush();
+
+        // Clear draw call buffer.
+        m_drawCallAllocator.Flush();
+    }
+
+    void RendererGL::MeshToDrawCalls()
+    {
+        for (auto& mesh : GetBackBuffer()) {
+            m_drawCallAllocator.AddMesh(mesh);
         }
     }
+
+
+    void RendererGL::DrawContext()
+    {
+        SetShader(m_shaders[0]->GetID());
+        glm::mat4 mvp = GetCamera().GetMVP();
+        m_shaders[0]->SetUniform<glm::mat4>("uMVP", mvp);
+        Clear(m_current_viewport, GetCamera().GetBackgroundColor());
+
+
+        for (auto drawCall : m_drawCallAllocator.GetDrawCalls()) {
+            Draw(drawCall);
+        }
+    }
+
+    void RendererGL::Draw(glDrawCall* drawCall)
+    {
+        // Updates the texture slot map (if texture is not already bounded)
+        TextureID targetTexture = drawCall->GetAssignedTexture();
+        if (TextureManager::BindTexture(targetTexture)) {
+            drawCall->UpdateTextureSlotIndex(TextureManager::GetTextureSlot(targetTexture));
+            UpdateTextureUniforms();
+        }
+
+        // Draw Call Procedure
+        SetVBO(drawCall->vboID);
+        SetIBO(drawCall->iboID);
+        SetShader(drawCall->shaderID);
+
+        // Update buffers and notify the GPU
+        drawCall->UpdatBuffers();
+        m_vertex_array->DefineVertexBufferLayout();
+
+        // TODO: Allow other render types
+        SetMode(FillMode);
+        RenderType type = RenderType::DrawFilled;
+
+        // Draw using the binded data
+        glDrawElements(
+            type == RenderType::DrawLine ? GL_LINES : GL_TRIANGLES,
+            drawCall->m_IBO->GetIndexCount(), GL_UNSIGNED_INT, nullptr);
+    }
+
 
     void RendererGL::OnEndFrameImpl()
     {
@@ -359,43 +402,6 @@ namespace rdt::core {
         return { mouseCoords.x - offset.x, mouseCoords.y - offset.y };
     }
 
-    void RendererGL::DrawContext()
-    {
-        SetShader(m_shaders[0]->GetID());
-        glm::mat4 mvp = GetCamera().GetMVP();
-        m_shaders[0]->SetUniform<glm::mat4>("uMVP", mvp);
-        Clear(m_current_viewport, GetCamera().GetBackgroundColor());
-        
-        for (auto& [layer_index, layer] : m_layers) {
-            layer.CompileBatches();
-
-            if (layer.TextureSlotsChanged()) {
-                UpdateTextureUniforms();
-            }
-
-            auto& units = layer.GetRenderUnits();
-            for (unsigned int i = 0; i < layer.GetBatchCount(); i++) {
-                auto& unit = units.at(i);
-
-                // Draw Call Procedure
-                SetVBO(unit.vboID);
-                SetIBO(unit.iboID);
-                SetShader(unit.shaderID);
-                SetMode(unit.type == DrawOutline ? OutlineMode : FillMode);
-
-                // Update buffers and notify the GPU
-                unit.m_VBO->Update();
-                unit.m_IBO->Update();
-                m_vertex_array->DefineVertexBufferLayout();
-
-                glDrawElements(
-                    unit.type == RenderType::DrawLine ? GL_LINES : GL_TRIANGLES,
-                    unit.m_IBO->GetIndexCount(), GL_UNSIGNED_INT, nullptr);
-            }
-        }
-
-    }
-
     void RendererGL::SetFBO(FBO_ID fbo)
     {
         if (fbo != m_current_fbo) {
@@ -448,12 +454,6 @@ namespace rdt::core {
         }
     }
 
-    void RendererGL::AddRenderLayer(unsigned int layer)
-    {
-        m_layers[layer];
-        m_layers.at(layer).SetDefaultShader(m_shaders[0]->GetID());
-    }
-
     void RendererGL::AddDefaultShader()
     {
         Shader* shader = new Shader;
@@ -465,6 +465,9 @@ namespace rdt::core {
         else {
             m_shaders.push_back(shader);
         }
+
+        // Add default shader to draw call allocator
+        m_drawCallAllocator.SetDefaultShader(m_shaders[0]->GetID());
     }
 
     void RendererGL::UpdateTextureUniforms()

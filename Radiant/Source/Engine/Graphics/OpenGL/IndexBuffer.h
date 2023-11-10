@@ -1,9 +1,10 @@
 #pragma once
 #include "pch.h"
 
-namespace rdt::core {
+#define RDT_NULL_INDEX_BUFFER_ID 0
 
-	typedef unsigned int IBO_ID;
+namespace rdt::core {
+	using IBO_ID = unsigned int;
 
 	class IndexBuffer {
 	private:

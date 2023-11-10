@@ -73,7 +73,7 @@ namespace rdt {
 			aliasToID[name] = nID;
 			
 			m_textures[nID];
-			m_textures.at(nID).LoadTexture(filepath);
+			m_textures.at(nID).LoadTexturePNG(filepath);
 
 			return nID;
 		}
@@ -121,6 +121,59 @@ namespace rdt {
 				return nullptr;
 			}
 			return m_atlases.at(tID);
+		}
+
+		TextureSlot GetNextSlot() {
+
+			unsigned int checkStart = m_next_slot;
+			while (m_texture_slots[m_next_slot] != UNASSIGNED_TEXTURE) {
+				m_next_slot++;
+
+				if (m_next_slot >= MAX_TEXTURES) {
+					m_next_slot = 2;
+				}
+
+				if (m_next_slot == checkStart) {
+					return UNASSIGNED_TEXTURE;
+				}
+			}
+
+			TextureSlot res = m_next_slot;
+			m_next_slot++;
+			if (m_next_slot >= MAX_TEXTURES) {
+				m_next_slot = 2;
+			}
+			return res;
+		}
+
+		bool BindTexture(TextureID tID)
+		{
+			if (!TextureExists(tID)) {
+				RDT_CORE_WARN("TextureManager - Tried to bind unregistered texture [id:{}]", tID);
+				return false;
+			}
+
+			if (UNASSIGNED_TEXTURE == m_textures.at(tID).CurrentTextureSlot()) {
+				TextureSlot nSlot = GetNextSlot();
+
+				if (nSlot == UNASSIGNED_TEXTURE) {
+					return false;
+				}
+
+				m_texture_slots[nSlot] = nSlot;
+				m_textures.at(tID).Bind(GetNextSlot());
+				return true;
+			}
+			return false;
+		}
+
+		TextureSlot GetTextureSlot(TextureID tID)
+		{
+			if (!TextureExists(tID)) {
+				return UNASSIGNED_TEXTURE;
+			}
+
+			return m_textures.at(tID).CurrentTextureSlot();
 		}
 	};
 
@@ -186,13 +239,18 @@ namespace rdt {
 		return m_impl->m_texture_slots;
 	}
 
+	bool TextureManager::BindTexture(TextureID tID)
+	{
+		return m_impl->BindTexture(tID);
+	}
+
+	TextureSlot TextureManager::GetTextureSlot(TextureID tID)
+	{
+		return m_impl->GetTextureSlot(tID);
+	}
+
 	void TextureManager::AddNoneTexture()
 	{
 		m_impl->AddNoneTexture();
-	}
-
-	TextureSlot TextureManager::GetNextSlot()
-	{
-		return m_impl->m_next_slot++;
 	}
 }
