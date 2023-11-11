@@ -32,7 +32,7 @@ namespace rdt::core {
 
 	public:
 		static void Destroy();
-		static DevLayer* GetInstance();
+		static std::shared_ptr<DevLayer> GetInstance();
 
 		void OnAttach() override final;
 		void OnDetach() override final;

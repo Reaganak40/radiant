@@ -9,7 +9,7 @@
 #include "Messaging/MessageBus.h"
 #include "Physics/Physics.h"
 #include "Gui/GuiManager.h"
-#include "OOComponents/Scene/SceneManager.h"
+#include "Scene/SceneManager.h"
 #include "Graphics/Model.h"
 #include "Utils/Timestep.h"
 #include "ResourceManager/ResourceManager.h"
@@ -27,7 +27,7 @@ namespace rdt {
 
 	struct Application::Impl {
 		Timestep m_timestep;
-		Scene* m_current_scene;
+		std::shared_ptr<Scene> m_current_scene;
 		ApplicationConfig m_config;
 
 		Impl()
@@ -98,17 +98,11 @@ namespace rdt {
 			/* Clears window and prepares for next game loop.*/
 			BeginFrame();
 
-			/* Get start of frame messages. */
-			PollMessages1();
-
 			/* Process input from user and update game objects. */
 			ProcessInput();
 
 			/* Update the physical world. Detect and resolve collisions. */
 			UpdateWorld();
-
-			/* Get late update messages. */
-			PollMessages2();
 
 			/* Final update of game objects before render. */
 			FinalUpdate();
@@ -148,10 +142,10 @@ namespace rdt {
 		ComponentManager::RegisterComponent<DebugComponent>();
 #endif
 		ComponentManager::RegisterComponent<Sprite>();
-		ComponentManager::RegisterComponent<Transform>();
-		ComponentManager::RegisterComponent<RigidBody2D>();
 		ComponentManager::RegisterComponent<Renderable>();
 		ComponentManager::RegisterComponent<Animator>();
+		ComponentManager::RegisterComponent<Transform>();
+		ComponentManager::RegisterComponent<RigidBody2D>();
 
 		// Add Common Systems
 		SystemManager::RegisterSystem<PhysicsSystem>();
@@ -174,6 +168,8 @@ namespace rdt {
 
 	void Application::BeginFrame()
 	{
+		MessageBus::SetLoopPhase(LoopPhase_Begin);
+
 		// Get the new deltaTime for this frame.
 		m_impl->m_timestep.Update(true);
 
@@ -195,16 +191,12 @@ namespace rdt {
 		Log::Update();
 	}
 
-	void Application::PollMessages1()
-	{
-		MessageBus::SendMessages();
-	}
-
 	void Application::ProcessInput()
 	{
-		// All game objects in the bounded scene run their OnProcessInput()
-		if (m_impl->m_current_scene != nullptr) {
-			m_impl->m_current_scene->OnProcessInput(m_impl->m_timestep.deltaTime);
+		MessageBus::SetLoopPhase(LoopPhase_ProcessInput);
+
+		if (m_impl->m_current_scene) {
+			m_impl->m_current_scene->ProcessInput(m_impl->m_timestep.deltaTime);
 		}
 
 		SystemManager::OnProcessInput(m_impl->m_timestep.deltaTime);
@@ -212,19 +204,20 @@ namespace rdt {
 
 	void Application::UpdateWorld()
 	{
-		SystemManager::OnWorldUpdate(m_impl->m_timestep.deltaTime);
-	}
+		MessageBus::SetLoopPhase(LoopPhase_WorldUpdate);
 
-	void Application::PollMessages2()
-	{
-		MessageBus::SendMessages();
+		if (m_impl->m_current_scene) {
+			m_impl->m_current_scene->UpdateWorld(m_impl->m_timestep.deltaTime);
+		}
+		SystemManager::OnWorldUpdate(m_impl->m_timestep.deltaTime);
 	}
 
 	void Application::FinalUpdate()
 	{
-		// Runs the procedures for the final update of the currently bounded scene.
-		if (m_impl->m_current_scene != nullptr) {
-			m_impl->m_current_scene->OnFinalUpdate();
+		MessageBus::SetLoopPhase(LoopPhase_FinalUpdate);
+
+		if (m_impl->m_current_scene) {
+			m_impl->m_current_scene->FinalUpdate();
 		}
 		SystemManager::OnFinalUpdate();
 		
@@ -234,9 +227,11 @@ namespace rdt {
 
 	void Application::Render()
 	{
+		MessageBus::SetLoopPhase(LoopPhase_RenderUpdate);
+
 		// Creates the render command queue for the currently bounded scene.
-		if (m_impl->m_current_scene != nullptr) {
-			m_impl->m_current_scene->OnRender();
+		if (m_impl->m_current_scene) {
+			m_impl->m_current_scene->RenderUpdate();
 		}
 
 		SystemManager::OnRender();
@@ -247,10 +242,11 @@ namespace rdt {
 
 	void Application::EndFrame()
 	{
+		MessageBus::SetLoopPhase(LoopPhase_End);
+
 		Renderer::OnEndFrame();
 		Input::UpdateTime(m_impl->m_timestep.deltaTime);
 		Input::PollInputs();
-		MessageBus::ResetBroadcasts();
 	}
 
 	const int Application::WindowWidth() {

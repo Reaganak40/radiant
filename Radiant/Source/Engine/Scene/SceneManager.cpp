@@ -3,30 +3,18 @@
 #include "Messaging/MessageBus.h"
 #include "Messaging/MessageTypes.h"
 
+#include "Logging/Log.h"
+
 namespace rdt {
 	SceneManager* SceneManager::m_instance = nullptr;
 
 	SceneManager::SceneManager()
 		: m_current_scene(nullptr), m_currentSceneName("")
 	{
-		RegisterToMessageBus("SceneManager");
-		m_broadcast = MessageBus::CreateBroadcast("SceneManager", new Broadcast);
 	}
 
 	SceneManager::~SceneManager()
 	{
-		for (auto& [sceneName, scenePtr] : m_scenes) {
-			delete scenePtr;
-		}
-	}
-
-	void SceneManager::OnMessage(Message msg)
-	{
-		switch (msg.type) {
-		case MT_RequestScenePtr:
-			SendDirectMessage(msg.from, MT_SendScenePtr, new ScenePtrData(m_current_scene));
-			break;
-		}
 	}
 
 	void SceneManager::Initialize()
@@ -43,7 +31,7 @@ namespace rdt {
 		}
 	}
 
-	void SceneManager::RegisterScene(const std::string& sceneName, Scene* scene)
+	void SceneManager::RegisterScene(const std::string& sceneName, std::shared_ptr<Scene> scene)
 	{
 		if (m_instance->m_scenes.find(sceneName) != m_instance->m_scenes.end()) {
 			RDT_CORE_WARN("SceneManager - Scene duplicate found!");
@@ -56,7 +44,6 @@ namespace rdt {
 		}
 
 		m_instance->m_scenes[sceneName] = scene;
-		scene->OnRegister();
 	}
 
 	void SceneManager::SetScene(const std::string& sceneName)
@@ -64,29 +51,18 @@ namespace rdt {
 		m_instance->m_currentSceneName = sceneName;
 	}
 
-	Scene* SceneManager::GetAnyScene(const std::string& sceneName)
-	{
-		if (m_instance->m_scenes.find(sceneName) == m_instance->m_scenes.end()) {
-			return nullptr;
-		}
-
-		return m_instance->m_scenes.at(sceneName);
-	}
-
-	Scene* SceneManager::GetCurrentSceneImpl()
+	std::shared_ptr<Scene> SceneManager::GetCurrentSceneImpl()
 	{
 		if (m_currentSceneName == "" && m_scenes.find("") == m_scenes.end()) {
-			m_scenes[""] = new Scene;
-			m_scenes.at("")->OnRegister();
+			m_scenes[""] = std::make_shared<Scene>();
 		}
 
 		if (m_current_scene != m_scenes[m_currentSceneName]) {
 			if (m_current_scene != nullptr) {
-				m_current_scene->OnRelease();
+				m_current_scene->Release();
 			}
 			m_current_scene = m_scenes[m_currentSceneName];
-			m_current_scene->OnBind();
-			MessageBus::AddToBroadcast(m_broadcast, MT_SceneChanged, new SceneChangedData(m_current_scene));
+			m_current_scene->Bind();
 		}
 
 		return m_current_scene;

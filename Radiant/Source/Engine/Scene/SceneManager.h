@@ -1,21 +1,29 @@
+/*******************************************************************
+*	Module:  Scene (core)
+*	File:    SceneManager.h
+*
+*	Author: Reagan Kelley
+*
+*	The SceneManager is a core singleton that manages the creation
+*	and storage of Scenes.
+*******************************************************************/
 #pragma once
+
+// Required Definitions for Struct/Class Members
 #include "Scene.h"
 
 namespace rdt {
 
-	class SceneManager : public Messenger {
+	class SceneManager {
 	private:
 		SceneManager();
 		~SceneManager();
 		static SceneManager* m_instance;
 
-		MessageID m_broadcast;
-
-		std::unordered_map<std::string, Scene*> m_scenes;
+		std::unordered_map<std::string, std::shared_ptr<Scene>> m_scenes;
 		std::string m_currentSceneName;
-		Scene* m_current_scene;
+		std::shared_ptr<Scene> m_current_scene;
 
-		void OnMessage(Message msg) override final;
 	public:
 
 		/*
@@ -31,7 +39,7 @@ namespace rdt {
 		/*
 			Adds a scene to the manager's map of name-associated scenes.
 		*/
-		static void RegisterScene(const std::string& sceneName, Scene* scene);
+		static void RegisterScene(const std::string& sceneName, std::shared_ptr<Scene> scene);
 
 		/*
 			Sets the current scene by providing its scene name. The associated
@@ -42,16 +50,9 @@ namespace rdt {
 		/*
 			Gets the currently set scene.
 		*/
-		static Scene* GetCurrentScene() { return m_instance->GetCurrentSceneImpl(); }
+		static std::shared_ptr<Scene> GetCurrentScene();
 
-		friend class Scene;
 	private:
-
-		/*
-			Returns a scene even if it is not active. Used by other
-			scenes for communication.
-		*/
-		static Scene* GetAnyScene(const std::string& sceneName);
 
 		/*
 			Unselects the scene, effectively setting the scene pointer
@@ -60,6 +61,6 @@ namespace rdt {
 		*/
 		static void UnselectScene() { m_instance->m_currentSceneName = ""; }
 
-		Scene* GetCurrentSceneImpl();
+		std::shared_ptr<Scene> GetCurrentSceneImpl();
 	};
 }

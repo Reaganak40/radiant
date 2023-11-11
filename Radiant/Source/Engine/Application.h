@@ -10,13 +10,20 @@
 
 namespace rdt {
 
+	enum LoopPhase {
+		LoopPhase_Begin,
+		LoopPhase_ProcessInput,
+		LoopPhase_WorldUpdate,
+		LoopPhase_FinalUpdate,
+		LoopPhase_RenderUpdate,
+		LoopPhase_End,
+	};
+
 	class RADIANT_API Application
 	{
 	private:
 		struct Impl;
 		Impl* m_impl;
-
-		
 
 	public:
 		Application();
@@ -107,11 +114,6 @@ namespace rdt {
 		void BeginFrame();
 
 		/*
-			Polls all messages from the message bus and runs OnMessage for all objects.
-		*/
-		void PollMessages1();
-
-		/*
 			Runs the OnProcessInput on game objects, which will result in requests
 			made in game space and the physics API.
 		*/
@@ -122,11 +124,6 @@ namespace rdt {
 			and sending messages back to game objects.
 		*/
 		void UpdateWorld();
-
-		/*
-			Polls all messages from the message bus right before final update.
-		*/
-		void PollMessages2();
 
 		/*
 			Runs the OnFinalUpdate() on all game objects for final changes before render.
