@@ -31,8 +31,6 @@ namespace rdt {
 		m_SoundCounter = 0;
 		m_shouldEndLoop = true;
 		m_queue_index = 0;
-
-		m_broadcast = MessageBus::CreateBroadcast("SoundEngine", new Broadcast);
 	}
 
 	SoundEngine::~SoundEngine()
@@ -114,7 +112,6 @@ namespace rdt {
 			sound->OnUpdate();
 
 			if (sound->JustStopped()) {
-				MessageBus::AddToBroadcast(m_broadcast, MT_SoundStopped, new SoundStoppedData(sID));
 			}
 		}
 	}
@@ -203,7 +200,6 @@ namespace rdt {
 		m_sounds.at(data->sID)->StopSound();
 		
 		if (m_sounds.at(data->sID)->JustStopped()) {
-			MessageBus::AddToBroadcast(m_broadcast, MT_SoundStopped, new SoundStoppedData(data->sID));
 		}
 	}
 

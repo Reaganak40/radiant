@@ -17,7 +17,7 @@ namespace rdt {
 	using RealmID = unsigned int;
 	using Entity = std::uint32_t;
 	using ChannelID = unsigned int;
-
+	using LayerID = unsigned int;
 	struct Message;
 }
 
@@ -35,25 +35,6 @@ namespace rdt {
 		Impl* m_impl;
 
 	protected:
-
-		/*
-			Gets the realms registered by this layer.
-		*/
-		std::vector<RealmID>& GetRealms();
-
-
-		/*
-			Initalized a new realm from the physics engine and appends it to the vector
-			of realms to be used by game objects.
-		*/
-		RealmID CreateNewRealm();
-
-
-		/*
-			Returns a list of the entities registered by this layer.
-		*/
-		const std::vector<Entity>& GetEntities();
-
 		/*
 			Registers a new entity to this layer. The layer is now
 			responsible for this entity. Returns the entity's ID
@@ -67,6 +48,18 @@ namespace rdt {
 	public:
 		Layer();
 		~Layer();
+
+		/*
+			Provides to the layer an internal reference to its parent
+			scene. Uses to query scene related resources.
+		*/
+		void BindToScene(Scene* scene);
+
+		/*
+			Gets the ID for this layer. Returns 0 if this layer
+			has no registered ID.
+		*/
+		LayerID GetID();
 
 		/*
 			Function called when the host scene of this layer is binded, entering
@@ -84,6 +77,11 @@ namespace rdt {
 			Returns true if the layer is attach flag is true.
 		*/
 		bool IsAttached();
+
+		/*
+			Returns a list of the entities registered by this layer.
+		*/
+		const std::vector<Entity>& GetEntities();
 
 		/*
 			Runs the ProcessInput game-loop-step on this layer.
@@ -110,6 +108,7 @@ namespace rdt {
 		*/
 		void PollMessages();
 
+		friend class SceneManager;
 		
 	protected:
 
@@ -153,11 +152,23 @@ namespace rdt {
 		*/
 		virtual void OnRenderUpdate() {}
 
+		/*
+			Gets the host scene's registered realm at the 
+			given index. Returns 0 if no such realm exists.
+		*/
+		RealmID GetRealm(size_t realmIndex = 0);
+
 	private:
 
 		/*
 			Overhead function to set the attach flag for the layer.
 		*/
 		void SetAttached(bool attach);
+
+		/*
+			Provided this layer with a global identifer, registered
+			by the SceneManager.
+		*/
+		void SetLayerID(LayerID nID);
 	};
 }

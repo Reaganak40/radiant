@@ -21,7 +21,7 @@
 #include "Engine/Graphics/AnimationSystem.h"
 
 // DevTools
-#include "Editor/DevTools.h"
+#include "Editor/Editor.h"
 
 namespace rdt {
 
@@ -53,6 +53,10 @@ namespace rdt {
 
 		AddECS();
 		ResourceManager::LoadDefaultResources();
+
+#ifdef RDT_USE_DEV_TOOLS
+		core::Editor::Initialize();
+#endif
 	}
 
 	Application::~Application()
@@ -60,7 +64,7 @@ namespace rdt {
 		delete m_impl;
   
 #ifdef RDT_USE_DEV_TOOLS
-		core::DevLayer::Destroy();
+		core::Editor::Destroy();
 #endif
 		ResourceManager::Destroy();
 		SceneManager::Destroy();
@@ -257,7 +261,7 @@ namespace rdt {
 		return Renderer::GetWindowHeight();
 	}
 
-	const UniqueID Application::AddScene(const std::string& sceneName, Scene* nScene)
+	const UniqueID Application::AddScene(const std::string& sceneName, std::shared_ptr<Scene> nScene)
 	{
 		SceneManager::RegisterScene(sceneName, nScene);
 		return nScene->GetID();

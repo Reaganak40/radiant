@@ -1,10 +1,13 @@
 #pragma once
-#include "pch.h"
 #include "Core.h"
-#include "OOComponents/Scene/Scene.h"
+
+// Forward Declarations
+namespace rdt {
+	using UniqueID = unsigned int;
+	class Scene;
+}
 
 // For ApplicationConfig Struct
-#include "Utils/UniqueID.h"
 #include "Utils/Color.h"
 #include "Graphics/Camera.h"
 
@@ -59,7 +62,7 @@ namespace rdt {
 			Registers a scene to the application called its OnRegister()
 			and adding it to its list of scenes.
 		*/
-		const UniqueID AddScene(const std::string& sceneName, Scene* nScene);
+		const UniqueID AddScene(const std::string& sceneName, std::shared_ptr<Scene> nScene);
 
 		/*
 			Manually sets the scene in the application to the one that

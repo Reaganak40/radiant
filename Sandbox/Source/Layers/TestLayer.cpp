@@ -84,9 +84,7 @@ public:
 TestLayer::TestLayer(const std::string& alias)
 {
 	SystemManager::RegisterSystem<Controller>();
-
-	RegisterToMessageBus(alias);
-	RealmID mRealm = CreateNewRealm();
+	RealmID mRealm = GetRealm();
 
 	ColliderID rectCollider = ColliderManager::GetColliderID("common.collider.rect");
 	{
@@ -141,10 +139,6 @@ TestLayer::~TestLayer()
 
 void TestLayer::OnAttach()
 {
-	Physics::ActivateRealm(GetRealms()[0]);
-
-	// TODO: Bind GameObjects and GUIs
-	BindAll();
 }
 
 void TestLayer::OnDetach()
@@ -154,29 +148,14 @@ void TestLayer::OnDetach()
 
 void TestLayer::OnProcessInput(const float deltaTime)
 {
-
-	/* 
-		Calls ProcessInput on all binded game objects
-		and GUIs.
-	*/
-	Layer::OnProcessInput(deltaTime);
 }
 
 void TestLayer::OnFinalUpdate()
 {
-
-	/* Calls FinalUpdate on all binded game objects. */
-	Layer::OnFinalUpdate();
 }
 
-void TestLayer::OnRender()
+void TestLayer::OnRenderUpdate()
 {
-
-	/* 
-		Calls OnRender on all binded game objects
-		and GUIs.
-	*/
-	Layer::OnRender();
 }
 
 

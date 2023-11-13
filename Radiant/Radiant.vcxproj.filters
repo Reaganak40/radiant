@@ -150,9 +150,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\Editor\DevTools.h">
-      <Filter>Source\Editor</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Editor\Editor.h">
       <Filter>Source\Editor</Filter>
     </ClInclude>
@@ -505,9 +502,6 @@
     <ClInclude Include="Source\Engine\Messaging\Communicator.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Editor\DevTools.cpp">
-      <Filter>Source\Editor</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Engine\Application.cpp">
       <Filter>Source\Engine</Filter>
     </ClCompile>
@@ -664,6 +658,7 @@
     <ClCompile Include="Source\Engine\Physics\Collider.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\DrawCall.cpp" />
     <ClCompile Include="Source\Engine\Messaging\Communicator.cpp" />
+    <ClCompile Include="Source\Editor\Editor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Resources\templates\gameObject.h.txt" />

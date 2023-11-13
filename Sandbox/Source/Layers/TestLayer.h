@@ -35,6 +35,6 @@ public:
 		Function called when the layer is active and the host scene
 		calls Render()
 	*/
-	void OnRender() override;
+	void OnRenderUpdate() override;
 
 };

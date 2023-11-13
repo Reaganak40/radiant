@@ -10,8 +10,7 @@ namespace rdt {
 		Vec2d(double nX = 0, double nY = 0)
 			: x(nX), y(nY) {}
 
-		Vec2d(ImVec2 imVector)
-			: x(imVector.x), y(imVector.y) {}
+		Vec2d(ImVec2 imVector);
 
 		Vec2d(std::pair<double, double> dpair)
 			: x(dpair.first), y(dpair.second) {}

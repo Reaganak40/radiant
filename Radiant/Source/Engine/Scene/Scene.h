@@ -13,6 +13,8 @@
 // Forward Declarations
 namespace rdt {
 	class Layer;
+	using RealmID = unsigned int;
+	using SceneID = unsigned int;
 }
 
 namespace rdt {
@@ -27,10 +29,16 @@ namespace rdt {
 		~Scene();
 
 		/*
-			Adds a layer to the top of the layer stack. The scene is
-			now responsible for freeing this layer.
+			Returns the global identifier for this scene, registered
+			by the SceneManager. If this scene has no registered ID,
+			returns 0.
 		*/
-		void AddLayer(std::shared_ptr<Layer> nLayer);
+		SceneID GetID();
+
+		/*
+			Returns the registered name for this scene.
+		*/
+		const char* GetName();
 
 		/*
 			Activates this scene and its elements, making
@@ -63,5 +71,44 @@ namespace rdt {
 			Runs the RenderUpdate game-loop-step on this scene.
 		*/
 		void RenderUpdate();
+
+		/*
+			Returns the current list of realms owned by this scene.
+		*/
+		const std::vector<RealmID>& GetRealms() const;
+
+		/*
+			Retursn the current list of layers attached to this scene.
+		*/
+		const std::vector<std::shared_ptr<Layer>>& GetLayers() const;
+
+		friend class SceneManager;
+
+	protected:
+		/*
+			Adds a layer to the top of the layer stack.
+		*/
+		void AddLayer(std::shared_ptr<Layer> layer);
+
+
+		/*
+			Using the Physics API, creates a new realm and stores
+			it in the realm list for this scene. Layers will have
+			access to this.
+		*/
+		RealmID AddRealm();
+
+	private:
+		/*
+			Sets the global identfier for this scene instance
+		*/
+		void SetSceneID(SceneID nID);
+
+		/*
+			Sets the alias for the scene
+		*/
+		void SetSceneName(const std::string& name);
 	};
+
+
 }

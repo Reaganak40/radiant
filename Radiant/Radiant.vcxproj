@@ -105,7 +105,6 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Source\Editor\DevTools.h" />
     <ClInclude Include="Source\Editor\Editor.h" />
     <ClInclude Include="Source\Editor\IconsForkAwesome.h" />
     <ClInclude Include="Source\Engine\Application.h" />
@@ -240,7 +239,7 @@
     <ClInclude Include="Vendor\stb\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Editor\DevTools.cpp" />
+    <ClCompile Include="Source\Editor\Editor.cpp" />
     <ClCompile Include="Source\Engine\Application.cpp" />
     <ClCompile Include="Source\Engine\Audio\AudioError.cpp" />
     <ClCompile Include="Source\Engine\Audio\Sound\Sound.cpp" />

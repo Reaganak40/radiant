@@ -5,8 +5,13 @@
 #include "Messaging/MessageBus.h"
 #include "Physics/Physics.h"
 #include "ECS/EntityFactory.h"
+#include "Scene/Scene.h"
+#include "Scene/SceneManager.h"
 
 struct rdt::Layer::Impl {
+
+	LayerID mID = RDT_NULL_LAYER_ID;
+
 	bool m_attached;
 
 	std::vector<RealmID> m_realms;
@@ -15,6 +20,8 @@ struct rdt::Layer::Impl {
 	Communicator m_communicator;
 	std::set<ChannelID> m_subscribed_channels;
 	ChannelID currentChannel = RDT_NULL_MESSAGE_ID;
+
+	Scene* m_host_scene = nullptr;
 
 	Impl()
 		: m_attached(false)
@@ -31,22 +38,27 @@ struct rdt::Layer::Impl {
 	void SubscribeToChannel(ChannelID channel) {
 		m_subscribed_channels.insert(channel);
 	}
+
+	void SetHostScene(Scene* scene) {
+		m_host_scene = scene;
+	}
+
+	RealmID GetRealm(size_t realmIndex) {
+		if (m_host_scene == nullptr) {
+			return RDT_NULL_REALM_ID;
+		}
+
+		auto& realms = m_host_scene->GetRealms();
+
+		if (realmIndex < realms.size()) {
+			return realms[realmIndex];
+		}
+
+		return RDT_NULL_REALM_ID;
+	}
 };
 
 // ==================================================================
-
-std::vector<rdt::RealmID>& rdt::Layer::GetRealms()
-{
-	return m_impl->m_realms;
-}
-
-
-rdt::RealmID rdt::Layer::CreateNewRealm()
-{
-	m_impl->m_realms.push_back(Physics::CreateRealm());
-	return m_impl->m_realms.back();
-}
-
 
 rdt::Entity rdt::Layer::RegisterEntity(EntityDefinition* nEntity, const std::string& alias)
 {
@@ -68,6 +80,21 @@ rdt::Layer::Layer()
 rdt::Layer::~Layer()
 {
 	delete m_impl;
+}
+
+void rdt::Layer::BindToScene(Scene* scene)
+{
+	m_impl->SetHostScene(scene);
+}
+
+void rdt::Layer::SetLayerID(LayerID nID)
+{
+	m_impl->mID = nID;
+}
+
+rdt::LayerID rdt::Layer::GetID() 
+{
+	return m_impl->mID;
 }
 
 bool rdt::Layer::IsAttached()
@@ -124,6 +151,11 @@ rdt::ChannelID rdt::Layer::CurrentMessageChannel()
 const std::vector<rdt::Entity>& rdt::Layer::GetEntities()
 {
 	return m_impl->m_entities;
+}
+
+rdt::RealmID rdt::Layer::GetRealm(size_t realmIndex)
+{
+	return m_impl->GetRealm(realmIndex);
 }
 
 void rdt::Layer::SetAttached(bool attach)

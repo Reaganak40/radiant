@@ -23,7 +23,7 @@ public:
 
 	void OnGameBegin() override final
 	{
-		AddScene("Sandbox Scene", new Sandbox);
+		AddScene("Sandbox Scene", std::make_shared<Sandbox>());
 		SetScene("Sandbox Scene");
 	}
 
