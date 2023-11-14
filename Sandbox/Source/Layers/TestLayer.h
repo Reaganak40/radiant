@@ -4,9 +4,7 @@
 class TestLayer : public rdt::Layer {
 private:
 public:
-
-	TestLayer(const std::string& alias = "TestLayer");
-	~TestLayer();
+	void OnCreate() override final;
 
 	/*
 		Function called when this layer is binded to a Scene, entering

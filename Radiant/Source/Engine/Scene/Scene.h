@@ -43,12 +43,16 @@ namespace rdt {
 		/*
 			Activates this scene and its elements, making
 			it the current scene.
+
+			Will call OnAttach() for layers and activate registered realms
 		*/
 		void Bind();
 
 		/*
 			Releases, unbinds, this scene, removing it from
 			the current scene.
+
+			Will call OnDetach() for layers and deactivate registered realms
 		*/
 		void Release();
 
@@ -97,6 +101,21 @@ namespace rdt {
 			access to this.
 		*/
 		RealmID AddRealm();
+
+		/*
+			To implement function that is called before Bind(), allowing
+			child scenes to add additional functionality before binding
+			a scene.
+		*/
+		virtual void OnBind() {}
+
+		/*
+			To implement function that is called before Release(), allowing
+			child scenes to add additional functionality before releasing a
+			scene.
+		*/
+		virtual void OnRelease() {}
+
 
 	private:
 		/*

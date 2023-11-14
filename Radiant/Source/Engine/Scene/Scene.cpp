@@ -30,6 +30,7 @@ struct rdt::Scene::Impl {
 	void AddLayer(std::shared_ptr<Layer> nLayer)
 	{
 		m_layers.push_back(nLayer);
+		nLayer->OnCreate();
 	}
 
 	const std::vector<std::shared_ptr<Layer>>& GetLayers() const {
@@ -43,6 +44,28 @@ struct rdt::Scene::Impl {
 
 	const std::vector<RealmID>& GetRealms() const {
 		return m_realms;
+	}
+
+	void Bind()
+	{
+		for (auto realm : m_realms) {
+			Physics::ActivateRealm(realm);
+		}
+
+		for (auto& layer : m_layers) {
+			layer->OnAttach();
+		}
+	}
+
+	void Release()
+	{
+		for (auto&& layer : m_layers) {
+			layer->OnDetach();
+		}
+
+		for (auto realm : m_realms) {
+			Physics::DeactivateRealm(realm);
+		}
 	}
 };
 
@@ -91,16 +114,12 @@ const char* rdt::Scene::GetName()
 
 void rdt::Scene::Bind()
 {
-	for (auto layer : m_impl->GetLayers()) {
-		layer->OnAttach();
-	}
+	m_impl->Bind();
 }
 
 void rdt::Scene::Release()
 {
-	for (auto layer : m_impl->GetLayers()) {
-		layer->OnDetach();
-	}
+	m_impl->Release();
 }
 
 void rdt::Scene::ProcessInput(const float deltaTime)

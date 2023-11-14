@@ -1543,7 +1543,6 @@ rdt::core::Editor::Editor()
 	: m_showEditor(true)
 {
 	RDT_CORE_TRACE("Launching editor...");
-	Renderer::AttachGui(this);
 
 	// Find base directory for child application
 	m_project_base_directory = Utils::GetCWD();
@@ -1579,6 +1578,16 @@ rdt::core::Editor::Editor()
 
 	Renderer::SetBackgroundColor({ 0.2f, 0.2f, 0.2f, 1.0f });
 
+	ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
+	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	GuiManager::EnableDockOverViewport();
+
+	m_gameWindowId = Renderer::AddRenderWindow(m_gameWindow = new GameRenderWindow);
+	Renderer::SetDefaultViewport(false);
+	Input::SetTargetRenderWindow(m_gameWindowId);
+	m_gameWindow->SetGuiPositionY(88);
+	m_gameWindow->SetGuiPositionX((m_window_width / 2) - (m_gameWindow->GetGuiDimensions().x / 2));
+
 	m_panel_manager.RegisterPanel(MenuBar);
 	m_panel_manager.RegisterPanel(DiagnosticsPanel);
 	m_panel_manager.RegisterPanel(ScenePanel);
@@ -1593,6 +1602,8 @@ rdt::core::Editor::Editor()
 	m_panel_manager.OpenPanel(GameWindowPanel);
 	m_panel_manager.OpenPanel(ConsolePanel);
 	m_panel_manager.OpenPanel(EntityHierarchyPanel);
+
+	Renderer::AttachGui(this);
 }
 
 rdt::core::Editor::~Editor()
@@ -1623,6 +1634,11 @@ void rdt::core::Editor::OnRender()
 	m_panel_manager.RenderMDI();
 
 	bool isFullscreen = Renderer::UsingDefaultViewport();
+}
+
+void rdt::core::Editor::SetCurrentScene(std::shared_ptr<Scene> currentScene)
+{
+	m_scene = currentScene;
 }
 
 void rdt::core::Editor::SetSourcePath(const std::string& path)

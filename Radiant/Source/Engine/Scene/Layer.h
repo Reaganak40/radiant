@@ -50,6 +50,13 @@ namespace rdt {
 		~Layer();
 
 		/*
+			Called after a layer has been initialized and appriopriately
+			configured and binded to its host scene. It is recomended that
+			this is used to register entities.
+		*/
+		virtual void OnCreate() {}
+
+		/*
 			Provides to the layer an internal reference to its parent
 			scene. Uses to query scene related resources.
 		*/

@@ -5,6 +5,10 @@
 #include "Layer.h"
 #include "Logging/Log.h"
 
+#ifdef RDT_USE_DEV_TOOLS
+	#include "Editor/Editor.h"
+#endif
+
 namespace rdt {
 	SceneManager* SceneManager::m_instance = nullptr;
 
@@ -77,6 +81,7 @@ namespace rdt {
 
 		SceneID nID = NextSceneID();
 		scene->SetSceneID(nID);
+		scene->SetSceneName(sceneName);
 		sceneAliasToId[sceneName] = nID;
 		m_scenes[nID] = scene;
 		return nID;
@@ -88,7 +93,19 @@ namespace rdt {
 			RDT_CORE_WARN("SceneManager - Could not find scene {}", sceneName);
 			return;
 		}
+
+		if (SceneExists(m_current_scene_id)) {
+			m_scenes.at(m_current_scene_id)->OnRelease();
+			m_scenes.at(m_current_scene_id)->Release();
+		}
+
 		m_current_scene_id = sceneAliasToId.at(sceneName);
+		m_scenes.at(m_current_scene_id)->OnBind();
+		m_scenes.at(m_current_scene_id)->Bind();
+
+#ifdef RDT_USE_DEV_TOOLS
+		core::Editor::SetCurrentScene(m_scenes.at(m_current_scene_id));
+#endif
 	}
 
 	std::shared_ptr<Scene> SceneManager::GetCurrentSceneImpl()

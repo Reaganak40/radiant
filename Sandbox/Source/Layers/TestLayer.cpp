@@ -80,8 +80,9 @@ public:
 	}
 };
 
+// =====================================================================
 
-TestLayer::TestLayer(const std::string& alias)
+void TestLayer::OnCreate()
 {
 	SystemManager::RegisterSystem<Controller>();
 	RealmID mRealm = GetRealm();
@@ -133,17 +134,12 @@ TestLayer::TestLayer(const std::string& alias)
 	}
 }
 
-TestLayer::~TestLayer()
-{
-}
-
 void TestLayer::OnAttach()
 {
 }
 
 void TestLayer::OnDetach()
 {
-	// TODO: Unbind GameObjects and GUIs
 }
 
 void TestLayer::OnProcessInput(const float deltaTime)

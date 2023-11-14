@@ -155,6 +155,11 @@ namespace rdt::core {
 		*/
 		void OnRender() override final;
 
+		/*
+			Notifies the editor of the current scene.
+		*/
+		static void SetCurrentScene(std::shared_ptr<Scene> currentScene);
+
 	private:
 		std::string m_radiant_resources_filepath;
 		std::string m_radiant_template_filepath;

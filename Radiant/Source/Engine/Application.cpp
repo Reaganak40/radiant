@@ -53,10 +53,6 @@ namespace rdt {
 
 		AddECS();
 		ResourceManager::LoadDefaultResources();
-
-#ifdef RDT_USE_DEV_TOOLS
-		core::Editor::Initialize();
-#endif
 	}
 
 	Application::~Application()
@@ -88,6 +84,10 @@ namespace rdt {
 
 		Renderer::GetCamera().SetAspectRatio(m_impl->m_config.cameraAspectRatio);
 		Renderer::GetCamera().SetBackgroundColor(m_impl->m_config.backgroundColor);
+
+#ifdef RDT_USE_DEV_TOOLS
+		core::Editor::Initialize();
+#endif
 	}
 
 	void Application::Run()
