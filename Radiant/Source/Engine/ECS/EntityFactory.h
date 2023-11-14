@@ -91,5 +91,11 @@ namespace rdt {
 			represented by this class. (its spawn coordinates and size)
 		*/
 		Sprite CreateSprite();
+
+		/*
+			Creates a transform object with the preconfigured data
+			represented by this class. (its spawn coordinates and size)
+		*/
+		Transform CreateTransform();
 	};
 }

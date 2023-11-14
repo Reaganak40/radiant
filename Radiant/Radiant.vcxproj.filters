@@ -150,9 +150,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\Editor\DevTools.h">
-      <Filter>Source\Editor</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Editor\Editor.h">
       <Filter>Source\Editor</Filter>
     </ClInclude>
@@ -183,10 +180,7 @@
     <ClInclude Include="Source\Engine\EntryPoint.h">
       <Filter>Source\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Engine\OOComponents\GameObject\GameObject.h">
-      <Filter>Source\Engine\GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Engine\OOComponents\GameState.h">
+    <ClInclude Include="Source\Engine\Utils\GameState.h">
       <Filter>Source\Engine\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Graphics\Mesh.h">
@@ -202,9 +196,6 @@
       <Filter>Source\Engine\Graphics\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Graphics\OpenGL\RenderCache.h">
-      <Filter>Source\Engine\Graphics\OpenGL</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Engine\Graphics\OpenGL\RenderLayer.h">
       <Filter>Source\Engine\Graphics\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Graphics\OpenGL\RendererGL.h">
@@ -240,9 +231,6 @@
     <ClInclude Include="Source\Engine\Logging\Log.h">
       <Filter>Source\Engine\Logging</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Engine\Messaging\Broadcast.h">
-      <Filter>Source\Engine\Messaging</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Engine\Messaging\Message.h">
       <Filter>Source\Engine\Messaging</Filter>
     </ClInclude>
@@ -252,25 +240,13 @@
     <ClInclude Include="Source\Engine\Messaging\MessageTypes.h">
       <Filter>Source\Engine\Messaging</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Engine\Messaging\Messenger.h">
-      <Filter>Source\Engine\Messaging</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Engine\Physics\Collision.h">
       <Filter>Source\Engine\Physics</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Physics\Physics.h">
       <Filter>Source\Engine\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Engine\Physics\Pobject.h">
-      <Filter>Source\Engine\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Engine\Physics\Ptag.h">
-      <Filter>Source\Engine\Physics</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Engine\Physics\Realm.h">
-      <Filter>Source\Engine\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Engine\Physics\Translation.h">
       <Filter>Source\Engine\Physics</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Polygon\Circle.h">
@@ -288,13 +264,13 @@
     <ClInclude Include="Source\Engine\Polygon\Triangle.h">
       <Filter>Source\Engine\Polygon</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Engine\OOComponents\Scene\Layer.h">
+    <ClInclude Include="Source\Engine\Scene\Layer.h">
       <Filter>Source\Engine\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Engine\OOComponents\Scene\Scene.h">
+    <ClInclude Include="Source\Engine\Scene\Scene.h">
       <Filter>Source\Engine\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Engine\OOComponents\Scene\SceneManager.h">
+    <ClInclude Include="Source\Engine\Scene\SceneManager.h">
       <Filter>Source\Engine\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Utils\BitSet.h">
@@ -506,7 +482,6 @@
     <ClInclude Include="Source\Editor\IconsForkAwesome.h" />
     <ClInclude Include="Source\Engine\Graphics\OpenGL\FrameBuffer.h" />
     <ClInclude Include="Source\Engine\Graphics\RenderWindow.h" />
-    <ClInclude Include="Source\Engine\OOComponents\OOComponent.h" />
     <ClInclude Include="Source\Engine\ECS\EntityManager.h" />
     <ClInclude Include="Source\Engine\ECS\ComponentManager.h" />
     <ClInclude Include="Source\Engine\ECS\SystemManager.h" />
@@ -518,11 +493,15 @@
     <ClInclude Include="Source\Engine\ECS\EntityFactory.h" />
     <ClInclude Include="Source\Engine\Graphics\Model.h" />
     <ClInclude Include="Source\Engine\Utils\rdt_string.h" />
+    <ClInclude Include="Source\Engine\Graphics\Animation.h" />
+    <ClInclude Include="Source\Engine\Graphics\Texture\TextureAtlas.h" />
+    <ClInclude Include="Source\Engine\Graphics\AnimationSystem.h" />
+    <ClInclude Include="Source\Engine\ResourceManager\ResourceManager.h" />
+    <ClInclude Include="Source\Engine\Physics\Collider.h" />
+    <ClInclude Include="Source\Engine\Graphics\OpenGL\DrawCall.h" />
+    <ClInclude Include="Source\Engine\Messaging\Communicator.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Editor\DevTools.cpp">
-      <Filter>Source\Editor</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Engine\Application.cpp">
       <Filter>Source\Engine</Filter>
     </ClCompile>
@@ -544,10 +523,7 @@
     <ClCompile Include="Source\Engine\Audio\SoundSource.cpp">
       <Filter>Source\Engine\Audio</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Engine\OOComponents\GameObject\GameObject.cpp">
-      <Filter>Source\Engine\GameObject</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Engine\OOComponents\GameState.cpp">
+    <ClCompile Include="Source\Engine\Utils\GameState.cpp">
       <Filter>Source\Engine\GameObject</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine\Graphics\OpenGL\ErrorHandling.cpp">
@@ -560,9 +536,6 @@
       <Filter>Source\Engine\Graphics\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine\Graphics\OpenGL\RenderCache.cpp">
-      <Filter>Source\Engine\Graphics\OpenGL</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Engine\Graphics\OpenGL\RenderLayer.cpp">
       <Filter>Source\Engine\Graphics\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine\Graphics\OpenGL\RendererGL.cpp">
@@ -595,16 +568,10 @@
     <ClCompile Include="Source\Engine\Logging\Log.cpp">
       <Filter>Source\Engine\Logging</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Messaging\Broadcast.cpp">
-      <Filter>Source\Engine\Messaging</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Engine\Messaging\Message.cpp">
       <Filter>Source\Engine\Messaging</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine\Messaging\MessageBus.cpp">
-      <Filter>Source\Engine\Messaging</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Engine\Messaging\Messenger.cpp">
       <Filter>Source\Engine\Messaging</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine\Physics\Collision.cpp">
@@ -613,16 +580,7 @@
     <ClCompile Include="Source\Engine\Physics\Physics.cpp">
       <Filter>Source\Engine\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Physics\Pobject.cpp">
-      <Filter>Source\Engine\Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Engine\Physics\Ptag.cpp">
-      <Filter>Source\Engine\Physics</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Engine\Physics\Realm.cpp">
-      <Filter>Source\Engine\Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Engine\Physics\Translation.cpp">
       <Filter>Source\Engine\Physics</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine\Polygon\Circle.cpp">
@@ -640,13 +598,13 @@
     <ClCompile Include="Source\Engine\Polygon\Triangle.cpp">
       <Filter>Source\Engine\Polygon</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Engine\OOComponents\Scene\Layer.cpp">
+    <ClCompile Include="Source\Engine\Scene\Layer.cpp">
       <Filter>Source\Engine\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Engine\OOComponents\Scene\Scene.cpp">
+    <ClCompile Include="Source\Engine\Scene\Scene.cpp">
       <Filter>Source\Engine\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Engine\OOComponents\Scene\SceneManager.cpp">
+    <ClCompile Include="Source\Engine\Scene\SceneManager.cpp">
       <Filter>Source\Engine\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine\Utils\BitSet.cpp">
@@ -683,7 +641,6 @@
     <ClCompile Include="Source\Engine\Polygon\PolygonImpl.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\FrameBuffer.cpp" />
     <ClCompile Include="Source\Engine\Graphics\RenderWindow.cpp" />
-    <ClCompile Include="Source\Engine\OOComponents\OOComponent.cpp" />
     <ClCompile Include="Source\Engine\ECS\EntityManager.cpp" />
     <ClCompile Include="Source\Engine\ECS\ComponentManager.cpp" />
     <ClCompile Include="Source\Engine\ECS\SystemManager.cpp" />
@@ -693,6 +650,15 @@
     <ClCompile Include="Source\Engine\ECS\CommonComponents.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Model.cpp" />
     <ClCompile Include="Source\Engine\Utils\rdt_string.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\Texture\TextureAtlas.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\Mesh.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\Animation.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\AnimationSystem.cpp" />
+    <ClCompile Include="Source\Engine\ResourceManager\ResourceManager.cpp" />
+    <ClCompile Include="Source\Engine\Physics\Collider.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\OpenGL\DrawCall.cpp" />
+    <ClCompile Include="Source\Engine\Messaging\Communicator.cpp" />
+    <ClCompile Include="Source\Editor\Editor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Resources\templates\gameObject.h.txt" />

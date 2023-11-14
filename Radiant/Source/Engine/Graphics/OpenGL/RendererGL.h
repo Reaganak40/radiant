@@ -1,6 +1,18 @@
+/*******************************************************************
+*	Module:  Graphics (core)
+*	File:    RendererGL.h
+*
+*	Author: Reagan Kelley
+*
+*	OpenGL implementation of the renderer.
+*******************************************************************/
 #pragma once
 #include "Core.h"
 #include "Graphics/Renderer.h"
+
+// Forward Declarations
+namespace rdt {
+}
 
 // For Opengl rendering
 #include "VertexArray.h"
@@ -8,56 +20,37 @@
 #include "IndexBuffer.h"
 #include "FrameBuffer.h"
 #include "Shader.h"
-#include "RenderLayer.h"
 #include "GeoMode.h"
 #include "RenderCache.h"
 
+#include "DrawCall.h"
+
+#include "Graphics/Mesh.h"
+#include "Utils/Color.h"
+
 namespace rdt::core {
 
-	class RADIANT_API RendererGL : public Renderer {
+	class RendererGL : public Renderer {
 	private:
 
 		// Window management
 		GLFWwindow* m_window;
 		GLFWmonitor* m_monitor;
 		
-#pragma warning(push)
-#pragma warning(disable: 4251)
 		std::string m_window_name;
 
 		int m_window_width;
 		int m_window_height;
 
+		Color m_clear_color;
+		
 		// *****************************************************
 		// 
 		//			  Renderer API dependables
 		// 
 		// *****************************************************
-		struct DrawCommand {
-			UniqueID meshIdentifier;
-			core::RenderType renderType;
-
-
-			DrawCommand(UniqueID nMeshIdentifier, core::RenderType nRenderType)
-				: meshIdentifier(nMeshIdentifier), renderType(nRenderType) {}
-		};
-
-		unsigned int m_current_layer;
 		core::RenderType m_current_render_type;
 		core::RenderCache m_render_cache;
-		std::queue<DrawCommand> m_command_queue;
-
-		bool begin_called;
-		// Assignable mesh attributes
-		Color m_polygon_color;
-		Texture* m_polygon_texture;
-		bool m_should_flip_texture;
-		Vec2i m_polygon_texture_coords;
-		float m_polygon_rotation;
-
-		Color m_line_color;
-
-		Color m_clear_color;
 
 		// *****************************************************
 		// 
@@ -73,13 +66,11 @@ namespace rdt::core {
 			glViewportData(int nPosX = 0, int nPosY = 0, int nWidth = 0, int nHeight = 0)
 				: posX(nPosX), posY(nPosY), width(nWidth), height(nHeight) {}
 		};
+
 		glViewportData m_default_viewport;
 
 		// Use only one VAO
 		core::VertexArray* m_vertex_array;
-
-		// Each layer contains render units (specified draw calls).
-		std::vector<RenderLayer> m_layers;
 
 		// Keep shaders independent from render units.
 		std::vector<Shader*> m_shaders;
@@ -104,7 +95,7 @@ namespace rdt::core {
 		std::vector<GuiTemplate*> m_GUIs;
 		bool m_imgui_newFrameCalled;
 
-#pragma warning(pop)
+		DrawCallAllocator m_drawCallAllocator;
 
 	public:
 		RendererGL();
@@ -132,24 +123,15 @@ namespace rdt::core {
 		
 		/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 		void RenderImpl() override final;
+		void MeshToDrawCalls();
+		void DrawContext();
+		void Draw(glDrawCall* drawCall);
 		/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 		void OnEndFrameImpl() override final;
-		void DrawRectImpl(const Vec2d& origin, const Vec2d& size, const Color& color, unsigned int layer = 0) override final;
-		void DrawLineImpl(const Vec2d& start, const Vec2d& end, const Color& color, unsigned int layer = 0) override final;
-		void BeginImpl(unsigned int layer) override final;
-		void EndImpl() override final;
 
 		void SetRenderTypeImpl(core::RenderType type) override final;
-		void AddPolygonImpl(const Polygon& polygon, const Vec2f& offset) override final;
-		void AddRectImpl(const Vec2d& origin, const Vec2d& size, const Vec2f& offset) override final;
 
-		void AddLineImpl(const Line& line) override final;
-		void SetLineColorImpl(const Color& color) override final;
-		void SetPolygonColorImpl(const Color& color) override final;
-		void SetPolygonRotationImpl(const float radians) override final;
-		void SetPolygonTextureImpl(const std::string& texName, unsigned int atlasX = 0, unsigned int atlasY = 0) override final;
-		void FlipPolygonTextureHorizontalImpl(bool flip) override final;
 		void AttachGuiImpl(GuiTemplate* gui) override final;
 		void DetachGuiImpl(const GuiTemplate* gui) override final;
 
@@ -158,11 +140,9 @@ namespace rdt::core {
 		void _FlushPolygonImpl(const UniqueID UUID) override final;
 		Vec2d _TranslateMouseCoordsToViewportImpl(const Vec2d& mouseCoords, int renderWindowIndex) override final;
 
-
 		/* ***********************************************
 			    OpenGL Rendering Helper Functions
 		** ***********************************************/
-		void DrawContext();
 
 		void SetFBO(FBO_ID fbo);
 		void SetVBO(VBO_ID vbo);

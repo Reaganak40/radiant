@@ -105,7 +105,6 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Source\Editor\DevTools.h" />
     <ClInclude Include="Source\Editor\Editor.h" />
     <ClInclude Include="Source\Editor\IconsForkAwesome.h" />
     <ClInclude Include="Source\Engine\Application.h" />
@@ -115,8 +114,12 @@
     <ClInclude Include="Source\Engine\Audio\SoundData.h" />
     <ClInclude Include="Source\Engine\Audio\SoundEngine.h" />
     <ClInclude Include="Source\Engine\Audio\SoundSource.h" />
+    <ClInclude Include="Source\Engine\Graphics\Animation.h" />
+    <ClInclude Include="Source\Engine\Graphics\AnimationSystem.h" />
     <ClInclude Include="Source\Engine\Graphics\Model.h" />
-    <ClInclude Include="Source\Engine\OOComponents\OOComponent.h" />
+    <ClInclude Include="Source\Engine\Graphics\OpenGL\DrawCall.h" />
+    <ClInclude Include="Source\Engine\Graphics\Texture\TextureAtlas.h" />
+    <ClInclude Include="Source\Engine\Messaging\Communicator.h" />
     <ClInclude Include="Source\Engine\Core.h" />
     <ClInclude Include="Source\Engine\ECS\CommonComponents.h" />
     <ClInclude Include="Source\Engine\ECS\ComponentManager.h" />
@@ -126,8 +129,7 @@
     <ClInclude Include="Source\Engine\ECS\EntityManager.h" />
     <ClInclude Include="Source\Engine\ECS\SystemManager.h" />
     <ClInclude Include="Source\Engine\EntryPoint.h" />
-    <ClInclude Include="Source\Engine\OOComponents\GameObject\GameObject.h" />
-    <ClInclude Include="Source\Engine\OOComponents\GameState.h" />
+    <ClInclude Include="Source\Engine\Utils\GameState.h" />
     <ClInclude Include="Source\Engine\Graphics\Camera.h" />
     <ClInclude Include="Source\Engine\Graphics\Mesh.h" />
     <ClInclude Include="Source\Engine\Graphics\OpenGL\ErrorHandling.h" />
@@ -135,7 +137,6 @@
     <ClInclude Include="Source\Engine\Graphics\OpenGL\GeoMode.h" />
     <ClInclude Include="Source\Engine\Graphics\OpenGL\IndexBuffer.h" />
     <ClInclude Include="Source\Engine\Graphics\OpenGL\RenderCache.h" />
-    <ClInclude Include="Source\Engine\Graphics\OpenGL\RenderLayer.h" />
     <ClInclude Include="Source\Engine\Graphics\OpenGL\RendererGL.h" />
     <ClInclude Include="Source\Engine\Graphics\OpenGL\Shader.h" />
     <ClInclude Include="Source\Engine\Graphics\OpenGL\VertexArray.h" />
@@ -149,27 +150,24 @@
     <ClInclude Include="Source\Engine\Gui\Gui.h" />
     <ClInclude Include="Source\Engine\Gui\GuiManager.h" />
     <ClInclude Include="Source\Engine\Logging\Log.h" />
-    <ClInclude Include="Source\Engine\Messaging\Broadcast.h" />
     <ClInclude Include="Source\Engine\Messaging\Message.h" />
     <ClInclude Include="Source\Engine\Messaging\MessageBus.h" />
     <ClInclude Include="Source\Engine\Messaging\MessageTypes.h" />
-    <ClInclude Include="Source\Engine\Messaging\Messenger.h" />
+    <ClInclude Include="Source\Engine\Physics\Collider.h" />
     <ClInclude Include="Source\Engine\Physics\Collision.h" />
     <ClInclude Include="Source\Engine\Physics\Physics.h" />
     <ClInclude Include="Source\Engine\Physics\PhysicsSystem.h" />
-    <ClInclude Include="Source\Engine\Physics\Pobject.h" />
-    <ClInclude Include="Source\Engine\Physics\Ptag.h" />
     <ClInclude Include="Source\Engine\Physics\Realm.h" />
-    <ClInclude Include="Source\Engine\Physics\Translation.h" />
     <ClInclude Include="Source\Engine\Polygon\Circle.h" />
     <ClInclude Include="Source\Engine\Polygon\Line.h" />
     <ClInclude Include="Source\Engine\Polygon\Polygon.h" />
     <ClInclude Include="Source\Engine\Polygon\PolygonImpl.h" />
     <ClInclude Include="Source\Engine\Polygon\Rect.h" />
     <ClInclude Include="Source\Engine\Polygon\Triangle.h" />
-    <ClInclude Include="Source\Engine\OOComponents\Scene\Layer.h" />
-    <ClInclude Include="Source\Engine\OOComponents\Scene\Scene.h" />
-    <ClInclude Include="Source\Engine\OOComponents\Scene\SceneManager.h" />
+    <ClInclude Include="Source\Engine\Scene\Layer.h" />
+    <ClInclude Include="Source\Engine\Scene\Scene.h" />
+    <ClInclude Include="Source\Engine\Scene\SceneManager.h" />
+    <ClInclude Include="Source\Engine\ResourceManager\ResourceManager.h" />
     <ClInclude Include="Source\Engine\Utils\BitSet.h" />
     <ClInclude Include="Source\Engine\Utils\Color.h" />
     <ClInclude Include="Source\Engine\Utils\ConfigReader.h" />
@@ -241,7 +239,7 @@
     <ClInclude Include="Vendor\stb\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Editor\DevTools.cpp" />
+    <ClCompile Include="Source\Editor\Editor.cpp" />
     <ClCompile Include="Source\Engine\Application.cpp" />
     <ClCompile Include="Source\Engine\Audio\AudioError.cpp" />
     <ClCompile Include="Source\Engine\Audio\Sound\Sound.cpp" />
@@ -250,10 +248,14 @@
     <ClCompile Include="Source\Engine\Audio\SoundEngine.cpp" />
     <ClCompile Include="Source\Engine\Audio\SoundSource.cpp" />
     <ClCompile Include="Source\Engine\ECS\CommonComponents.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\Animation.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\AnimationSystem.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\Mesh.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Model.cpp" />
-    <ClCompile Include="Source\Engine\OOComponents\OOComponent.cpp" />
-    <ClCompile Include="Source\Engine\OOComponents\GameObject\GameObject.cpp" />
-    <ClCompile Include="Source\Engine\OOComponents\GameState.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\OpenGL\DrawCall.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\Texture\TextureAtlas.cpp" />
+    <ClCompile Include="Source\Engine\Messaging\Communicator.cpp" />
+    <ClCompile Include="Source\Engine\Utils\GameState.cpp" />
     <ClCompile Include="Source\Engine\ECS\ComponentManager.cpp" />
     <ClCompile Include="Source\Engine\ECS\EntityFactory.cpp" />
     <ClCompile Include="Source\Engine\ECS\EntityManager.cpp" />
@@ -264,7 +266,6 @@
     <ClCompile Include="Source\Engine\Graphics\OpenGL\GeoMode.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\IndexBuffer.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\RenderCache.cpp" />
-    <ClCompile Include="Source\Engine\Graphics\OpenGL\RenderLayer.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\RendererGL.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\Shader.cpp" />
     <ClCompile Include="Source\Engine\Graphics\OpenGL\VertexArray.cpp" />
@@ -277,26 +278,23 @@
     <ClCompile Include="Source\Engine\Gui\Gui.cpp" />
     <ClCompile Include="Source\Engine\Gui\GuiManager.cpp" />
     <ClCompile Include="Source\Engine\Logging\Log.cpp" />
-    <ClCompile Include="Source\Engine\Messaging\Broadcast.cpp" />
     <ClCompile Include="Source\Engine\Messaging\Message.cpp" />
     <ClCompile Include="Source\Engine\Messaging\MessageBus.cpp" />
-    <ClCompile Include="Source\Engine\Messaging\Messenger.cpp" />
+    <ClCompile Include="Source\Engine\Physics\Collider.cpp" />
     <ClCompile Include="Source\Engine\Physics\Collision.cpp" />
     <ClCompile Include="Source\Engine\Physics\Physics.cpp" />
     <ClCompile Include="Source\Engine\Physics\PhysicsSystem.cpp" />
-    <ClCompile Include="Source\Engine\Physics\Pobject.cpp" />
-    <ClCompile Include="Source\Engine\Physics\Ptag.cpp" />
     <ClCompile Include="Source\Engine\Physics\Realm.cpp" />
-    <ClCompile Include="Source\Engine\Physics\Translation.cpp" />
     <ClCompile Include="Source\Engine\Polygon\Circle.cpp" />
     <ClCompile Include="Source\Engine\Polygon\Line.cpp" />
     <ClCompile Include="Source\Engine\Polygon\Polygon.cpp" />
     <ClCompile Include="Source\Engine\Polygon\PolygonImpl.cpp" />
     <ClCompile Include="Source\Engine\Polygon\Rect.cpp" />
     <ClCompile Include="Source\Engine\Polygon\Triangle.cpp" />
-    <ClCompile Include="Source\Engine\OOComponents\Scene\Layer.cpp" />
-    <ClCompile Include="Source\Engine\OOComponents\Scene\Scene.cpp" />
-    <ClCompile Include="Source\Engine\OOComponents\Scene\SceneManager.cpp" />
+    <ClCompile Include="Source\Engine\Scene\Layer.cpp" />
+    <ClCompile Include="Source\Engine\Scene\Scene.cpp" />
+    <ClCompile Include="Source\Engine\Scene\SceneManager.cpp" />
+    <ClCompile Include="Source\Engine\ResourceManager\ResourceManager.cpp" />
     <ClCompile Include="Source\Engine\Utils\BitSet.cpp" />
     <ClCompile Include="Source\Engine\Utils\Color.cpp" />
     <ClCompile Include="Source\Engine\Utils\ConfigReader.cpp" />

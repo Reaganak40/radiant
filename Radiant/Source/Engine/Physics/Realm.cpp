@@ -3,102 +3,112 @@
 #include "Collision.h"
 #include "Messaging/MessageTypes.h"
 
+#include "ECS/ECS.h"
+#include "Utils/Utils.h"
+
+#include "Collider.h"
+
 namespace rdt::core {
 
     Realm::Realm()
-        : m_ID(GetUniqueID()), m_gravity(0)
     {
+        is_active = false;
+        m_gravity = Vec2d(0, -900);
     }
 
     Realm::~Realm()
     {
-        FreeUniqueID(m_ID);
+    }
+
+    void Realm::PushEntity(Entity nEntity)
+    {
+        m_entities.push_back(nEntity);
+    }
+
+    void Realm::Flush()
+    {
+        m_entities.clear();
+    }
+
+    void Realm::SetActive(bool active)
+    {
+        is_active = active;
     }
 
     void Realm::OnUpdate(const float deltaTime)
     {
-        for (auto& [id1, object1] : m_objects) {
+        if (!is_active) {
+            return;
+        }
 
-            object1.translation.UpdateVelocity(deltaTime);
+        // Entities have already been verified to hold all these components
+        auto rigidbodies = ComponentManager::GetComponent<RigidBody2D>();
+        auto transforms = ComponentManager::GetComponent<Transform>();
+        auto sprites = ComponentManager::GetComponent<Sprite>();
 
-            bool collisionDetected = false;
+        // Create CollisionObjects made from each entity's collider and transform
+        std::unordered_map<Entity, CollisionObject> entityCollisionData;
+        auto getCollisionObject = [&](Entity entity) -> CollisionObject& {
+            if (entityCollisionData.find(entity) == entityCollisionData.end()) {
+                entityCollisionData[entity];
 
-            if (!object1.HasProperties(NoCollision)) {
+                auto& collisionData = entityCollisionData.at(entity);
+                auto& rigidbody = rigidbodies->GetData(entity);
+                auto& transform = transforms->GetData(entity);
+                auto& collider = ColliderManager::GetCollider(rigidbody.colliderID);
 
-                for (auto& [id2, object2] : m_objects) {
-                    if (id1 == id2) {
-                        continue;
-                    }
+                collider.ApplyTransform(transform, collisionData.vertices);
+                collisionData.isRect = collider.IsRect();
+                collisionData.isAxisAligned = collider.IsAxisAligned() && (transform.rotation == 0.0f);
+                collisionData.resolveCollision = true;
 
-                    std::vector<UniqueID> sharedTags;
-                    if (object1.GetSharedTags(object2, sharedTags)) {
-                        bool skip = false;
-                        for (auto tagID : sharedTags) {
-                            if (PtagManager::GetTag(tagID).HasProperties(NoCollision)) {
-                                skip = true;
-                                break;
-                            }
-                        }
-                        if (skip) {
-                            continue;
-                        }
-                    }
-                    
+                collisionData.transform = &transform;
+                collisionData.rigidBody = &rigidbody;
+                collisionData.size = collider.GetSize(transform.scale);
+                collisionData.midpoint = collider.GetMidpoint(transform);
+            }
 
-                    if (Collision::CheckCollision(object1, object2, deltaTime)) {
-                        MessageBus::AddToQueue(m_object_mIDs[id2], m_object_mIDs[id1], MT_Collision, new CollisionData(id2));
-                        collisionDetected = true;
-                    }
+            return entityCollisionData.at(entity);
+            };
+
+        // Update velocities
+        for (auto entity : m_entities) {
+            auto& rigidbody = rigidbodies->GetData(entity);
+
+            Vec2d externalForce;
+            if (rigidbody.use_gravity) {
+                externalForce = m_gravity;
+            }
+            rigidbody.UpdateVelocity(deltaTime, externalForce);
+        }
+
+        // Cycle entities checking for collisions
+        for (auto entity1 : m_entities) {
+
+            auto& collisionObject1 = getCollisionObject(entity1);
+
+            for (auto entity2 : m_entities) {
+                if (entity1 == entity2) {
+                    continue;
+                }
+
+                auto& collisionObject2 = getCollisionObject(entity2);
+                if (Collision::CheckCollision(collisionObject1, collisionObject2, deltaTime)) {
+                    // TODO: Notify/send collision data
                 }
             }
+        }
 
-
-            if (object1.HasProperties(NoCollision) || !collisionDetected || !object1.HasProperties(ppBouncy)) {
-                object1.translation.Translate(*object1.m_polygon, deltaTime);
+        // Do final translation
+        for (auto entity : m_entities) {
+            if (!getCollisionObject(entity).m_object_moved) {
+                transforms->GetData(entity).Translate(deltaTime, rigidbodies->GetData(entity).velocity);
             }
         }
-	}
-    void Realm::OnEndFrame()
-    {
-        for (auto& [id, object] : m_objects) {
-            object.translation.OnEndFrame();
-        }
-    }
-    const UniqueID Realm::CreatePhysicsObject(std::shared_ptr<Polygon> polygon, const MessageID messageID)
-    {
-        UniqueID objectID = GetUniqueID();
-        m_objects[objectID] = Pobject(polygon);
-        m_object_mIDs[objectID] = messageID;
-        
-        m_objects.at(objectID).SetGravity(m_gravity);
-        return objectID;
-    }
-
-    std::shared_ptr<Polygon> Realm::DestroyPhysicsObject(const UniqueID UUID)
-    {
-        if (m_objects.find(UUID) == m_objects.end()) {
-            return std::shared_ptr<Polygon>();
-        }
-
-        std::shared_ptr<Polygon> polygon = m_objects.at(UUID).m_polygon;
-        m_objects.erase(UUID);
-        return polygon;
-    }
-
-    Pobject* Realm::GetPhysicsObject(const UniqueID UUID)
-    {
-        if (m_objects.find(UUID) == m_objects.end()) {
-            return nullptr;
-        }
-
-        return &m_objects.at(UUID);
     }
 
     void Realm::SetGravity(double mps2)
     {
-        m_gravity = mps2;
-        for (auto& [id, object] : m_objects) {
-            object.SetGravity(m_gravity);
-        }
+        m_gravity.y = mps2;
     }
 }

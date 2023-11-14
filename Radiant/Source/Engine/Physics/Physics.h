@@ -1,26 +1,54 @@
 #pragma once
 #include "Core.h"
-#include "Pobject.h"
 #include "Utils/UniqueID.h"
 #include "Realm.h"
 #include "Messaging/MessageBus.h"
 
+// Forward Declarations
 namespace rdt {
+	using Entity = unsigned int;
+}
+
+#define RDT_NULL_REALM_ID 0
+
+namespace rdt {
+	using RealmID = unsigned int;
+
+	// =======================================================================================
+	enum PhysicalProperties {
+		PhysicalProperty_None = 0,	   // No special physical properties
+		PhysicalProperty_NoCollision = (1 << 0), // Do not detect or resolve any collisions
+		PhysicalProperty_Bouncy = (1 << 1), // When colliding with an object, bounce back.
+		PhysicalProperty_DontResolve = (1 << 2), // Detect but do not resolve collisions
+	};
+
+	inline PhysicalProperties operator|(PhysicalProperties a, PhysicalProperties b)
+	{
+		return static_cast<PhysicalProperties>(static_cast<int>(a) | static_cast<int>(b));
+	}
+
+	inline PhysicalProperties& operator |=(PhysicalProperties& a, PhysicalProperties b)
+	{
+		return a = a | b;
+	}
+
+	inline PhysicalProperties operator^(PhysicalProperties a, PhysicalProperties b)
+	{
+		return static_cast<PhysicalProperties>(static_cast<int>(a) ^ static_cast<int>(b));
+	}
+
+	inline PhysicalProperties operator^=(PhysicalProperties& a, PhysicalProperties b)
+	{
+		return a = a ^ b;
+	}
+	// =======================================================================================
 
 	class RADIANT_API Physics {
 	private:
-		/* Singleton Implementation*/
-		Physics();
-		~Physics();
-		static Physics* m_instance;
-
-		/* Pimpl Implementation */
 		struct Impl;
-		Impl* m_impl;
+		static Impl* m_impl;
 
 	public:
-		static Physics* GetInstance();
-
 		/*
 			Creates a new instance of the Physics engine API.
 		*/
@@ -36,169 +64,38 @@ namespace rdt {
 			detecting collisions, and resolves them according to rules. Creates a message queue
 			to be used by game objects for final update procedures.
 		*/
-		static void OnUpdate(const float deltaTime) { m_instance->OnUpdateImpl(deltaTime); }
-
-		/*
-			Performs end of frame routines for the physics API.
-		*/
-		static void OnEndFrame() { m_instance->OnEndFrameImpl(); }
-
+		static void OnUpdate(const float deltaTime);
 
 		/*
 			Creates a new self-contained realm to add physical objects to.
 		*/
-
-		static UniqueID CreateRealm() { return m_instance->CreateRealmImpl(); }
+		static RealmID CreateRealm();
 		
 		/*
 			Activates a realm, meaning that the objects in this realm will be updates
 			each update cycle.
 		*/
-		static void ActivateRealm(const UniqueID realmID) { m_instance->ActivateRealmImpl(realmID); }
+		static void ActivateRealm(const RealmID realm);
 
 		/*
 			Deactivates an activated realm from the update cycle.
 		*/
-		static void DeactivateRealm(const UniqueID realmID) { m_instance->DeactivateRealmImpl(realmID); }
+		static void DeactivateRealm(const RealmID realm);
 
 		/*
-			Adds an object to the physical world. Returns its UUID for future lookups. 
+			Returns true if a realm is regisrted with the given realmID
 		*/
-		static UniqueID CreateObject(const UniqueID realmID, const MessageID messageID, std::shared_ptr<Polygon> polygon) { return m_instance->CreateObjectImpl(realmID, messageID, polygon); }
+		static bool RealmExists(const RealmID realm);
 
 		/*
-			Removes an object from the physical world. Returns its polygon for easy reintroduction if desired.
+			Adds an entity to the provided realm for this session. Returns
+			false if realm does not exist.
 		*/
-		static std::shared_ptr<Polygon> RemoveObject(const UniqueID realmID, const UniqueID objectID) { return m_instance->RemoveObjectImpl(realmID, objectID); }
-
-		/*
-			Sets an existing objects properties in the physical world.
-		*/
-		static void SetObjectProperties(const UniqueID realmID, const UniqueID objectID, PhysicalProperties nProperties) {
-			m_instance->SetObjectPropertiesImpl(realmID, objectID, nProperties);
-		}
-
-		/*
-			Removes an existing objects properties in the physical world.
-		*/
-		static void RemoveObjectProperties(const UniqueID realmID, const UniqueID objectID, PhysicalProperties rProperties) {
-			m_instance->RemoveObjectPropertiesImpl(realmID, objectID, rProperties);
-		}
-
-		/*
-			Returns true if the queried object has any of the specified properties.
-		*/
-		static bool QueryObjectProperties(const UniqueID realmID, const UniqueID objectID, PhysicalProperties propertyQuery) {
-			return m_instance->QueryObjectPropertiesImpl(realmID, objectID, propertyQuery);
-		}
-
-		/*
-			Gets a const reference to the polygon indiciated by the Unique identifier.
-		*/
-		static const Polygon& GetPolygon(const UniqueID realmID, const UniqueID objectID) { return m_instance->GetPolygonImpl(realmID, objectID); }
+		static bool AddEntityToRealm(const RealmID realm, const Entity entity);
 
 
-		static void CreatePtag(const std::string& tagName, PhysicalProperties tagProperties = NoProperties) { m_instance->CreatePtagImpl(tagName, tagProperties); }
-
-		/*
-			Adds a tag to the physics object, which will be used to interact with other objects.
-		*/
-		static void AddPTag(const UniqueID realmID, const UniqueID objectID, const std::string& tagName) { m_instance->AddPTagImpl(tagName, realmID, objectID); }
-		
-		/*
-			Adds a graviational force to the realm, measured by its accelration ("meters" per second squared)
-		*/
-		static void SetGravity(const UniqueID realmID, double mps2) { m_instance->SetGravityImpl(realmID, mps2); }
-		/*
-			Sets the friction magnitude of the specified object. [0 to 1], where 0 is
-			no friction, and 1 is maximum friction.
-		*/
-		static void SetFriction(const UniqueID realmID, const UniqueID objectID, const double friction) { m_instance->SetFrictionImpl(realmID, objectID, friction); }
-
-		/*
-			Sets the accerlation vector to the new provided vector.
-		*/
-		static void SetAcceleration(const UniqueID realmID, const UniqueID objectID, const Vec2d& nAcceleration) { m_instance->SetAccelerationImpl(realmID, objectID, nAcceleration); }
-		
-		/*
-			Sets the acceleration vector in the x-direction
-		*/
-		static void SetAccelerationX(const UniqueID realmID, const UniqueID objectID, const double nX) { m_instance->SetAccelerationXImpl(realmID, objectID, nX); }
-		
-		/*
-			Sets the acceleration vector in the y-direction
-		*/
-		static void SetAccelerationY(const UniqueID realmID, const UniqueID objectID, const double nY) { m_instance->SetAccelerationYImpl(realmID, objectID, nY); }
-
-		/*
-			Sets a maximum velocity for the specified object.
-		*/
-		static void SetMaximumVelocity(const UniqueID realmID, const UniqueID objectID, const Vec2d& nMaxVelocity) { m_instance->SetMaximumVelocityImpl(realmID, objectID, nMaxVelocity); }
-
-		/*
-			Sets the current velocity for the spciefied object.
-		*/
-		static void SetVelocity(const UniqueID realmID, const UniqueID objectID, Vec2d velocity) { m_instance->SetVelocityImpl(realmID, objectID, velocity); }
-
-		/*
-			Manually sets the current position of an object, effectively teleporting it.
-		*/
-		static void SetPosition(const UniqueID realmID, const UniqueID objectID, const Vec2d& nPosition) { m_instance->SetPositionImpl(realmID, objectID, nPosition); }
-		
-		/*
-			Manually sets the current rotation of an object.
-		*/
-		static void SetRotation(const UniqueID realmID, const UniqueID objectID, const double nRadians) { m_instance->SetRotationImpl(realmID, objectID, nRadians); }
-
-		/*
-			Set the hitbox size of the physics object. This is by scale where 1x1 makes the hitbox
-			the same as the shape of the polygon, and less than that shrinks the hitbox.
-		*/
-		static void SetHitBoxSize(const UniqueID realmID, const UniqueID objectID, const Vec2d& nSize) {
-			m_instance->SetHitBoxSizeImpl(realmID, objectID, nSize);
-		}
-		/*
-			Gets the current velocity of the queried object.
-		*/
-		static Vec2d GetVelocity(const UniqueID realmID, const UniqueID objectID) { return m_instance->GetVelocityImpl(realmID, objectID); }
-
-		/*
-			Gets the current position of the queried object
-		*/
-		static Vec2d GetPosition(const UniqueID realmID, const UniqueID objectID) { return m_instance->GetPositionImpl(realmID, objectID); }
+		friend class PhysicsSystem;
 private:
-
-		void OnUpdateImpl(const float deltaTime);
-		void OnEndFrameImpl();
-
-		UniqueID CreateRealmImpl();
-		void ActivateRealmImpl(const UniqueID realmID);
-		void DeactivateRealmImpl(const UniqueID realmID);
-
-
-		const Polygon& GetPolygonImpl(const UniqueID realmID, const UniqueID objectID);
-
-		void SetObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, PhysicalProperties nProperties);
-		void RemoveObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, PhysicalProperties nProperties);
-		bool QueryObjectPropertiesImpl(const UniqueID realmID, const UniqueID objectID, PhysicalProperties propertyQuery);
-
-		UniqueID CreateObjectImpl(const UniqueID realmID, const MessageID messageID, std::shared_ptr<Polygon> polygon);
-		std::shared_ptr<Polygon> RemoveObjectImpl(const UniqueID realmID, const UniqueID objectID);
-
-		void CreatePtagImpl(const std::string& tagName, PhysicalProperties tagProperties);
-		void AddPTagImpl(const std::string& tagName, const UniqueID realmID, const UniqueID objectID);
-		void SetAccelerationImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nAcceleration);
-		void SetAccelerationXImpl(const UniqueID realmID, const UniqueID objectID, const double nX);
-		void SetAccelerationYImpl(const UniqueID realmID, const UniqueID objectID, const double nY);
-		void SetVelocityImpl(const UniqueID realmID, const UniqueID objectID, Vec2d& nVelocity);
-		void SetMaximumVelocityImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nMaxVelocity);
-		void SetGravityImpl(const UniqueID realmID, double mps2);
-		void SetFrictionImpl(const UniqueID realmID, const UniqueID objectID, const double friction);
-		void SetPositionImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nPosition);
-		void SetRotationImpl(const UniqueID realmID, const UniqueID objectID, const double nRadians);
-		void SetHitBoxSizeImpl(const UniqueID realmID, const UniqueID objectID, const Vec2d& nSize);
-
-		Vec2d GetVelocityImpl(const UniqueID realmID, const UniqueID objectID);
-		Vec2d GetPositionImpl(const UniqueID realmID, const UniqueID objectID);
+		
 	};
 }

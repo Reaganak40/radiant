@@ -2,6 +2,7 @@
 #include "Input.h"
 #include "Utils.h"
 #include "Engine/Graphics/Renderer.h"
+#include "Logging/Log.h"
 
 namespace rdt {
 

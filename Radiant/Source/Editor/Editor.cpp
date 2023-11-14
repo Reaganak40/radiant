@@ -1,110 +1,37 @@
 #include "pch.h"
-#include "DevTools.h"
+#include "Editor.h"
+#include "Gui/GuiManager.h"
+#include "Graphics/Renderer.h"
+#include "Graphics/Texture/TextureManager.h"
+#include "Graphics/Texture/Texture.h"
+#include "Graphics/Model.h"
+#include "Physics/Collider.h"
+#include "ECS/ECS.h"
+#include "Scene/Layer.h"
+#include "Scene/Scene.h"
+#include "Utils/Input.h"
+#include "Polygon/Polygon.h"
+#include "Utils/MathTypes.h"
+#include "Utils/Utils.h"
 #include "IconsForkAwesome.h"
 
-#include "Messaging/MessageTypes.h"
-#include "Graphics/Renderer.h"
-#include "Physics/Physics.h"
-#include "Utils/Utils.h"
-
-#include "Gui/GuiManager.h"
 
 namespace fs = std::filesystem;
 
+// =====================================================================================
+enum rdt::core::EditorTheme {
+	Theme_Codz,
+	Nightingale,
+	ET_NAT, // Not a theme
+};
+
+enum rdt::core::EditorFont {
+	NunitoSans = 1,
+	NunitoSans_Bold,
+	ForkAwesome,
+};
+// =====================================================================================
 namespace rdt::core {
-
-	DevLayer* DevLayer::m_instance = nullptr;
-
-	DevLayer::DevLayer()
-	{
-		RDT_CORE_WARN("Developer tools are enabled");
-
-		RegisterToMessageBus("DevLayer");
-
-		Editor* layout;
-		RegisterGUI(layout = new Editor);
-
-		m_base_directory = Utils::GetCWD();
-		RDT_CORE_INFO("DevTools base directory: {}", m_base_directory);
-
-		fs::path configFile = fs::path(m_base_directory) / fs::path("radiant.ini");
-		m_config.SetTargetFile(configFile.generic_string());
-		m_config.Read();
-
-		fs::path sourceFile = fs::path(m_base_directory) / fs::path("Source");
-		layout->SetSourcePath(sourceFile.generic_string());
-
-		if (m_config.GetAttribute("Core", "ProjectName", m_projectName)) {
-			RDT_CORE_TRACE("DevTools enabled for '{}'", m_projectName);
-		}
-		else {
-			RDT_CORE_WARN("No project found!");
-		}
-
-		if (m_config.GetAttribute("Core", "Resources", m_resources_filepath)) {
-			RDT_CORE_TRACE("Resources found at '{}'", m_resources_filepath);
-			layout->InitResources(m_resources_filepath);
-		}
-		else {
-			RDT_CORE_WARN("No resource filepath found!");
-		}
-
-		layout->AddConfigPtr(&m_config);
-		layout->ApplyConfig();
-
-		Renderer::SetBackgroundColor({0.2f, 0.2f, 0.2f, 1.0f});
-	}
-	DevLayer::~DevLayer()
-	{
-		m_config.Write();
-	}
-
-	void DevLayer::Destroy()
-	{
-		if (m_instance != nullptr) {
-			delete m_instance;
-			m_instance = nullptr;
-		}
-	}
-
-	DevLayer* DevLayer::GetInstance()
-	{
-		if (m_instance == nullptr) {
-			m_instance = new DevLayer;
-		}
-
-		return m_instance;
-	}
-
-	void DevLayer::OnAttach()
-	{
-		for (auto& gui : GetGUIs()) {
-			Renderer::AttachGui(gui);
-		}
-	}
-
-	void DevLayer::OnDetach()
-	{
-		for (auto& gui : GetGUIs()) {
-			Renderer::DetachGui(gui);
-		}
-	}
-	void DevLayer::OnMessage(Message msg)
-	{
-	
-	}
-	void DevLayer::OnProcessInput(const float deltaTime)
-	{
-		Layer::OnProcessInput(deltaTime);
-	}
-
-	void DevLayer::OnRender()
-	{
-		Layer::OnRender();
-	}
-
-	// ==============================================================================
-
 	constexpr float GameWindowPanelGuiWidth = 1115;
 	constexpr float GameWindowPanelGuiHeight = 653.0f;
 	constexpr float PanelMargin = 7.5f;
@@ -230,13 +157,13 @@ namespace rdt::core {
 	struct MenuBarImpl : public Panel::Impl {
 
 		void CallOpenPanel(PanelType panel) {
-			MessageBus::SendDirectMessage(FROM_ANONYMOUS, MessageBus::GetMessageID("Editor"), CM_OpenPanelRequest,
-				new OpenPanelRequestData(panel));
+			/*MessageBus::SendDirectMessage(FROM_ANONYMOUS, MessageBus::GetMessageID("Editor"), CM_OpenPanelRequest,
+				new OpenPanelRequestData(panel));*/
 		}
 
 		void CallChangeTheme(EditorTheme nTheme) {
-			MessageBus::SendDirectMessage(FROM_ANONYMOUS, MessageBus::GetMessageID("Editor"), CM_ChangeSceneRequest,
-				new ChangeThemeRequestData(nTheme));
+			/*MessageBus::SendDirectMessage(FROM_ANONYMOUS, MessageBus::GetMessageID("Editor"), CM_ChangeSceneRequest,
+				new ChangeThemeRequestData(nTheme));*/
 		}
 
 		void OnRender() override final {
@@ -447,12 +374,11 @@ namespace rdt::core {
 	struct LayerPanelImpl : public Panel::Impl {
 		std::string panel_header = "Layer: ";
 		float lastGameObjectPanelHeight = 0.0f;
-		Layer* layer = nullptr;
+		std::shared_ptr<Layer>layer = nullptr;
 		float nodeListMaxY = 500.0f;
 
 		enum NodeType {
 			LPNT_Entity,
-			LPNT_GameObject
 		};
 
 		struct Node {
@@ -464,9 +390,9 @@ namespace rdt::core {
 
 		// Index 0: Entity Node
 		// Index 1: Game Object Node
-		Node nodes[2];
+		Node nodes[1];
 
-		LayerPanelImpl(Layer* ref)
+		LayerPanelImpl(std::shared_ptr<Layer> ref)
 			: layer(ref) 
 		{
 			if (ref == nullptr) {
@@ -477,32 +403,6 @@ namespace rdt::core {
 			panel_header += typeid(*layer).name();
 
 			nodes[0].type = LPNT_Entity;
-			nodes[1].type = LPNT_GameObject;
-		}
-
-		void AddGameObjectItem(GameObject* gobject) 
-		{
-			std::string name = typeid(*gobject).name();
-			std::string panel_header = name.substr(6, name.size() - 6) + ": " + gobject->GetName();
-
-			if (ImGui::CollapsingHeader(panel_header.c_str())) {
-
-				ImGui::Text("GameObjectID: %d", gobject->GetID());
-				if (gobject->GetModelID() != 0 && gobject->GetRealmID() != 0) {
-					ImGui::Text("RealmID: %d", gobject->GetRealmID());
-					ImGui::Text("ModelID: %d", gobject->GetModelID());
-
-					Vec2d pos = Physics::GetPosition(gobject->GetRealmID(), gobject->GetModelID());
-					ImGui::Text("Position: (%.2f, %.2f)", pos.x, pos.y);
-
-					Vec2d vel = Physics::GetVelocity(gobject->GetRealmID(), gobject->GetModelID());
-					ImGui::Text("Velocity: (%.2f, %.2f)", vel.x, vel.y);
-
-				}
-				else {
-					ImGui::Text("Not Registered to any realms.");
-				}
-			}
 		}
 
 		void AddEntityItem(Entity entity) {
@@ -549,15 +449,6 @@ namespace rdt::core {
 			}
 		}
 
-		void AddGameObjectPanel() {
-
-			size_t itemCount = 0;
-			layer->GetGameObjects(&itemCount);
-			nodes[1].itemCount = itemCount;
-			RenderNode(nodes[1]);
-		}
-
-
 		void AddEntityPanel() {
 
 			nodes[0].itemCount = layer->GetEntities().size();
@@ -566,7 +457,7 @@ namespace rdt::core {
 
 		void RenderNode(Node& node) {
 
-			ImVec2 nodeChildWindowSize = ImVec2(ImGui::GetWindowSize().x * 0.90, node.lastSize);
+			ImVec2 nodeChildWindowSize = ImVec2(ImGui::GetWindowSize().x * 0.90f, node.lastSize);
 
 			if (!node.nodeOpen) {
 				nodeChildWindowSize.y = 25;
@@ -587,8 +478,8 @@ namespace rdt::core {
 					ImGui::Text(("Browse " + (std::string)(node.type == LPNT_Entity ? "Entities: " : "GameObjects: ")).c_str());
 					if (node.itemCount > 0) {
 
-						nodeChildWindowSize.x *= 0.95;
-						nodeChildWindowSize.y -= 75;
+						nodeChildWindowSize.x *= 0.95f;
+						nodeChildWindowSize.y -= 75.0f;
 						indent = (ImGui::GetWindowSize().x - nodeChildWindowSize.x) / 2;
 						ImGui::SetCursorPosX(indent);
 						std::string child2 = (panel_header + "- " + (node.type == LPNT_Entity ? "Entity" : "GameObject") + "List");
@@ -598,16 +489,6 @@ namespace rdt::core {
 							case LPNT_Entity:
 								for (auto entity : layer->GetEntities()) {
 									AddEntityItem(entity);
-								}
-								break;
-
-							case LPNT_GameObject:
-								{
-									size_t itemCount = 0;
-									GameObject** objects = layer->GetGameObjects(&itemCount);
-									for (size_t i = 0; i < itemCount; i++) {
-										AddGameObjectItem(objects[i]);
-									}
 								}
 								break;
 							}
@@ -623,9 +504,7 @@ namespace rdt::core {
 
 		void OnRender() override final {
 			if (ImGui::CollapsingHeader(panel_header.c_str())) {
-
 				AddEntityPanel();
-				AddGameObjectPanel();
 			}
 		}
 	};
@@ -649,14 +528,14 @@ namespace rdt::core {
 			config.yPos = 100;
 		}
 
-		void AddLayerPanel(Layer* layer) {
+		void AddLayerPanel(std::shared_ptr<Layer> layer) {
 
 			if (m_layers.find(layer->GetID()) == m_layers.end()) {
 				m_layers[layer->GetID()] = new LayerPanelImpl(layer);
 			}
 		}
 
-		void RenderLayerPanel(Layer* layer) {
+		void RenderLayerPanel(std::shared_ptr<Layer> layer) {
 			m_layers.at(layer->GetID())->OnRender();
 		}
 
@@ -667,13 +546,10 @@ namespace rdt::core {
 					ImGui::Text("No Scene Selected!");
 				}
 				else {
-					ImGui::Text("Scene: %s", Editor::m_scene->GetName().c_str());
-
-					size_t count;
-					Layer** layers = Editor::m_scene->GetLayers(&count);
-					for (size_t i = 0; i < count; i++) {
-						AddLayerPanel(layers[i]);
-						RenderLayerPanel(layers[i]);
+					ImGui::Text("Scene: %s", Editor::m_scene->GetName());
+					for (auto& layer : Editor::m_scene->GetLayers()) {
+						AddLayerPanel(layer);
+						RenderLayerPanel(layer);
 					}
 				}
 			}
@@ -746,7 +622,7 @@ namespace rdt::core {
 					ImGui::Text("%s", EntityManager::GetEntityAlias(entity));
 
 					ImGui::TableNextColumn();
-					ImGui::Text("%d", entitySignature.count());
+					ImGui::Text("%d", entitySignature.count() - RDT_NUM_HIDDEN_COMPONENTS);
 
 					current_row++;
 				}
@@ -762,6 +638,27 @@ namespace rdt::core {
 			}
 		}
 		
+		void ShowSetTexturePanel(bool* isOpen) {
+			char texSelectionLabel[60];
+			sprintf_s(texSelectionLabel, 60, "Set Texture for Entity [id:%d] ###SetTexturePanel", selectedEntity);
+
+			ImGui::SetNextWindowSize(ImVec2(300, 350), ImGuiCond_Appearing);
+
+			ImGuiWindowFlags setTexturePanelFlags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar;
+			if (ImGui::Begin(texSelectionLabel, isOpen, setTexturePanelFlags)) {
+				if (ImGui::BeginMenuBar()) {
+					if (ImGui::BeginMenu("File")) {
+						if (ImGui::MenuItem("Load Texture (.png)")) {
+						}
+						ImGui::EndMenu();
+					}
+
+					ImGui::EndMenuBar();
+				}
+			}
+			ImGui::End();
+		}
+
 		void RenderEditTool(const char* name, void* data, const core::TraceData& info) {
 			
 			auto next_sub_row = []() {
@@ -787,6 +684,194 @@ namespace rdt::core {
 			data = (unsigned char*)data + info.offset;
 
 			switch (info.type) {
+			case SupportedTraceType_textureID:
+			{
+				title("TextureID", name);
+
+				
+				static bool showTextureSelection = false;
+
+				TextureID texture = *((TextureID*)data);
+				const char* texture_name = TextureManager::GetTextureAlias(texture);
+				ImGui::Text("Using:");
+				ImGui::SameLine();
+				ImGui::PushFont(Editor::m_fonts[NunitoSans_Bold][18]);
+				ImGui::Text(texture_name);
+				ImGui::PopFont();
+				
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - Editor::GetButtonWidth("Browse        "));
+				if (ImGui::Button("Browse        ")) {
+					showTextureSelection = true;
+				}
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() - ImGui::CalcTextSize("C").x - ImGui::GetStyle().FramePadding.x - ImGui::GetStyle().ItemSpacing.x * 2);
+				Editor::AddIcon(ICON_FK_FILE_IMAGE_O);
+
+				next_sub_row();
+
+				// Show what texture looks like
+				Vec2i img_size = Vec2i::Zero();
+				glTextureID glTexID = Editor::GetImGuiTextureData(texture, img_size.x, img_size.y);
+				img_size.y = ((ImGui::GetContentRegionAvail().x - 2) * img_size.y) / img_size.x;
+				img_size.x = ImGui::GetContentRegionAvail().x - 2;
+
+				ImVec2 uv_min = ImVec2(0.0f, 0.0f);                 // Top-left
+				ImVec2 uv_max = ImVec2(1.0f, 1.0f);                 // Lower-right
+				ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);   // No tint
+				ImVec4 border_col = ImGui::GetStyleColorVec4(ImGuiCol_Border);
+
+				ImGui::Image((void*)(intptr_t)glTexID, ImVec2(img_size.x, img_size.y), uv_min, uv_max, tint_col, border_col);
+				
+				if (showTextureSelection) {
+					ShowSetTexturePanel(&showTextureSelection);
+				}
+			}
+			break;
+			case SupportedTraceType_bool:
+			{
+				title("Bool", name);
+				bool val = *((bool*)data);
+
+				ImGui::Text("Enable:");
+				ImGui::SameLine();
+				
+				char checkbox_label[40];
+				sprintf_s(checkbox_label, 40, "##checkboxLabel_%s", name);
+				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+				if (ImGui::Checkbox(checkbox_label, &val)) {
+					*((bool*)data) = val;
+				}
+				ImGui::PopStyleVar();
+				
+			}
+				break;
+			case SupportedTraceType_modelID:
+			{
+				title("ModelID", name);
+
+				ModelID model = *((ModelID*)data);
+				const char* model_name = ModelManager::GetModelAlias(model);
+				ImGui::Text("Name:");
+				ImGui::SameLine();
+				ImGui::PushFont(Editor::m_fonts[NunitoSans_Bold][18]);
+				ImGui::Text(model_name);
+				ImGui::PopFont();
+			}
+				break;
+			case SupportedTraceType_colliderID:
+			{
+				title("ColliderID", name);
+
+				ColliderID colliderID = *((ColliderID*)data);
+				
+				const char* collider_name = ColliderManager::GetColliderAlias(colliderID);
+				ImGui::Text("Name:");
+				ImGui::SameLine();
+				ImGui::PushFont(Editor::m_fonts[NunitoSans_Bold][18]);
+				ImGui::Text(collider_name);
+				ImGui::PopFont();
+
+				next_sub_row();
+				ImGui::Text("Show Hitbox:");
+				ImGui::SameLine();
+
+				DebugComponent* dc = Editor::GetDebugComponent(selectedEntity);
+				
+				char checkbox_label[40];
+				sprintf_s(checkbox_label, 40, "##checkboxLabel_%s", name);
+				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+				if(ImGui::Checkbox(checkbox_label, &dc->show_collider_hitbox)) {
+
+				}
+				ImGui::PopStyleVar();
+
+			}
+				break;
+			case SupportedTraceType_angle:
+			{
+				title("Angle", name);
+
+				char combo_label[40];
+				sprintf_s(combo_label, 40, "##angleUnitOption_%s", name);
+				int selection = Editor::GetComboxBoxResult(combo_label);
+
+				float val = ((Angle*)data)->radians;
+				char label[30];
+				sprintf_s(label, 30, "##editAngle_%s", name);
+
+				if (selection <= 0) {
+					if (ImGui::SliderFloat(label, &val, 0.0f, 2 * (float)M_PI)) {
+						((Angle*)data)->radians = val;
+					}
+				}
+				else {
+					val = Utils::RadiansToDegrees(val);
+					if (ImGui::SliderFloat(label, &val, 0.0f, 360)) {
+						((Angle*)data)->radians = Utils::DegreesToRadians(val);
+					}
+				}
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(ImGui::GetCursorPosX() - 5);
+
+				const char* options[] = { "  radians", "  degrees" };
+				ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+				Editor::AddComboBox(combo_label, options, 2, "  radians");
+				ImGui::PopItemWidth();
+			}
+			break;
+			case SupportedTraceType_float:
+			{
+				title("float", name);
+
+				float val = *((float*)data);
+				char label[30];
+				sprintf_s(label, 30, "##editfloat_%s", name);
+				ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+				if (ImGui::DragFloat(label, &val, 2)) {
+					*((float*)data) = val;
+				}
+				ImGui::PopItemWidth();
+
+			}
+			break;
+			case SupportedTraceType_vec2d:
+			{
+				title("Vec2d", name);
+
+				float valX = (float)((Vec2d*)data)->x;
+				float valY = (float)((Vec2d*)data)->y;
+
+				// X label
+				float xStart = ImGui::GetCursorPosX();
+				ImGui::Text("x:");
+				ImGui::SameLine();
+				float itemWidth = (ImGui::GetContentRegionAvail().x - (ImGui::GetCursorPosX() - xStart)) / 2;
+
+				// Edit X
+				char label[30];
+				sprintf_s(label, 30, "##editX_%s", name);
+				ImGui::PushItemWidth(itemWidth);
+				if (ImGui::DragFloat(label, &valX, 2)) {
+					((Vec2d*)data)->x = (double)valX;
+				}
+				ImGui::PopItemWidth();
+
+				// Y label
+				ImGui::SameLine();
+				ImGui::Text("y:");
+
+				// Edit Y
+				ImGui::SameLine();
+				sprintf_s(label, 30, "##editY_%s", name);
+				ImGui::PushItemWidth(itemWidth);
+				if (ImGui::DragFloat(label, &valY, 2)) {
+					((Vec2d*)data)->y = (double)valY;
+				}
+				ImGui::PopItemWidth();
+			}
+				break;
 			case SupportedTraceType_color:
 			{
 				title("Color", name);
@@ -816,13 +901,13 @@ namespace rdt::core {
 				}
 			}
 				break;
-
 			case SupportedTraceType_polygon:
 			{	
 				title("Polygon", name);
 				
 				Vec2d coords = (*((std::shared_ptr<Polygon>*)data))->GetOrigin();
-				float vals[2] = { coords.x, coords.y };
+				float vals[2] = { (float)coords.x, (float)coords.y };
+
 
 				ImGui::Text("Position:");
 				ImGui::SameLine();
@@ -831,11 +916,11 @@ namespace rdt::core {
 				if (ImGui::DragFloat2("##updateOrigin", vals, 2)) {
 					(*((std::shared_ptr<Polygon>*)data))->SetPosition({ vals[0], vals[1] });
 				}
-				ImGui::PopItemWidth();
-
+				ImGui::PopItemWidth();		
 				next_sub_row();
-				vals[0] = (*((std::shared_ptr<Polygon>*)data))->GetWidth();
-				vals[1] = (*((std::shared_ptr<Polygon>*)data))->GetHeight();
+
+				vals[0] = (float)(*((std::shared_ptr<Polygon>*)data))->GetWidth();
+				vals[1] = (float)(*((std::shared_ptr<Polygon>*)data))->GetHeight();
 				ImGui::Text("Size:");
 				ImGui::SameLine();
 				ImGui::SetCursorPosX(xAlign);
@@ -846,7 +931,6 @@ namespace rdt::core {
 				ImGui::PopItemWidth();
 			}
 			break;
-
 			case SupportedTraceType_uint:
 			{
 				title("unsigned int", name);
@@ -866,7 +950,6 @@ namespace rdt::core {
 				ImGui::PopItemWidth();
 			}
 				break;
-
 			case SupportedTraceType_double:
 			{
 				title("double", name);
@@ -919,34 +1002,48 @@ namespace rdt::core {
 					if (signature[index]) {
 						std::string componentName = ComponentManager::GetComponenentName(index);
 						
+						// Don't show hidden component
+						if (ComponentManager::IsHiddenComponent(componentName)) {
+							continue;
+						}
+
+						// Component Icon
 						Editor::AddIcon(ICON_FK_CUBES);
 						ImGui::SameLine();
+						float headerStartX = ImGui::GetCursorPosX();
 
+						// Component Collapsing Header
 						char checkboxLabel[60];
 						sprintf_s(checkboxLabel, 60, "##%s_enable", componentName.c_str());
-						bool isChecked = true;
-
 						ImGui::PushFont(Editor::m_fonts[NunitoSans_Bold][18]);
-
 						bool componentMenuOpen = ImGui::TreeNodeEx(componentName.c_str(), ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_CollapsingHeader | ImGuiTreeNodeFlags_AllowItemOverlap, componentName.c_str());
 						ImGui::PopFont();
+						
+						// Set component enable button position
 						ImGui::SameLine();
-						ImGui::SetCursorPosX(ImGui::GetWindowWidth() - ImGui::CalcTextSize("C").x - 13.5 - ImGui::GetStyle().ItemInnerSpacing.x);
+						ImGui::SetCursorPosX(headerStartX + ImGui::GetItemRectSize().x - (ImGui::CalcTextSize("C").x + 13.5f + ImGui::GetStyle().ItemInnerSpacing.x));
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2.5);
 
+						// Component enable button
+						bool isChecked = EntityManager::IsComponentEnabled(selectedEntity, index);
 						ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
 						ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.8f, 0.8f, 0.8f, 1.0f));
 						ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
 						ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
-						ImGui::Checkbox(checkboxLabel, &isChecked);
+						if (ImGui::Checkbox(checkboxLabel, &isChecked)) {
+							if (isChecked) {
+								EntityManager::EnableComponent(selectedEntity, index);
+							}
+							else {
+								EntityManager::DisableComponent(selectedEntity, index);
+							}
+						}
 						ImGui::PopStyleVar();
 						ImGui::PopStyleColor(3);
 
+						// If component collapsing header is open
 						if (componentMenuOpen) {
 							ImGui::Indent(10);
-							
-
-							
 
 							if (!ComponentTraceTracker::GetTraceData(componentName.c_str()).size()) {
 								ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
@@ -962,10 +1059,10 @@ namespace rdt::core {
 									ImGui::TableSetupColumn("dataIntrospection");
 									
 									void* entity_data = ComponentManager::GetData(index, selectedEntity);
-									for (auto& [memberName, typeDef] : ComponentTraceTracker::GetTraceData(componentName.c_str())) {
+									for (auto& type_definition : ComponentTraceTracker::GetTraceData(componentName.c_str())) {
 										ImGui::TableNextRow();
 										ImGui::TableNextColumn();
-										RenderEditTool(memberName.c_str(), entity_data, typeDef);
+										RenderEditTool(type_definition.name, entity_data, type_definition);
 									}
 									ImGui::EndTable();
 								}
@@ -1059,9 +1156,9 @@ namespace rdt::core {
 		void CreateFileFromTemplate(TemplateType type, const std::string& name)
 		{
 
-			fs::path filepath = fs::path(Editor::sourcePath);
-			fs::path template_h = fs::path(Editor::templatePath);
-			fs::path template_cpp = fs::path(Editor::templatePath);
+			fs::path filepath = fs::path(Editor::GetProjectSourcePath());
+			fs::path template_h = fs::path(Editor::GetRadiantTemplatePath());
+			fs::path template_cpp = fs::path(Editor::GetRadiantTemplatePath());
 
 
 			switch (type) {
@@ -1250,9 +1347,9 @@ namespace rdt::core {
 	// =========================================================
 	struct EntityWizardImpl : public Panel::Impl {
 
-		bool m_entityWizardLaunched;
+		bool m_entityWizardLaunched = false;
+		bool m_template_name_edited = false;
 		char m_entity_name[60];
-		bool m_template_name_edited;
 
 		void OnRender() override final {
 			if (!m_entityWizardLaunched) {
@@ -1430,460 +1527,467 @@ namespace rdt::core {
 			panel->Render();
 		}
 	}
+}
+// =====================================================================================
+// Static Variables
+std::shared_ptr<rdt::Scene> rdt::core::Editor::m_scene = nullptr;
+std::unordered_map<rdt::core::EditorFont, std::unordered_map<unsigned int, ImFont*>> rdt::core::Editor::m_fonts;
+rdt::core::GameRenderWindow* rdt::core::Editor::m_gameWindow = nullptr;
+int rdt::core::Editor::m_gameWindowId = -1;
+std::unordered_map<std::string, int> rdt::core::Editor::m_combo_selections = std::unordered_map<std::string, int>();
+std::unordered_map<std::string, bool> rdt::core::Editor::m_checkbox_selections = std::unordered_map<std::string, bool>();
 
-	// ==============================================================================
-	/*
-		Editor Gui Implementation
-	*/
+rdt::core::Editor* rdt::core::Editor::m_instance = nullptr;
 
-	// Static Variables
-	std::string Editor::sourcePath = "";
-	std::string Editor::templatePath = "";
-	Scene* Editor::m_scene = nullptr;
-	std::unordered_map<EditorFont, std::unordered_map<unsigned int, ImFont*>> Editor::m_fonts;
-	GameRenderWindow* Editor::m_gameWindow = nullptr;
-	int Editor::m_gameWindowId = -1;
+rdt::core::Editor::Editor()
+	: m_showEditor(true)
+{
+	RDT_CORE_TRACE("Launching editor...");
 
-	/*
-		Panel Layout Macros
-	*/
+	// Find base directory for child application
+	m_project_base_directory = Utils::GetCWD();
+	RDT_CORE_INFO("Base directory defined: {}", m_project_base_directory);
 
-	Editor::Editor()
-		: m_config(nullptr)
-	{
-		m_showTools = true;
-		
-		RegisterToMessageBus("Editor");
-		SetTheme(Theme_Codz);
+	// Get child application's Radiant profile
+	fs::path configFile = fs::path(m_project_base_directory) / fs::path("radiant.ini");
+	m_config.SetTargetFile(configFile.generic_string());
+	m_config.Read();
 
-		ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
-		ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-		GuiManager::EnableDockOverViewport();
+	// Get the source directory for the child application
+	fs::path sourceFile = fs::path(m_project_base_directory) / fs::path("Source");
+	SetSourcePath(sourceFile.generic_string());
 
-		m_gameWindowId = Renderer::AddRenderWindow(m_gameWindow = new GameRenderWindow);
-		Renderer::SetDefaultViewport(false);
-		Input::SetTargetRenderWindow(m_gameWindowId);
-		m_gameWindow->SetGuiPositionY(88);
-		m_gameWindow->SetGuiPositionX((m_window_width / 2) - (m_gameWindow->GetGuiDimensions().x / 2));
-
-		m_panel_manager.RegisterPanel(MenuBar);
-		m_panel_manager.RegisterPanel(DiagnosticsPanel);
-		m_panel_manager.RegisterPanel(ScenePanel);
-		m_panel_manager.RegisterPanel(GameWindowPanel);
-		m_panel_manager.RegisterPanel(ConsolePanel);
-		m_panel_manager.RegisterPanel(EntityHierarchyPanel);
-		m_panel_manager.RegisterPanel(TemplateWizard);
-
-		m_panel_manager.OpenPanel(MenuBar);
-		m_panel_manager.OpenPanel(DiagnosticsPanel);
-		m_panel_manager.OpenPanel(ScenePanel);
-		m_panel_manager.OpenPanel(GameWindowPanel);
-		m_panel_manager.OpenPanel(ConsolePanel);
-		m_panel_manager.OpenPanel(EntityHierarchyPanel);
-
-		/*m_panel_manager.RegisterPanel(MenuBar);
-		m_panel_manager.RegisterPanel(DiagnosticsPanel);
-		m_panel_manager.RegisterPanel(ScenePanel);
-		m_panel_manager.RegisterPanel(ConsolePanel);
-		m_panel_manager.RegisterPanel(GameWindowPanel);
-		m_panel_manager.RegisterPanel(GameWindowSettingsPanel);
-
-		m_panel_manager.AssignToContainer(MenuBar, ContainerType::DockBorderTop);
-		m_panel_manager.AssignToContainer(DiagnosticsPanel, ContainerType::DockRight);
-		m_panel_manager.AssignToContainer(ScenePanel, ContainerType::DockRight);
-		m_panel_manager.AssignToContainer(ConsolePanel, ContainerType::DockBottom);
-		m_panel_manager.AssignToContainer(GameWindowPanel, ContainerType::DockFill);
-		m_panel_manager.AssignToContainer(GameWindowSettingsPanel, ContainerType::DockTop);*/
+	// Get attributes from Radiant profile
+	if (m_config.GetAttribute("Core", "ProjectName", m_projectName)) {
+		RDT_CORE_TRACE("DevTools enabled for '{}'", m_projectName);
+	}
+	else {
+		RDT_CORE_WARN("No project found!");
 	}
 
-	Editor::~Editor()
-	{
+	if (m_config.GetAttribute("Core", "Resources", m_radiant_resources_filepath)) {
+		RDT_CORE_TRACE("Resources found at '{}'", m_radiant_resources_filepath);
+		InitResources();
 	}
-	void Editor::OnMessage(Message msg)
-	{
-		switch (msg.type) {
-		case CM_OpenPanelRequest:
-			OnOpenPanelRequest((OpenPanelRequestData*)msg.data);
-			break;
-		case CM_ChangeSceneRequest:
-			OnChangeThemeRequest((ChangeThemeRequestData*)msg.data);
-			break;
-		}
+	else {
+		RDT_CORE_WARN("No resource filepath found!");
 	}
 
-	void Editor::OnUpdate(const float deltaTime)
-	{
-		auto broadcast = MessageBus::GetBroadcast("SceneManager");
-		if (broadcast == nullptr) {
-			return;
-		}
+	// Apply saved configurations from the Radiant profile
+	ApplyConfig();
 
-		for (auto it = begin(*broadcast); it != end(*broadcast); ++it) {
-			switch (it->type) {
-			case MT_SceneChanged:
-				SetScenePtr(((SceneChangedData*)it->data)->ptr);
-				break;
-			}
-		}
+	Renderer::SetBackgroundColor({ 0.2f, 0.2f, 0.2f, 1.0f });
 
-		if (Input::CheckInput(controls_ShowTools1) && Input::CheckInput(controls_ShowTools2)) {
-			if (Renderer::UsingDefaultViewport()) {
-				m_showTools = !m_showTools;
-			}
-		}
+	ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
+	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	GuiManager::EnableDockOverViewport();
+
+	m_gameWindowId = Renderer::AddRenderWindow(m_gameWindow = new GameRenderWindow);
+	Renderer::SetDefaultViewport(false);
+	Input::SetTargetRenderWindow(m_gameWindowId);
+	m_gameWindow->SetGuiPositionY(88);
+	m_gameWindow->SetGuiPositionX((m_window_width / 2) - (m_gameWindow->GetGuiDimensions().x / 2));
+
+	m_panel_manager.RegisterPanel(MenuBar);
+	m_panel_manager.RegisterPanel(DiagnosticsPanel);
+	m_panel_manager.RegisterPanel(ScenePanel);
+	m_panel_manager.RegisterPanel(GameWindowPanel);
+	m_panel_manager.RegisterPanel(ConsolePanel);
+	m_panel_manager.RegisterPanel(EntityHierarchyPanel);
+	m_panel_manager.RegisterPanel(TemplateWizard);
+
+	m_panel_manager.OpenPanel(MenuBar);
+	m_panel_manager.OpenPanel(DiagnosticsPanel);
+	m_panel_manager.OpenPanel(ScenePanel);
+	m_panel_manager.OpenPanel(GameWindowPanel);
+	m_panel_manager.OpenPanel(ConsolePanel);
+	m_panel_manager.OpenPanel(EntityHierarchyPanel);
+
+	Renderer::AttachGui(this);
+}
+
+rdt::core::Editor::~Editor()
+{
+	Renderer::DetachGui(this);
+}
+
+void rdt::core::Editor::Initialize()
+{
+	Destroy();
+	m_instance = new Editor;
+}
+
+void rdt::core::Editor::Destroy()
+{
+	if (m_instance != nullptr) {
+		delete m_instance;
+		m_instance = nullptr;
+	}
+}
+
+void rdt::core::Editor::OnRender()
+{
+	if (!m_showEditor) {
+		return;
 	}
 
-	void Editor::OnRender()
-	{
-		if (!m_showTools) {
-			return;
-		}
+	m_panel_manager.RenderMDI();
 
-		m_panel_manager.RenderMDI();
+	bool isFullscreen = Renderer::UsingDefaultViewport();
+}
 
-		bool isFullscreen = Renderer::UsingDefaultViewport();
+void rdt::core::Editor::SetCurrentScene(std::shared_ptr<Scene> currentScene)
+{
+	m_scene = currentScene;
+}
+
+void rdt::core::Editor::SetSourcePath(const std::string& path)
+{
+	if (Utils::PathExists(path)) {
+		m_project_source_directory = path;
 	}
-
-	void Editor::SetTheme(EditorTheme nTheme)
-	{
-		ImGuiStyle& style = ImGui::GetStyle();
-		switch (nTheme) {
-		case Theme_Codz:
-			// From: https://github.com/ocornut/imgui/issues/707
-			style.WindowRounding = 5.3f;
-			style.FrameRounding = 2.3f;
-			style.ScrollbarRounding = 0;
-
-			style.Colors[ImGuiCol_Text] = ImVec4(0.95f, 0.95f, 0.95f, 0.95f);
-			style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
-			style.Colors[ImGuiCol_WindowBg] = ImVec4(0.09f, 0.09f, 0.15f, 1.00f);
-			style.Colors[ImGuiCol_PopupBg] = ImVec4(0.05f, 0.05f, 0.10f, 0.85f);
-			style.Colors[ImGuiCol_Border] = ImVec4(0.70f, 0.70f, 0.70f, 0.65f);
-			style.Colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-			style.Colors[ImGuiCol_FrameBg] = ImVec4(0.00f, 0.00f, 0.01f, 1.00f);
-			style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.90f, 0.80f, 0.80f, 0.40f);
-			style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0.90f, 0.65f, 0.65f, 0.45f);
-			style.Colors[ImGuiCol_TitleBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.83f);
-			style.Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.40f, 0.40f, 0.80f, 0.20f);
-			style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.00f, 0.00f, 0.00f, 0.87f);
-			style.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.01f, 0.01f, 0.02f, 0.80f);
-			style.Colors[ImGuiCol_ScrollbarBg] = ImVec4(0.20f, 0.25f, 0.30f, 0.60f);
-			style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.55f, 0.53f, 0.55f, 0.51f);
-			style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.56f, 0.56f, 0.56f, 1.00f);
-			style.Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.56f, 0.56f, 0.56f, 0.91f);
-			style.Colors[ImGuiCol_CheckMark] = ImVec4(0.90f, 0.90f, 0.90f, 0.83f);
-			style.Colors[ImGuiCol_SliderGrab] = ImVec4(0.70f, 0.70f, 0.70f, 0.62f);
-			style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.30f, 0.30f, 0.30f, 0.84f);
-			style.Colors[ImGuiCol_Button] = ImVec4(0.48f, 0.72f, 0.89f, 0.49f);
-			style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.50f, 0.69f, 0.99f, 0.68f);
-			style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.80f, 0.50f, 0.50f, 1.00f);
-			style.Colors[ImGuiCol_Header] = ImVec4(0.30f, 0.69f, 1.00f, 0.53f);
-			style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.44f, 0.61f, 0.86f, 1.00f);
-			style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.38f, 0.62f, 0.83f, 1.00f);
-			style.Colors[ImGuiCol_ResizeGrip] = ImVec4(1.00f, 1.00f, 1.00f, 0.85f);
-			style.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(1.00f, 1.00f, 1.00f, 0.60f);
-			style.Colors[ImGuiCol_ResizeGripActive] = ImVec4(1.00f, 1.00f, 1.00f, 0.90f);
-			style.Colors[ImGuiCol_PlotLines] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-			style.Colors[ImGuiCol_PlotLinesHovered] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
-			style.Colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
-			style.Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
-			style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.00f, 0.00f, 1.00f, 0.35f);
-			style.Colors[ImGuiCol_Separator] = ImVec4(1.0f, 1.0f, 1.0f, 0.65f);
-
-			Log::SetLogColor(LogLevel::L_TRACE, WHITE);
-
-			break;
-
-		case Nightingale:
-			style.WindowRounding = 5.3f;
-			style.FrameRounding = 2.3f;
-			style.ScrollbarRounding = 0;
-
-			ImVec4 black = ImVec4(0.1f, 0.1f, 0.1f, 0.95f);
-			ImVec4 white = ImVec4(0.95f, 0.95f, 0.95f, 1.0f);
-			ImVec4 header(0.153f, 0.157f, 0.161f, 1.0f);
-			ImVec4 base(0.38f, 0.404f, 0.478f, 0.95f);
-			ImVec4 border(0.847f, 0.851f, 0.855f, 1.0f);
-
-			style.Colors[ImGuiCol_Text] = white;
-			style.Colors[ImGuiCol_TextDisabled] = white;
-			style.Colors[ImGuiCol_WindowBg] = base;
-			style.Colors[ImGuiCol_PopupBg] = base;
-			style.Colors[ImGuiCol_Border] = border;
-			style.Colors[ImGuiCol_BorderShadow] = border;
-			style.Colors[ImGuiCol_FrameBg] = header;
-			style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.90f, 0.80f, 0.80f, 0.40f);
-			style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0.90f, 0.65f, 0.65f, 0.45f);
-			style.Colors[ImGuiCol_TitleBg] = header;
-			style.Colors[ImGuiCol_TitleBgCollapsed] = header;
-			style.Colors[ImGuiCol_TitleBgActive] = header;
-			style.Colors[ImGuiCol_MenuBarBg] = header;
-			style.Colors[ImGuiCol_ScrollbarBg] = ImVec4(0.20f, 0.25f, 0.30f, 0.60f);
-			style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.55f, 0.53f, 0.55f, 0.51f);
-			style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.56f, 0.56f, 0.56f, 1.00f);
-			style.Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.56f, 0.56f, 0.56f, 0.91f);
-			style.Colors[ImGuiCol_CheckMark] = ImVec4(0.90f, 0.90f, 0.90f, 0.83f);
-			style.Colors[ImGuiCol_SliderGrab] = ImVec4(0.70f, 0.70f, 0.70f, 0.62f);
-			style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.30f, 0.30f, 0.30f, 0.84f);
-			style.Colors[ImGuiCol_Button] = ImVec4(0.48f, 0.72f, 0.89f, 0.49f);
-			style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.50f, 0.69f, 0.99f, 0.68f);
-			style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.80f, 0.50f, 0.50f, 1.00f);
-			style.Colors[ImGuiCol_Header] = header;
-			style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.44f, 0.61f, 0.86f, 1.00f);
-			style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.38f, 0.62f, 0.83f, 1.00f);
-			style.Colors[ImGuiCol_ResizeGrip] = ImVec4(1.00f, 1.00f, 1.00f, 0.85f);
-			style.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(1.00f, 1.00f, 1.00f, 0.60f);
-			style.Colors[ImGuiCol_ResizeGripActive] = ImVec4(1.00f, 1.00f, 1.00f, 0.90f);
-			style.Colors[ImGuiCol_PlotLines] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-			style.Colors[ImGuiCol_PlotLinesHovered] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
-			style.Colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
-			style.Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
-			style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.00f, 0.00f, 1.00f, 0.35f);
-			style.Colors[ImGuiCol_Separator] = ImVec4(1.0f, 1.0f, 1.0f, 0.65f);
-
-			Log::SetLogColor(LogLevel::L_TRACE, WHITE);
-			break;
-		}
-
-		if (m_config != nullptr) {
-			m_config->SetAttribute("DevTools", "Theme", nTheme);
-		}
+	else {
+		RDT_CORE_WARN("EditorLayout - Source path does not exist: {}", path);
 	}
+}
 
-	void Editor::SetSourcePath(const std::string& path)
-	{
-		if (Utils::PathExists(path)) {
-			sourcePath = path;
+void rdt::core::Editor::InitResources()
+{
+	fs::path fontFolder = fs::path(m_radiant_resources_filepath) / fs::path("fonts");
+	std::string ttfFile;
+
+	// Set the default font
+	ttfFile = (fontFolder / fs::path("NunitoSans_7pt_Condensed-Medium.ttf")).generic_string();
+	GuiManager::LoadFont(NunitoSans, ttfFile);
+	GuiManager::SetDefaultFont(NunitoSans, 18);
+	AddFont(NunitoSans, ttfFile, std::vector<unsigned int>{18, 24, 36});
+
+	// Set the default font
+	ttfFile = (fontFolder / fs::path("NunitoSans_7pt_Condensed-Bold.ttf")).generic_string();
+	GuiManager::LoadFont(NunitoSans_Bold, ttfFile);
+	AddFont(NunitoSans_Bold, ttfFile, std::vector<unsigned int>{18, 24, 36});
+
+	// Load Icons from ForkAwesome
+	ttfFile = (fontFolder / fs::path(FONT_ICON_FILE_NAME_FK)).generic_string();
+	static const ImWchar icons_ranges[] = { ICON_MIN_FK, ICON_MAX_16_FK, 0 };
+
+	GuiManager::LoadIcons(ForkAwesome, ttfFile, icons_ranges);
+	m_fonts[ForkAwesome][36] = GuiManager::GetFont(ForkAwesome, 36);
+	m_fonts[ForkAwesome][13] = GuiManager::GetFont(ForkAwesome, 13);
+	m_fonts[ForkAwesome][18] = GuiManager::GetFont(ForkAwesome, 18);
+
+	fs::path templateFolder = fs::path(m_radiant_resources_filepath) / fs::path("templates");
+	if (!fs::is_directory(templateFolder) || !fs::exists(templateFolder)) {
+		RDT_CORE_WARN("Could not find templates at '{}'", templateFolder.generic_string());
+		return;
+	}
+	m_radiant_template_filepath = templateFolder.generic_string();
+}
+
+void rdt::core::Editor::ApplyConfig()
+{
+	std::string config_theme;
+	if (m_config.GetAttribute("DevTools", "Theme", config_theme)) {
+		int themeVal = std::stoi(config_theme);
+
+		if (themeVal >= EditorTheme::Theme_Codz && themeVal <= EditorTheme::Nightingale) {
+			SetTheme((EditorTheme)themeVal);
 		}
 		else {
-			RDT_CORE_WARN("EditorLayout - Source path does not exist: {}", path);
+			RDT_CORE_WARN("Could not find theme associated with id: {}", themeVal);
 		}
 	}
+}
 
-	void Editor::InitResources(std::string& resourcePath)
-	{
-		fs::path fontFolder = fs::path(resourcePath) / fs::path("fonts");
-		std::string ttfFile;
-		
-		// Set the default font
-		ttfFile = (fontFolder / fs::path("NunitoSans_7pt_Condensed-Medium.ttf")).generic_string();
-		GuiManager::LoadFont(NunitoSans, ttfFile);
-		GuiManager::SetDefaultFont(NunitoSans, 18);
-		AddFont(NunitoSans, ttfFile, std::vector<unsigned int>{18, 24, 36});
+void rdt::core::Editor::AddFont(EditorFont name, std::string& ttfFile, const std::vector<unsigned int>& sizes)
+{
+	if (Utils::PathExists(ttfFile)) {
 
-		// Set the default font
-		ttfFile = (fontFolder / fs::path("NunitoSans_7pt_Condensed-Bold.ttf")).generic_string();
-		GuiManager::LoadFont(NunitoSans_Bold, ttfFile);
-		AddFont(NunitoSans_Bold, ttfFile, std::vector<unsigned int>{18, 24, 36});
-
-		// Load Icons from ForkAwesome
-		ttfFile = (fontFolder / fs::path(FONT_ICON_FILE_NAME_FK)).generic_string();
-		static const ImWchar icons_ranges[] = { ICON_MIN_FK, ICON_MAX_16_FK, 0 };
-
-		GuiManager::LoadIcons(ForkAwesome, ttfFile, icons_ranges);
-		m_fonts[ForkAwesome][36] = GuiManager::GetFont(ForkAwesome, 36);
-		m_fonts[ForkAwesome][13] = GuiManager::GetFont(ForkAwesome, 13);
-		m_fonts[ForkAwesome][18] = GuiManager::GetFont(ForkAwesome, 18);
-
-		fs::path templateFolder = fs::path(resourcePath) / fs::path("templates");
-		if (!fs::is_directory(templateFolder) || !fs::exists(templateFolder)) { 
-			RDT_CORE_WARN("Could not find templates at '{}'", templateFolder.generic_string());
-			return;
-		}
-		templatePath = templateFolder.generic_string();
-
-	}
-
-	void Editor::AddConfigPtr(ConfigReader* ptr)
-	{
-		m_config = ptr;
-	}
-
-	void Editor::ProcessMessages()
-	{
-	}
-
-	void Editor::OnOpenPanelRequest(OpenPanelRequestData* data)
-	{
-		m_panel_manager.OpenPanel(data->panelToOpen);
-	}
-
-	void Editor::OnChangeThemeRequest(ChangeThemeRequestData* data)
-	{
-		SetTheme(data->theme);
-	}
-
-	void Editor::OpenPanel(PanelType panel)
-	{
-	}
-
-	void Editor::ApplyConfig()
-	{
-		if (m_config == nullptr) {
-			return;
+		if (!GuiManager::FontExists(name)) {
+			GuiManager::LoadFont(name, ttfFile);
 		}
 
-		std::string config_theme;
-		if (m_config->GetAttribute("DevTools", "Theme", config_theme)) {
-			int themeVal = std::stoi(config_theme);
-
-			if (themeVal >= EditorTheme::Theme_Codz && themeVal <= EditorTheme::Nightingale) {
-				SetTheme((EditorTheme)themeVal);
-			}
-			else {
-				RDT_CORE_WARN("Could not find theme associated with id: {}", themeVal);
-			}
+		for (auto size : sizes) {
+			m_fonts[name][size] = GuiManager::GetFont(name, size);
 		}
 	}
+	else {
+		RDT_CORE_WARN("Could not find file '{}'", ttfFile);
+		return;
+	}
+}
 
-	void Editor::OnFirstRender()
-	{
-		/*ImGui::PushFont(m_fonts[ForkAwesome][18]);
-		m_game_window_settings_panel.width = GameWindowSettingsPanelWidth;
-		m_game_window_settings_panel.height = GetButtonHeight(ICON_FK_PAUSE) + 20;
-		m_game_window_settings_panel.xPos = ((float)m_game_window_panel->GetLastPosition().x) + m_game_window_panel->GetGuiDimensions().x - m_game_window_settings_panel.width;
-		m_game_window_settings_panel.yPos = GetDockPosY(DockTop, m_game_window_settings_panel.height, PanelMargin) + m_menu_bar_height;
-		ImGui::PopFont();
+void rdt::core::Editor::SetTheme(EditorTheme nTheme)
+{
+	ImGuiStyle& style = ImGui::GetStyle();
+	switch (nTheme) {
+	case Theme_Codz:
+		// From: https://github.com/ocornut/imgui/issues/707
+		style.WindowRounding = 5.3f;
+		style.FrameRounding = 2.3f;
+		style.ScrollbarRounding = 0;
 
-		m_game_window_panel->SetGuiPositionY(m_game_window_settings_panel.yPos + m_game_window_settings_panel.height + PanelMargin);
-		m_game_window_panel->TriggerUpdatePos();
+		style.Colors[ImGuiCol_Text] = ImVec4(0.95f, 0.95f, 0.95f, 0.95f);
+		style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
+		style.Colors[ImGuiCol_WindowBg] = ImVec4(0.09f, 0.09f, 0.15f, 1.00f);
+		style.Colors[ImGuiCol_PopupBg] = ImVec4(0.05f, 0.05f, 0.10f, 0.85f);
+		style.Colors[ImGuiCol_Border] = ImVec4(0.70f, 0.70f, 0.70f, 0.65f);
+		style.Colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+		style.Colors[ImGuiCol_FrameBg] = ImVec4(0.00f, 0.00f, 0.01f, 1.00f);
+		style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.90f, 0.80f, 0.80f, 0.40f);
+		style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0.90f, 0.65f, 0.65f, 0.45f);
+		style.Colors[ImGuiCol_TitleBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.83f);
+		style.Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.40f, 0.40f, 0.80f, 0.20f);
+		style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.00f, 0.00f, 0.00f, 0.87f);
+		style.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.01f, 0.01f, 0.02f, 0.80f);
+		style.Colors[ImGuiCol_ScrollbarBg] = ImVec4(0.20f, 0.25f, 0.30f, 0.60f);
+		style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.55f, 0.53f, 0.55f, 0.51f);
+		style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.56f, 0.56f, 0.56f, 1.00f);
+		style.Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.56f, 0.56f, 0.56f, 0.91f);
+		style.Colors[ImGuiCol_CheckMark] = ImVec4(0.90f, 0.90f, 0.90f, 0.83f);
+		style.Colors[ImGuiCol_SliderGrab] = ImVec4(0.70f, 0.70f, 0.70f, 0.62f);
+		style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.30f, 0.30f, 0.30f, 0.84f);
+		style.Colors[ImGuiCol_Button] = ImVec4(0.48f, 0.72f, 0.89f, 0.49f);
+		style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.50f, 0.69f, 0.99f, 0.68f);
+		style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.80f, 0.50f, 0.50f, 1.00f);
+		style.Colors[ImGuiCol_Header] = ImVec4(0.30f, 0.69f, 1.00f, 0.53f);
+		style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.44f, 0.61f, 0.86f, 1.00f);
+		style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.38f, 0.62f, 0.83f, 1.00f);
+		style.Colors[ImGuiCol_ResizeGrip] = ImVec4(1.00f, 1.00f, 1.00f, 0.85f);
+		style.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(1.00f, 1.00f, 1.00f, 0.60f);
+		style.Colors[ImGuiCol_ResizeGripActive] = ImVec4(1.00f, 1.00f, 1.00f, 0.90f);
+		style.Colors[ImGuiCol_PlotLines] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+		style.Colors[ImGuiCol_PlotLinesHovered] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
+		style.Colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
+		style.Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
+		style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.00f, 0.00f, 1.00f, 0.35f);
+		style.Colors[ImGuiCol_Separator] = ImVec4(1.0f, 1.0f, 1.0f, 0.65f);
 
-		m_diagnostics_panel.width = m_window_width - (m_game_window_settings_panel.xPos + m_game_window_settings_panel.width + (PanelMargin * 2));
-		m_diagnostics_panel.height = DiagnosticGuiHeight;
-		m_diagnostics_panel.xPos = GetDockPosX(DockRight, m_diagnostics_panel.width, PanelMargin);
-		m_diagnostics_panel.yPos = GetDockPosY(DockTop, m_diagnostics_panel.height, PanelMargin) + m_menu_bar_height;
+		Log::SetLogColor(LogLevel::L_TRACE, WHITE);
 
-		m_scene_panel.width = m_diagnostics_panel.width;
-		m_scene_panel.height = m_window_height - (m_diagnostics_panel.yPos + m_diagnostics_panel.height + (PanelMargin * 2));
-		m_scene_panel.xPos = GetDockPosX(DockRight, m_scene_panel.width, PanelMargin);
-		m_scene_panel.yPos = m_diagnostics_panel.yPos + m_diagnostics_panel.height + PanelMargin;
+		break;
 
-		m_template_wizard.width = TemplateWizardGuiWidth;
-		m_template_wizard.height = TemplateWizardGuiHeight;
-		m_template_wizard.xPos = (m_window_width / 2) - (m_template_wizard.width / 2);
-		m_template_wizard.yPos = (m_window_height / 2) - (m_template_wizard.height / 2);
+	case Nightingale:
+		style.WindowRounding = 5.3f;
+		style.FrameRounding = 2.3f;
+		style.ScrollbarRounding = 0;
 
-		m_entity_wizard = m_template_wizard;
+		ImVec4 black = ImVec4(0.1f, 0.1f, 0.1f, 0.95f);
+		ImVec4 white = ImVec4(0.95f, 0.95f, 0.95f, 1.0f);
+		ImVec4 header(0.153f, 0.157f, 0.161f, 1.0f);
+		ImVec4 base(0.38f, 0.404f, 0.478f, 0.95f);
+		ImVec4 border(0.847f, 0.851f, 0.855f, 1.0f);
 
-		m_console_panel.width = m_game_window_panel->GetGuiDimensions().x;
-		m_console_panel.height = m_window_height -  (m_game_window_panel->GetLastPosition().y + m_game_window_panel->GetGuiDimensions().y + (PanelMargin * 2));
-		m_console_panel.xPos = (float)m_game_window_panel->GetLastPosition().x;
-		m_console_panel.yPos = ((float)m_game_window_panel->GetLastPosition().y) + m_game_window_panel->GetGuiDimensions().y + PanelMargin;*/
+		style.Colors[ImGuiCol_Text] = white;
+		style.Colors[ImGuiCol_TextDisabled] = white;
+		style.Colors[ImGuiCol_WindowBg] = base;
+		style.Colors[ImGuiCol_PopupBg] = base;
+		style.Colors[ImGuiCol_Border] = border;
+		style.Colors[ImGuiCol_BorderShadow] = border;
+		style.Colors[ImGuiCol_FrameBg] = header;
+		style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.90f, 0.80f, 0.80f, 0.40f);
+		style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0.90f, 0.65f, 0.65f, 0.45f);
+		style.Colors[ImGuiCol_TitleBg] = header;
+		style.Colors[ImGuiCol_TitleBgCollapsed] = header;
+		style.Colors[ImGuiCol_TitleBgActive] = header;
+		style.Colors[ImGuiCol_MenuBarBg] = header;
+		style.Colors[ImGuiCol_ScrollbarBg] = ImVec4(0.20f, 0.25f, 0.30f, 0.60f);
+		style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.55f, 0.53f, 0.55f, 0.51f);
+		style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.56f, 0.56f, 0.56f, 1.00f);
+		style.Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.56f, 0.56f, 0.56f, 0.91f);
+		style.Colors[ImGuiCol_CheckMark] = ImVec4(0.90f, 0.90f, 0.90f, 0.83f);
+		style.Colors[ImGuiCol_SliderGrab] = ImVec4(0.70f, 0.70f, 0.70f, 0.62f);
+		style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.30f, 0.30f, 0.30f, 0.84f);
+		style.Colors[ImGuiCol_Button] = ImVec4(0.48f, 0.72f, 0.89f, 0.49f);
+		style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.50f, 0.69f, 0.99f, 0.68f);
+		style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.80f, 0.50f, 0.50f, 1.00f);
+		style.Colors[ImGuiCol_Header] = header;
+		style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.44f, 0.61f, 0.86f, 1.00f);
+		style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.38f, 0.62f, 0.83f, 1.00f);
+		style.Colors[ImGuiCol_ResizeGrip] = ImVec4(1.00f, 1.00f, 1.00f, 0.85f);
+		style.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(1.00f, 1.00f, 1.00f, 0.60f);
+		style.Colors[ImGuiCol_ResizeGripActive] = ImVec4(1.00f, 1.00f, 1.00f, 0.90f);
+		style.Colors[ImGuiCol_PlotLines] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+		style.Colors[ImGuiCol_PlotLinesHovered] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
+		style.Colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
+		style.Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
+		style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.00f, 0.00f, 1.00f, 0.35f);
+		style.Colors[ImGuiCol_Separator] = ImVec4(1.0f, 1.0f, 1.0f, 0.65f);
+
+		Log::SetLogColor(LogLevel::L_TRACE, WHITE);
+		break;
 	}
 
-	void Editor::AddFont(EditorFont name, std::string& ttfFile, const std::vector<unsigned int>& sizes)
-	{
-		if (Utils::PathExists(ttfFile)) {
-			
-			if (!GuiManager::FontExists(name)) {
-				GuiManager::LoadFont(name, ttfFile);
-			}
+	m_config.SetAttribute("DevTools", "Theme", nTheme);
+}
 
-			for (auto size : sizes) {
-				m_fonts[name][size] = GuiManager::GetFont(name, size);
-			}
-		}
-		else {
-			RDT_CORE_WARN("Could not find file '{}'", ttfFile);
-			return;
-		}
+void rdt::core::Editor::AddCenteredText(const std::string& text)
+{
+	ImVec2 size = ImGui::CalcTextSize(text.c_str());
+
+	ImVec2 pos = { (ImGui::GetWindowSize().x / 2) - (size.x / 2), ImGui::GetCursorPosY() };
+	ImGui::SetCursorPos(pos);
+	ImGui::Text(text.c_str());
+}
+
+void rdt::core::Editor::InactiveButtonBegin()
+{
+	ImGuiStyle& style = ImGui::GetStyle();
+	ImVec4 color;
+
+	color = style.Colors[ImGuiCol_Button];
+	color.w = 0.1f;
+	ImGui::PushStyleColor(ImGuiCol_Button, color);
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, color);
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, color);
+
+	color = style.Colors[ImGuiCol_Text];
+	color.w = 0.1f;
+	ImGui::PushStyleColor(ImGuiCol_Text, color);
+}
+
+void rdt::core::Editor::InactiveButtonEnd()
+{
+	ImGui::PopStyleColor();
+	ImGui::PopStyleColor();
+	ImGui::PopStyleColor();
+	ImGui::PopStyleColor();
+}
+
+void rdt::core::Editor::InactiveTextBoxBegin()
+{
+	ImGuiStyle& style = ImGui::GetStyle();
+	ImVec4 color;
+
+	color = style.Colors[ImGuiCol_FrameBg];
+	color.w = 0.3f;
+	ImGui::PushStyleColor(ImGuiCol_FrameBg, color);
+	ImGui::BeginDisabled();
+}
+
+void rdt::core::Editor::InactiveTextBoxEnd()
+{
+	ImGui::PopStyleColor();
+	ImGui::EndDisabled();
+}
+
+int rdt::core::Editor::AddComboBox(const char* combo_label, const char** options, unsigned int optionCount, const char* preview)
+{
+	if (m_combo_selections.find(combo_label) == m_combo_selections.end()) {
+		m_combo_selections[combo_label] = -1;
+	}
+	auto& selection_index = m_combo_selections.at(combo_label);
+
+	const char* preview_label;
+	if (preview == nullptr) {
+		preview_label = options[0];
+	}
+	else {
+		preview_label = selection_index < 0 ? preview : options[selection_index];
 	}
 
-	void Editor::SetScenePtr(Scene* ptr)
+	if (ImGui::BeginCombo(combo_label, preview_label))
 	{
-		m_scene = ptr;
-	}
-
-	void Editor::AddCenteredText(const std::string& text)
-	{
-		ImVec2 size = ImGui::CalcTextSize(text.c_str());
-
-		ImVec2 pos = { (ImGui::GetWindowSize().x / 2) - (size.x / 2), ImGui::GetCursorPosY() };
-		ImGui::SetCursorPos(pos);
-		ImGui::Text(text.c_str());
-	}
-
-	void Editor::InactiveButtonBegin()
-	{
-		ImGuiStyle& style = ImGui::GetStyle();
-		ImVec4 color;
-
-		color = style.Colors[ImGuiCol_Button];
-		color.w = 0.1f;
-		ImGui::PushStyleColor(ImGuiCol_Button, color);
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, color);
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, color);
-
-		color = style.Colors[ImGuiCol_Text];
-		color.w = 0.1f;
-		ImGui::PushStyleColor(ImGuiCol_Text, color);
-	}
-
-	void Editor::InactiveButtonEnd()
-	{
-		ImGui::PopStyleColor();
-		ImGui::PopStyleColor();
-		ImGui::PopStyleColor();
-		ImGui::PopStyleColor();
-	}
-
-	void Editor::InactiveTextBoxBegin()
-	{
-		ImGuiStyle& style = ImGui::GetStyle();
-		ImVec4 color;
-
-		color = style.Colors[ImGuiCol_FrameBg];
-		color.w = 0.3f;
-		ImGui::PushStyleColor(ImGuiCol_FrameBg, color);
-		ImGui::BeginDisabled();
-	}
-
-	void Editor::InactiveTextBoxEnd()
-	{
-		ImGui::PopStyleColor();
-		ImGui::EndDisabled();
-	}
-
-	void Editor::AddIcon(const char* unicode, size_t size)
-	{
-		ImGui::PushFont(m_fonts[ForkAwesome][size]);
-		ImGui::Text(unicode);
-		ImGui::PopFont();
-	}
-
-	float Editor::GetButtonWidth(const char* label)
-	{
-		ImGuiStyle& style = ImGui::GetStyle();
-		return ImGui::CalcTextSize(label).x + (style.FramePadding.x * 2);
-	}
-
-	float Editor::GetButtonHeight(const char* label)
-	{
-		ImGuiStyle& style = ImGui::GetStyle();
-		return ImGui::CalcTextSize(label).y + (style.FramePadding.y * 2);
-	}
-
-	int Editor::MyTextCallback(ImGuiInputTextCallbackData* data)
-	{
-		if (data->EventFlag == ImGuiInputTextFlags_CallbackEdit)
+		for (unsigned int n = 0; n < optionCount; n++)
 		{
-			bool* p_bool = (bool*)data->UserData;
-			*p_bool = true;
-		}
+			const bool is_selected = (selection_index == n);
+			if (ImGui::Selectable(options[n], is_selected)) {
+				selection_index = n;
+			}
 
+			// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+			if (is_selected)
+				ImGui::SetItemDefaultFocus();
+		}
+		ImGui::EndCombo();
+	}
+
+	return selection_index;
+}
+
+int rdt::core::Editor::GetComboxBoxResult(const char* label)
+{
+	if (m_combo_selections.find(label) == m_combo_selections.end()) {
+		m_combo_selections[label] = -1;
+	}
+
+	return m_combo_selections.at(label);
+}
+
+void rdt::core::Editor::AddIcon(const char* unicode, size_t size)
+{
+	ImGui::PushFont(m_fonts[ForkAwesome][size]);
+	ImGui::Text(unicode);
+	ImGui::PopFont();
+}
+
+const std::string& rdt::core::Editor::GetProjectSourcePath()
+{
+	return m_instance->m_project_source_directory;
+}
+
+const std::string& rdt::core::Editor::GetRadiantTemplatePath()
+{
+	return m_instance->m_radiant_template_filepath;
+}
+
+float rdt::core::Editor::GetButtonWidth(const char* label)
+{
+	ImGuiStyle& style = ImGui::GetStyle();
+	return ImGui::CalcTextSize(label).x + (style.FramePadding.x * 2);
+}
+
+float rdt::core::Editor::GetButtonHeight(const char* label)
+{
+	ImGuiStyle& style = ImGui::GetStyle();
+	return ImGui::CalcTextSize(label).y + (style.FramePadding.y * 2);
+}
+
+int rdt::core::Editor::MyTextCallback(ImGuiInputTextCallbackData* data)
+{
+	if (data->EventFlag == ImGuiInputTextFlags_CallbackEdit)
+	{
+		bool* p_bool = (bool*)data->UserData;
+		*p_bool = true;
+	}
+
+	return 0;
+}
+
+void rdt::core::Editor::ApplyGuiConfig(PanelConfig& config)
+{
+	if (config.update) {
+		ImGui::SetNextWindowSize(ImVec2(config.width, config.height), ImGuiCond_Always);
+		ImGui::SetNextWindowPos(ImVec2(config.xPos, config.yPos), ImGuiCond_Always);
+		config.update = false;
+	}
+	else {
+		ImGui::SetNextWindowSize(ImVec2(config.width, config.height), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowPos(ImVec2(config.xPos, config.yPos), ImGuiCond_FirstUseEver);
+	}
+}
+bool* rdt::core::Editor::GetCheckboxSelection(const std::string& checkbox_label)
+{
+	if (m_checkbox_selections.find(checkbox_label) == m_checkbox_selections.end()) {
+		m_checkbox_selections[checkbox_label] = false;
+	}
+
+	return &m_checkbox_selections.at(checkbox_label);
+}
+
+rdt::DebugComponent* rdt::core::Editor::GetDebugComponent(Entity entity)
+{
+	return EntityManager::GetComponent<DebugComponent>(entity);
+}
+
+rdt::glTextureID rdt::core::Editor::GetImGuiTextureData(rdt::TextureID tID, int& imageWidth, int& imageHeight)
+{
+	if (!TextureManager::TextureExists(tID)) {
 		return 0;
 	}
-	
-	void Editor::ApplyGuiConfig(PanelConfig& config)
-	{
-		if (config.update) {
-			ImGui::SetNextWindowSize(ImVec2(config.width, config.height), ImGuiCond_Always);
-			ImGui::SetNextWindowPos(ImVec2(config.xPos, config.yPos), ImGuiCond_Always);
-			config.update = false;
-		}
-		else {
-			ImGui::SetNextWindowSize(ImVec2(config.width, config.height), ImGuiCond_FirstUseEver);
-			ImGui::SetNextWindowPos(ImVec2(config.xPos, config.yPos), ImGuiCond_FirstUseEver);
-		}
-	}
+
+	auto& tex = TextureManager::GetTexture(tID);
+	imageWidth = tex.GetImageWidth();
+	imageHeight = tex.GetImageHeight();
+	return tex.GetID();
 }

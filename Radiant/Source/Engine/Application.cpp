@@ -9,24 +9,25 @@
 #include "Messaging/MessageBus.h"
 #include "Physics/Physics.h"
 #include "Gui/GuiManager.h"
-#include "OOComponents/Scene/SceneManager.h"
+#include "Scene/SceneManager.h"
 #include "Graphics/Model.h"
-#include "Physics/Ptag.h"
 #include "Utils/Timestep.h"
+#include "ResourceManager/ResourceManager.h"
 
 // ECS
 #include "Engine/ECS/ECS.h"
 #include "Engine/Physics/PhysicsSystem.h"
 #include "Engine/Graphics/RenderSystem.h"
+#include "Engine/Graphics/AnimationSystem.h"
 
 // DevTools
-#include "Editor/DevTools.h"
+#include "Editor/Editor.h"
 
 namespace rdt {
 
 	struct Application::Impl {
 		Timestep m_timestep;
-		Scene* m_current_scene;
+		std::shared_ptr<Scene> m_current_scene;
 		ApplicationConfig m_config;
 
 		Impl()
@@ -45,12 +46,13 @@ namespace rdt {
 		Renderer::Initialize();
 		MessageBus::Initialize();
 		SoundEngine::Initialize();
-		core::PtagManager::Initialize();
 		Physics::Initialize();
 		SceneManager::Initialize();
 		ModelManager::Initialize();
-		
+		ResourceManager::Initialize();
+
 		AddECS();
+		ResourceManager::LoadDefaultResources();
 	}
 
 	Application::~Application()
@@ -58,12 +60,11 @@ namespace rdt {
 		delete m_impl;
   
 #ifdef RDT_USE_DEV_TOOLS
-		core::DevLayer::Destroy();
+		core::Editor::Destroy();
 #endif
-
+		ResourceManager::Destroy();
 		SceneManager::Destroy();
 		Physics::Destroy();
-		core::PtagManager::Destroy();
 
 		RemoveECS();
 
@@ -83,6 +84,10 @@ namespace rdt {
 
 		Renderer::GetCamera().SetAspectRatio(m_impl->m_config.cameraAspectRatio);
 		Renderer::GetCamera().SetBackgroundColor(m_impl->m_config.backgroundColor);
+
+#ifdef RDT_USE_DEV_TOOLS
+		core::Editor::Initialize();
+#endif
 	}
 
 	void Application::Run()
@@ -97,17 +102,11 @@ namespace rdt {
 			/* Clears window and prepares for next game loop.*/
 			BeginFrame();
 
-			/* Get start of frame messages. */
-			PollMessages1();
-
 			/* Process input from user and update game objects. */
 			ProcessInput();
 
 			/* Update the physical world. Detect and resolve collisions. */
 			UpdateWorld();
-
-			/* Get late update messages. */
-			PollMessages2();
 
 			/* Final update of game objects before render. */
 			FinalUpdate();
@@ -142,13 +141,21 @@ namespace rdt {
 
 		// Add Common Components
 		ComponentManager::RegisterComponent<EntityConfig>();
+
+#ifdef RDT_USE_DEV_TOOLS
+		ComponentManager::RegisterComponent<DebugComponent>();
+#endif
 		ComponentManager::RegisterComponent<Sprite>();
-		ComponentManager::RegisterComponent<RigidBody2D>();
 		ComponentManager::RegisterComponent<Renderable>();
+		ComponentManager::RegisterComponent<Animator>();
+		ComponentManager::RegisterComponent<Transform>();
+		ComponentManager::RegisterComponent<RigidBody2D>();
 
 		// Add Common Systems
 		SystemManager::RegisterSystem<PhysicsSystem>();
+		SystemManager::RegisterSystem<AnimationSystem>();
 		SystemManager::RegisterSystem<RenderSystem>();
+
 	}
 
 	void Application::RemoveECS()
@@ -165,6 +172,8 @@ namespace rdt {
 
 	void Application::BeginFrame()
 	{
+		MessageBus::SetLoopPhase(LoopPhase_Begin);
+
 		// Get the new deltaTime for this frame.
 		m_impl->m_timestep.Update(true);
 
@@ -186,16 +195,12 @@ namespace rdt {
 		Log::Update();
 	}
 
-	void Application::PollMessages1()
-	{
-		MessageBus::SendMessages();
-	}
-
 	void Application::ProcessInput()
 	{
-		// All game objects in the bounded scene run their OnProcessInput()
-		if (m_impl->m_current_scene != nullptr) {
-			m_impl->m_current_scene->OnProcessInput(m_impl->m_timestep.deltaTime);
+		MessageBus::SetLoopPhase(LoopPhase_ProcessInput);
+
+		if (m_impl->m_current_scene) {
+			m_impl->m_current_scene->ProcessInput(m_impl->m_timestep.deltaTime);
 		}
 
 		SystemManager::OnProcessInput(m_impl->m_timestep.deltaTime);
@@ -203,22 +208,20 @@ namespace rdt {
 
 	void Application::UpdateWorld()
 	{
-		// Updates all active physical objects.
-		Physics::OnUpdate(m_impl->m_timestep.deltaTime);
+		MessageBus::SetLoopPhase(LoopPhase_WorldUpdate);
+
+		if (m_impl->m_current_scene) {
+			m_impl->m_current_scene->UpdateWorld(m_impl->m_timestep.deltaTime);
+		}
 		SystemManager::OnWorldUpdate(m_impl->m_timestep.deltaTime);
-
-	}
-
-	void Application::PollMessages2()
-	{
-		MessageBus::SendMessages();
 	}
 
 	void Application::FinalUpdate()
 	{
-		// Runs the procedures for the final update of the currently bounded scene.
-		if (m_impl->m_current_scene != nullptr) {
-			m_impl->m_current_scene->OnFinalUpdate();
+		MessageBus::SetLoopPhase(LoopPhase_FinalUpdate);
+
+		if (m_impl->m_current_scene) {
+			m_impl->m_current_scene->FinalUpdate();
 		}
 		SystemManager::OnFinalUpdate();
 		
@@ -228,9 +231,11 @@ namespace rdt {
 
 	void Application::Render()
 	{
+		MessageBus::SetLoopPhase(LoopPhase_RenderUpdate);
+
 		// Creates the render command queue for the currently bounded scene.
-		if (m_impl->m_current_scene != nullptr) {
-			m_impl->m_current_scene->OnRender();
+		if (m_impl->m_current_scene) {
+			m_impl->m_current_scene->RenderUpdate();
 		}
 
 		SystemManager::OnRender();
@@ -241,10 +246,11 @@ namespace rdt {
 
 	void Application::EndFrame()
 	{
+		MessageBus::SetLoopPhase(LoopPhase_End);
+
 		Renderer::OnEndFrame();
 		Input::UpdateTime(m_impl->m_timestep.deltaTime);
 		Input::PollInputs();
-		MessageBus::ResetBroadcasts();
 	}
 
 	const int Application::WindowWidth() {
@@ -255,7 +261,7 @@ namespace rdt {
 		return Renderer::GetWindowHeight();
 	}
 
-	const UniqueID Application::AddScene(const std::string& sceneName, Scene* nScene)
+	const UniqueID Application::AddScene(const std::string& sceneName, std::shared_ptr<Scene> nScene)
 	{
 		SceneManager::RegisterScene(sceneName, nScene);
 		return nScene->GetID();

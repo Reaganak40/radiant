@@ -1,15 +1,18 @@
 #pragma once
-#include "Utils/UniqueID.h"
-#include "OOComponents/GameObject/GameObject.h"
-#include "Audio/SoundEngine.h"
-#include "OOComponents/Scene/Scene.h"
+
+// Forward Declarations
+namespace rdt {
+	using UniqueID = unsigned int;
+	typedef unsigned int SoundID;
+}
+
+// Required Definitions for Struct/Class Members
+#include "Scene/Scene.h"
 
 namespace rdt {
 
 	enum DefaultMessage {
 		MT_Collision = 0xdead,
-		MT_RequestGameObjectPtr,
-		MT_SendGameObjectPtr,
 		MT_SoundStopped,
 
 		MT_RequestScenePtr,
@@ -29,13 +32,6 @@ namespace rdt {
 
 		CollisionData(UniqueID nSource)
 			: objectID(nSource) {}
-	};
-
-	struct GameObjectPtrData {
-		GameObject* ptr;
-
-		GameObjectPtrData(GameObject* nPtr)
-			: ptr(nPtr) {}
 	};
 
 	struct SoundStoppedData {

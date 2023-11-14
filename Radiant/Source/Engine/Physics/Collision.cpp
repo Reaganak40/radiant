@@ -3,17 +3,17 @@
 #include "Utils/MathTypes.h"
 #include "Utils/Utils.h"
 #include "Utils/Input.h"
+#include "Physics.h"
 
 namespace rdt::core {
 	
-	bool Collision::CheckCollision(Pobject& source, const Pobject& suspect, const float deltaTime)
+	bool Collision::CheckCollision(CollisionObject& source, const CollisionObject& suspect, const float deltaTime)
 	{
+		if (source.isRect && suspect.isRect) {
 
-		if (source.m_polygon->CheckProperties(IsRect) && suspect.m_polygon->CheckProperties(IsRect)) {
+			if (source.isAxisAligned && suspect.isAxisAligned) {
 
-			if (source.m_polygon->GetRotation() == 0 && suspect.m_polygon->GetRotation() == 0) {
-
-				if (source.HasProperties(DontResolve)) {
+				if (!source.resolveCollision) {
 					return CheckCollisionAABB(source, suspect);
 				}
 
@@ -73,8 +73,6 @@ namespace rdt::core {
 			}
 		}
 
-
-
 		return true;
 	}
 
@@ -110,22 +108,15 @@ namespace rdt::core {
 		/*
 			Step 3: Check to see if the polygons closest vertex is in the radius of the circle.
 		*/
-
 		Vec2d closestVertex = Utils::GetClosestVertex(B.GetVertices(), A.GetOrigin());
 
 		return true;
 	}
 
-	bool Collision::CheckCollisionAABB(const Pobject& A, const Pobject& B)
+	bool Collision::CheckCollisionAABB(const CollisionObject& source, const CollisionObject& suspect)
 	{
-		std::vector<Vec2d> A_vertices;
-		std::vector<Vec2d> B_vertices;
-
-		A.GetHitBox(A_vertices);
-		B.GetHitBox(B_vertices);
-
-		return !((A_vertices[1].x < B_vertices[0].x || B_vertices[1].x < A_vertices[0].x) ||
-			(A_vertices[2].y < B_vertices[1].y || B_vertices[2].y < A_vertices[1].y));
+		return !((source.vertices[1].x < suspect.vertices[0].x || suspect.vertices[1].x < source.vertices[0].x) ||
+			(source.vertices[2].y < suspect.vertices[1].y || suspect.vertices[2].y < source.vertices[1].y));
 	}
 
 	bool Collision::StaticCollisionDiags(Polygon& dynamicPoly, Polygon& staticPoly)
@@ -176,63 +167,48 @@ namespace rdt::core {
 		return displaced;
 	}
 
-	bool Collision::SweptAABB(Pobject& source, const Pobject& suspect, const float deltaTime)
+	bool Collision::SweptAABB(CollisionObject& source, const CollisionObject& suspect, const float deltaTime)
 	{
-		/*
-			Rect:
-
-			sp*------
-			  |     |
-			  |     |
-			  |     |
-			  ------* ep
-		*/
-		if (source.translation.GetVelocity() == Vec2d::Zero()) {
+		if (source.rigidBody->velocity == Vec2d::Zero()) {
 			return false;
 		}
 
-		std::vector<Vec2d> sourceVertices;
-		std::vector<Vec2d> suspectVertices;
-		source.GetHitBox(sourceVertices);
-		suspect.GetHitBox(suspectVertices);
+		Vec2d ray = source.rigidBody->GetChangeInPosition(deltaTime);
+		Vec2d sp = suspect.vertices[3];
+		Vec2d ep = suspect.vertices[1];
 
-		Vec2d ray = source.translation.GetChangeInPosition(deltaTime);
-		Vec2d sp = suspectVertices[3];
-		Vec2d ep = suspectVertices[1];
+		sp.x = ceil(sp.x - source.size.x / 2);
+		sp.y = ceil(sp.y + source.size.y / 2);
 
-		sp.x = ceil(sp.x - source.GetHitboxWidth() / 2);
-		sp.y = ceil(sp.y + source.GetHitboxHeight() / 2);
+		ep.x = ceil(ep.x + source.size.x / 2);
+		ep.y = ceil(ep.y - source.size.y / 2);
 
-		ep.x = ceil(ep.x + source.GetHitboxWidth() / 2);
-		ep.y = ceil(ep.y - source.GetHitboxHeight() / 2);
-
-		Vec2d start = source.m_polygon->GetOrigin();
+		Vec2d start = source.midpoint;
 		Vec2d contactPoint;
 		Vec2d contactNormal;
 		float contactTime = 1.0f;
 
 		if (RayVsRect(start, ray, sp, ep, contactPoint, contactNormal, contactTime)) {
 
-			if (source.HasProperties(ppBouncy)) {
-
-				source.translation.Translate(*source.m_polygon, (deltaTime * contactTime));
+			if (source.rigidBody->HasProperties(PhysicalProperty_Bouncy)) {
+				source.transform->Translate(deltaTime * contactTime, source.rigidBody->velocity);
 
 				if (abs(contactNormal.x) > 0) {
-					source.translation.m_current_velocity.x *= -1.0;
-					source.translation.m_acceleration.x *= -1.0;
-
+					source.rigidBody->velocity.x *= -1.0;
+					source.rigidBody->acceleration.x *= -1.0;
 				}
 				if (abs(contactNormal.y) > 0) {
-					source.translation.m_current_velocity.y *= -1.0;
-					source.translation.m_acceleration.y *= -1.0;
+					source.rigidBody->velocity.y *= -1.0;
+					source.rigidBody->acceleration.y *= -1.0;
 				}
 
-				source.translation.Translate(*source.m_polygon, deltaTime * (1 - contactTime));
-
+				source.transform->Translate(deltaTime * (1 - contactTime), source.rigidBody->velocity);
+				source.m_object_moved = true;
 			}
 			else {
-				source.translation.m_current_velocity += contactNormal * Vabs(source.translation.m_current_velocity) * (1 - contactTime);
+				source.rigidBody->velocity += contactNormal * Vabs(source.rigidBody->velocity) * (1 - contactTime);
 			}
+
 			return true;
 		}
 

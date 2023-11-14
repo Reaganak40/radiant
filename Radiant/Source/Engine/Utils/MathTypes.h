@@ -2,6 +2,7 @@
 #include "Core.h"
 
 namespace rdt {
+	struct Vec2f;
 
 	struct RADIANT_API Vec2d {
 		double x, y;
@@ -9,8 +10,7 @@ namespace rdt {
 		Vec2d(double nX = 0, double nY = 0)
 			: x(nX), y(nY) {}
 
-		Vec2d(ImVec2 imVector)
-			: x(imVector.x), y(imVector.y) {}
+		Vec2d(ImVec2 imVector);
 
 		Vec2d(std::pair<double, double> dpair)
 			: x(dpair.first), y(dpair.second) {}
@@ -32,6 +32,8 @@ namespace rdt {
 			y *= multiplier;
 			return (*this);
 		}
+
+		operator Vec2f() const;
 
 		/*
 			Returns the magnitude of this vector.
@@ -134,7 +136,17 @@ namespace rdt {
 				Returns a zero vector.
 			*/
 		static Vec2f Zero();
+
+		Vec2f operator=(const Vec2d& other) {
+			x = (float)other.x;
+			y = (float)other.y;
+			return (*this);
+		}
+
+		operator Vec2d() const;
+
 	};
+	
 
 
 	/*
@@ -146,4 +158,18 @@ namespace rdt {
 		Returns an absolute vector with all positive values.
 	*/
 	Vec2i Vabs(Vec2i vector);
+
+	/*
+		Wrapper for angle computation
+	*/
+	struct Angle {
+		float radians = 0;
+
+		Angle operator=(const float other) {
+			radians = other;
+			return (*this);
+		}
+
+		operator float() const { return radians; }
+	};
 }

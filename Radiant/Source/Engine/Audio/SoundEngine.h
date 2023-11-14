@@ -12,7 +12,6 @@ namespace rdt {
 		SoundEngine();
 		~SoundEngine();
 		static SoundEngine* m_instance;
-		MessageID m_broadcast;
 		std::mutex m_mutex;
 
 		/* ***********************************************

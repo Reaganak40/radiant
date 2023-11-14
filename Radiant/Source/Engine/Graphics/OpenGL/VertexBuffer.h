@@ -2,9 +2,10 @@
 #include "pch.h"
 #include "Graphics/Mesh.h"
 
+#define RDT_NULL_VERTEX_BUFFER_ID 0
 namespace rdt::core {
+	using VBO_ID = unsigned int;
 
-	typedef unsigned int VBO_ID;
 #define DEFAULT_VERTEX_BUFFER_LIMIT 64
 
 	class VertexBuffer {
@@ -44,6 +45,16 @@ namespace rdt::core {
 			Statically binds a vertex buffer with the provided ID.
 		*/
 		static void Bind(VBO_ID id);
+
+		/*
+			Returns the current vertex buffer data
+		*/
+		std::vector<Vertex>& GetBufferData();
+
+		/*
+			Returns the number of vertices in the buffer 
+		*/
+		unsigned int GetVertexCount();
 
 	private:
 		void RegisterBufferData();

@@ -3,204 +3,15 @@
 #include "Logging/Log.h"
 
 namespace rdt {
-	
-	struct MessageBus::Impl {
-		static MessageID idCounter;
-
-		std::queue<Message> m_message_queue;
-
-		/***********************************************************
-		*
-		*    	  Messenger Dictionary and Register Tables
-		*
-		************************************************************/
-		std::unordered_map<std::string, MessageID> m_messengers_AliasToId;
-		std::unordered_map<MessageID, std::string> m_messengers_IdToAlias;
-		std::unordered_map<MessageID, Messenger*> m_messengers;
-
-		/***********************************************************
-		*
-		*    	  Broadcast Dictionary and Register Tables
-		*
-		************************************************************/
-		std::unordered_map<std::string, MessageID> m_broadcasts_AliasToId;
-		std::unordered_map<MessageID, std::string> m_broadcasts_IdToAlias;
-		std::unordered_map<MessageID, Broadcast*> m_broadcasts;
-
-		MessageID Register(const std::string& alias, Messenger* messenger)
-		{
-			if (alias.empty()) {
-				return 0;
-			}
-
-			if (m_messengers_AliasToId.find(alias) != m_messengers_AliasToId.end()) {
-				RDT_CORE_WARN("MessageBus: Could not register '{}' (already exists)", alias);
-				return 0;
-			}
-
-			MessageID nID = GetNextMessageID();
-
-			m_messengers_AliasToId[alias] = nID;
-			m_messengers_IdToAlias[nID] = alias;
-			m_messengers[nID] = messenger;
-
-			RDT_CORE_TRACE("MessageBus: Registered new object '{}' to [mID: {}]", alias, nID);
-
-			return nID;
-		}
-
-		std::string GetAlias(MessageID mID)
-		{
-			if (m_messengers_IdToAlias.find(mID) == m_messengers_IdToAlias.end()) {
-				return "";
-			}
-
-			return m_messengers_IdToAlias.at(mID);
-		}
-
-		const MessageID GetMessageID(const std::string& alias)
-		{
-			if (m_messengers_AliasToId.find(alias) == m_messengers_AliasToId.end()) {
-				return 0;
-			}
-
-			return m_messengers_AliasToId.at(alias);
-		}
-
-		void AddToQueue(Message& msg)
-		{
-			if (msg.from == 0) {
-				RDT_CORE_WARN("Message sent from unregister object. Message dropped.", msg.from);
-				DropMessage(msg);
-				return;
-			}
-
-			if (m_messengers.find(msg.from) == m_messengers.end()) {
-				RDT_CORE_WARN("Message sent from unknown object [mID: {}]. Message dropped.", msg.from);
-				DropMessage(msg);
-				return;
-			}
-
-			if (m_messengers.find(msg.to) == m_messengers.end()) {
-				RDT_CORE_WARN("Message sent to unknown object [mID: {}]. Message dropped.", msg.to);
-				DropMessage(msg);
-				return;
-			}
-
-			m_message_queue.push(msg);
-		}
-
-		void SendDirectMessage(Message& msg)
-		{
-			if (msg.from != FROM_ANONYMOUS && m_messengers.find(msg.from) == m_messengers.end()) {
-				return;
-			}
-
-			if (m_messengers.find(msg.to) == m_messengers.end()) {
-				return;
-			}
-
-			m_messengers[msg.to]->OnMessage(msg);
-			msg.Destroy();
-		}
-
-		MessageID GetNextMessageID()
-		{
-			return ++idCounter;
-		}
-
-		void SendMessages()
-		{
-			while (!m_message_queue.empty()) {
-				auto& msg = m_message_queue.front();
-				m_messengers[msg.to]->OnMessage(msg);
-				msg.Destroy();
-				m_message_queue.pop();
-			}
-		}
-
-		MessageID CreateBroadcast(const std::string& alias, Broadcast* broadcast)
-		{
-			if (alias.empty()) {
-				return 0;
-			}
-
-			if (m_broadcasts_AliasToId.find(alias) != m_broadcasts_AliasToId.end()) {
-				RDT_CORE_WARN("MessageBus: Could not register broadcast '{}' (already exists)", alias);
-				return 0;
-			}
-
-			MessageID nID = GetNextMessageID();
-
-			m_broadcasts_AliasToId[alias] = nID;
-			m_broadcasts_IdToAlias[nID] = alias;
-			m_broadcasts[nID] = broadcast;
-
-			return nID;
-		}
-
-		const std::vector<Message>* GetBroadcast(const std::string& alias)
-		{
-			if (m_broadcasts_AliasToId.find(alias) == m_broadcasts_AliasToId.end()) {
-				return nullptr;
-			}
-			return m_broadcasts.at(m_broadcasts_AliasToId.at(alias))->GetMessages();
-		}
-
-		void AddToBroadcast(const MessageID broadcastID, MessageType type, void* data)
-		{
-			if (m_broadcasts.find(broadcastID) == m_broadcasts.end()) {
-				return;
-			}
-
-			Message nMsg;
-			nMsg.from = broadcastID;
-			nMsg.to = broadcastID;
-			nMsg.type = type;
-			nMsg.data = data;
-
-			m_broadcasts.at(broadcastID)->AddToBroadcast(nMsg);
-		}
-
-		void ResetBroadcasts()
-		{
-			for (auto& [mID, broadcast] : m_broadcasts) {
-				broadcast->SwapBuffers();
-			}
-		}
-
-		void DropMessage(Message& msg)
-		{
-			msg.Destroy();
-		}
-
-		void RemoveMessenger(MessageID mID)
-		{
-			if (m_messengers.find(mID) != m_messengers.end()) {
-				m_messengers.erase(mID);
-			}
-
-			if (m_messengers_IdToAlias.find(mID) != m_messengers_IdToAlias.end()) {
-				std::string alias = m_messengers_IdToAlias.at(mID);
-				m_messengers_IdToAlias.erase(mID);
-				m_messengers_AliasToId.erase(alias);
-			}
-		}
-	};
-
-	// ==============================================================================
 
 	MessageBus* MessageBus::m_instance = nullptr;
-	MessageID MessageBus::Impl::idCounter = 1;
 
 	MessageBus::MessageBus()
-		: m_impl(new MessageBus::Impl)
 	{
 	}
 
 	MessageBus::~MessageBus()
 	{
-		delete m_impl;
 	}
 
 	void MessageBus::Initialize()
@@ -215,116 +26,177 @@ namespace rdt {
 			m_instance = nullptr;
 		}
 	}
-	MessageID MessageBus::Register(const std::string& alias, Messenger* messenger)
+
+	MessageID MessageBus::Register(const std::string& alias)
 	{
-		return m_instance->m_impl->Register(alias, messenger);
+		return m_instance->Register(alias);
 	}
 
-	void MessageBus::RemoveMessenger(MessageID mID)
+	MessageID MessageBus::GetCommunicator(const std::string& alias)
 	{
-		if (mID == 0) {
+		return MessageID();
+	}
+
+	void MessageBus::PollMessages(MessageID communicator, ChannelID channel)
+	{
+		m_instance->PollMessagesImpl(communicator, channel);
+	}
+
+	bool MessageBus::GetNextMessage(MessageID communicator, Message& message)
+	{
+		return m_instance->GetNextMessageImpl(communicator, message);
+	}
+
+	void MessageBus::MessageHandled()
+	{
+		m_instance->MessageHandledImpl();
+	}
+
+	void MessageBus::EndPoll()
+	{
+
+	}
+
+	void MessageBus::SetLoopPhase(LoopPhase nPhase)
+	{
+		m_instance->SetLoopPhaseImpl(nPhase);
+	}
+
+	void MessageBus::AddMessage(ChannelID channel, MessageID from, MessageID to, MessageType type, void* data)
+	{
+		
+	}
+
+	MessageID MessageBus::RegisterImpl(const std::string& alias)
+	{
+		MessageID nID = ++idCounter;
+		if (!alias.empty()) {
+			aliasToId[alias] = nID;
+		}
+
+		return nID;
+	}
+
+	MessageID MessageBus::GetCommunicatorImpl(const std::string& alias)
+	{
+		if (aliasToId.find(alias) == aliasToId.end()) {
+			return RDT_NULL_MESSAGE_ID;
+		}
+
+		return aliasToId.at(alias);
+	}
+
+	void MessageBus::PollMessagesImpl(MessageID communicator, ChannelID channel)
+	{
+		if (m_in_poll) {
+			RDT_CORE_ERROR("MessageBus - Trying to poll messages but already in a poll!");
 			return;
 		}
 
-		m_instance->m_impl->RemoveMessenger(mID);
+		if (m_channels.size() >= channel) {
+			RDT_CORE_ERROR("MessageBus - Trying to poll messages from unregisrted channel [{}]", channel);
+			return;
+		}
+
+		if (communicator == RDT_NULL_MESSAGE_ID) {
+			RDT_CORE_ERROR("MessageBus - Trying to poll messages from unregistered communicator");
+			return;
+		}
+
+		// clear the poll queue
+		std::queue<unsigned int> empty;
+		std::swap(poll_queue, empty);
+
+		auto& messageQueue = m_channels[channel];
+
+		for (unsigned int i = 0; i < messageQueue.size(); i++) {
+
+			if (messageQueue[i].handled) {
+				continue;
+			}
+
+			if (messageQueue[i].to == communicator || messageQueue[i].to == RDT_MESSAGE_BROADCAST) {
+				poll_queue.push(i);
+			}
+		}
+
+		m_in_poll = true;
+		currentCommunicator = communicator;
+		pollChannel = channel;
 	}
 
-	std::string MessageBus::GetAlias(MessageID mID)
+	bool MessageBus::GetNextMessageImpl(MessageID communicator, Message& message)
 	{
-		return m_instance->m_impl->GetAlias(mID);
+		if (!m_in_poll) {
+			RDT_CORE_ERROR("MessageBus - Communicator [{}] tried to get next message, but no poll available", communicator);
+			return false;
+		}
+		if (communicator != currentCommunicator) {
+			RDT_CORE_ERROR("MessageBus - Communicator [{}] tried to get next message but is not the current communicator", communicator);
+			return false;
+		}
+
+		if (poll_queue.size() == 0) {
+			return false;
+		}
+
+		unsigned int nMessageIndex = poll_queue.front();
+		poll_queue.pop();
+
+		message = m_channels[pollChannel][nMessageIndex];
+		lastMessageIndex = nMessageIndex;
+		return true;
 	}
 
-	const MessageID MessageBus::GetMessageID(const std::string& alias)
+	void MessageBus::MessageHandledImpl()
 	{
-		return m_instance->m_impl->GetMessageID(alias);
+		if (!m_in_poll) {
+			RDT_CORE_ERROR("MessageBus - Tried to handle message but not in poll.");
+			return;
+		}
+
+		m_channels[pollChannel][lastMessageIndex].handled = true;
 	}
 
-	void MessageBus::AddToQueue(Message& msg)
+	void MessageBus::EndPollImpl()
 	{
-		m_instance->m_impl->AddToQueue(msg);
+		m_in_poll = false;
+		currentCommunicator = RDT_NULL_MESSAGE_ID;
 	}
 
-	void MessageBus::AddToQueue(const std::string& from, const std::string& to, MessageType type, void* data)
+	void MessageBus::SetLoopPhaseImpl(LoopPhase nPhase)
 	{
-		Message nMsg;
+		m_current_phase = nPhase;
 
-		nMsg.from = GetMessageID(from);
-		nMsg.to = GetMessageID(to);
-		nMsg.type = type;
-		nMsg.data = data;
-
-		AddToQueue(nMsg);
+		for (auto& channel : m_channels) {
+			// Remove handled messages and old messages
+			channel.erase(std::remove_if(channel.begin(), channel.end(), [&](const Message& msg) {
+				return msg.GetCreationDate() == nPhase || msg.IsMessageHandled();
+				}), channel.end());
+		}
 	}
 
-	void MessageBus::AddToQueue(const MessageID from, const MessageID to, MessageType type, void* data)
+	void MessageBus::AddMessageImpl(ChannelID channel, MessageID from, MessageID to, MessageType type, void* data)
 	{
-		Message nMsg;
+		if (channel >= m_channels.size()) {
+			RDT_CORE_WARN("MessageBus - Tried to add message to unregistered channel: [{}]", channel);
+			return;
+		}
+
+		if (from == RDT_NULL_MESSAGE_ID) {
+			RDT_CORE_WARN("MessageBus - Tried to add message to unregistered communicator.");
+			return;
+		}
+
+		m_channels[channel].push_back({});
+		auto& nMsg = m_channels[channel].back();
 
 		nMsg.from = from;
 		nMsg.to = to;
 		nMsg.type = type;
 		nMsg.data = data;
-
-		AddToQueue(nMsg);
-	}
-
-	void MessageBus::SendDirectMessage(Message& msg)
-	{
-		m_instance->m_impl->SendDirectMessage(msg);
-	}
-
-	void MessageBus::SendDirectMessage(const std::string& from, const std::string& to, MessageType type, void* data)
-	{
-		Message nMsg;
-
-		nMsg.from = GetMessageID(from);
-		nMsg.to = GetMessageID(to);
-		nMsg.type = type;
-		nMsg.data = data;
-
-		SendDirectMessage(nMsg);
-	}
-
-	void MessageBus::SendDirectMessage(const MessageID from, const MessageID to, MessageType type, void* data)
-	{
-		Message nMsg;
-
-		nMsg.from = from;
-		nMsg.to = to;
-		nMsg.type = type;
-		nMsg.data = data;
-
-		SendDirectMessage(nMsg);
-	}
-
-	MessageID MessageBus::GetNextMessageID()
-	{
-		return m_instance->m_impl->GetNextMessageID();
-	}
-
-	void MessageBus::SendMessagesImpl()
-	{
-		m_impl->SendMessages();
-	}
-
-	MessageID MessageBus::CreateBroadcastImpl(const std::string& alias, Broadcast* broadcast)
-	{
-		return m_impl->CreateBroadcast(alias, broadcast);
-	}
-
-	const std::vector<Message>* MessageBus::GetBroadcastImpl(const std::string& alias)
-	{
-		return m_impl->GetBroadcast(alias);
-	}
-
-	void MessageBus::AddToBroadcastImpl(const MessageID broadcastID, MessageType type, void* data)
-	{
-		m_impl->AddToBroadcast(broadcastID, type, data);
-	}
-
-	void MessageBus::ResetBroadcastsImpl()
-	{
-		m_impl->ResetBroadcasts();
+		nMsg.createdOn = m_current_phase;
+		nMsg.handled = false;
 	}
 
 }

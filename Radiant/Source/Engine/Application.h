@@ -1,22 +1,32 @@
 #pragma once
-#include "pch.h"
 #include "Core.h"
-#include "OOComponents/Scene/Scene.h"
+
+// Forward Declarations
+namespace rdt {
+	using UniqueID = unsigned int;
+	class Scene;
+}
 
 // For ApplicationConfig Struct
-#include "Utils/UniqueID.h"
 #include "Utils/Color.h"
 #include "Graphics/Camera.h"
 
 namespace rdt {
+
+	enum LoopPhase {
+		LoopPhase_Begin,
+		LoopPhase_ProcessInput,
+		LoopPhase_WorldUpdate,
+		LoopPhase_FinalUpdate,
+		LoopPhase_RenderUpdate,
+		LoopPhase_End,
+	};
 
 	class RADIANT_API Application
 	{
 	private:
 		struct Impl;
 		Impl* m_impl;
-
-		
 
 	public:
 		Application();
@@ -52,7 +62,7 @@ namespace rdt {
 			Registers a scene to the application called its OnRegister()
 			and adding it to its list of scenes.
 		*/
-		const UniqueID AddScene(const std::string& sceneName, Scene* nScene);
+		const UniqueID AddScene(const std::string& sceneName, std::shared_ptr<Scene> nScene);
 
 		/*
 			Manually sets the scene in the application to the one that
@@ -107,11 +117,6 @@ namespace rdt {
 		void BeginFrame();
 
 		/*
-			Polls all messages from the message bus and runs OnMessage for all objects.
-		*/
-		void PollMessages1();
-
-		/*
 			Runs the OnProcessInput on game objects, which will result in requests
 			made in game space and the physics API.
 		*/
@@ -122,11 +127,6 @@ namespace rdt {
 			and sending messages back to game objects.
 		*/
 		void UpdateWorld();
-
-		/*
-			Polls all messages from the message bus right before final update.
-		*/
-		void PollMessages2();
 
 		/*
 			Runs the OnFinalUpdate() on all game objects for final changes before render.

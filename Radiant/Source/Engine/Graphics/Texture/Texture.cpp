@@ -7,43 +7,33 @@
 namespace rdt {
 	
 	Texture::Texture()
-		: m_textureID(0), m_image_height(0), m_image_width(0), m_bits_per_pixel(0)
+		: m_ID(0), m_image_height(0), m_image_width(0), m_bits_per_pixel(0)
 	{
-		glGenTextures(1, &m_textureID);
-		m_texture_slot = UNASSIGNED_TEXTURE;
-
-		has_texture_atlas = false;
-		m_tileWidth = 0.0f;
-		m_tileHeight = 0.0f;
-		m_numRows = 0;
-		m_numCols = 0;
-		m_tile_gap = 0;
-
+		glGenTextures(1, &m_ID);
+		m_texture_slot = RDT_NULL_TEXTURE_SLOT;
 	}
 
 	Texture::~Texture()
 	{
-		glDeleteTextures(1, &m_textureID);
+		glDeleteTextures(1, &m_ID);
 	}
 
-	void Texture::DefineTextureAtlas(unsigned int tileWidth, unsigned int tileHeight, unsigned int numRows, unsigned int numCols, unsigned int tileGap)
+	int Texture::GetImageWidth()
 	{
-		has_texture_atlas = true;
-		m_tileWidth = (float)tileWidth;
-		m_tileHeight = (float)tileHeight;
-		m_numRows = numRows;
-		m_numCols = numCols;
-		m_tile_gap = tileGap;
+		return m_image_width;
 	}
 
-	void Texture::LoadTexture(const std::string& textureFilePath)
+	int Texture::GetImageHeight()
+	{
+		return m_image_height;
+	}
+
+
+	void Texture::LoadTexturePNG(const std::string& textureFilePath)
 	{
 		unsigned char* imageBuffer;
 
-		if (!Utils::PathExists(textureFilePath)) {
-			printf("Warning: Could not load texture. File not found!\n");
-			return;
-		}
+		// Precondition: filepath already been verified
 
 		//stbi_set_flip_vertically_on_load(1);
 
@@ -52,7 +42,7 @@ namespace rdt {
 			&m_image_height,
 			&m_bits_per_pixel, 4);
 
-		glBindTexture(GL_TEXTURE_2D, m_textureID);
+		glBindTexture(GL_TEXTURE_2D, m_ID);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -71,7 +61,7 @@ namespace rdt {
 		m_image_width = 1;
 		m_image_height = 1;
 
-		glBindTexture(GL_TEXTURE_2D, m_textureID);
+		glBindTexture(GL_TEXTURE_2D, m_ID);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -93,7 +83,7 @@ namespace rdt {
 
 	void Texture::Bind(TextureSlot textureSlot)
 	{
-		glBindTextureUnit(textureSlot, m_textureID);
+		glBindTextureUnit(textureSlot, m_ID);
 		m_texture_slot = textureSlot;
 	}
 }

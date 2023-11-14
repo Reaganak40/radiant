@@ -16,14 +16,14 @@ public:
 		appConfig.appName = "Sandbox";
 		appConfig.windowWidth = 1280;
 		appConfig.windowHeight = 720;
-		appConfig.backgroundColor = WHITE;
+		appConfig.backgroundColor = GREEN;
 		appConfig.cameraAspectRatio = AR_16_9;
 		SetApplicationConfig(appConfig);
 	}
 
 	void OnGameBegin() override final
 	{
-		AddScene("Sandbox Scene", new Sandbox);
+		AddScene("Sandbox Scene", std::make_shared<Sandbox>());
 		SetScene("Sandbox Scene");
 	}
 

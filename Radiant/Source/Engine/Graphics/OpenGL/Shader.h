@@ -1,10 +1,11 @@
 #pragma once
-#include "Graphics/Texture/Texture.h"
+#include "Graphics/Texture/TextureManager.h"
 #include "pch.h"
 
+#define RDT_NULL_SHADER_ID 0 
 namespace rdt::core {
+	using ShaderID = unsigned int;
 
-	typedef unsigned int ShaderID;
 	typedef unsigned int UniformID;
 	class Shader {
 	private:

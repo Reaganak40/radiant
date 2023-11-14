@@ -1,52 +1,69 @@
+/*******************************************************************
+*	Module:  Graphics (core)
+*	File:    Texture.h
+*
+*	Author: Reagan Kelley
+*
+*	This file contains the Texture class which holds image resource
+	data, and openGL bindings.
+*******************************************************************/
 #pragma once
 
-#include "Core.h"
-#include "Utils/UniqueID.h"
-#include "Utils/MathTypes.h"
-
-typedef unsigned int TextureSlot;
-typedef unsigned int TextureID;
-
-#define MAX_TEXTURES 30
-#define UNASSIGNED_TEXTURE 125
-#define NONE_TEXTURE 1
+#define RDT_NULL_TEXTURE_SLOT 125
+#define RDT_NONE_TEXTURE 1
 
 namespace rdt {
-	class RADIANT_API Texture {
-	private:
-		TextureID m_textureID;
-		TextureSlot m_texture_slot;
+	using TextureSlot = unsigned int;
+	using glTextureID = unsigned int;
 
+	class Texture {
+	private:
+		TextureSlot m_texture_slot;
+		glTextureID m_ID;
 		int m_image_width;
 		int m_image_height;
 		int m_bits_per_pixel;
-
-		bool has_texture_atlas;
-		float m_tileWidth;
-		float m_tileHeight;
-		unsigned int m_numRows;
-		unsigned int m_numCols;
-		unsigned int m_tile_gap;
-
 
 	public:
 		Texture();
 		~Texture();
 
-		inline TextureID GetID() { return m_textureID; }
+		/*
+			Returns the OpenGL texture ID for this instance.
+		*/
+		const glTextureID GetID() { return m_ID; }
 
 		/*
-			Adds a texture atlas to the texture, which can be used for reference tile maps.
+			Returns the assigned texture slot for this texture.
 		*/
-		void DefineTextureAtlas(unsigned int tileWidth, unsigned int tileHeight, unsigned int numRows, unsigned int numCols, unsigned int tileGap);
+		const TextureSlot CurrentTextureSlot() { return m_texture_slot; }
+
+		/*
+			Returns the image texture width (in pixels)
+		*/
+		int GetImageWidth();
+
+		/*
+			Returns the image texture height (in pixels)
+		*/
+		int GetImageHeight();
+
 
 		friend class TextureManager;
-
 	private:
-		void LoadTexture(const std::string& textureFilePath);
+		/*
+			Load texture from a PNG image
+		*/
+		void LoadTexturePNG(const std::string& textureFilePath);
+		
+		/*
+			Sets this texture to a white square (effectively a blank texture)
+		*/
 		void SetToNone();
 
+		/*
+			Binds this texture to this provided texture slot
+		*/
 		void Bind(TextureSlot slot);
-		const TextureSlot CurrentTextureSlot() { return m_texture_slot; }
 	};
 }

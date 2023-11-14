@@ -3,7 +3,7 @@
 namespace rdt {
 #define NO_UUID 0
 
-	typedef unsigned int UniqueID;
+	using UniqueID = unsigned int;
 	static UniqueID UUID_counter = 0;
 	UniqueID GetUniqueID();
 	void FreeUniqueID(UniqueID UUID);

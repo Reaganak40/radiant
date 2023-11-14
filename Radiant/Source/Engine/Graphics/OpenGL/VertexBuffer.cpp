@@ -53,6 +53,16 @@ namespace rdt::core {
 		glBindBuffer(GL_ARRAY_BUFFER, id);
 	}
 
+	std::vector<Vertex>& VertexBuffer::GetBufferData()
+	{
+		return m_buffer;
+	}
+
+	unsigned int VertexBuffer::GetVertexCount()
+	{
+		return m_current_count;
+	}
+
 	void VertexBuffer::RegisterBufferData()
 	{
 		glBufferData(GL_ARRAY_BUFFER, m_buffer.capacity() * sizeof(Vertex), nullptr, GL_DYNAMIC_DRAW);

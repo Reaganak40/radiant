@@ -125,6 +125,11 @@ namespace rdt {
             return sqrt(pow(pointB.x - pointA.x, 2) + pow(pointB.y - pointA.y, 2));
         }
 
+        float RADIANT_API GetDistance(const Vec2f& pointA, const Vec2f& pointB)
+        {
+            return sqrtf(pow(pointB.x - pointA.x, 2) + pow(pointB.y - pointA.y, 2));
+        }
+
         Vec2d GetManhattanDistance(const Vec2d& pointA, const Vec2d& pointB)
         {
             return pointB - pointA;
@@ -138,6 +143,12 @@ namespace rdt {
         {
             return std::atan2(point.y - origin.y, point.x - origin.x);
         }
+
+        float RADIANT_API GetRotation(const Vec2f& origin, const Vec2f& point)
+        {
+            return std::atan2f(point.y - origin.y, point.x - origin.x);
+        }
+
         void RotatePoint(const Vec2d& origin, Vec2d& point, const double dr)
         {
             double magnitude = GetDistance(origin, point);
@@ -146,9 +157,22 @@ namespace rdt {
             point.y = origin.y + (magnitude * std::sin(theta));
         }
 
+        void RotatePoint(const Vec2f& origin, Vec2f& point, const float dr)
+        {
+            float magnitude = GetDistance(origin, point);
+            float theta = GetRotation(origin, point) + dr;
+            point.x = origin.x + (magnitude * std::cos(theta));
+            point.y = origin.y + (magnitude * std::sin(theta));
+        }
+
         float RADIANT_API DegreesToRadians(float degrees)
         {
             return degrees * ((float)M_PI) / 180.0f;
+        }
+
+        float RADIANT_API RadiansToDegrees(float radians)
+        {
+            return radians * 180 / ((float)M_PI);
         }
 
         std::string GetCWD()
@@ -204,5 +228,24 @@ namespace rdt {
             ofile << content;
             ofile.close();
         }
+
+        Vec2f Scale(Vec2f start, Vec2f end, Vec2f scale)
+        {
+            float dx = end.x - start.x;
+            float dy = end.y - start.y;
+
+            return Vec2f(scale.x * dx, scale.y * dy);
+        }
+        void Translate(Vec2d& point, const Vec2d& translation)
+        {
+            point.x += translation.x;
+            point.y += translation.y;
+        }
+        void Translate(Vec2f& point, const Vec2f& translation)
+        {
+            point.x += translation.x;
+            point.y += translation.y;
+        }
+  
     }
 }

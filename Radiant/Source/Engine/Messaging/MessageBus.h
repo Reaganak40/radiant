@@ -1,23 +1,54 @@
+/*******************************************************************
+*	Module:  Messaging (core)
+*	File:    MessageBus.h
+*
+*	Author: Reagan Kelley
+*
+*   The MessageBus is a managing internal, that handles the
+*	communication between systems, the recylcing of messages,
+*	and ensures the safe handling of data.
+*******************************************************************/
 #pragma once
 #include "Core.h"
-#include "Message.h"
-#include "Messenger.h"
-#include "Broadcast.h"
 
-#define FROM_ANONYMOUS 0
+// Forward Declarations
+namespace rdt {
+	using ChannelID = unsigned int;
+
+	enum LoopPhase;
+	class Communicator;
+}
+
+// Required Definitions for Struct/Class Members
+#include "Message.h"
+
+#define RDT_NULL_MESSAGE_ID 0
+#define RDT_MESSAGE_BROADCAST 0
+#define RDT_NULL_CHANNEL_ID 0
+
 namespace rdt {
 
 	constexpr MessageID SoundMessengerID = 1;
+	using MessageQueue = std::vector<Message>;
 
-	class RADIANT_API MessageBus {
+	class MessageBus {
 	private:
 		MessageBus();
 		~MessageBus();
 		static MessageBus* m_instance;
 
-		struct Impl;
-		Impl* m_impl;
+		LoopPhase m_current_phase;
 
+		MessageID idCounter = 0;
+		std::unordered_map<std::string, MessageID> aliasToId;
+		
+		std::vector<MessageQueue> m_channels;
+
+		bool m_in_poll;
+		MessageID currentCommunicator;
+		ChannelID pollChannel;
+		unsigned int lastMessageIndex;
+		std::queue<unsigned int> poll_queue;
 	public:
 		/*
 			Create a new singleton instance of the Message Bus
@@ -30,90 +61,58 @@ namespace rdt {
 		static void Destroy();
 
 		/*
-			Runs all messages in the message queue, sending them all to their
-			receivers.
+			Called by a communicator object to register to the message bus
 		*/
-		static void SendMessages() { m_instance->SendMessagesImpl(); }
+		static MessageID Register(const std::string& alias = "");
 
 		/*
-			Removes all old messages from the registered broadcasts and replaces
-			them with new ones.
+			Gets the communicator with the given alias's messageID.
 		*/
-		static void ResetBroadcasts() { m_instance->ResetBroadcastsImpl(); }
+		static MessageID GetCommunicator(const std::string& alias);
 
 		/*
-			Registers an object to the message bus, by providing a unique alias and a pointer to
-			its OnMessage function. Returns the unique messageID for this registered object.
+			Polls the messages for the given communicator for the given channel.
 		*/
-		static MessageID Register(const std::string& alias, Messenger* messenger);
+		static void PollMessages(MessageID communicator, ChannelID channel);
 
 		/*
-			Removes a messenger from the MessageBus that had previously been registered with
-			the MessageBus.
+			Gets the next polled message for the communicator. Returns true
+			if there is no messages left in the poll.
 		*/
-		static void RemoveMessenger(MessageID mID);
+		static bool GetNextMessage(MessageID communicator, Message& message);
 
 		/*
-			Creates a new broadcast instance under the provided alias. The owner of the broadcast
-			should be the only entity that can add broadcast messages, but all entities should be
-			able to see the broadcast messages at any time.
+			Notfies that the last message has been handled and can be removed
+			from the message queue.
 		*/
-		static MessageID CreateBroadcast(const std::string& alias, Broadcast* broadcast) { return m_instance->CreateBroadcastImpl(alias, broadcast); }
+		static void MessageHandled();
 
 		/*
-			Gets the unique alias from the provided MessageID, returns empty string if it
-			does not exist.
+			Ends the current message poll.
 		*/
-		static std::string GetAlias(MessageID mID);
+		static void EndPoll();
 
 		/*
-			Gets the messageID belonging to the provided alias. Returns 0 if it does not exist.
+			Notifies the game loop of the next phase of the game loop, filtering
+			old messages from that phase last cylce.
 		*/
-		static const MessageID GetMessageID(const std::string& alias);
+		static void SetLoopPhase(LoopPhase nPhase);
 
 		/*
-			Adds a new message to the Message Queue.
+			Adds a new message to the message queue for the given channel.
 		*/
-		static void AddToQueue(Message& msg);
-
-		/*
-			Adds a new message to the Message Queue.
-		*/
-		static void AddToQueue(const std::string& from, const std::string& to, MessageType type, void* data);
-
-		/*
-			Adds a new message to the Message Queue.
-		*/
-		static void AddToQueue(const MessageID from, const MessageID to, MessageType type, void* data);
-
-		/*
-			Sends a message directly to the receiver, calling its OnMessage immediately.
-		*/
-		static void SendDirectMessage(Message& msg);
-		
-		/*
-			Sends a message directly to the receiver, calling its OnMessage immediately.
-		*/
-		static void SendDirectMessage(const std::string& from, const std::string& to, MessageType type, void* data = nullptr);
-
-		/*
-			Sends a message directly to the receiver, calling its OnMessage immediately.
-		*/
-		static void SendDirectMessage(const MessageID from, const MessageID to, MessageType type, void* data = nullptr);
-
-		static void AddToBroadcast(const MessageID broadcastID, MessageType type, void* data) { m_instance->AddToBroadcastImpl(broadcastID, type, data); }
-
-		/*
-			Returns the current display of messages from a registered broadcast.
-		*/
-		static const std::vector<Message>* GetBroadcast(const std::string& alias) { return m_instance->GetBroadcastImpl(alias); }
-
+		static void AddMessage(ChannelID channel, MessageID from, MessageID to, MessageType type, void* data = nullptr);
+	
 	private:
-		static MessageID GetNextMessageID();
-		void SendMessagesImpl();
-		MessageID CreateBroadcastImpl(const std::string& alias, Broadcast* broadcast);
-		const std::vector<Message>* GetBroadcastImpl(const std::string& alias);
-		void AddToBroadcastImpl(const MessageID broadcastID, MessageType type, void* data);
-		void ResetBroadcastsImpl();
+		MessageID RegisterImpl(const std::string& alias);
+		MessageID GetCommunicatorImpl(const std::string& alias);
+
+		void PollMessagesImpl(MessageID communicator, ChannelID channel);
+		bool GetNextMessageImpl(MessageID communicator, Message& message);
+		void MessageHandledImpl();
+		void EndPollImpl();
+
+		void SetLoopPhaseImpl(LoopPhase nPhase);
+		void AddMessageImpl(ChannelID channel, MessageID from, MessageID to, MessageType type, void* data);
 	};
 }

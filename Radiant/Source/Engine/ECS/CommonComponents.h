@@ -13,14 +13,23 @@
 // Forward Declarations
 namespace rdt {
 	using ModelID = unsigned int;
+	using TextureID = unsigned int;   // Unique Identifier for a Texture
+	using AnimationID = unsigned int;    // Unique Identifier for an Animation object.
+	using AnimationIndex = unsigned int; // Indicates the index of an animation sequence
+	using RealmID = unsigned int;
+	using ColliderID = unsigned int;
+
+	enum PhysicalProperties;
 	class Polygon;
 	class Layer;
 }
 
 // Required Definitions for Struct/Class Members
 #include "Utils/MathTypes.h"
+#include "Utils/Timestep.h"
 #include "Utils/Color.h"
 #include "Utils/rdt_string.h"
+#include "Graphics/Texture/TextureAtlas.h"
 
 /*
 	Stringify name
@@ -32,7 +41,7 @@ namespace rdt {
 	be accessed in the editor. This should be called in the contstructor
 	of a component child class.
 */
-#define TRACE_COMPONENT_DATA(ComponentName, MemberVariable) \
+#define TRACE_COMPONENT_DATA2(ComponentName, MemberVariable) \
 static bool is_ ## MemberVariable ## _defined = false; \
 if(!is_ ## MemberVariable ## _defined) { \
 	const char* memberName = GET_NAME(MemberVariable);\
@@ -42,6 +51,21 @@ if(!is_ ## MemberVariable ## _defined) { \
 	DEFINE_MEMBER(componentName, memberName, type, offset);\
 	is_ ## MemberVariable ## _defined = true;\
 }
+
+#define TRACE_COMPONENT_DATA3(ComponentName, MemberVariable, MemberVariableType) \
+static bool is_ ## MemberVariable ## _defined = false; \
+if(!is_ ## MemberVariable ## _defined) { \
+	const char* memberName = GET_NAME(MemberVariable);\
+	const char* componentName = typeid(*this).name();\
+	core::SupportedTraceType type = core::ResolveSupportTypeFromString(GET_NAME(MemberVariableType));\
+	size_t offset = offsetof(ComponentName, MemberVariable);\
+	DEFINE_MEMBER(componentName, memberName, type, offset);\
+	is_ ## MemberVariable ## _defined = true;\
+}
+
+#define EXPAND(x) x
+#define GET_MACRO(_1,_2,_3,NAME,...) NAME
+#define TRACE_COMPONENT_DATA(...) EXPAND(GET_MACRO(__VA_ARGS__, TRACE_COMPONENT_DATA3, TRACE_COMPONENT_DATA2)(__VA_ARGS__))
 
 namespace rdt {
 
@@ -55,10 +79,19 @@ namespace rdt {
 			SupportedTraceType_layerPtr,
 			SupportedTraceType_uint,
 			SupportedTraceType_double,
+			SupportedTraceType_float,
 			SupportedTraceType_color,
 			SupportedTraceType_polygon,
+			SupportedTraceType_vec2d,
+			SupportedTraceType_angle,
+			SupportedTraceType_colliderID,
+			SupportedTraceType_modelID,
+			SupportedTraceType_textureID,
+			SupportedTraceType_bool,
 			SupportedTraceType_NotSupported,
 		};
+
+		SupportedTraceType ResolveSupportTypeFromString(const std::string& type);
 
 		template<typename T>
 		SupportedTraceType ResolveSupportType(const T& queryType)
@@ -87,10 +120,27 @@ namespace rdt {
 				return SupportedTraceType_double;
 			}
 
+			if (typeid(queryType) == typeid(Vec2d)) {
+				return SupportedTraceType_vec2d;
+			}
+
+			if (typeid(queryType) == typeid(float)) {
+				return SupportedTraceType_float;
+			}
+
+			if (typeid(queryType) == typeid(Angle)) {
+				return SupportedTraceType_angle;
+			}
+
+			if (typeid(queryType) == typeid(bool)) {
+				return SupportedTraceType_bool;
+			}
+
 			return SupportedTraceType_NotSupported;
 		}
 
 		struct TraceData {
+			const char* name;
 			SupportedTraceType type;
 			size_t offset;
 		};
@@ -99,13 +149,13 @@ namespace rdt {
 			This should be hidden from client, used only by the editor.
 		*/
 		struct ComponentTraceTracker {
-			static std::unordered_map<std::string, std::unordered_map<std::string, core::TraceData>> ComponentDefinitions;
+			static std::unordered_map<std::string, std::vector<core::TraceData>> ComponentDefinitions;
 			static void AddDefinition(const char* component, const char* memberName, core::SupportedTraceType type, size_t offset);
 			
 			/*
 				Gets the member data of this component that have been marked for tracing
 			*/
-			static std::unordered_map<std::string, core::TraceData>& GetTraceData(const char* ComponentName);
+			static std::vector<core::TraceData>& GetTraceData(const char* ComponentName);
 		};
 	}
 
@@ -133,6 +183,18 @@ namespace rdt {
 
 		EntityConfig();
 	};
+	
+	/*
+		For entity debugging, highly used by the editor for
+		debug tracing and functionality. DebugComponent is
+		stripped away on release.
+	*/
+	struct RADIANT_API DebugComponent : ECSComponent
+	{
+		bool show_collider_hitbox;
+
+		DebugComponent();
+	};
 
 	/*
 		Defines the dimensionality of an entity, that is
@@ -140,9 +202,6 @@ namespace rdt {
 	*/
 	struct RADIANT_API Sprite : ECSComponent
 	{
-		// Contains a centeralized origin and 2D vertices
-		// NOTE: Pointer required because the number of vertices in arbitrary
-		std::shared_ptr<Polygon> polygon; 
 		ModelID model;
 
 		Sprite();
@@ -157,8 +216,12 @@ namespace rdt {
 	struct RADIANT_API Transform : ECSComponent
 	{
 		Vec2d position;
-		float rotation;
+		Angle rotation;
 		Vec2d scale;
+
+		Transform();
+
+		void Translate(float deltaTime, const Vec2d velocity);
 	};
 
 	/*
@@ -166,9 +229,36 @@ namespace rdt {
 	*/
 	struct RADIANT_API RigidBody2D : ECSComponent
 	{
+		RealmID realmID;
+		ColliderID colliderID;
+		PhysicalProperties physicalProperties;
+
+		bool use_gravity;
+		Vec2d velocity;
+
+		Vec2d max_velocity;
+		Vec2d acceleration;
+
 		double mass;
 
 		RigidBody2D();
+
+		/*
+			Updates the velocity vector by the given timestep, applies
+			changes in velocity with any provided external forces.
+		*/
+		void UpdateVelocity(float deltaTime, Vec2d externalForces = Vec2d::Zero());
+		
+		/*
+			Gets the dx/dy of the given deltaTime, based on velocity.
+		*/
+		Vec2d GetChangeInPosition(const float deltaTime);
+
+		/*
+			Returns true if the provided physical property matches the
+			physical properties of this rigidbody in any way.
+		*/
+		bool HasProperties(PhysicalProperties propertyQuery);
 	};
 
 	/*
@@ -176,10 +266,26 @@ namespace rdt {
 	*/
 	struct RADIANT_API Renderable : ECSComponent
 	{
-		unsigned int layer;		// The render layer to begin draw
-		rdt_string texture;     // texture alias to be applied to this render object
-		Color polygon_color;    // The shader color for the polygon
+		unsigned int layer;		    // The render layer to begin draw
+		TextureID texture;		    // The texture to use
+		bool flipTexture;			// If texture should be flipped
+		AtlasProfile atlasProfile;	// the texture coords to use
+		Color fillColor;			// The shader color for the polygon
 
 		Renderable();
+	};
+
+	/*
+		Defines the animation of a sprite. Animators refernece
+		animation objects, which utilize a texture. That texture
+		will override a renderable component's texture.
+	*/
+	struct RADIANT_API Animator : ECSComponent
+	{
+		AnimationID animationID;		// What animation to use
+		AnimationIndex currentFrame;	// What frame in animation to use
+		Timer timer;					// time left until next frame
+
+		Animator();
 	};
 }
