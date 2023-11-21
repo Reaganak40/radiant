@@ -4,7 +4,7 @@
 #include "Texture/TextureManager.h"
 
 #define GL_CORE_NULL_SHADER_ID 0 
-namespace glCore {
+namespace rdt::glCore {
 	using ShaderID = unsigned int;
 
 	typedef unsigned int UniformID;

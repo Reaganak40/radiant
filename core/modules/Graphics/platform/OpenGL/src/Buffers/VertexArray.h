@@ -1,6 +1,6 @@
 #pragma once
 
-namespace glCore {
+namespace rdt::glCore {
 
 	using VAO_ID = unsigned int;
 

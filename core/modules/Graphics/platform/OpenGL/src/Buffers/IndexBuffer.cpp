@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "IndexBuffer.h"
 
-namespace glCore {
+namespace rdt::glCore {
 
     IndexBuffer::IndexBuffer()
         : m_vertex_count(0), m_should_update(false), m_current_count(0), m_ID(0), m_last_count(0)

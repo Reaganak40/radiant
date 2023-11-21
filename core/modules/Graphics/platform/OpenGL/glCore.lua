@@ -16,11 +16,15 @@ project "glCore"
         "src/**.h",
         "src/**.cpp",
         "include/**.h",
+
+        -- Include the stb_image.cpp file in compilation
+        "%{IncludeDir.stb}/**.cpp"
     }
 
     includedirs
     {
         "src",
+        "include",
         
         "%{IncludeDir.GLFW}",
 		"%{IncludeDir.glad}",
@@ -28,21 +32,22 @@ project "glCore"
 		"%{IncludeDir.ImGuiBackend}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.stb}",
+
+        "%{IncludeModule.Logger}",
     }
 
     links
     { 
-        "GLFW", "GLM", "GLAD", "ImGui"
+        "GLFW", "GLM", "GLAD", "ImGui", "Logger"
     }
 
     postbuildcommands
     {
-        SendProjectDLL("Graphics")
+        SendProjectDLL("Graphics"),
     }
 
     pchheader "pch.h"
     pchsource "src/pch.cpp"
-    filter {"files:vendor/**.cpp"}
         flags {"NoPCH"}
 
     filter "system:windows"
@@ -52,7 +57,7 @@ project "glCore"
 
         defines
         {
-            "GL_CORE_PLATFORM_WINDOWS",
+            "RDT_PLATFORM_WINDOWS",
             "GL_CORE_BUILD_DLL"
         }
     

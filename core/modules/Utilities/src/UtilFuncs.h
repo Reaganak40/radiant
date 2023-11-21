@@ -113,7 +113,7 @@ namespace rdt::utils {
     /*
         Tokenizes a string by the provided delimeter and returns a vector of the tokenized strings
     */
-    void Tokenize(const char* str, const char* delimeter, STRING_ARRAY& tokens);
+    void UTILS_API Tokenize(const char* str, const char* delimeter, STRING_ARRAY& tokens);
 
     /*
         Returns the parent directory of the filepath

@@ -37,8 +37,8 @@ namespace rdt::logger {
 		*/
 		static void Update();
 
-		static void CoreLog(LogLevel level, ...);
-		static void ClientLog(LogLevel level, ...);
+		static void CoreLog(LogLevel level, const char* fmt, ...);
+		static void ClientLog(LogLevel level, const char* fmt, ...);
 
 		/*
 			Gets a log message fro mthe log buffer at the given index. If no
@@ -56,20 +56,29 @@ namespace rdt::logger {
 			Set the log color for logs at the given log level.
 		*/
 		static void SetLogColor(LogLevel level, Color nColor);
+
+		/*
+			Activates the stdout buffer stream sink, allowing logging
+			to the console window.
+		*/
+		static void log_to_stdout(bool yes_log = true);
+
+	private:
+		static Impl* GetImpl();
 	};
 }
 
 // Core Logging Macros
-#define RDT_CORE_TRACE(...) ::rdt::logger::Log::CoreLog(::rdt::logger::L_TRACE, __VA_ARGS__);
-#define RDT_CORE_INFO(...)  ::rdt::logger::Log::CoreLog(::rdt::logger::L_INFO, __VA_ARGS__);
-#define RDT_CORE_WARN(...)  ::rdt::logger::Log::CoreLog(::rdt::logger::L_WARNING, __VA_ARGS__);
-#define RDT_CORE_ERROR(...) ::rdt::logger::Log::CoreLog(::rdt::logger::L_ERROR, __VA_ARGS__);
-#define RDT_CORE_FATAL(...) ::rdt::logger::Log::CoreLog(::rdt::logger::L_CRITICAL, __VA_ARGS__);
+#define RDT_CORE_TRACE(...) ::rdt::logger::Log::CoreLog(::rdt::logger::L_TRACE, __VA_ARGS__)
+#define RDT_CORE_INFO(...)  ::rdt::logger::Log::CoreLog(::rdt::logger::L_INFO, __VA_ARGS__)
+#define RDT_CORE_WARN(...)  ::rdt::logger::Log::CoreLog(::rdt::logger::L_WARNING, __VA_ARGS__)
+#define RDT_CORE_ERROR(...) ::rdt::logger::Log::CoreLog(::rdt::logger::L_ERROR, __VA_ARGS__)
+#define RDT_CORE_FATAL(...) ::rdt::logger::Log::CoreLog(::rdt::logger::L_CRITICAL, __VA_ARGS__)
 
 // Client Logging Macros
-#define RDT_TRACE(...) ::rdt::logger::Log::ClientLog(::rdt::logger::L_TRACE, __VA_ARGS__);
-#define RDT_INFO(...)  ::rdt::logger::Log::ClientLog(::rdt::logger::L_INFO, __VA_ARGS__);
-#define RDT_WARN(...)  ::rdt::logger::Log::ClientLog(::rdt::logger::L_WARNING, __VA_ARGS__);
-#define RDT_ERROR(...) ::rdt::logger::Log::ClientLog(::rdt::logger::L_ERROR, __VA_ARGS__);
+#define RDT_TRACE(...) ::rdt::logger::Log::ClientLog(::rdt::logger::L_TRACE, __VA_ARGS__)
+#define RDT_INFO(...)  ::rdt::logger::Log::ClientLog(::rdt::logger::L_INFO, __VA_ARGS__)
+#define RDT_WARN(...)  ::rdt::logger::Log::ClientLog(::rdt::logger::L_WARNING, __VA_ARGS__)
+#define RDT_ERROR(...) ::rdt::logger::Log::ClientLog(::rdt::logger::L_ERROR, __VA_ARGS__)
 #define RDT_FATAL(...) ::rdt::logger::Log::ClientLog(::rdt::logger::L_CRITICAL, __VA_ARGS__);
 

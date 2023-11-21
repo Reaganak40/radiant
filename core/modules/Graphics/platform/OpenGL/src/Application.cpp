@@ -1,21 +1,20 @@
 #include "pch.h"
-#include "../include/glCore.h"
-
+#include "Application.h"
 #include "Internal/State.h"
 #include "Internal/Window.h"
 #include "Texture/TextureManager.h"
-#include "../include/glCore.h"
 #include "Utils/ErrorHandling.h"
-#include "Logging/Log.h"
 
-glCore::Window& GetWindow(glCore::WindowImpl* ptr) {
-    return *((glCore::Window*)ptr);
+#include <Radiant/Logger.h>
+
+rdt::glCore::Window& GetWindow(rdt::glCore::WindowImpl* ptr) {
+    return *((rdt::glCore::Window*)ptr);
 }
 
 #define APP_WINDOW GetWindow(m_windowImpl)
 #define TEXTURE_MANAGER GetWindow(m_windowImpl).GetTextureManager()
 
-glCore::glApplication::glApplication(const char* name)
+rdt::glCore::glApplication::glApplication(const char* name)
 {
     size_t length = strlen(name) + 1;
     m_name = new char[length];
@@ -24,7 +23,7 @@ glCore::glApplication::glApplication(const char* name)
     m_windowImpl = nullptr;
 }
 
-glCore::glApplication::~glApplication()
+rdt::glCore::glApplication::~glApplication()
 {
     delete m_name;
 
@@ -33,12 +32,12 @@ glCore::glApplication::~glApplication()
     }
 }
 
-const char* glCore::glApplication::GetName()
+const char* rdt::glCore::glApplication::GetName()
 {
 	return m_name;
 }
 
-bool glCore::glApplication::LaunchWindow()
+bool rdt::glCore::glApplication::LaunchWindow()
 {
     if (m_windowImpl == nullptr) {
         m_windowImpl = new Window;
@@ -47,94 +46,94 @@ bool glCore::glApplication::LaunchWindow()
     return APP_WINDOW.LaunchWindow(m_name);
 }
 
-bool glCore::glApplication::AppShouldClose()
+bool rdt::glCore::glApplication::AppShouldClose()
 {
     return APP_WINDOW.WindowShouldClose();
 }
 
-void glCore::glApplication::BeginFrame()
+void rdt::glCore::glApplication::BeginFrame()
 {
     APP_WINDOW.BeginFrame();
 }
 
-void glCore::glApplication::Clear()
+void rdt::glCore::glApplication::Clear()
 {
     APP_WINDOW.ClearViewport();
 }
 
-void glCore::glApplication::SetClearColor(float r, float g, float b, float a)
+void rdt::glCore::glApplication::SetClearColor(float r, float g, float b, float a)
 {
     APP_WINDOW.SetClearColor(r, g, b, a);
 }
 
-void glCore::glApplication::EndFrame()
+void rdt::glCore::glApplication::EndFrame()
 {
     APP_WINDOW.EndFrame();
 }
 
-glCore::ViewportID glCore::glApplication::CreateViewport(int xPos, int yPos, int width, int height)
+rdt::glCore::ViewportID rdt::glCore::glApplication::CreateViewport(int xPos, int yPos, int width, int height)
 {
     return APP_WINDOW.CreateViewport(xPos, yPos, width, height);
 }
 
-void glCore::glApplication::SetViewport(ViewportID vID)
+void rdt::glCore::glApplication::SetViewport(ViewportID vID)
 {
     APP_WINDOW.SetViewport(vID);
 }
 
-glCore::TextureID glCore::glApplication::CreateTextureFromPNG(const char* filepath)
+rdt::glCore::TextureID rdt::glCore::glApplication::CreateTextureFromPNG(const char* filepath)
 {
     return TEXTURE_MANAGER.LoadTextureFromPNG(filepath);
 }
 
-const glCore::Texture& glCore::glApplication::GetTexture(TextureID tID)
+const rdt::glCore::Texture& rdt::glCore::glApplication::GetTexture(TextureID tID)
 {
     return TEXTURE_MANAGER.GetTexture(tID);
 }
 
-void glCore::glApplication::UseTexture(TextureID tID)
+void rdt::glCore::glApplication::UseTexture(TextureID tID)
 {
     if (!TEXTURE_MANAGER.TextureExists(tID)) {
-        GL_CORE_WARN("UseTexture - Texture [id:{}] does not exist! Request ignored.", tID);
+        RDT_CORE_WARN("UseTexture - Texture [id:{}] does not exist! Request ignored.", tID);
         return;
     }
 
     APP_WINDOW.AddToTextureList(tID);
 }
 
-glCore::CameraID glCore::glApplication::CreateCamera()
+rdt::glCore::CameraID rdt::glCore::glApplication::CreateCamera()
 {
     return APP_WINDOW.CreateCamera();
 }
 
-glCore::Camera& glCore::glApplication::GetCamera(CameraID cID)
+rdt::glCore::Camera& rdt::glCore::glApplication::GetCamera(CameraID cID)
 {
     return APP_WINDOW.GetCamera(cID);
 }
 
-void glCore::glApplication::SetCamera(CameraID cID)
+void rdt::glCore::glApplication::SetCamera(CameraID cID)
 {
     APP_WINDOW.SetCamera(cID);
 }
 
-void glCore::glApplication::SubmitVertices(Vertex* vertices, size_t vertexCount)
+void rdt::glCore::glApplication::SubmitVertices(Vertex* vertices, size_t vertexCount)
 {
     APP_WINDOW.SubmitVertices(vertices, vertexCount);
 }
 
-void glCore::glApplication::SubmitIndices(unsigned int* indices, size_t indexCount, size_t vertexCount)
+void rdt::glCore::glApplication::SubmitIndices(unsigned int* indices, size_t indexCount, size_t vertexCount)
 {
     APP_WINDOW.SubmitIndices(indices, indexCount, vertexCount);
 }
 
-void glCore::glApplication::Draw()
+void rdt::glCore::glApplication::Draw()
 {
     APP_WINDOW.DrawContext();
 }
 
 // ========================================================================================
 
-glCore::glApplication& glCore::CreateApplication(const char* application_name)
+rdt::glCore::glApplication& rdt::glCore::CreateApplication(const char* application_name)
 {
 	if (strlen(application_name) == 0) {
         application_name = "OpenGL Window";
@@ -143,12 +142,12 @@ glCore::glApplication& glCore::CreateApplication(const char* application_name)
 	return glState::Get()->RegisterApplication(application_name);
 }
 
-glCore::glApplication& glCore::GetApplication(const char* application_name)
+rdt::glCore::glApplication& rdt::glCore::GetApplication(const char* application_name)
 {
 	return glState::Get()->GetApplication(application_name);
 }
 
-bool glCore::DestroyApplication(glApplication& application)
+bool rdt::glCore::DestroyApplication(glApplication& application)
 {
 	auto state = glState::Get();
 	

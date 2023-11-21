@@ -74,7 +74,7 @@
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>if not exist $(SolutionDir)\bin\Debug-windows-x86_64\Editor mkdir $(SolutionDir)\bin\Debug-windows-x86_64\Editor &amp; copy /B /Y ..\bin\Debug-windows-x86_64\Engine\Engine.dll $(SolutionDir)\bin\Debug-windows-x86_64\Editor</Command>
+      <Command>(if not exist $(SolutionDir)bin\Debug-windows-x86_64\Editor mkdir $(SolutionDir)bin\Debug-windows-x86_64\Editor) &amp; copy /B /Y ..\bin\Debug-windows-x86_64\Engine\Engine.dll $(SolutionDir)bin\Debug-windows-x86_64\Editor</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -101,20 +101,27 @@
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>if not exist $(SolutionDir)\bin\Release-windows-x86_64\Editor mkdir $(SolutionDir)\bin\Release-windows-x86_64\Editor &amp; copy /B /Y ..\bin\Release-windows-x86_64\Engine\Engine.dll $(SolutionDir)\bin\Release-windows-x86_64\Editor</Command>
+      <Command>(if not exist $(SolutionDir)bin\Release-windows-x86_64\Editor mkdir $(SolutionDir)bin\Release-windows-x86_64\Editor) &amp; copy /B /Y ..\bin\Release-windows-x86_64\Engine\Engine.dll $(SolutionDir)bin\Release-windows-x86_64\Editor</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\Radiant.h" />
     <ClInclude Include="include\radiant_api.h" />
     <ClInclude Include="src\Application.h" />
+    <ClInclude Include="src\pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="modules\Graphics\Graphics.vcxproj">
       <Project>{8DFD7D4A-7960-0DEF-22E6-45A50E28D971}</Project>
+    </ProjectReference>
+    <ProjectReference Include="modules\Logger\Logger.vcxproj">
+      <Project>{1C0DC9E5-08C5-0A33-71CC-E38E5DA3A523}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

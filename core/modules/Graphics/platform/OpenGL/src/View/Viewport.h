@@ -10,7 +10,7 @@
 #pragma once
 
 #define GL_CORE_DEFAULT_VIEWPORT_ID 0
-namespace glCore {
+namespace rdt::glCore {
 
 	using ViewportID = unsigned int;
 

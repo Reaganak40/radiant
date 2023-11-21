@@ -74,8 +74,8 @@
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>if not exist $(SolutionDir)\bin\Debug-windows-x86_64\Engine mkdir $(SolutionDir)\bin\Debug-windows-x86_64\Engine &amp; copy /B /Y ..\..\..\bin\Debug-windows-x86_64\Logger\Logger.dll $(SolutionDir)\bin\Debug-windows-x86_64\Engine
-if not exist $(SolutionDir)\bin\Debug-windows-x86_64\glCore mkdir $(SolutionDir)\bin\Debug-windows-x86_64\glCore &amp; copy /B /Y ..\..\..\bin\Debug-windows-x86_64\Logger\Logger.dll $(SolutionDir)\bin\Debug-windows-x86_64\glCore</Command>
+      <Command>(if not exist $(SolutionDir)bin\Debug-windows-x86_64\Engine mkdir $(SolutionDir)bin\Debug-windows-x86_64\Engine) &amp; copy /B /Y ..\..\..\bin\Debug-windows-x86_64\Logger\Logger.dll $(SolutionDir)bin\Debug-windows-x86_64\Engine
+(if not exist $(SolutionDir)bin\Debug-windows-x86_64\glCore mkdir $(SolutionDir)bin\Debug-windows-x86_64\glCore) &amp; copy /B /Y ..\..\..\bin\Debug-windows-x86_64\Logger\Logger.dll $(SolutionDir)bin\Debug-windows-x86_64\glCore</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -102,8 +102,8 @@ if not exist $(SolutionDir)\bin\Debug-windows-x86_64\glCore mkdir $(SolutionDir)
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>if not exist $(SolutionDir)\bin\Release-windows-x86_64\Engine mkdir $(SolutionDir)\bin\Release-windows-x86_64\Engine &amp; copy /B /Y ..\..\..\bin\Release-windows-x86_64\Logger\Logger.dll $(SolutionDir)\bin\Release-windows-x86_64\Engine
-if not exist $(SolutionDir)\bin\Release-windows-x86_64\glCore mkdir $(SolutionDir)\bin\Release-windows-x86_64\glCore &amp; copy /B /Y ..\..\..\bin\Release-windows-x86_64\Logger\Logger.dll $(SolutionDir)\bin\Release-windows-x86_64\glCore</Command>
+      <Command>(if not exist $(SolutionDir)bin\Release-windows-x86_64\Engine mkdir $(SolutionDir)bin\Release-windows-x86_64\Engine) &amp; copy /B /Y ..\..\..\bin\Release-windows-x86_64\Logger\Logger.dll $(SolutionDir)bin\Release-windows-x86_64\Engine
+(if not exist $(SolutionDir)bin\Release-windows-x86_64\glCore mkdir $(SolutionDir)bin\Release-windows-x86_64\glCore) &amp; copy /B /Y ..\..\..\bin\Release-windows-x86_64\Logger\Logger.dll $(SolutionDir)bin\Release-windows-x86_64\glCore</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

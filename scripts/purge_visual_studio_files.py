@@ -31,6 +31,7 @@ target_dirs = [
     "core",
     "core/modules/Audio",
     "core/modules/Graphics",
+    "core/modules/Graphics/platform/OpenGL",
     "core/modules/Logger",
     "core/modules/Physics",
     "core/modules/Utilities",

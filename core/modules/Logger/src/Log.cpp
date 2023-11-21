@@ -3,6 +3,9 @@
 
 #include <Radiant/Utils.h>
 
+#define CORE_LOGGER 0
+#define CLIENT_LOGGER 1
+
 namespace rdt::logger {
 
 	constexpr size_t MaxLogs = 250;
@@ -10,7 +13,9 @@ namespace rdt::logger {
 	struct Log::Impl {
 		std::shared_ptr<spdlog::logger> m_CoreLogger;
 		std::shared_ptr<spdlog::logger> m_ClientLogger;
-		std::shared_ptr< spdlog::sinks::ostream_sink_mt> m_sink;
+
+		std::shared_ptr<spdlog::sinks::ostream_sink_mt> m_ostream_sink;
+		std::shared_ptr<spdlog::sinks::stdout_color_sink_mt> m_stdout_sink;
 
 		std::ostringstream m_log_oss;
 
@@ -26,12 +31,12 @@ namespace rdt::logger {
 		{
 			spdlog::set_pattern("%^[%T] %n: %v%$");
 
-			m_sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(m_log_oss);
-
-			m_CoreLogger = std::make_shared<spdlog::logger>("Core", m_sink);
+			m_ostream_sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(m_log_oss);
+		
+			m_CoreLogger = std::make_shared<spdlog::logger>("Core", m_ostream_sink);
 			m_CoreLogger->set_level(spdlog::level::trace);
 
-			m_ClientLogger = std::make_shared<spdlog::logger>("Client", m_sink);
+			m_ClientLogger = std::make_shared<spdlog::logger>("Client", m_ostream_sink);
 			m_ClientLogger->set_level(spdlog::level::trace);
 
 			logIndex = 0;
@@ -52,11 +57,13 @@ namespace rdt::logger {
 		void OnUpdate()
 		{
 			std::string stream = m_log_oss.str();
-			std::vector<std::string> nLogs;
 
-			rdt::utils::Tokenize(stream, "\n", nLogs);
+			STRING_ARRAY nLogs;
 
-			for (auto log : nLogs) {
+			rdt::utils::Tokenize(stream.c_str(), "\n", nLogs);
+
+			for (size_t log_index = 0; log_index < nLogs.size(); log_index++) {
+				std::string log = nLogs[log_index];
 
 				int end1 = 0;
 				int start2 = 0;
@@ -158,6 +165,63 @@ namespace rdt::logger {
 			outLevel = originalLog.substr(end1 + 2, start2 - (end1 + 2) - 1);
 			return originalLog.substr(0, end1) + originalLog.substr(start2, originalLog.size() - start2);
 		}
+
+		void log_to_stdout(bool yes_log)
+		{
+			if (yes_log) {
+
+				if (m_CoreLogger->sinks().size() == 1) {
+					m_CoreLogger->sinks().push_back(m_stdout_sink);
+				}
+
+				if (m_ClientLogger->sinks().size() == 1) {
+					m_ClientLogger->sinks().push_back(m_stdout_sink);
+				}
+			}
+			else {
+				if (m_CoreLogger->sinks().size() == 2) {
+					m_CoreLogger->sinks().pop_back();
+				}
+
+				if (m_ClientLogger->sinks().size() == 2) {
+					m_CoreLogger->sinks().pop_back();
+				}
+			}
+		}
+
+		void LogMessage(int logger_choice, LogLevel level, const char* fmt, va_list& args)
+		{
+			std::shared_ptr<spdlog::logger> logger = nullptr;
+			switch (logger_choice)
+			{
+			case CORE_LOGGER:
+				logger = m_CoreLogger;
+				break;
+			case CLIENT_LOGGER:
+				logger = m_ClientLogger;
+				break;
+			default:
+				return;
+			}
+
+			switch (level) {
+			case L_INFO:
+				logger->info(fmt, args);
+				break;
+			case L_TRACE:
+				logger->trace(fmt, args);
+				break;
+			case L_WARNING:
+				logger->warn(fmt, args);
+				break;
+			case L_ERROR:
+				logger->error(fmt, args);
+				break;
+			case L_CRITICAL:
+				logger->critical(fmt, args);
+				break;
+			}
+		}
 	};
 
 	// ===============================================================
@@ -182,52 +246,18 @@ namespace rdt::logger {
 		m_impl->OnUpdate();
 	}
 
-	void Log::CoreLog(LogLevel level, ...)
+	void Log::CoreLog(LogLevel level, const char* fmt, ...)
 	{
 		va_list args;
-		va_start(args, level);
-
-		switch (level) {
-		case L_INFO:
-			m_impl->m_CoreLogger->info(args);
-			break;
-		case L_TRACE:
-			m_impl->m_CoreLogger->trace(args);
-			break;
-		case L_WARNING:
-			m_impl->m_CoreLogger->warn(args);
-			break;
-		case L_ERROR:
-			m_impl->m_CoreLogger->error(args);
-			break;
-		case L_CRITICAL:
-			m_impl->m_CoreLogger->critical(args);
-			break;
-		}
+		va_start(args, fmt);
+		GetImpl()->LogMessage(CORE_LOGGER, level, fmt, args);
 	}
 
-	void Log::ClientLog(LogLevel level, ...)
+	void Log::ClientLog(LogLevel level, const char* fmt, ...)
 	{
 		va_list args;
-		va_start(args, level);
-
-		switch (level) {
-		case L_INFO:
-			m_impl->m_ClientLogger->info(args);
-			break;
-		case L_TRACE:
-			m_impl->m_ClientLogger->trace(args);
-			break;
-		case L_WARNING:
-			m_impl->m_ClientLogger->warn(args);
-			break;
-		case L_ERROR:
-			m_impl->m_CoreLogger->error(args);
-			break;
-		case L_CRITICAL:
-			m_impl->m_ClientLogger->critical(args);
-			break;
-		}
+		va_start(args, fmt);
+		GetImpl()->LogMessage(CLIENT_LOGGER, level, fmt, args);
 	}
 
 	const char* Log::GetLog(int index, Color& msgColor)
@@ -253,5 +283,18 @@ namespace rdt::logger {
 				m_impl->m_logColors[i] = nColor;
 			}
 		}
+	}
+
+	void rdt::logger::Log::log_to_stdout(bool yes_log)
+	{
+		GetImpl()->log_to_stdout(yes_log);
+	}
+
+	rdt::logger::Log::Impl* Log::GetImpl()
+	{
+		if (m_impl == nullptr) {
+			Initialize();
+		}
+		return m_impl;
 	}
 }

@@ -9,10 +9,10 @@
 *	of each respectively.
 *******************************************************************/
 #pragma once
-#include "../include/glCore.h"
+#include "Application.h"
 #include "Texture/TextureManager.h"
 
-namespace glCore {
+namespace rdt::glCore {
 
 	class glState {
 	private:

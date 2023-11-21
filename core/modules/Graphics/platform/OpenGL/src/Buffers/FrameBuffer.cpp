@@ -1,8 +1,9 @@
 #include "pch.h"
 #include "FrameBuffer.h"
-#include "Logging/Log.h"
 
-namespace glCore {
+#include <Radiant/Logger.h>
+
+namespace rdt::glCore {
 	FrameBuffer::FrameBuffer()
 		: m_ID(0), m_texture(0), m_RBO(0)
 	{
@@ -42,7 +43,7 @@ namespace glCore {
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_RBO);
 
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-			GL_CORE_ERROR("FrameBuffer is not complete!");
+			RDT_CORE_ERROR("FrameBuffer is not complete!");
 		}
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);

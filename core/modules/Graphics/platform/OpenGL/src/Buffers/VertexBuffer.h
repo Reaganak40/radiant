@@ -1,8 +1,8 @@
 #pragma once
-#include "../include/glCore.h"
+#include "Vertex.h"
 
 #define GL_CORE_NULL_VERTEX_BUFFER_ID 0
-namespace glCore {
+namespace rdt::glCore {
 	using VBO_ID = unsigned int;
 
 #define DEFAULT_VERTEX_BUFFER_LIMIT 64

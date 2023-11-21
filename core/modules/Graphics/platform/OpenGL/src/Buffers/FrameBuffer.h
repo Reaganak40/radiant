@@ -1,6 +1,6 @@
 #pragma once
 
-namespace glCore {
+namespace rdt::glCore {
 
 	typedef unsigned int FBO_ID;
 

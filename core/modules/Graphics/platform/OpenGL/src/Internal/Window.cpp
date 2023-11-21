@@ -1,13 +1,12 @@
 #include "pch.h"
-
 #include "Window.h"
-#include "Logging/Log.h"
 #include "Utils/ErrorHandling.h"
-
 #include "State.h"
 #include "Texture/TextureManager.h"
 
-glCore::Window::Window()
+#include <Radiant/Logger.h>
+
+rdt::glCore::Window::Window()
 {
     m_clear_color[0] = 0.0f;
     m_clear_color[1] = 0.0f;
@@ -15,13 +14,13 @@ glCore::Window::Window()
     m_clear_color[3] = 0.0f;
 }
 
-glCore::Window::~Window()
+rdt::glCore::Window::~Window()
 {
 }
 
-bool glCore::Window::LaunchWindow(const char* windowName)
+bool rdt::glCore::Window::LaunchWindow(const char* windowName)
 {
-    GL_CORE_TRACE("Launching new window instance...");
+    RDT_CORE_TRACE("Launching new window instance...");
 
     // Launch the glfw window with the given config data
     m_window_data.SetWindowName(windowName);
@@ -54,18 +53,18 @@ bool glCore::Window::LaunchWindow(const char* windowName)
     return true;
 }
 
-bool glCore::Window::WindowShouldClose()
+bool rdt::glCore::Window::WindowShouldClose()
 {
     return glfwWindowShouldClose(m_window_data.m_window);
 }
 
-void glCore::Window::BeginFrame()
+void rdt::glCore::Window::BeginFrame()
 {
     m_VBO_component.Reset();
     m_IBO_component.Reset();
 }
 
-void glCore::Window::EndFrame()
+void rdt::glCore::Window::EndFrame()
 {
     /* Swap front and back buffers */
     glfwSwapBuffers(m_window_data.m_window);
@@ -74,7 +73,7 @@ void glCore::Window::EndFrame()
     glfwPollEvents();
 }
 
-void glCore::Window::ClearViewport()
+void rdt::glCore::Window::ClearViewport()
 {
     auto& viewport = m_viewport_component.GetCurrentViewport();
     glScissor(viewport.posX, viewport.posY, viewport.width, viewport.height);
@@ -82,7 +81,7 @@ void glCore::Window::ClearViewport()
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void glCore::Window::SetClearColor(float r, float g, float b, float a)
+void rdt::glCore::Window::SetClearColor(float r, float g, float b, float a)
 {
     m_clear_color[0] = r;
     m_clear_color[1] = g;
@@ -92,33 +91,33 @@ void glCore::Window::SetClearColor(float r, float g, float b, float a)
     glClearColor(r, g, b, a);
 }
 
-glCore::ViewportID glCore::Window::CreateViewport(int xPos, int yPos, int width, int height)
+rdt::glCore::ViewportID rdt::glCore::Window::CreateViewport(int xPos, int yPos, int width, int height)
 {
     return m_viewport_component.CreateViewport(xPos, yPos, width, height);
 }
 
-glCore::ViewportID glCore::Window::GetCurrentViewport()
+rdt::glCore::ViewportID rdt::glCore::Window::GetCurrentViewport()
 {
     return m_viewport_component.m_current_viewport;
 }
 
-void glCore::Window::SubmitVertices(Vertex* vertices, size_t vertexCount)
+void rdt::glCore::Window::SubmitVertices(Vertex* vertices, size_t vertexCount)
 {
     m_VBO_component.GetVertexBuffer().PushToBatch(vertices, vertexCount);
 }
 
-void glCore::Window::SubmitIndices(unsigned int* indices, size_t indexCount, size_t vertexCount)
+void rdt::glCore::Window::SubmitIndices(unsigned int* indices, size_t indexCount, size_t vertexCount)
 {
     m_IBO_component.GetIndexBuffer().PushToBatch(indices, indexCount, vertexCount);
 }
 
 
-glCore::CameraID glCore::Window::CreateCamera()
+rdt::glCore::CameraID rdt::glCore::Window::CreateCamera()
 {
     return m_camera_component.CreateCamera();
 }
 
-glCore::Camera& glCore::Window::GetCamera(CameraID cID)
+rdt::glCore::Camera& rdt::glCore::Window::GetCamera(CameraID cID)
 {
     if (!m_camera_component.CameraExists(cID)) {
         cID = GL_CORE_NULL_CAMERA_ID;
@@ -128,7 +127,7 @@ glCore::Camera& glCore::Window::GetCamera(CameraID cID)
 }
 
 
-void glCore::Window::SetCamera(CameraID cID)
+void rdt::glCore::Window::SetCamera(CameraID cID)
 {
     if (m_camera_component.BindCamera(cID)) {
         auto& current_camera = m_camera_component.GetCurrentCamera();
@@ -136,15 +135,15 @@ void glCore::Window::SetCamera(CameraID cID)
     }
 }
 
-glCore::TextureManager& glCore::Window::GetTextureManager()
+rdt::glCore::TextureManager& rdt::glCore::Window::GetTextureManager()
 {
     return *m_texture_component.m_texture_manager;
 }
 
-bool glCore::Window::AddToTextureList(TextureID tID)
+bool rdt::glCore::Window::AddToTextureList(TextureID tID)
 {
     if (m_texture_component.m_texture_requests.size() == MAX_TEXTURES) {
-        GL_CORE_WARN("AddToTextureList - Maximum textures reached! Ignored request.");
+        RDT_CORE_WARN("AddToTextureList - Maximum textures reached! Ignored request.");
         return false;
     }
 
@@ -152,12 +151,12 @@ bool glCore::Window::AddToTextureList(TextureID tID)
     return true;
 }
 
-void glCore::Window::SetViewport(ViewportID vID)
+void rdt::glCore::Window::SetViewport(ViewportID vID)
 {
     m_viewport_component.BindViewport(vID);
 }
 
-void glCore::Window::DrawContext()
+void rdt::glCore::Window::DrawContext()
 {
     auto& vao = m_VAO_component.GetVertexArray();
     auto& vbo = m_VBO_component.GetVertexBuffer();
@@ -186,14 +185,14 @@ void glCore::Window::DrawContext()
     SetUpNextContext();
 }
 
-void glCore::Window::SetUpNextContext()
+void rdt::glCore::Window::SetUpNextContext()
 {
     m_VBO_component.OnFinishedDrawCall();
     m_IBO_component.OnFinishedDrawCall();
     m_texture_component.OnFinishedDrawCall();
 }
 
-void glCore::Window::PrepareShader()
+void rdt::glCore::Window::PrepareShader()
 {
     auto& shader = m_shader_component.GetCurrentShader();
 

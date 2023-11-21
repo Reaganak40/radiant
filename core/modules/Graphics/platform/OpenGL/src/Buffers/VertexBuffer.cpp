@@ -1,9 +1,8 @@
 #include "pch.h"
 #include "VertexBuffer.h"
-#include "../include/glCore.h"
 #include "Internal/State.h"
 
-namespace glCore {
+namespace rdt::glCore {
 
 	VertexBuffer::VertexBuffer()
 		: m_buffer_defined(false), m_current_count(0), m_last_count(0), m_ID(0)

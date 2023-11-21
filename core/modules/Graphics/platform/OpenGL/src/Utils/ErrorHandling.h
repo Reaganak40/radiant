@@ -1,6 +1,6 @@
 #pragma once
 
-namespace glCore {
+namespace rdt::glCore {
 
 #define ASSERT(x) if (!(x)) __debugbreak();
 

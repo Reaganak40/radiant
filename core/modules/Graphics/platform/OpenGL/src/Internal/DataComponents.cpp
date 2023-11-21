@@ -1,19 +1,20 @@
 #include "pch.h"
 #include "DataComponents.h"
-#include "Logging/Log.h"
 #include "Utils/ErrorHandling.h"
 
+#include <Radiant/Logger.h>
+
 // ======================================================
-void glCore::WindowDataComponent::SetWindowName(const std::string& name)
+void rdt::glCore::WindowDataComponent::SetWindowName(const std::string& name)
 {
 	m_window_name = name;
 }
-void glCore::WindowDataComponent::SetWindowSize(int windowWidth, int windowHeight)
+void rdt::glCore::WindowDataComponent::SetWindowSize(int windowWidth, int windowHeight)
 {
 	m_window_width = windowWidth;
 	m_window_height = windowHeight;
 }
-bool glCore::WindowDataComponent::Launch()
+bool rdt::glCore::WindowDataComponent::Launch()
 {
 	if (m_window != nullptr) {
 		return false;
@@ -31,7 +32,7 @@ bool glCore::WindowDataComponent::Launch()
 	m_window = glfwCreateWindow(mode->width, mode->height, m_window_name.c_str(), NULL, NULL);
 	if (!m_window)
 	{
-		GL_CORE_FATAL("Failed to create glfw window");
+		RDT_CORE_FATAL("Failed to create glfw window");
 		return false;
 	}
 
@@ -45,44 +46,44 @@ bool glCore::WindowDataComponent::Launch()
 	// Load all OpenGL functions using the glfw loader function
 	// If you use SDL you can use: https://wiki.libsdl.org/SDL_GL_GetProcAddress
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		GL_CORE_FATAL("Failed to initialize OpenGL context");
+		RDT_CORE_FATAL("Failed to initialize OpenGL context");
 		glfwMakeContextCurrent(NULL);
 		return false;
 	}
 
 	// glad populates global constants after loading to indicate,
 	// if a certain extension/version is available.
-	GL_CORE_INFO("OpenGL {}.{}", GLVersion.major, GLVersion.minor);
+	RDT_CORE_INFO("OpenGL {}.{}", GLVersion.major, GLVersion.minor);
 
 	// For opengl error handling
 	EnableErrorCallback();
 }
 // ======================================================
-void glCore::VertexArrayDataComponent::Init()
+void rdt::glCore::VertexArrayDataComponent::Init()
 {
 	m_vertex_array = std::make_shared<VertexArray>();
 }
-glCore::VertexArray& glCore::VertexArrayDataComponent::GetVertexArray()
+rdt::glCore::VertexArray& rdt::glCore::VertexArrayDataComponent::GetVertexArray()
 {
 	return* m_vertex_array;
 }
 // ======================================================
-void glCore::ViewportDataComponent::Init(int windowWidth, int windowHeight)
+void rdt::glCore::ViewportDataComponent::Init(int windowWidth, int windowHeight)
 {
 	m_viewports[GL_CORE_DEFAULT_VIEWPORT_ID] = Viewport(0, 0, windowWidth, windowHeight);
 	m_viewports.at(GL_CORE_DEFAULT_VIEWPORT_ID).Bind();
 }
-glCore::ViewportID glCore::ViewportDataComponent::NextViewportID()
+rdt::glCore::ViewportID rdt::glCore::ViewportDataComponent::NextViewportID()
 {
 	return ++viewportIDCounter;
 }
-glCore::ViewportID glCore::ViewportDataComponent::CreateViewport(int xPos, int yPos, int width, int height)
+rdt::glCore::ViewportID rdt::glCore::ViewportDataComponent::CreateViewport(int xPos, int yPos, int width, int height)
 {
 	ViewportID nID = NextViewportID();
 	m_viewports[nID] = Viewport(xPos, yPos, width, height);
 	return nID;
 }
-void glCore::ViewportDataComponent::BindViewport(ViewportID vID)
+void rdt::glCore::ViewportDataComponent::BindViewport(ViewportID vID)
 {
 	if (m_current_viewport == vID || !ViewportExists(vID)) {
 		return;
@@ -91,15 +92,15 @@ void glCore::ViewportDataComponent::BindViewport(ViewportID vID)
 	m_viewports.at(vID).Bind();
 	m_current_viewport = vID;
 }
-bool glCore::ViewportDataComponent::ViewportExists(ViewportID vID)
+bool rdt::glCore::ViewportDataComponent::ViewportExists(ViewportID vID)
 {
 	return m_viewports.find(vID) != m_viewports.end();
 }
-glCore::Viewport& glCore::ViewportDataComponent::GetCurrentViewport()
+rdt::glCore::Viewport& rdt::glCore::ViewportDataComponent::GetCurrentViewport()
 {
 	return m_viewports.at(m_current_viewport);
 }
-void glCore::ViewportDataComponent::OnCameraChange(Camera& bindedCamera)
+void rdt::glCore::ViewportDataComponent::OnCameraChange(Camera& bindedCamera)
 {
 	if (!bindedCamera.ShouldMaintainAspectRatio()) {
 		return;
@@ -117,7 +118,7 @@ void glCore::ViewportDataComponent::OnCameraChange(Camera& bindedCamera)
 	Viewport::Bind(nX, nY, nWidth, nHeight);
 }
 // ======================================================
-void glCore::VertexBufferDataComponent::Reset()
+void rdt::glCore::VertexBufferDataComponent::Reset()
 {
 	for (size_t i = 0; i < m_VBO_index; i++) {
 		m_VBOs[i].Flush();
@@ -125,7 +126,7 @@ void glCore::VertexBufferDataComponent::Reset()
 
 	m_VBO_index = 0;
 }
-glCore::VertexBuffer& glCore::VertexBufferDataComponent::GetVertexBuffer()
+rdt::glCore::VertexBuffer& rdt::glCore::VertexBufferDataComponent::GetVertexBuffer()
 {
 	if (m_VBO_index < m_VBOs.size()) {
 		return m_VBOs[m_VBO_index];
@@ -134,11 +135,11 @@ glCore::VertexBuffer& glCore::VertexBufferDataComponent::GetVertexBuffer()
 	m_VBOs.push_back(VertexBuffer());
 	return m_VBOs.back();
 }
-void glCore::VertexBufferDataComponent::OnFinishedDrawCall()
+void rdt::glCore::VertexBufferDataComponent::OnFinishedDrawCall()
 {
 	m_VBO_index++;
 }
-void glCore::VertexBufferDataComponent::BindVertexBuffer(const VertexBuffer& vbo)
+void rdt::glCore::VertexBufferDataComponent::BindVertexBuffer(const VertexBuffer& vbo)
 {
 	if (m_binded_VBO == vbo.GetID()) {
 		return;
@@ -148,7 +149,7 @@ void glCore::VertexBufferDataComponent::BindVertexBuffer(const VertexBuffer& vbo
 	m_binded_VBO = vbo.GetID();
 }
 // ======================================================
-void glCore::IndexBufferDataComponent::Reset()
+void rdt::glCore::IndexBufferDataComponent::Reset()
 {
 	for (size_t i = 0; i < m_IBO_index; i++) {
 		m_IBOs[i].Flush();
@@ -156,7 +157,7 @@ void glCore::IndexBufferDataComponent::Reset()
 
 	m_IBO_index = 0;
 }
-glCore::IndexBuffer& glCore::IndexBufferDataComponent::GetIndexBuffer()
+rdt::glCore::IndexBuffer& rdt::glCore::IndexBufferDataComponent::GetIndexBuffer()
 {
 	if (m_IBO_index < m_IBOs.size()) {
 		return m_IBOs[m_IBO_index];
@@ -165,11 +166,11 @@ glCore::IndexBuffer& glCore::IndexBufferDataComponent::GetIndexBuffer()
 	m_IBOs.push_back(IndexBuffer());
 	return m_IBOs.back();
 }
-void glCore::IndexBufferDataComponent::OnFinishedDrawCall()
+void rdt::glCore::IndexBufferDataComponent::OnFinishedDrawCall()
 {
 	m_IBO_index++;
 }
-void glCore::IndexBufferDataComponent::BindIndexBuffer(const IndexBuffer& ibo)
+void rdt::glCore::IndexBufferDataComponent::BindIndexBuffer(const IndexBuffer& ibo)
 {
 	if (m_binded_IBO == ibo.GetID()) {
 		return;
@@ -179,7 +180,7 @@ void glCore::IndexBufferDataComponent::BindIndexBuffer(const IndexBuffer& ibo)
 	m_binded_IBO = ibo.GetID();
 }
 // ======================================================
-void glCore::ShaderDataComponent::Init()
+void rdt::glCore::ShaderDataComponent::Init()
 {
 	// Set default shader
 	Shader nShader;
@@ -191,7 +192,7 @@ void glCore::ShaderDataComponent::Init()
 	nShader.Bind();
 	m_current_shader = nShader.GetID();
 }
-void glCore::ShaderDataComponent::BindShader(ShaderID shader)
+void rdt::glCore::ShaderDataComponent::BindShader(ShaderID shader)
 {
 	if (m_current_shader == shader || !ShaderExists(shader)) {
 		return;
@@ -200,38 +201,38 @@ void glCore::ShaderDataComponent::BindShader(ShaderID shader)
 	m_shaders.at(shader).Bind();
 	m_current_shader = shader;
 }
-bool glCore::ShaderDataComponent::ShaderExists(ShaderID shader)
+bool rdt::glCore::ShaderDataComponent::ShaderExists(ShaderID shader)
 {
 	return m_shaders.find(shader) != m_shaders.end();
 }
-glCore::Shader& glCore::ShaderDataComponent::GetCurrentShader()
+rdt::glCore::Shader& rdt::glCore::ShaderDataComponent::GetCurrentShader()
 {
 	return m_shaders.at(m_current_shader);
 }
 // ======================================================
-void glCore::TextureDataComponent::Init()
+void rdt::glCore::TextureDataComponent::Init()
 {
 	m_texture_manager = std::make_shared<TextureManager>();
 }
-void glCore::TextureDataComponent::BindTextureRequests()
+void rdt::glCore::TextureDataComponent::BindTextureRequests()
 {
 	m_texture_manager->BindTextures(m_texture_requests);
 }
-void glCore::TextureDataComponent::OnFinishedDrawCall()
+void rdt::glCore::TextureDataComponent::OnFinishedDrawCall()
 {
 	m_texture_requests.clear();
 }
 // ======================================================
-void glCore::CameraDataComponent::Init()
+void rdt::glCore::CameraDataComponent::Init()
 {
 	m_cameras[GL_CORE_NULL_CAMERA_ID];
 }
-glCore::CameraID glCore::CameraDataComponent::NextCameraID()
+rdt::glCore::CameraID rdt::glCore::CameraDataComponent::NextCameraID()
 {
 	return ++cameraIDCounter;
 }
 
-bool glCore::CameraDataComponent::BindCamera(CameraID camera)
+bool rdt::glCore::CameraDataComponent::BindCamera(CameraID camera)
 {
 	if (m_current_camera == camera || !CameraExists(camera)) {
 		return false;
@@ -240,21 +241,21 @@ bool glCore::CameraDataComponent::BindCamera(CameraID camera)
 	m_current_camera = camera;
 	return true;
 }
-glCore::CameraID glCore::CameraDataComponent::CreateCamera()
+rdt::glCore::CameraID rdt::glCore::CameraDataComponent::CreateCamera()
 {
 	CameraID nID = NextCameraID();
 	m_cameras[nID];
 	return nID;
 }
-bool glCore::CameraDataComponent::CameraExists(CameraID camera)
+bool rdt::glCore::CameraDataComponent::CameraExists(CameraID camera)
 {
 	return m_cameras.find(camera) != m_cameras.end();
 }
-glCore::Camera& glCore::CameraDataComponent::GetCurrentCamera()
+rdt::glCore::Camera& rdt::glCore::CameraDataComponent::GetCurrentCamera()
 {
 	return m_cameras.at(m_current_camera);
 }
-glCore::Camera& glCore::CameraDataComponent::GetAnyCamera(CameraID camera)
+rdt::glCore::Camera& rdt::glCore::CameraDataComponent::GetAnyCamera(CameraID camera)
 {
 	return m_cameras.at(camera);
 }

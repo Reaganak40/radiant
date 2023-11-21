@@ -1,9 +1,10 @@
 #include "pch.h"
 #include "TextureManager.h"
-#include "../include/glCore.h"
-#include "Logging/Log.h"
+#include "Texture.h"
 
-namespace glCore {
+#include <Radiant/Logger.h>
+
+namespace rdt::glCore {
 
 	TextureManager::TextureManager()
 	{
@@ -50,7 +51,7 @@ namespace glCore {
 	bool TextureManager::BindTexture(TextureID tID)
 	{
 		if (!TextureExists(tID)) {
-			GL_CORE_WARN("TextureManager - Tried to bind unregistered texture [id:{}]", tID);
+			RDT_CORE_WARN("TextureManager - Tried to bind unregistered texture [id:{}]", tID);
 			return false;
 		}
 

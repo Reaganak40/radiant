@@ -1,10 +1,9 @@
 #include "pch.h"
-#include "../include/glCore.h"
-#include "Logging/Log.h"
+#include "Texture.h"
 
-#include <stb_image.h>
+#include <Radiant/Logger.h>
 
-namespace glCore {
+namespace rdt::glCore {
 	
 	Texture::Texture()
 		: m_ID(0), m_image_height(0), m_image_width(0), m_bits_per_pixel(0)
@@ -51,7 +50,7 @@ namespace glCore {
 
 		// Precondition: filepath already been verified
 		if (!std::filesystem::exists(textureFilePath)) {
-			GL_CORE_WARN("Texture - Failed to load from PNG. File not found!");
+			RDT_CORE_WARN("Texture - Failed to load from PNG. File not found!");
 			return false;
 		}
 		//stbi_set_flip_vertically_on_load(1);

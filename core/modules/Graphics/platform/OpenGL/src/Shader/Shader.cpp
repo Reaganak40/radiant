@@ -2,11 +2,9 @@
 #include "Shader.h"
 #include "Internal/State.h"
 
-#include <fstream>
+#include <Radiant/Logger.h>
 
-#include "Logging/Log.h"
-
-namespace glCore {
+namespace rdt::glCore {
 
     Shader::Shader()
         : m_ID(GL_CORE_NULL_SHADER_ID)
@@ -99,7 +97,7 @@ namespace glCore {
             char* message = new char[length];
             glGetShaderInfoLog(id, length, &length, message);
 
-            GL_CORE_WARN("OpenGL Shader: Failed to compile {} shader:\n\tError Msg: {}",
+            RDT_CORE_WARN("OpenGL Shader: Failed to compile {} shader:\n\tError Msg: {}",
                 (type == GL_VERTEX_SHADER ? "vertex" : "fragment"), message);
 
             delete[] message;
@@ -146,7 +144,7 @@ namespace glCore {
             location = glGetUniformLocation(m_ID, variableName.c_str());
 
             if (location < 0) {
-                GL_CORE_WARN("OpenGL Shader: UniformVariable [{}] does not exist.", variableName);
+                RDT_CORE_WARN("OpenGL Shader: UniformVariable [{}] does not exist.", variableName);
             }
 
             m_uniforms[variableName] = location;
@@ -169,7 +167,7 @@ namespace glCore {
             }
         }
         else {
-            GL_CORE_WARN("OpenGL Shader: Could not open '{}'.", filepath);
+            RDT_CORE_WARN("OpenGL Shader: Could not open '{}'.", filepath);
         }
 
         sFilestream.close();

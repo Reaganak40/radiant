@@ -1,9 +1,9 @@
 #include "pch.h"
 #include "ErrorHandling.h"
-#include "Logging/Log.h"
-#include <sstream>
 
-namespace glCore {
+#include <Radiant/Logger.h>
+
+namespace rdt::glCore {
 
 	void glClearError() {
 		int count = 0;
@@ -11,7 +11,7 @@ namespace glCore {
 			count++;
 		}
 		if (count > 0) {
-			GL_CORE_WARN("OpenGL: Found {} unboarded errors", count);
+			RDT_CORE_WARN("OpenGL: Found {} unboarded errors", count);
 		}
 	}
 
@@ -20,7 +20,7 @@ namespace glCore {
 		bool noErrors = true;
 		while (GLenum error = glGetError()) {
 
-			GL_CORE_ERROR("OpenGL: Error\n\tFunction: {}\n\tfilepath: {}\n\tline: {}\n\terror: ({})",
+			RDT_CORE_ERROR("OpenGL: Error\n\tFunction: {}\n\tfilepath: {}\n\tline: {}\n\terror: ({})",
 				function, filename, line, glErrorContext(error));
 			noErrors = false;
 		}

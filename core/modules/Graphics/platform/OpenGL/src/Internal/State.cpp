@@ -1,34 +1,31 @@
 #include "pch.h"
 #include "State.h"
-#include "Logging/Log.h"
 
-glCore::glState* glCore::glState::m_singleton = nullptr;
+#include <Radiant/Logger.h>
 
-glCore::glState::glState()
+rdt::glCore::glState* rdt::glCore::glState::m_singleton = nullptr;
+
+rdt::glCore::glState::glState()
 {
-	if (!Log::IsInitialized()) {
-		Log::Init();
-	}
-	
-	GL_CORE_TRACE("Initialized new OpenGL state...");
+	RDT_CORE_TRACE("Initialized new OpenGL state...");
 
 	/* Initialize the library */
 	if (!glfwInit()) {
-		GL_CORE_ERROR("Could not initliaze glfw.");
+		RDT_CORE_ERROR("Could not initliaze glfw.");
 	}
 }
 
-glCore::glState::~glState()
+rdt::glCore::glState::~glState()
 {
 	for (auto& [name, application] : m_applications) {
 		delete application;
 	}
 
-	GL_CORE_TRACE("Terminating OpenGL state...");
+	RDT_CORE_TRACE("Terminating OpenGL state...");
 	glfwTerminate();
 }
 
-glCore::glState* glCore::glState::Get()
+rdt::glCore::glState* rdt::glCore::glState::Get()
 {
 	if (m_singleton == nullptr) {
 		m_singleton = new glState;
@@ -36,7 +33,7 @@ glCore::glState* glCore::glState::Get()
 	return m_singleton;
 }
 
-void glCore::glState::Reset()
+void rdt::glCore::glState::Reset()
 {
 	if (m_singleton != nullptr) {
 		delete m_singleton;
@@ -44,7 +41,7 @@ void glCore::glState::Reset()
 	}
 }
 
-glCore::glApplication& glCore::glState::RegisterApplication(const std::string& name)
+rdt::glCore::glApplication& rdt::glCore::glState::RegisterApplication(const std::string& name)
 {
 	if (!ApplicationExists(name)) {
 		m_applications[name] = new glApplication(name.c_str());
@@ -53,7 +50,7 @@ glCore::glApplication& glCore::glState::RegisterApplication(const std::string& n
 	return *m_applications.at(name);
 }
 
-glCore::glApplication& glCore::glState::GetApplication(const std::string& name)
+rdt::glCore::glApplication& rdt::glCore::glState::GetApplication(const std::string& name)
 {
 	if (!ApplicationExists(name)) {
 		return RegisterApplication(name);
@@ -62,12 +59,12 @@ glCore::glApplication& glCore::glState::GetApplication(const std::string& name)
 	return *m_applications.at(name);
 }
 
-bool glCore::glState::ApplicationExists(const std::string& name)
+bool rdt::glCore::glState::ApplicationExists(const std::string& name)
 {
 	return m_applications.find(name) != m_applications.end();
 }
 
-bool glCore::glState::RemoveApplication(const std::string& name)
+bool rdt::glCore::glState::RemoveApplication(const std::string& name)
 {
 	if (!ApplicationExists(name)) {
 		return false;
@@ -78,7 +75,7 @@ bool glCore::glState::RemoveApplication(const std::string& name)
 	return true;
 }
 
-size_t glCore::glState::ApplicationCount()
+size_t rdt::glCore::glState::ApplicationCount()
 {
 	return m_applications.size();
 }

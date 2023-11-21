@@ -1,8 +1,9 @@
+#include "pch.h"
 #include "Application.h"
-#include <stdio.h>	
+#include <Radiant/Logger.h>
 
 void rdt::Application::TestImpl()
 {
-
-	printf("Hello from Radiant Engine!\n");
+	logger::Log::log_to_stdout();
+	RDT_CORE_TRACE("Hello world!");
 }

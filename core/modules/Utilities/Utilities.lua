@@ -35,7 +35,6 @@ project "Utilities"
     {
         SendProjectDLL("Logger"),
         SendProjectDLL("Engine"),
-        SendProjectDLL("glCore"),
     }
 
     pchheader "pch.h"

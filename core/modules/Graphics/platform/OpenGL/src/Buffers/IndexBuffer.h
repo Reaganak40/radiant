@@ -2,7 +2,7 @@
 
 #define GL_CORE_NULL_INDEX_BUFFER_ID 0
 
-namespace glCore {
+namespace rdt::glCore {
 	using IBO_ID = unsigned int;
 
 	class IndexBuffer {

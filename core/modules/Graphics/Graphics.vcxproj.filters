@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{89AF369E-F58E-B539-FEA6-40106A051C9B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Radiant">
+      <UniqueIdentifier>{1BEADCCD-8775-4A92-9086-CD86FC90A692}</UniqueIdentifier>
+    </Filter>
     <Filter Include="platform">
       <UniqueIdentifier>{4A63C33C-3630-1E48-5F49-0CF04B7553D6}</UniqueIdentifier>
     </Filter>
@@ -10,20 +16,38 @@
     <Filter Include="platform\OpenGL\include">
       <UniqueIdentifier>{B1BA2FF4-1DF2-778B-26FC-DBAE92B29E84}</UniqueIdentifier>
     </Filter>
+    <Filter Include="platform\OpenGL\include\Radiant">
+      <UniqueIdentifier>{439D2299-AF80-31D9-B883-5F1524E6F729}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src">
       <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="platform\OpenGL\include\glCore.h">
+    <ClInclude Include="include\Radiant\Graphics.h">
+      <Filter>include\Radiant</Filter>
+    </ClInclude>
+    <ClInclude Include="include\graphics_api.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="platform\OpenGL\include\Radiant\glCore.h">
+      <Filter>platform\OpenGL\include\Radiant</Filter>
+    </ClInclude>
+    <ClInclude Include="platform\OpenGL\include\gl_core_api.h">
       <Filter>platform\OpenGL\include</Filter>
     </ClInclude>
     <ClInclude Include="src\Renderer.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\pch.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Renderer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pch.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

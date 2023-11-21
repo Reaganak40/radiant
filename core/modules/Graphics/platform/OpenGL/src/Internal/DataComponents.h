@@ -6,9 +6,9 @@
 #include "Buffers/IndexBuffer.h"
 #include "Shader/Shader.h"
 #include "View/Viewport.h"
-#include "../include/glCore.h"
+#include "View/Camera.h"
 
-namespace glCore {
+namespace rdt::glCore {
 
 	struct WindowDataComponent {
         // Window management

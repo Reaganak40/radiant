@@ -18,7 +18,7 @@ end
 
 function SendProjectDLL(projName)
     local sendpath = ("%{wks.location}bin\\" .. outputdir .. "\\" .. projName) 
-    return ("if not exist " .. sendpath .. " mkdir " .. sendpath .. " & {COPYFILE} %{cfg.buildtarget.relpath} " .. sendpath)
+    return ("(if not exist " .. sendpath .. " mkdir " .. sendpath .. ") & {COPYFILE} %{cfg.buildtarget.relpath} " .. sendpath)
 end
 
 -- All include directories

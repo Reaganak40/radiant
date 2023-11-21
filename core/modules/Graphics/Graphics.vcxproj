@@ -59,8 +59,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;RDT_BUILD_DLL;RDT_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;platform\OpenGL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;GRAPHICS_BUILD_DLL;RDT_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src;include;platform\OpenGL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -74,7 +74,7 @@
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>if not exist $(SolutionDir)\bin\Debug-windows-x86_64\Engine mkdir $(SolutionDir)\bin\Debug-windows-x86_64\Engine &amp; copy /B /Y ..\..\..\bin\Debug-windows-x86_64\Graphics\Graphics.dll $(SolutionDir)\bin\Debug-windows-x86_64\Engine</Command>
+      <Command>(if not exist $(SolutionDir)bin\Debug-windows-x86_64\Engine mkdir $(SolutionDir)bin\Debug-windows-x86_64\Engine) &amp; copy /B /Y ..\..\..\bin\Debug-windows-x86_64\Graphics\Graphics.dll $(SolutionDir)bin\Debug-windows-x86_64\Engine</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -82,8 +82,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;RDT_BUILD_DLL;RDT_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;platform\OpenGL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;GRAPHICS_BUILD_DLL;RDT_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src;include;platform\OpenGL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -101,15 +101,22 @@
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>if not exist $(SolutionDir)\bin\Release-windows-x86_64\Engine mkdir $(SolutionDir)\bin\Release-windows-x86_64\Engine &amp; copy /B /Y ..\..\..\bin\Release-windows-x86_64\Graphics\Graphics.dll $(SolutionDir)\bin\Release-windows-x86_64\Engine</Command>
+      <Command>(if not exist $(SolutionDir)bin\Release-windows-x86_64\Engine mkdir $(SolutionDir)bin\Release-windows-x86_64\Engine) &amp; copy /B /Y ..\..\..\bin\Release-windows-x86_64\Graphics\Graphics.dll $(SolutionDir)bin\Release-windows-x86_64\Engine</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="platform\OpenGL\include\glCore.h" />
+    <ClInclude Include="include\Radiant\Graphics.h" />
+    <ClInclude Include="include\graphics_api.h" />
+    <ClInclude Include="platform\OpenGL\include\Radiant\glCore.h" />
+    <ClInclude Include="platform\OpenGL\include\gl_core_api.h" />
     <ClInclude Include="src\Renderer.h" />
+    <ClInclude Include="src\pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Renderer.cpp" />
+    <ClCompile Include="src\pch.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="platform\OpenGL\glCore.vcxproj">

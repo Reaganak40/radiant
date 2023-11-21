@@ -15,6 +15,7 @@ project "Graphics"
     {
         "src/**.h",
         "src/**.cpp",
+        "include/**.h",
 
         "platform/OpenGL/include/**.h"
     }
@@ -22,6 +23,8 @@ project "Graphics"
     includedirs
     {
         "src",
+        "include",
+
         "platform/OpenGL/include"
     }
 
@@ -46,7 +49,7 @@ project "Graphics"
         defines
         {
             "RDT_PLATFORM_WINDOWS",
-            "RDT_BUILD_DLL"
+            "GRAPHICS_BUILD_DLL"
         }
     
     filter "configurations:Debug"

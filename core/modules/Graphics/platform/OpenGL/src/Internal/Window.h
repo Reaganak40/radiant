@@ -11,7 +11,7 @@
 #pragma once
 
 // Forward Declarations
-namespace glCore {
+namespace rdt::glCore {
     struct Vertex;
 
     using TextureID = unsigned int;
@@ -21,7 +21,7 @@ namespace glCore {
 // Required files for struct/classes
 #include "DataComponents.h"
 
-namespace glCore {
+namespace rdt::glCore {
 	class Window {
 	private:
 

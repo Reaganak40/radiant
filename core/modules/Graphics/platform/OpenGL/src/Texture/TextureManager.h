@@ -10,7 +10,7 @@
 #pragma once
 
 // Forward Declarations
-namespace glCore {
+namespace rdt::glCore {
 	using TextureSlot = unsigned int;
 	using TextureID = unsigned int;
 	class Texture;
@@ -22,7 +22,7 @@ namespace glCore {
 // Max textures supported at a given time
 #define MAX_TEXTURES 30
 
-namespace glCore {
+namespace rdt::glCore {
 	
 	using TextureSlotMap = std::array<unsigned int, MAX_TEXTURES>;
 

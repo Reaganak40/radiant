@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "../include/glCore.h"
+#include "Camera.h"
 
 #define FLOAT_EPSILON 0.0001
 
@@ -31,7 +31,7 @@ T ApplyEpsilon(T d)
 	}
 }
 
-namespace glCore {
+namespace rdt::glCore {
 	
 	struct Camera::Impl {
 		glm::mat4 m_proj;

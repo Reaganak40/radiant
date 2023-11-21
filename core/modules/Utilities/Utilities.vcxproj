@@ -74,9 +74,8 @@
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>if not exist $(SolutionDir)\bin\Debug-windows-x86_64\Logger mkdir $(SolutionDir)\bin\Debug-windows-x86_64\Logger &amp; copy /B /Y ..\..\..\bin\Debug-windows-x86_64\Utilities\Utilities.dll $(SolutionDir)\bin\Debug-windows-x86_64\Logger
-if not exist $(SolutionDir)\bin\Debug-windows-x86_64\Engine mkdir $(SolutionDir)\bin\Debug-windows-x86_64\Engine &amp; copy /B /Y ..\..\..\bin\Debug-windows-x86_64\Utilities\Utilities.dll $(SolutionDir)\bin\Debug-windows-x86_64\Engine
-if not exist $(SolutionDir)\bin\Debug-windows-x86_64\glCore mkdir $(SolutionDir)\bin\Debug-windows-x86_64\glCore &amp; copy /B /Y ..\..\..\bin\Debug-windows-x86_64\Utilities\Utilities.dll $(SolutionDir)\bin\Debug-windows-x86_64\glCore</Command>
+      <Command>(if not exist $(SolutionDir)bin\Debug-windows-x86_64\Logger mkdir $(SolutionDir)bin\Debug-windows-x86_64\Logger) &amp; copy /B /Y ..\..\..\bin\Debug-windows-x86_64\Utilities\Utilities.dll $(SolutionDir)bin\Debug-windows-x86_64\Logger
+(if not exist $(SolutionDir)bin\Debug-windows-x86_64\Engine mkdir $(SolutionDir)bin\Debug-windows-x86_64\Engine) &amp; copy /B /Y ..\..\..\bin\Debug-windows-x86_64\Utilities\Utilities.dll $(SolutionDir)bin\Debug-windows-x86_64\Engine</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -103,9 +102,8 @@ if not exist $(SolutionDir)\bin\Debug-windows-x86_64\glCore mkdir $(SolutionDir)
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>if not exist $(SolutionDir)\bin\Release-windows-x86_64\Logger mkdir $(SolutionDir)\bin\Release-windows-x86_64\Logger &amp; copy /B /Y ..\..\..\bin\Release-windows-x86_64\Utilities\Utilities.dll $(SolutionDir)\bin\Release-windows-x86_64\Logger
-if not exist $(SolutionDir)\bin\Release-windows-x86_64\Engine mkdir $(SolutionDir)\bin\Release-windows-x86_64\Engine &amp; copy /B /Y ..\..\..\bin\Release-windows-x86_64\Utilities\Utilities.dll $(SolutionDir)\bin\Release-windows-x86_64\Engine
-if not exist $(SolutionDir)\bin\Release-windows-x86_64\glCore mkdir $(SolutionDir)\bin\Release-windows-x86_64\glCore &amp; copy /B /Y ..\..\..\bin\Release-windows-x86_64\Utilities\Utilities.dll $(SolutionDir)\bin\Release-windows-x86_64\glCore</Command>
+      <Command>(if not exist $(SolutionDir)bin\Release-windows-x86_64\Logger mkdir $(SolutionDir)bin\Release-windows-x86_64\Logger) &amp; copy /B /Y ..\..\..\bin\Release-windows-x86_64\Utilities\Utilities.dll $(SolutionDir)bin\Release-windows-x86_64\Logger
+(if not exist $(SolutionDir)bin\Release-windows-x86_64\Engine mkdir $(SolutionDir)bin\Release-windows-x86_64\Engine) &amp; copy /B /Y ..\..\..\bin\Release-windows-x86_64\Utilities\Utilities.dll $(SolutionDir)bin\Release-windows-x86_64\Engine</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -124,13 +122,13 @@ if not exist $(SolutionDir)\bin\Release-windows-x86_64\glCore mkdir $(SolutionDi
     <ClCompile Include="src\Color.cpp" />
     <ClCompile Include="src\ConfigReader.cpp" />
     <ClCompile Include="src\MathTypes.cpp" />
-    <ClCompile Include="src\rdt_array.cpp" />
     <ClCompile Include="src\Timestep.cpp" />
     <ClCompile Include="src\UniqueID.cpp" />
     <ClCompile Include="src\UtilFuncs.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\rdt_array.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

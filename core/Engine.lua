@@ -28,7 +28,7 @@ project "Engine"
 
     links
     {
-        "Graphics"
+        "Graphics", "Logger"
     }
 
     postbuildcommands

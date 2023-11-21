@@ -6,4 +6,5 @@
 #pragma warning ( disable : ALL_CODE_ANALYSIS_WARNINGS )
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/ostream_sink.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
 #pragma warning(pop)

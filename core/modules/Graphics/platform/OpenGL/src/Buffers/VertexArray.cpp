@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "VertexArray.h"
-#include "../include/glCore.h"
+#include "Vertex.h"
 
-namespace glCore {
+namespace rdt::glCore {
 
 	VAO_ID VertexArray::currently_bounded_VAO = 0;
 
