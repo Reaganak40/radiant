@@ -14,7 +14,7 @@ project "Engine"
     {
         "src/**.h",
         "src/**.cpp",
-        "include/radiant_api.h",
+        "include/**.h",
     }
 
     includedirs

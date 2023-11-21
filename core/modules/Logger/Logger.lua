@@ -16,7 +16,7 @@ project "Logger"
     {
         "src/**.h",
         "src/**.cpp",
-        "include/logger_api.h",
+        "include/**.h",
     }
 
     includedirs
@@ -24,7 +24,8 @@ project "Logger"
         "src",
         "include",
         
-        "%{IncludeDir.spdlog}"
+        "%{IncludeDir.spdlog}",
+        "%{IncludeModule.Utilities}",
     }
 
     links

@@ -16,7 +16,7 @@ project "Utilities"
     {
         "src/**.h",
         "src/**.cpp",
-        "include/utils_api.h",
+        "include/**.h",
     }
 
     includedirs
@@ -33,6 +33,7 @@ project "Utilities"
 
     postbuildcommands
     {
+        SendProjectDLL("Logger"),
         SendProjectDLL("Engine"),
         SendProjectDLL("glCore"),
     }

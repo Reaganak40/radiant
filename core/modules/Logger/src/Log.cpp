@@ -1,11 +1,12 @@
 #include "pch.h"
 #include "Log.h"
 
-namespace rdt {
+#include <Radiant/Utils.h>
+
+namespace rdt::logger {
 
 	constexpr size_t MaxLogs = 250;
 
-	
 	struct Log::Impl {
 		std::shared_ptr<spdlog::logger> m_CoreLogger;
 		std::shared_ptr<spdlog::logger> m_ClientLogger;
@@ -53,7 +54,7 @@ namespace rdt {
 			std::string stream = m_log_oss.str();
 			std::vector<std::string> nLogs;
 
-			Utils::Tokenize(stream, "\n", nLogs);
+			rdt::utils::Tokenize(stream, "\n", nLogs);
 
 			for (auto log : nLogs) {
 
@@ -113,21 +114,20 @@ namespace rdt {
 			m_log_oss.clear();
 		}
 
-		bool GetLog(int index, std::string& msg, Color& msgColor)
+		const char* GetLog(int index, Color& msgColor)
 		{
 			if (index >= MaxLogs) {
-				return false;
+				return nullptr;
 			}
 
 			if (!maxReached && (index >= logIndex)) {
-				return false;
+				return nullptr;
 			}
 
 			index = (logIndex - index - 1 + MaxLogs) % MaxLogs;
-			msg = m_logs[index];
 			msgColor = m_logColors[index];
 
-			return true;
+			return m_logs[index].c_str();
 		}
 
 		std::string StripLogLevel(const std::string& originalLog, std::string& outLevel)
@@ -160,69 +160,98 @@ namespace rdt {
 		}
 	};
 
-	Log* Log::m_instance = nullptr;
-
-	Log::Log()
-		: m_impl(new Log::Impl)
-	{
-	}
-
-	Log::~Log()
-	{
-		delete m_impl;
-	}
+	// ===============================================================
+	Log::Impl* Log::m_impl = nullptr;
 
 	void Log::Initialize()
 	{
 		Destroy();
-		m_instance = new Log;
+		m_impl = new Log::Impl;
 	}
 
 	void Log::Destroy()
 	{
-		if (m_instance != nullptr) {
-			delete m_instance;
-			m_instance = nullptr;
+		if (m_impl != nullptr) {
+			delete m_impl;
+			m_impl = nullptr;
 		}
 	}
 
 	void Log::Update()
 	{
-		m_instance->m_impl->OnUpdate();
+		m_impl->OnUpdate();
 	}
 
-	std::shared_ptr<spdlog::logger>& Log::GetCoreLogger()
+	void Log::CoreLog(LogLevel level, ...)
 	{
-		return m_instance->m_impl->m_CoreLogger;
+		va_list args;
+		va_start(args, level);
+
+		switch (level) {
+		case L_INFO:
+			m_impl->m_CoreLogger->info(args);
+			break;
+		case L_TRACE:
+			m_impl->m_CoreLogger->trace(args);
+			break;
+		case L_WARNING:
+			m_impl->m_CoreLogger->warn(args);
+			break;
+		case L_ERROR:
+			m_impl->m_CoreLogger->error(args);
+			break;
+		case L_CRITICAL:
+			m_impl->m_CoreLogger->critical(args);
+			break;
+		}
 	}
 
-	std::shared_ptr<spdlog::logger>& Log::GetClientLogger()
+	void Log::ClientLog(LogLevel level, ...)
 	{
-		return m_instance->m_impl->m_ClientLogger;
+		va_list args;
+		va_start(args, level);
+
+		switch (level) {
+		case L_INFO:
+			m_impl->m_ClientLogger->info(args);
+			break;
+		case L_TRACE:
+			m_impl->m_ClientLogger->trace(args);
+			break;
+		case L_WARNING:
+			m_impl->m_ClientLogger->warn(args);
+			break;
+		case L_ERROR:
+			m_impl->m_CoreLogger->error(args);
+			break;
+		case L_CRITICAL:
+			m_impl->m_ClientLogger->critical(args);
+			break;
+		}
+	}
+
+	const char* Log::GetLog(int index, Color& msgColor)
+	{
+		return m_impl->GetLog(index, msgColor);
 	}
 
 	size_t Log::GetLogCount()
 	{
-		if (m_instance->m_impl->maxReached) {
+		if (m_impl->maxReached) {
 			return MaxLogs;
 		}
 		
-		return m_instance->m_impl->logIndex;
+		return m_impl->logIndex;
 	}
 
 	void Log::SetLogColor(LogLevel level, Color nColor)
 	{
-		m_instance->m_impl->m_level_color[level] = nColor;
+		m_impl->m_level_color[level] = nColor;
 
 		for (int i = 0; i < MaxLogs; i++) {
-			if (m_instance->m_impl->m_log_levels[i] == level) {
-				m_instance->m_impl->m_logColors[i] = nColor;
+			if (m_impl->m_log_levels[i] == level) {
+				m_impl->m_logColors[i] = nColor;
 			}
 		}
-	}
-
-	bool Log::GetLog(int index, std::string& msg, Color& msgColor)
-	{
-		return m_instance->m_impl->GetLog(index, msg, msgColor);
 	}
 }

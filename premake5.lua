@@ -17,7 +17,8 @@ function GetProjectDLL(projName)
 end
 
 function SendProjectDLL(projName)
-    return ("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/" .. projName)
+    local sendpath = ("%{wks.location}bin\\" .. outputdir .. "\\" .. projName) 
+    return ("if not exist " .. sendpath .. " mkdir " .. sendpath .. " & {COPYFILE} %{cfg.buildtarget.relpath} " .. sendpath)
 end
 
 -- All include directories

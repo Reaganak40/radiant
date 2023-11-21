@@ -11,10 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{98D06841-8488-AA8E-ED8F-83EAD966457F}</ProjectGuid>
+    <ProjectGuid>{8DFD7D4A-7960-0DEF-22E6-45A50E28D971}</ProjectGuid>
     <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>glCore</RootNamespace>
+    <RootNamespace>Graphics</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -42,16 +42,16 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\..\..\..\..\bin\Debug-windows-x86_64\glCore\</OutDir>
-    <IntDir>..\..\..\..\..\bin\obj\Debug-windows-x86_64\glCore\</IntDir>
-    <TargetName>glCore</TargetName>
+    <OutDir>..\..\..\bin\Debug-windows-x86_64\Graphics\</OutDir>
+    <IntDir>..\..\..\bin\obj\Debug-windows-x86_64\Graphics\</IntDir>
+    <TargetName>Graphics</TargetName>
     <TargetExt>.dll</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\..\..\..\..\bin\Release-windows-x86_64\glCore\</OutDir>
-    <IntDir>..\..\..\..\..\bin\obj\Release-windows-x86_64\glCore\</IntDir>
-    <TargetName>glCore</TargetName>
+    <OutDir>..\..\..\bin\Release-windows-x86_64\Graphics\</OutDir>
+    <IntDir>..\..\..\bin\obj\Release-windows-x86_64\Graphics\</IntDir>
+    <TargetName>Graphics</TargetName>
     <TargetExt>.dll</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -59,8 +59,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>GL_CORE_PLATFORM_WINDOWS;GL_CORE_BUILD_DLL;GL_CORE_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;..\..\..\..\..\thirdparty\glfw\glfw\include;..\..\..\..\..\thirdparty\glad\glad\include;..\..\..\..\..\thirdparty\imgui\imgui;..\..\..\..\..\thirdparty\imgui\imgui\backends;..\..\..\..\..\thirdparty\glm\glm;..\..\..\..\..\thirdparty\stb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;RDT_BUILD_DLL;RDT_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src;platform\OpenGL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -70,11 +70,11 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>..\..\..\..\..\bin\Debug-windows-x86_64\glCore\glCore.lib</ImportLibrary>
+      <ImportLibrary>..\..\..\bin\Debug-windows-x86_64\Graphics\Graphics.lib</ImportLibrary>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>if not exist $(SolutionDir)\bin\Debug-windows-x86_64\Graphics mkdir $(SolutionDir)\bin\Debug-windows-x86_64\Graphics &amp; copy /B /Y ..\..\..\..\..\bin\Debug-windows-x86_64\glCore\glCore.dll $(SolutionDir)\bin\Debug-windows-x86_64\Graphics</Command>
+      <Command>if not exist $(SolutionDir)\bin\Debug-windows-x86_64\Engine mkdir $(SolutionDir)\bin\Debug-windows-x86_64\Engine &amp; copy /B /Y ..\..\..\bin\Debug-windows-x86_64\Graphics\Graphics.dll $(SolutionDir)\bin\Debug-windows-x86_64\Engine</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -82,8 +82,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>GL_CORE_PLATFORM_WINDOWS;GL_CORE_BUILD_DLL;GL_CORE_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;..\..\..\..\..\thirdparty\glfw\glfw\include;..\..\..\..\..\thirdparty\glad\glad\include;..\..\..\..\..\thirdparty\imgui\imgui;..\..\..\..\..\thirdparty\imgui\imgui\backends;..\..\..\..\..\thirdparty\glm\glm;..\..\..\..\..\thirdparty\stb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;RDT_BUILD_DLL;RDT_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src;platform\OpenGL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -97,63 +97,23 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <ImportLibrary>..\..\..\..\..\bin\Release-windows-x86_64\glCore\glCore.lib</ImportLibrary>
+      <ImportLibrary>..\..\..\bin\Release-windows-x86_64\Graphics\Graphics.lib</ImportLibrary>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>if not exist $(SolutionDir)\bin\Release-windows-x86_64\Graphics mkdir $(SolutionDir)\bin\Release-windows-x86_64\Graphics &amp; copy /B /Y ..\..\..\..\..\bin\Release-windows-x86_64\glCore\glCore.dll $(SolutionDir)\bin\Release-windows-x86_64\Graphics</Command>
+      <Command>if not exist $(SolutionDir)\bin\Release-windows-x86_64\Engine mkdir $(SolutionDir)\bin\Release-windows-x86_64\Engine &amp; copy /B /Y ..\..\..\bin\Release-windows-x86_64\Graphics\Graphics.dll $(SolutionDir)\bin\Release-windows-x86_64\Engine</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\glCore.h" />
-    <ClInclude Include="src\Buffers\FrameBuffer.h" />
-    <ClInclude Include="src\Buffers\IndexBuffer.h" />
-    <ClInclude Include="src\Buffers\VertexArray.h" />
-    <ClInclude Include="src\Buffers\VertexBuffer.h" />
-    <ClInclude Include="src\Core.h" />
-    <ClInclude Include="src\Internal\DataComponents.h" />
-    <ClInclude Include="src\Internal\State.h" />
-    <ClInclude Include="src\Internal\Window.h" />
-    <ClInclude Include="src\Logging\Log.h" />
-    <ClInclude Include="src\Shader\Shader.h" />
-    <ClInclude Include="src\Texture\TextureManager.h" />
-    <ClInclude Include="src\Utils\ErrorHandling.h" />
-    <ClInclude Include="src\View\Viewport.h" />
-    <ClInclude Include="src\pch.h" />
+    <ClInclude Include="platform\OpenGL\include\glCore.h" />
+    <ClInclude Include="src\Renderer.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Application.cpp" />
-    <ClCompile Include="src\Buffers\FrameBuffer.cpp" />
-    <ClCompile Include="src\Buffers\IndexBuffer.cpp" />
-    <ClCompile Include="src\Buffers\VertexArray.cpp" />
-    <ClCompile Include="src\Buffers\VertexBuffer.cpp" />
-    <ClCompile Include="src\Internal\DataComponents.cpp" />
-    <ClCompile Include="src\Internal\State.cpp" />
-    <ClCompile Include="src\Internal\Window.cpp" />
-    <ClCompile Include="src\Logging\Log.cpp" />
-    <ClCompile Include="src\Shader\Shader.cpp" />
-    <ClCompile Include="src\Texture\Texture.cpp" />
-    <ClCompile Include="src\Texture\TextureManager.cpp" />
-    <ClCompile Include="src\Utils\ErrorHandling.cpp" />
-    <ClCompile Include="src\Vertex.cpp" />
-    <ClCompile Include="src\View\Camera.cpp" />
-    <ClCompile Include="src\View\Viewport.cpp" />
-    <ClCompile Include="src\pch.cpp">
-      <PrecompiledHeader>Create</PrecompiledHeader>
-    </ClCompile>
+    <ClCompile Include="src\Renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\thirdparty\glfw\GLFW.vcxproj">
-      <Project>{0CDDDE85-F8A9-3991-21C3-27390DEF6E1F}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\thirdparty\glm\GLM.vcxproj">
-      <Project>{FCF40F14-68D4-8EAF-71EC-1986DD4AF510}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\thirdparty\glad\GLAD.vcxproj">
-      <Project>{5440DD78-400D-3884-6926-262C55526D12}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\thirdparty\imgui\ImGui.vcxproj">
-      <Project>{37EF8E33-A359-43AA-EC97-F44F584121FF}</Project>
+    <ProjectReference Include="platform\OpenGL\glCore.vcxproj">
+      <Project>{98D06841-8488-AA8E-ED8F-83EAD966457F}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
