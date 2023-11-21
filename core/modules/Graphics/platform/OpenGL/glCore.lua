@@ -16,16 +16,6 @@ project "glCore"
         "src/**.h",
         "src/**.cpp",
         "include/**.h",
-
-        -- Vendor header files
-        ("%{IncludeDir.GLFW}" .. "/**.h")
-		("%{IncludeDir.glad}" .. "/**.h")
-		("%{IncludeDir.ImGui}" .. "/**.h")
-		("%{IncludeDir.ImGuiBackend}" .. "/**.h")
-		("%{IncludeDir.glm}" .. "/**.h")
-		
-        ("%{IncludeDir.stb}" .. "/**.h")
-		("%{IncludeDir.stb}" .. "/**.cpp")
     }
 
     includedirs
@@ -47,7 +37,7 @@ project "glCore"
 
     postbuildcommands
     {
-        CopyDLL("Graphics")
+        SendProjectDLL("Graphics")
     }
 
     pchheader "pch.h"

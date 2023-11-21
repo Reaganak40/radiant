@@ -7,7 +7,11 @@ project "ImGui"
 	targetdir (solutionDir .. "/bin/" .. outputdir .. "/%{prj.name}")
     objdir (solutionDir .. "/bin/obj/" .. outputdir .. "/%{prj.name}")
 	
-	includedirs { "imgui/", "glad/include", "glfw/include/" }
+	includedirs {
+		 "imgui/",
+		 "%{IncludeDir.glad}",
+		 "%{IncludeDir.GLFW}",
+	}
 
 	files
 	{

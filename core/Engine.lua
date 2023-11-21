@@ -14,27 +14,26 @@ project "Engine"
     {
         "src/**.h",
         "src/**.cpp",
-
-        ("%{IncludeModule.Graphics}" .. "/**.h"),
-
-
+        "include/radiant_api.h",
     }
 
     includedirs
     {
         "src",
+        "include",
 
-        "%{IncludeModule.Graphics}"
+        "%{IncludeModule.Graphics}",
+        "%{IncludeModule.Logger}",
     }
 
     links
     {
-        
+        "Graphics"
     }
 
     postbuildcommands
     {
-        CopyDLL("Editor")
+        SendProjectDLL("Editor")
     }
 
     pchheader "pch.h"

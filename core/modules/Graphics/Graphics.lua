@@ -32,7 +32,7 @@ project "Graphics"
 
     postbuildcommands
     {
-        CopyDLL("Engine")
+        SendProjectDLL("Engine")
     }
 
     pchheader "pch.h"

@@ -13,9 +13,6 @@ project "Editor"
         -- Editor Implementation
         "src/**.h",
         "src/**.cpp",
-
-        -- Radiant Engine Files
-        (solutionDir .. "/core/include/**.h")
     }
 
     includedirs
@@ -31,7 +28,6 @@ project "Editor"
 
     postbuildcommands
     {
-        CopyDLL("Engine")
     }
 
     filter "system:windows"
