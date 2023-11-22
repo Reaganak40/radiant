@@ -3,9 +3,6 @@
 
 #include <Radiant/Utils.h>
 
-#define CORE_LOGGER 0
-#define CLIENT_LOGGER 1
-
 namespace rdt::logger {
 
 	constexpr size_t MaxLogs = 250;
@@ -188,40 +185,6 @@ namespace rdt::logger {
 				}
 			}
 		}
-
-		void LogMessage(int logger_choice, LogLevel level, const char* fmt, va_list& args)
-		{
-			std::shared_ptr<spdlog::logger> logger = nullptr;
-			switch (logger_choice)
-			{
-			case CORE_LOGGER:
-				logger = m_CoreLogger;
-				break;
-			case CLIENT_LOGGER:
-				logger = m_ClientLogger;
-				break;
-			default:
-				return;
-			}
-
-			switch (level) {
-			case L_INFO:
-				logger->info(fmt, args);
-				break;
-			case L_TRACE:
-				logger->trace(fmt, args);
-				break;
-			case L_WARNING:
-				logger->warn(fmt, args);
-				break;
-			case L_ERROR:
-				logger->error(fmt, args);
-				break;
-			case L_CRITICAL:
-				logger->critical(fmt, args);
-				break;
-			}
-		}
 	};
 
 	// ===============================================================
@@ -246,18 +209,14 @@ namespace rdt::logger {
 		m_impl->OnUpdate();
 	}
 
-	void Log::CoreLog(LogLevel level, const char* fmt, ...)
+	spdlog::logger* Log::GetCoreLogger()
 	{
-		va_list args;
-		va_start(args, fmt);
-		GetImpl()->LogMessage(CORE_LOGGER, level, fmt, args);
+		return GetImpl()->m_CoreLogger.get();
 	}
 
-	void Log::ClientLog(LogLevel level, const char* fmt, ...)
+	spdlog::logger* Log::GetClientLogger()
 	{
-		va_list args;
-		va_start(args, fmt);
-		GetImpl()->LogMessage(CLIENT_LOGGER, level, fmt, args);
+		return GetImpl()->m_ClientLogger.get();
 	}
 
 	const char* Log::GetLog(int index, Color& msgColor)
