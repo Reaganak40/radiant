@@ -6,6 +6,9 @@ namespace rdt {
 	class Color;
 }
 
+namespace spdlog {
+	class logger;
+}
 namespace rdt::logger {
 	
 	enum LogLevel {

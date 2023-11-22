@@ -10,3 +10,6 @@
 
 #include "../logger_api.h"
 #include "../../src/Log.h"
+
+// include declarations of spdlog
+#include "spdlog/spdlog.h"

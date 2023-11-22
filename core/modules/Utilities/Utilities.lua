@@ -23,8 +23,6 @@ project "Utilities"
     {
         "src",
         "include",
-
-        "%{IncludeModule.Utilities}",
     }
 
     links

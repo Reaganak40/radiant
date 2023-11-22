@@ -21,9 +21,14 @@ project "Engine"
     {
         "src",
         "include",
-
+        
+        -- Depends on graphics module
         "%{IncludeModule.Graphics}",
+        
+        -- Depends on logger module
         "%{IncludeModule.Logger}",
+        "%{IncludeDir.spdlog}",
+
     }
 
     links
@@ -37,7 +42,7 @@ project "Engine"
     }
 
     pchheader "pch.h"
-    pchsource "Source/pch.cpp"
+    pchsource "src/pch.cpp"
 
     filter "system:windows"
         cppdialect "C++20"

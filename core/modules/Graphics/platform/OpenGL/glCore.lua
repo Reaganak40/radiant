@@ -34,6 +34,7 @@ project "glCore"
 		"%{IncludeDir.stb}",
 
         "%{IncludeModule.Logger}",
+        "%{IncludeDir.spdlog}",
     }
 
     links

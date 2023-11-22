@@ -59,7 +59,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;GL_CORE_BUILD_DLL;GL_CORE_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;include;..\..\..\..\..\thirdparty\glfw\glfw\include;..\..\..\..\..\thirdparty\glad\glad\include;..\..\..\..\..\thirdparty\imgui\imgui;..\..\..\..\..\thirdparty\imgui\imgui\backends;..\..\..\..\..\thirdparty\glm\glm;..\..\..\..\..\thirdparty\stb;..\..\..\Logger\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;include;..\..\..\..\..\thirdparty\glfw\glfw\include;..\..\..\..\..\thirdparty\glad\glad\include;..\..\..\..\..\thirdparty\imgui\imgui;..\..\..\..\..\thirdparty\imgui\imgui\backends;..\..\..\..\..\thirdparty\glm\glm;..\..\..\..\..\thirdparty\stb;..\..\..\Logger\include;..\..\..\..\..\thirdparty\spdlog\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -81,7 +81,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;GL_CORE_BUILD_DLL;GL_CORE_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;include;..\..\..\..\..\thirdparty\glfw\glfw\include;..\..\..\..\..\thirdparty\glad\glad\include;..\..\..\..\..\thirdparty\imgui\imgui;..\..\..\..\..\thirdparty\imgui\imgui\backends;..\..\..\..\..\thirdparty\glm\glm;..\..\..\..\..\thirdparty\stb;..\..\..\Logger\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;include;..\..\..\..\..\thirdparty\glfw\glfw\include;..\..\..\..\..\thirdparty\glad\glad\include;..\..\..\..\..\thirdparty\imgui\imgui;..\..\..\..\..\thirdparty\imgui\imgui\backends;..\..\..\..\..\thirdparty\glm\glm;..\..\..\..\..\thirdparty\stb;..\..\..\Logger\include;..\..\..\..\..\thirdparty\spdlog\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
