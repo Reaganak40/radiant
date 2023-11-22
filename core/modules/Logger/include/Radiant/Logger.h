@@ -11,5 +11,9 @@
 #include "../logger_api.h"
 #include "../../src/Log.h"
 
+#ifdef APIENTRY
+	#undef APIENTRY
+#endif
 // include declarations of spdlog
 #include "spdlog/spdlog.h"
+

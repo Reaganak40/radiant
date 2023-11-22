@@ -74,8 +74,7 @@
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>(if not exist $(SolutionDir)bin\Debug-windows-x86_64\Logger mkdir $(SolutionDir)bin\Debug-windows-x86_64\Logger) &amp; copy /B /Y ..\..\..\bin\Debug-windows-x86_64\Utilities\Utilities.dll $(SolutionDir)bin\Debug-windows-x86_64\Logger
-(if not exist $(SolutionDir)bin\Debug-windows-x86_64\Engine mkdir $(SolutionDir)bin\Debug-windows-x86_64\Engine) &amp; copy /B /Y ..\..\..\bin\Debug-windows-x86_64\Utilities\Utilities.dll $(SolutionDir)bin\Debug-windows-x86_64\Engine</Command>
+      <Command>(if not exist $(SolutionDir)bin\Debug-windows-x86_64\Editor mkdir $(SolutionDir)bin\Debug-windows-x86_64\Editor) &amp; copy /B /Y ..\..\..\bin\Debug-windows-x86_64\Utilities\Utilities.dll $(SolutionDir)bin\Debug-windows-x86_64\Editor</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -102,8 +101,7 @@
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>(if not exist $(SolutionDir)bin\Release-windows-x86_64\Logger mkdir $(SolutionDir)bin\Release-windows-x86_64\Logger) &amp; copy /B /Y ..\..\..\bin\Release-windows-x86_64\Utilities\Utilities.dll $(SolutionDir)bin\Release-windows-x86_64\Logger
-(if not exist $(SolutionDir)bin\Release-windows-x86_64\Engine mkdir $(SolutionDir)bin\Release-windows-x86_64\Engine) &amp; copy /B /Y ..\..\..\bin\Release-windows-x86_64\Utilities\Utilities.dll $(SolutionDir)bin\Release-windows-x86_64\Engine</Command>
+      <Command>(if not exist $(SolutionDir)bin\Release-windows-x86_64\Editor mkdir $(SolutionDir)bin\Release-windows-x86_64\Editor) &amp; copy /B /Y ..\..\..\bin\Release-windows-x86_64\Utilities\Utilities.dll $(SolutionDir)bin\Release-windows-x86_64\Editor</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

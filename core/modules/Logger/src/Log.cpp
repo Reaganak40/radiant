@@ -12,7 +12,7 @@ namespace rdt::logger {
 		std::shared_ptr<spdlog::logger> m_ClientLogger;
 
 		std::shared_ptr<spdlog::sinks::ostream_sink_mt> m_ostream_sink;
-		std::shared_ptr<spdlog::sinks::stdout_color_sink_mt> m_stdout_sink;
+		std::shared_ptr<spdlog::sinks::stderr_color_sink_mt> m_stdout_sink;
 
 		std::ostringstream m_log_oss;
 
@@ -26,16 +26,19 @@ namespace rdt::logger {
 
 		Impl()
 		{
-			spdlog::set_pattern("%^[%T] %n: %v%$");
-
+			const char* pattern = "%^[%T][%n]: %v%$";
 			m_ostream_sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(m_log_oss);
-			m_stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-		
+			m_stdout_sink = std::make_shared<spdlog::sinks::stderr_color_sink_mt>();
+			
+			m_ostream_sink->set_pattern(pattern);
+			m_stdout_sink->set_pattern(pattern);
+				
 			m_CoreLogger = std::make_shared<spdlog::logger>("Core", m_ostream_sink);
 			m_CoreLogger->set_level(spdlog::level::trace);
 
 			m_ClientLogger = std::make_shared<spdlog::logger>("Client", m_ostream_sink);
 			m_ClientLogger->set_level(spdlog::level::trace);
+
 
 			logIndex = 0;
 			maxReached = false;

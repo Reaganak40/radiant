@@ -31,8 +31,7 @@ project "Utilities"
 
     postbuildcommands
     {
-        SendProjectDLL("Logger"),
-        SendProjectDLL("Engine"),
+        SendProjectDLL("Editor")
     }
 
     pchheader "pch.h"

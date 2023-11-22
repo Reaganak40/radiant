@@ -5,10 +5,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 // Image Processing
-#include <stb_image.h>
+#include <stb/stb_image.h>
 
 // Graphics
 #include "GLAD/glad.h"
+#ifdef APIENTRY
+	#undef APIENTRY
+#endif
 #include "GLFW/glfw3.h"
 #include <imgui.h>
 #include <imgui_impl_glfw.h>

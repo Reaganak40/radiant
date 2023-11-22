@@ -56,7 +56,8 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;GL_CORE_BUILD_DLL;GL_CORE_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>src;include;..\..\..\..\..\thirdparty\glfw\glfw\include;..\..\..\..\..\thirdparty\glad\glad\include;..\..\..\..\..\thirdparty\imgui\imgui;..\..\..\..\..\thirdparty\imgui\imgui\backends;..\..\..\..\..\thirdparty\glm\glm;..\..\..\..\..\thirdparty\stb;..\..\..\Logger\include;..\..\..\..\..\thirdparty\spdlog\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -73,12 +74,13 @@
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>(if not exist $(SolutionDir)bin\Debug-windows-x86_64\Graphics mkdir $(SolutionDir)bin\Debug-windows-x86_64\Graphics) &amp; copy /B /Y ..\..\..\..\..\bin\Debug-windows-x86_64\glCore\glCore.dll $(SolutionDir)bin\Debug-windows-x86_64\Graphics</Command>
+      <Command>(if not exist $(SolutionDir)bin\Debug-windows-x86_64\Editor mkdir $(SolutionDir)bin\Debug-windows-x86_64\Editor) &amp; copy /B /Y ..\..\..\..\..\bin\Debug-windows-x86_64\glCore\glCore.dll $(SolutionDir)bin\Debug-windows-x86_64\Editor</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;GL_CORE_BUILD_DLL;GL_CORE_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>src;include;..\..\..\..\..\thirdparty\glfw\glfw\include;..\..\..\..\..\thirdparty\glad\glad\include;..\..\..\..\..\thirdparty\imgui\imgui;..\..\..\..\..\thirdparty\imgui\imgui\backends;..\..\..\..\..\thirdparty\glm\glm;..\..\..\..\..\thirdparty\stb;..\..\..\Logger\include;..\..\..\..\..\thirdparty\spdlog\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -99,7 +101,7 @@
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>(if not exist $(SolutionDir)bin\Release-windows-x86_64\Graphics mkdir $(SolutionDir)bin\Release-windows-x86_64\Graphics) &amp; copy /B /Y ..\..\..\..\..\bin\Release-windows-x86_64\glCore\glCore.dll $(SolutionDir)bin\Release-windows-x86_64\Graphics</Command>
+      <Command>(if not exist $(SolutionDir)bin\Release-windows-x86_64\Editor mkdir $(SolutionDir)bin\Release-windows-x86_64\Editor) &amp; copy /B /Y ..\..\..\..\..\bin\Release-windows-x86_64\glCore\glCore.dll $(SolutionDir)bin\Release-windows-x86_64\Editor</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -124,7 +126,9 @@
     <ClInclude Include="src\pch.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\thirdparty\stb\stb_image.cpp" />
+    <ClCompile Include="..\..\..\..\..\thirdparty\stb\stb\stb_image.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\Buffers\FrameBuffer.cpp" />
     <ClCompile Include="src\Buffers\IndexBuffer.cpp" />
@@ -140,7 +144,9 @@
     <ClCompile Include="src\Vertex.cpp" />
     <ClCompile Include="src\View\Camera.cpp" />
     <ClCompile Include="src\View\Viewport.cpp" />
-    <ClCompile Include="src\pch.cpp" />
+    <ClCompile Include="src\pch.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\thirdparty\glfw\GLFW.vcxproj">
@@ -157,6 +163,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\Logger\Logger.vcxproj">
       <Project>{1C0DC9E5-08C5-0A33-71CC-E38E5DA3A523}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Utilities\Utilities.vcxproj">
+      <Project>{F831B7B8-64F2-32EF-2D2D-7C6C99AC77CB}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

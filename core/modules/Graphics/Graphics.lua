@@ -30,12 +30,12 @@ project "Graphics"
 
     links
     {
-        "glCore"
+        md_graph["Graphics"]
     }
 
     postbuildcommands
     {
-        SendProjectDLL("Engine")
+        SendProjectDLL("Editor")
     }
 
     pchheader "pch.h"

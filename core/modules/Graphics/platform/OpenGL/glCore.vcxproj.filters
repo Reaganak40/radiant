@@ -34,6 +34,9 @@
     <Filter Include="thirdparty\stb">
       <UniqueIdentifier>{A88B6809-9459-5C0F-7DED-CC35695A3874}</UniqueIdentifier>
     </Filter>
+    <Filter Include="thirdparty\stb\stb">
+      <UniqueIdentifier>{00DEB15C-ECC1-72B2-5522-6D0541255D34}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Radiant\glCore.h">
@@ -95,8 +98,8 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\thirdparty\stb\stb_image.cpp">
-      <Filter>thirdparty\stb</Filter>
+    <ClCompile Include="..\..\..\..\..\thirdparty\stb\stb\stb_image.cpp">
+      <Filter>thirdparty\stb\stb</Filter>
     </ClCompile>
     <ClCompile Include="src\Application.cpp">
       <Filter>src</Filter>

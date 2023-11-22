@@ -39,16 +39,20 @@ project "glCore"
 
     links
     { 
-        "GLFW", "GLM", "GLAD", "ImGui", "Logger"
+        "GLFW", "GLM", "GLAD", "ImGui", md_graph["glCore"]
     }
 
     postbuildcommands
     {
-        SendProjectDLL("Graphics"),
+        SendProjectDLL("Editor")
     }
 
     pchheader "pch.h"
     pchsource "src/pch.cpp"
+
+    -- Need actual path to stb because tokens cannot be expanded on filter
+    -- ! Issue: https://github.com/premake/premake-core/issues/1036
+    filter {"files:../../../../../thirdparty/stb/**.cpp"}
         flags {"NoPCH"}
 
     filter "system:windows"

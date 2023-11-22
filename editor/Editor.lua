@@ -23,11 +23,12 @@ project "Editor"
 
     links
     {
-        "Engine"
+        md_graph["Editor"]
     }
 
     postbuildcommands
     {
+        GetAllDllDependencies('Editor')
     }
 
     filter "system:windows"

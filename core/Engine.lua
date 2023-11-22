@@ -33,8 +33,9 @@ project "Engine"
 
     links
     {
-        "Graphics", "Logger"
+        md_graph["Engine"]
     }
+
 
     postbuildcommands
     {
