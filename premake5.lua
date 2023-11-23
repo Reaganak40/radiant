@@ -36,11 +36,11 @@ IncludeDir["spdlog"]        = (solutionDir .. "/thirdparty/spdlog/spdlog/include
 
 -- Radiant Module include directories
 IncludeModule = {}
-IncludeModule["Graphics"]  = (solutionDir .. "/core/modules/Graphics/include")
-IncludeModule["glCore"]    = (solutionDir .. "/core/modules/Graphics/platform/OpenGL/include")
-IncludeModule["Logger"]    = (solutionDir .. "/core/modules/Logger/include")
-IncludeModule["Utilities"] = (solutionDir .. "/core/modules/Utilities/include")
-IncludeModule["Engine"]    = (solutionDir .. "/core/include")
+IncludeModule["Graphics"]  = (solutionDir .. "/engine/core/Graphics/include")
+IncludeModule["glCore"]    = (solutionDir .. "/engine/core/Graphics/framework/OpenGL/include")
+IncludeModule["Logger"]    = (solutionDir .. "/engine/core/Logger/include")
+IncludeModule["Utilities"] = (solutionDir .. "/engine/core/Utilities/include")
+IncludeModule["Engine"]    = (solutionDir .. "/engine/include")
 
 -- Module Depedency graph
 md_graph = {}
@@ -94,12 +94,25 @@ function GetModuleDependencies(projName)
     return unique_models
 end
 
+-- Returns a list of post-build commands to copy all dll's this project is dependent on
 function GetAllDllDependencies(projName)
     local copy_commands = {}
     for dll_module, _ in pairs(GetModuleDependencies(projName)) do
         table.insert(copy_commands, GetProjectDLL(dll_module))
     end
     return copy_commands
+end
+
+-- Returns all the include paths for the modules this project depends on 
+function GetAllModuleIncludes(projName)
+    local includes = {}
+    for module_name, _ in pairs(GetModuleDependencies(projName)) do
+        table.insert(includes, ("%{IncludeModule." .. module_name .."}"))
+        if module_name == "Logger" then
+            table.insert(includes, "%{IncludeDir.spdlog}")
+        end
+    end
+    return includes
 end
 
 -- Projects
@@ -112,12 +125,12 @@ include "thirdparty/AL/AL.lua"
 group ""
 
 group "Core-Modules"
-    include "core/modules/Utilities/Utilities.lua"
-    include "core/modules/Logger/Logger.lua"
-    include "core/modules/Graphics/platform/OpenGL/glCore.lua"
-    include "core/modules/Graphics/Graphics.lua"
+    include "engine/core/Utilities/Utilities.lua"
+    include "engine/core/Logger/Logger.lua"
+    include "engine/core/Graphics/framework/OpenGL/glCore.lua"
+    include "engine/core/Graphics/Graphics.lua"
 group ""
 
-include "core/Engine.lua"
+include "engine/Engine.lua"
 include "editor/Editor.lua"
 --include "sandbox/Sandbox.lua"

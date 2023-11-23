@@ -18,7 +18,7 @@ project "Editor"
     includedirs
     {
         "src",
-        (solutionDir .. "/core/include")
+        "%{IncludeModule.Engine}",
     }
 
     links

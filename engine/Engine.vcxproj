@@ -60,7 +60,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;RDT_BUILD_DLL;RDT_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;include;modules\Graphics\include;modules\Logger\include;..\thirdparty\spdlog\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;include;core\Graphics\framework\OpenGL\include;core\Graphics\include;core\Logger\include;..\thirdparty\spdlog\spdlog\include;core\Utilities\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -83,7 +83,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;RDT_BUILD_DLL;RDT_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;include;modules\Graphics\include;modules\Logger\include;..\thirdparty\spdlog\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;include;core\Graphics\framework\OpenGL\include;core\Graphics\include;core\Logger\include;..\thirdparty\spdlog\spdlog\include;core\Utilities\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -105,6 +105,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\Engine\EntryPoint.h" />
     <ClInclude Include="include\Radiant.h" />
     <ClInclude Include="include\radiant_api.h" />
     <ClInclude Include="src\Application.h" />
@@ -117,13 +118,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="modules\Graphics\Graphics.vcxproj">
+    <ProjectReference Include="core\Graphics\Graphics.vcxproj">
       <Project>{8DFD7D4A-7960-0DEF-22E6-45A50E28D971}</Project>
     </ProjectReference>
-    <ProjectReference Include="modules\Logger\Logger.vcxproj">
+    <ProjectReference Include="core\Logger\Logger.vcxproj">
       <Project>{1C0DC9E5-08C5-0A33-71CC-E38E5DA3A523}</Project>
     </ProjectReference>
-    <ProjectReference Include="modules\Utilities\Utilities.vcxproj">
+    <ProjectReference Include="core\Utilities\Utilities.vcxproj">
       <Project>{F831B7B8-64F2-32EF-2D2D-7C6C99AC77CB}</Project>
     </ProjectReference>
   </ItemGroup>

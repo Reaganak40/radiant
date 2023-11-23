@@ -28,13 +28,13 @@ target_dirs = [
     "thirdparty/glm",
     "editor",
     "sandbox",
-    "core",
-    "core/modules/Audio",
-    "core/modules/Graphics",
-    "core/modules/Graphics/platform/OpenGL",
-    "core/modules/Logger",
-    "core/modules/Physics",
-    "core/modules/Utilities",
+    "engine",
+    "engine/core/Audio",
+    "engine/core/Graphics",
+    "engine/core/Graphics/framework/OpenGL",
+    "engine/core/Logger",
+    "engine/core/Physics",
+    "engine/core/Utilities",
 ]
 
 for target in target_dirs:

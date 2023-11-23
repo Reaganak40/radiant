@@ -1,5 +1,5 @@
 #pragma once
-#include "Core.h"
+#include "radiant_api.h"
 
 // Forward Declarations
 namespace rdt {
@@ -8,8 +8,8 @@ namespace rdt {
 }
 
 // For ApplicationConfig Struct
-#include "Utils/Color.h"
-#include "Graphics/Camera.h"
+#include <Radiant/Graphics.h>
+#include <Radiant/Utils.h>
 
 namespace rdt {
 

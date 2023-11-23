@@ -105,23 +105,17 @@ namespace rdt::glCore {
 		void UseTexture(TextureID tID);
 
 		/*
-			Creates a new camera instance that can be set for draw calls. Cameras
-			allow for easy manipulation of the Model View Projection Matrix.
+			Sets the model view projection matrix to be used by the selected
+			shader.
 		*/
-		CameraID CreateCamera();
+		void SetMVPMatrix(const glm::mat4& mvp);
 
 		/*
-			Gets the camera assoicatied with this CameraID. If it doesn't exist,
-			returns the default camera.
+			Sets the aspect ratio that is to be maintained by the viewport.
+			If the viewport does not match the aspect ratio, the viewport
+			will shrink to maximum fit.
 		*/
-		Camera& GetCamera(CameraID cID);
-
-		/*
-			Enables the use of the camera indiciated by the CameraID. If no cameraID provided (0),
-			uses the default camera. Only one camera allowed per draw call. This camera will be
-			remain the current camera until a different one replaces it.
-		*/
-		void SetCamera(CameraID cID = 0);
+		void SetAspectRatio(AspectRatio aspectRatio);
 
 		/*
 			Submits an array of vertices for the current draw call. This
@@ -152,13 +146,13 @@ namespace rdt::glCore {
 		Creates a new instance of a OpenGL application. Registers the instance
 		with the internal glState, for global reference.
 	*/
-	GL_CORE_API glApplication& CreateApplication(const char* application_name);
+	GL_CORE_API glApplication* CreateApplication(const char* application_name);
 
 	/*
 		Returns a pointer to a OpenGL created instance. If none
 		exists under the provided name, it will be created.
 	*/
-	GL_CORE_API glApplication& GetApplication(const char* application_name);
+	GL_CORE_API glApplication* GetApplication(const char* application_name);
 
 	/*
 		Destroys an instantiated OpenGL application. If it has a name,

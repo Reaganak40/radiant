@@ -1,11 +1,12 @@
--- ===============================================================================================
--- Radiant Engine Build Configuration
--- ===============================================================================================
+--[[ 
+    Premake for Module: Graphics
 
-project "Engine"
+--]]
+
+project "Graphics"
     kind "SharedLib"
     language "C++"
-    uuid (os.uuid("EngineUUID"))
+    uuid (os.uuid("GraphicsUUID"))
 	targetdir (solutionDir .. "/bin/" .. outputdir .. "/%{prj.name}")
     objdir (solutionDir .. "/bin/obj/" .. outputdir .. "/%{prj.name}")
     ignoredefaultlibraries { "LIBCMTD" }
@@ -15,27 +16,21 @@ project "Engine"
         "src/**.h",
         "src/**.cpp",
         "include/**.h",
+
+        "platform/OpenGL/include/**.h"
     }
 
     includedirs
     {
         "src",
         "include",
-        
-        -- Depends on graphics module
-        "%{IncludeModule.Graphics}",
-        
-        -- Depends on logger module
-        "%{IncludeModule.Logger}",
-        "%{IncludeDir.spdlog}",
-
+        GetAllModuleIncludes('Graphics')
     }
 
     links
     {
-        md_graph["Engine"]
+        md_graph["Graphics"]
     }
-
 
     postbuildcommands
     {
@@ -53,7 +48,7 @@ project "Engine"
         defines
         {
             "RDT_PLATFORM_WINDOWS",
-            "RDT_BUILD_DLL"
+            "GRAPHICS_BUILD_DLL"
         }
     
     filter "configurations:Debug"

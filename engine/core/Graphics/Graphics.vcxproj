@@ -60,7 +60,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;GRAPHICS_BUILD_DLL;RDT_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;include;platform\OpenGL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;include;..\Utilities\include;..\Logger\include;..\..\..\thirdparty\spdlog\spdlog\include;framework\OpenGL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -83,7 +83,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;GRAPHICS_BUILD_DLL;RDT_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;include;platform\OpenGL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;include;..\Utilities\include;..\Logger\include;..\..\..\thirdparty\spdlog\spdlog\include;framework\OpenGL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -107,8 +107,6 @@
   <ItemGroup>
     <ClInclude Include="include\Radiant\Graphics.h" />
     <ClInclude Include="include\graphics_api.h" />
-    <ClInclude Include="platform\OpenGL\include\Radiant\glCore.h" />
-    <ClInclude Include="platform\OpenGL\include\gl_core_api.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\pch.h" />
   </ItemGroup>
@@ -119,7 +117,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="platform\OpenGL\glCore.vcxproj">
+    <ProjectReference Include="framework\OpenGL\glCore.vcxproj">
       <Project>{98D06841-8488-AA8E-ED8F-83EAD966457F}</Project>
     </ProjectReference>
     <ProjectReference Include="..\Logger\Logger.vcxproj">

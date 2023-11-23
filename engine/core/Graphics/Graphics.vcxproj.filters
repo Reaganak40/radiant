@@ -7,18 +7,6 @@
     <Filter Include="include\Radiant">
       <UniqueIdentifier>{1BEADCCD-8775-4A92-9086-CD86FC90A692}</UniqueIdentifier>
     </Filter>
-    <Filter Include="platform">
-      <UniqueIdentifier>{4A63C33C-3630-1E48-5F49-0CF04B7553D6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="platform\OpenGL">
-      <UniqueIdentifier>{3E351A86-AAC0-874A-B3D1-0A3F1FDCE34A}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="platform\OpenGL\include">
-      <UniqueIdentifier>{B1BA2FF4-1DF2-778B-26FC-DBAE92B29E84}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="platform\OpenGL\include\Radiant">
-      <UniqueIdentifier>{439D2299-AF80-31D9-B883-5F1524E6F729}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src">
       <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
     </Filter>
@@ -29,12 +17,6 @@
     </ClInclude>
     <ClInclude Include="include\graphics_api.h">
       <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="platform\OpenGL\include\Radiant\glCore.h">
-      <Filter>platform\OpenGL\include\Radiant</Filter>
-    </ClInclude>
-    <ClInclude Include="platform\OpenGL\include\gl_core_api.h">
-      <Filter>platform\OpenGL\include</Filter>
     </ClInclude>
     <ClInclude Include="src\Renderer.h">
       <Filter>src</Filter>

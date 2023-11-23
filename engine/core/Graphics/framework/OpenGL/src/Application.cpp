@@ -133,7 +133,7 @@ void rdt::glCore::glApplication::Draw()
 
 // ========================================================================================
 
-rdt::glCore::glApplication& rdt::glCore::CreateApplication(const char* application_name)
+rdt::glCore::glApplication* rdt::glCore::CreateApplication(const char* application_name)
 {
 	if (strlen(application_name) == 0) {
         application_name = "OpenGL Window";
@@ -142,7 +142,7 @@ rdt::glCore::glApplication& rdt::glCore::CreateApplication(const char* applicati
 	return glState::Get()->RegisterApplication(application_name);
 }
 
-rdt::glCore::glApplication& rdt::glCore::GetApplication(const char* application_name)
+rdt::glCore::glApplication* rdt::glCore::GetApplication(const char* application_name)
 {
 	return glState::Get()->GetApplication(application_name);
 }

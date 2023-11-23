@@ -34,13 +34,13 @@ namespace rdt::glCore {
 		/*
 			Adds an application to the state
 		*/
-		glApplication& RegisterApplication(const std::string& name);
+		glApplication* RegisterApplication(const std::string& name);
 
 		/*
 			Gets a registered application instance, or creates it
 			if it does not exist.
 		*/
-		glApplication& GetApplication(const std::string& name);
+		glApplication* GetApplication(const std::string& name);
 
 		/*
 			Returns true if an application under the given name exists.

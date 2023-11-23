@@ -5,15 +5,15 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Editor", "editor\Editor.vcx
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core-Modules", "Core-Modules", "{1BC8AF7E-07AC-70D4-700C-6B275C0F5B56}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Graphics", "core\modules\Graphics\Graphics.vcxproj", "{8DFD7D4A-7960-0DEF-22E6-45A50E28D971}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Graphics", "engine\core\Graphics\Graphics.vcxproj", "{8DFD7D4A-7960-0DEF-22E6-45A50E28D971}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Logger", "core\modules\Logger\Logger.vcxproj", "{1C0DC9E5-08C5-0A33-71CC-E38E5DA3A523}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Logger", "engine\core\Logger\Logger.vcxproj", "{1C0DC9E5-08C5-0A33-71CC-E38E5DA3A523}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Utilities", "core\modules\Utilities\Utilities.vcxproj", "{F831B7B8-64F2-32EF-2D2D-7C6C99AC77CB}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Utilities", "engine\core\Utilities\Utilities.vcxproj", "{F831B7B8-64F2-32EF-2D2D-7C6C99AC77CB}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glCore", "core\modules\Graphics\platform\OpenGL\glCore.vcxproj", "{98D06841-8488-AA8E-ED8F-83EAD966457F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glCore", "engine\core\Graphics\framework\OpenGL\glCore.vcxproj", "{98D06841-8488-AA8E-ED8F-83EAD966457F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine", "core\Engine.vcxproj", "{D24C0A03-BE04-4C50-270C-25AC13E3E640}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine", "engine\Engine.vcxproj", "{D24C0A03-BE04-4C50-270C-25AC13E3E640}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Third-Party", "Third-Party", "{64AB4291-D0C1-4027-1939-CC48858E11AF}"
 EndProject

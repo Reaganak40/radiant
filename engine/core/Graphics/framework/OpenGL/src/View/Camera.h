@@ -12,8 +12,9 @@
 
 namespace rdt::glCore {
 	enum AspectRatio {
-		AR_16_9, // Window Projection = (1920px, 1080px)
-		AR_1_1,  // Window Projection = (1000px, 1000px)
+		NoAspectRatio,  // No aspect ratio is maintained (stretch)
+		AR_16_9,		// Window Projection = (1920px, 1080px)
+		AR_1_1,			// Window Projection = (1000px, 1000px)
 	};
 
 	using CameraID = unsigned int;

@@ -41,22 +41,22 @@ void rdt::glCore::glState::Reset()
 	}
 }
 
-rdt::glCore::glApplication& rdt::glCore::glState::RegisterApplication(const std::string& name)
+rdt::glCore::glApplication* rdt::glCore::glState::RegisterApplication(const std::string& name)
 {
 	if (!ApplicationExists(name)) {
 		m_applications[name] = new glApplication(name.c_str());
 	}
 
-	return *m_applications.at(name);
+	return m_applications.at(name);
 }
 
-rdt::glCore::glApplication& rdt::glCore::glState::GetApplication(const std::string& name)
+rdt::glCore::glApplication* rdt::glCore::glState::GetApplication(const std::string& name)
 {
 	if (!ApplicationExists(name)) {
 		return RegisterApplication(name);
 	}
 
-	return *m_applications.at(name);
+	return m_applications.at(name);
 }
 
 bool rdt::glCore::glState::ApplicationExists(const std::string& name)
