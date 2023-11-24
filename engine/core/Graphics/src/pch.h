@@ -2,3 +2,4 @@
 
 // STL
 #include <string>
+#include <memory>

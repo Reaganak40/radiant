@@ -34,19 +34,19 @@ namespace rdt::glCore {
 	{
 		// define position coordinates
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, position));
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glVertex), (const void*)offsetof(glVertex, position));
 
 		// define color coordinates
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, color));
+		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(glVertex), (const void*)offsetof(glVertex, color));
 
 		//define texture coordinates
 		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, texCoords));
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(glVertex), (const void*)offsetof(glVertex, texCoords));
 
 		// define texture id (slot)
 		glEnableVertexAttribArray(3);
-		glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, texIndex));
+		glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(glVertex), (const void*)offsetof(glVertex, texIndex));
 
 	}
 }

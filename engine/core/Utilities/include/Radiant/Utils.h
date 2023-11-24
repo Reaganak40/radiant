@@ -13,4 +13,5 @@
 #include "../utils_api.h"
 #include "../../src/MathTypes.h"
 #include "../../src/Color.h"
+#include "../../src/WindowConfig.h"
 #include "../../src/UtilFuncs.h"

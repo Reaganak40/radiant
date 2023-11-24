@@ -19,7 +19,7 @@ namespace rdt::glCore {
 	{
 	}
 
-	TextureID TextureManager::LoadTextureFromPNG(const std::string& filepath)
+	glTextureID TextureManager::LoadTextureFromPNG(const std::string& filepath)
 	{
 		Texture nTexture;
 		if (!nTexture.LoadTexturePNG(filepath.c_str())) {
@@ -29,12 +29,12 @@ namespace rdt::glCore {
 		return nTexture.GetID();
 	}
 
-	bool TextureManager::TextureExists(TextureID tID)
+	bool TextureManager::TextureExists(glTextureID tID)
 	{
 		return m_textures.find(tID) != m_textures.end();
 	}
 
-	Texture& TextureManager::GetTexture(TextureID tID)
+	Texture& TextureManager::GetTexture(glTextureID tID)
 	{
 		if (!TextureExists(tID)) {
 			return m_textures.at(GL_CORE_NULL_TEXTURE_ID);
@@ -48,7 +48,7 @@ namespace rdt::glCore {
 		return m_texture_slots;
 	}
 
-	bool TextureManager::BindTexture(TextureID tID)
+	bool TextureManager::BindTexture(glTextureID tID)
 	{
 		if (!TextureExists(tID)) {
 			RDT_CORE_WARN("TextureManager - Tried to bind unregistered texture [id:{}]", tID);
@@ -69,14 +69,14 @@ namespace rdt::glCore {
 		return false;
 	}
 
-	void TextureManager::BindTextures(const std::unordered_set<TextureID>& textures)
+	void TextureManager::BindTextures(const std::unordered_set<glTextureID>& textures)
 	{
 		if (textures.size() > MAX_TEXTURES) {
 			return;
 		}
 		
 		std::bitset<MAX_TEXTURES + 2> taken_slots;
-		std::vector<TextureID> toAdd;
+		std::vector<glTextureID> toAdd;
 		toAdd.reserve(textures.size());
 
 		for (auto tID : textures) {
@@ -107,7 +107,7 @@ namespace rdt::glCore {
 		m_texture_slots_changed = true;
 	}
 
-	TextureSlot TextureManager::GetTextureSlot(TextureID tID)
+	TextureSlot TextureManager::GetTextureSlot(glTextureID tID)
 	{
 		if (!TextureExists(tID)) {
 			return GL_CORE_NULL_TEXTURE_SLOT;
@@ -126,7 +126,7 @@ namespace rdt::glCore {
 		m_texture_slots_changed = false;
 	}
 
-	TextureID TextureManager::NextTextureID()
+	glTextureID TextureManager::NextTextureID()
 	{
 		return ++idCounter;
 	}

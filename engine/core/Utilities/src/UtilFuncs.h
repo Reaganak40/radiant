@@ -102,7 +102,6 @@ namespace rdt::utils {
         Returns an angle in degrees into radians
     */
     float UTILS_API DegreesToRadians(float degrees);
-
     float UTILS_API RadiansToDegrees(float radians);
 
     /*

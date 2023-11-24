@@ -124,7 +124,7 @@ include "thirdparty/imgui/imgui.lua"
 include "thirdparty/AL/AL.lua"
 group ""
 
-group "Core-Modules"
+group "Core"
     include "engine/core/Utilities/Utilities.lua"
     include "engine/core/Logger/Logger.lua"
     include "engine/core/Graphics/framework/OpenGL/glCore.lua"

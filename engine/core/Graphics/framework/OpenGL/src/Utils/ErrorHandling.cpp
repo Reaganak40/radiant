@@ -70,9 +70,8 @@ namespace rdt::glCore {
 			severityStr = "UNKNOWN";
 		}
 
-		fprintf(stderr, "GL Error: %s type = 0x%x, severity = %s:\n\tmessage = %s\n",
-			(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
-			type, severityStr.c_str(), message);
+		RDT_CORE_FATAL("GL Error: {} type = 0x{:x}, severity = {}", (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severityStr.c_str());
+		RDT_CORE_FATAL("GL Error Msg: {}", message);
 
 		if (severity == GL_DEBUG_SEVERITY_HIGH || severityStr == "UNKNOWN") {
 			ASSERT(false);

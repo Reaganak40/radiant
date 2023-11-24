@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "VertexBuffer.h"
-#include "Internal/State.h"
 
 namespace rdt::glCore {
 
@@ -33,7 +32,7 @@ namespace rdt::glCore {
 		}
 	}
 
-	void VertexBuffer::PushToBatch(Vertex* vertices, size_t vertexCount)
+	void VertexBuffer::PushToBatch(glVertex* vertices, size_t vertexCount)
 	{
 		if ((m_current_count + vertexCount) >= m_buffer.capacity()) {
 			ExtendBuffer();
@@ -75,7 +74,7 @@ namespace rdt::glCore {
 		glBindBuffer(GL_ARRAY_BUFFER, m_ID);
 	}
 
-	std::vector<Vertex>& VertexBuffer::GetBufferData()
+	std::vector<glVertex>& VertexBuffer::GetBufferData()
 	{
 		return m_buffer;
 	}
@@ -87,12 +86,12 @@ namespace rdt::glCore {
 
 	void VertexBuffer::RegisterBufferData()
 	{
-		glBufferData(GL_ARRAY_BUFFER, m_buffer.capacity() * sizeof(Vertex), nullptr, GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, m_buffer.capacity() * sizeof(glVertex), nullptr, GL_DYNAMIC_DRAW);
 	}
 
 	void VertexBuffer::UpdateBuffer()
 	{
-		glBufferSubData(GL_ARRAY_BUFFER, 0, m_current_count * sizeof(Vertex), m_buffer.data());
+		glBufferSubData(GL_ARRAY_BUFFER, 0, m_current_count * sizeof(glVertex), m_buffer.data());
 		m_last_count = m_current_count;
 	}
 

@@ -10,13 +10,13 @@
 #include "gl_core_api.h"
 
 namespace rdt::glCore {
-	struct GL_CORE_API Vertex {
+	struct GL_CORE_API glVertex {
 		float position	[3];	// x,y,z coordinats of a vertex
 		float color		[4];	// the rgba (normalized) color values of a vertex
 		float texCoords	[2];	// the texture mapping coordinates for this vertex
 		float texIndex;         // the texture slot that the target texture is currently binded.
 
-		Vertex();
+		glVertex();
 
 		void SetPosition(const float nPosition[3]);
 		void SetPosition(const float x, const float y, const float z);

@@ -113,6 +113,7 @@
     <ClInclude Include="src\Timestep.h" />
     <ClInclude Include="src\UniqueID.h" />
     <ClInclude Include="src\UtilFuncs.h" />
+    <ClInclude Include="src\WindowConfig.h" />
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\rdt_array.h" />
   </ItemGroup>
@@ -123,6 +124,7 @@
     <ClCompile Include="src\Timestep.cpp" />
     <ClCompile Include="src\UniqueID.cpp" />
     <ClCompile Include="src\UtilFuncs.cpp" />
+    <ClCompile Include="src\WindowConfig.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>

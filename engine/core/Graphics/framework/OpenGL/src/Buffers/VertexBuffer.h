@@ -13,7 +13,7 @@ namespace rdt::glCore {
 
 		bool m_buffer_defined;
 
-		std::vector<Vertex> m_buffer;
+		std::vector<glVertex> m_buffer;
 		unsigned int m_last_count;
 		unsigned int m_current_count;
 
@@ -27,7 +27,7 @@ namespace rdt::glCore {
 		/*
 			Adds the list of vertices to the end of the buffer.
 		*/
-		void PushToBatch(Vertex* vertices, size_t vertexCount);
+		void PushToBatch(glVertex* vertices, size_t vertexCount);
 
 		/*
 			Sends new vertex buffer data to GPU via opengl.
@@ -52,7 +52,7 @@ namespace rdt::glCore {
 		/*
 			Returns the current vertex buffer data
 		*/
-		std::vector<Vertex>& GetBufferData();
+		std::vector<glVertex>& GetBufferData();
 
 		/*
 			Returns the number of vertices in the buffer 

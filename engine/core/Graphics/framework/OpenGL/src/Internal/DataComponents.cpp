@@ -3,18 +3,10 @@
 #include "Utils/ErrorHandling.h"
 
 #include <Radiant/Logger.h>
+#include <Radiant/Utils.h>
 
 // ======================================================
-void rdt::glCore::WindowDataComponent::SetWindowName(const std::string& name)
-{
-	m_window_name = name;
-}
-void rdt::glCore::WindowDataComponent::SetWindowSize(int windowWidth, int windowHeight)
-{
-	m_window_width = windowWidth;
-	m_window_height = windowHeight;
-}
-bool rdt::glCore::WindowDataComponent::Launch()
+bool rdt::glCore::WindowDataComponent::Launch(std::shared_ptr<WindowConfig> windowConfig)
 {
 	if (m_window != nullptr) {
 		return false;
@@ -29,15 +21,19 @@ bool rdt::glCore::WindowDataComponent::Launch()
 	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 
 	/* Create a windowed mode window and its OpenGL context */
-	m_window = glfwCreateWindow(mode->width, mode->height, m_window_name.c_str(), NULL, NULL);
+	m_window = glfwCreateWindow(windowConfig->GetWindowSize().x, windowConfig->GetWindowSize().y, windowConfig->GetWindowName(), NULL, NULL);
 	if (!m_window)
 	{
 		RDT_CORE_FATAL("Failed to create glfw window");
 		return false;
 	}
+	m_window_title = windowConfig->GetWindowName();
 
 	/* Start with maximized window */
-	glfwMaximizeWindow(m_window);
+	if (windowConfig->ShouldMaximizeWindow()) {
+		glfwMaximizeWindow(m_window);
+	}
+
 	glfwGetWindowSize(m_window, &m_window_width, &m_window_height);
 
 	/* Make the window's context current */
@@ -70,52 +66,76 @@ rdt::glCore::VertexArray& rdt::glCore::VertexArrayDataComponent::GetVertexArray(
 // ======================================================
 void rdt::glCore::ViewportDataComponent::Init(int windowWidth, int windowHeight)
 {
-	m_viewports[GL_CORE_DEFAULT_VIEWPORT_ID] = Viewport(0, 0, windowWidth, windowHeight);
-	m_viewports.at(GL_CORE_DEFAULT_VIEWPORT_ID).Bind();
+	SetViewport(0, 0, windowWidth, windowHeight);
 }
-rdt::glCore::ViewportID rdt::glCore::ViewportDataComponent::NextViewportID()
+void rdt::glCore::ViewportDataComponent::SetViewport(int xPos, int yPos, int width, int height)
 {
-	return ++viewportIDCounter;
+	m_current_viewport.posX   = xPos;
+	m_current_viewport.posY   = yPos;
+	m_current_viewport.width  = width;
+	m_current_viewport.height = height;
+
+	if (m_aspect_ratio == NoAspectRatio) {
+		m_current_viewport.Bind();
+	}
+	else {
+		ApplyAspectRatio();
+		m_adjusted_viewport.Bind();
+	}
 }
-rdt::glCore::ViewportID rdt::glCore::ViewportDataComponent::CreateViewport(int xPos, int yPos, int width, int height)
+void rdt::glCore::ViewportDataComponent::SetAspectRatio(AspectRatio aspect_ratio)
 {
-	ViewportID nID = NextViewportID();
-	m_viewports[nID] = Viewport(xPos, yPos, width, height);
-	return nID;
-}
-void rdt::glCore::ViewportDataComponent::BindViewport(ViewportID vID)
-{
-	if (m_current_viewport == vID || !ViewportExists(vID)) {
+	if (m_aspect_ratio == aspect_ratio) {
 		return;
 	}
 
-	m_viewports.at(vID).Bind();
-	m_current_viewport = vID;
-}
-bool rdt::glCore::ViewportDataComponent::ViewportExists(ViewportID vID)
-{
-	return m_viewports.find(vID) != m_viewports.end();
-}
-rdt::glCore::Viewport& rdt::glCore::ViewportDataComponent::GetCurrentViewport()
-{
-	return m_viewports.at(m_current_viewport);
-}
-void rdt::glCore::ViewportDataComponent::OnCameraChange(Camera& bindedCamera)
-{
-	if (!bindedCamera.ShouldMaintainAspectRatio()) {
+	if (aspect_ratio == NoAspectRatio) {
+		m_current_viewport.Bind();
 		return;
 	}
-	Viewport& viewport = GetCurrentViewport();
-	int nWidth = 0;
-	int nHeight = 0;
-	int nX = 0;
-	int nY = 0;
-	bindedCamera.GetCameraDimensionsFromViewport(viewport.width, viewport.height, &nWidth, &nHeight);
 
-	nX = (viewport.width / 2) - (nWidth / 2);
-	nY = (viewport.height / 2) - (nHeight / 2);
-	
-	Viewport::Bind(nX, nY, nWidth, nHeight);
+	ApplyAspectRatio();
+	m_adjusted_viewport.Bind();
+}
+void rdt::glCore::ViewportDataComponent::ApplyAspectRatio()
+{
+	Vec2d dimensions = Vec2d::Zero();
+	dimensions.y = m_current_viewport.height;
+
+	switch (m_aspect_ratio) {
+	case AR_16_9:
+		dimensions.x = (16.0f / 9.0f) * dimensions.y;
+		break;
+	case AR_1_1:
+		dimensions.x = dimensions.y;
+		break;
+	default:
+		RDT_CORE_ERROR("glCore - Tried to apply undefined aspect ratio: {}", m_aspect_ratio);
+		return;
+	}
+
+	if (dimensions.x > m_current_viewport.width) {
+		dimensions.x = m_current_viewport.width;
+		switch (m_aspect_ratio) {
+		case AR_16_9:
+			dimensions.y = (9 / 16.0f) * dimensions.x;
+			break;
+		case AR_1_1:
+			dimensions.y = dimensions.x;
+			break;
+		}
+		dimensions.x = utils::ApplyEpsilon(dimensions.x);
+		dimensions.y = utils::ApplyEpsilon(dimensions.y);
+	}
+
+	m_adjusted_viewport.width = (int)dimensions.x;
+	m_adjusted_viewport.height = (int)dimensions.y;
+	m_adjusted_viewport.posX = (m_current_viewport.width / 2) - (m_adjusted_viewport.width / 2);
+	m_adjusted_viewport.posY = (m_current_viewport.height / 2) - (m_adjusted_viewport.height / 2);
+}
+const rdt::glCore::Viewport& rdt::glCore::ViewportDataComponent::GetBindedViewport()
+{
+	return (m_aspect_ratio == NoAspectRatio) ? m_current_viewport : m_adjusted_viewport;
 }
 // ======================================================
 void rdt::glCore::VertexBufferDataComponent::Reset()
@@ -209,6 +229,19 @@ rdt::glCore::Shader& rdt::glCore::ShaderDataComponent::GetCurrentShader()
 {
 	return m_shaders.at(m_current_shader);
 }
+void rdt::glCore::ShaderDataComponent::SetMVP(const glm::mat4& mvp)
+{
+	m_MVP = mvp;
+	mvp_initialized = true;
+}
+glm::mat4& rdt::glCore::ShaderDataComponent::GetMVP()
+{
+	if (!mvp_initialized) {
+		RDT_CORE_WARN("glCore - Using unitialized model view projection matrix!");
+	}
+
+	return m_MVP;
+}
 // ======================================================
 void rdt::glCore::TextureDataComponent::Init()
 {
@@ -221,41 +254,4 @@ void rdt::glCore::TextureDataComponent::BindTextureRequests()
 void rdt::glCore::TextureDataComponent::OnFinishedDrawCall()
 {
 	m_texture_requests.clear();
-}
-// ======================================================
-void rdt::glCore::CameraDataComponent::Init()
-{
-	m_cameras[GL_CORE_NULL_CAMERA_ID];
-}
-rdt::glCore::CameraID rdt::glCore::CameraDataComponent::NextCameraID()
-{
-	return ++cameraIDCounter;
-}
-
-bool rdt::glCore::CameraDataComponent::BindCamera(CameraID camera)
-{
-	if (m_current_camera == camera || !CameraExists(camera)) {
-		return false;
-	}
-
-	m_current_camera = camera;
-	return true;
-}
-rdt::glCore::CameraID rdt::glCore::CameraDataComponent::CreateCamera()
-{
-	CameraID nID = NextCameraID();
-	m_cameras[nID];
-	return nID;
-}
-bool rdt::glCore::CameraDataComponent::CameraExists(CameraID camera)
-{
-	return m_cameras.find(camera) != m_cameras.end();
-}
-rdt::glCore::Camera& rdt::glCore::CameraDataComponent::GetCurrentCamera()
-{
-	return m_cameras.at(m_current_camera);
-}
-rdt::glCore::Camera& rdt::glCore::CameraDataComponent::GetAnyCamera(CameraID camera)
-{
-	return m_cameras.at(camera);
 }

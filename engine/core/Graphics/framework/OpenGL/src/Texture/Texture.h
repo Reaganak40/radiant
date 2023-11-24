@@ -12,12 +12,12 @@
 
 namespace rdt::glCore {
 	using TextureSlot = unsigned int;
-	using TextureID = unsigned int;
+	using glTextureID = unsigned int;
 
 	class GL_CORE_API Texture {
 	private:
 		TextureSlot m_texture_slot;
-		TextureID m_ID;
+		glTextureID m_ID;
 		int m_image_width;
 		int m_image_height;
 		int m_bits_per_pixel;
@@ -30,7 +30,7 @@ namespace rdt::glCore {
 		/*
 			Returns the OpenGL texture ID for this instance.
 		*/
-		const TextureID GetID() { return m_ID; }
+		const glTextureID GetID() { return m_ID; }
 
 		/*
 			Returns the assigned texture slot for this texture.

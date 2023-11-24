@@ -1,4 +1,10 @@
 #pragma once
+#include <Radiant/Utils.h>
+
+// Forward Declarations
+namespace rdt {
+    struct Vec2i;
+}
 
 // Required files for struct/classes
 #include "Buffers/VertexArray.h"
@@ -6,7 +12,6 @@
 #include "Buffers/IndexBuffer.h"
 #include "Shader/Shader.h"
 #include "View/Viewport.h"
-#include "View/Camera.h"
 
 namespace rdt::glCore {
 
@@ -15,26 +20,17 @@ namespace rdt::glCore {
         GLFWwindow* m_window = nullptr;
         GLFWmonitor* m_monitor = nullptr;
 
-        // Window Config
-        std::string m_window_name = "OpenGL Window";
         int m_window_width = 0;
         int m_window_height = 0;
-        
-        /*
-            Sets the name of the window
-        */
-        void SetWindowName(const std::string& name);
+        Color m_clear_color;
 
-        /*
-            Sets the window dimensions (pixels)
-        */
-        void SetWindowSize(int windowWidth, int windowHeight);
+        std::string m_window_title = "No title";
 
         /*
             Initializes and launches a new glfw Context. Returns false
             on failure.
         */
-        bool Launch();
+        bool Launch(std::shared_ptr<WindowConfig> windowConfig);
 
 	};
 
@@ -53,9 +49,9 @@ namespace rdt::glCore {
     };
 
     struct ViewportDataComponent {
-        ViewportID viewportIDCounter = 0;
-        std::unordered_map<ViewportID, Viewport> m_viewports;
-        ViewportID m_current_viewport = GL_CORE_DEFAULT_VIEWPORT_ID;
+        Viewport m_current_viewport;
+        Viewport m_adjusted_viewport;
+        AspectRatio m_aspect_ratio = NoAspectRatio;
 
         /*
             Initializes the default viewport
@@ -63,36 +59,26 @@ namespace rdt::glCore {
         void Init(int windowWidth, int windowHeight);
 
         /*
-            Generates the next available viewportID
+            Sets and rebinds the viewport on the top of the stack
         */
-        ViewportID NextViewportID();
+        void SetViewport(int xPos, int yPos, int width, int height);
 
         /*
-            Creates a new viewport that can binded and drawn too. Use the
-            returned viewport's ID to reference it later.
+            Sets a new aspect ratio to the viewport. The viewport
+            will be adjusted according to the aspect ratio.
         */
-        ViewportID CreateViewport(int xPos, int yPos, int width, int height);
+        void SetAspectRatio(AspectRatio aspect_ratio);
 
         /*
-            Sets the new current viewport
+            Takes the current viewport and applies aspect ratio
+            restrictions to it.
         */
-        void BindViewport(ViewportID vID);
+        void ApplyAspectRatio();
 
         /*
-            Returns true if the given viewport is registered
+            Returns a reference to the binded viewport
         */
-        bool ViewportExists(ViewportID vID);
-        
-        /*
-            Returns a reference to the currently bound viewport
-        */
-        Viewport& GetCurrentViewport();
-
-        /*
-            Procedure called when the camera changes which demands new
-            viewport configurations.
-        */
-        void OnCameraChange(Camera& bindedCamera);
+        const Viewport& GetBindedViewport();
     };
 
     struct VertexBufferDataComponent {
@@ -153,6 +139,9 @@ namespace rdt::glCore {
         std::unordered_map<ShaderID, Shader> m_shaders;
         ShaderID m_default_shader = GL_CORE_NULL_SHADER_ID;
         ShaderID m_current_shader = GL_CORE_NULL_SHADER_ID;
+        
+        glm::mat4 m_MVP;
+        bool mvp_initialized = false;
 
         /*
             Initializes the default shader and binds it.
@@ -173,11 +162,21 @@ namespace rdt::glCore {
             Gets the currently in-use shader
         */
         Shader& GetCurrentShader();
+
+        /*
+            Sets the model view projection matrix
+        */
+        void SetMVP(const glm::mat4& mvp);
+
+        /*
+            Gets the model view projection matrix
+        */
+        glm::mat4& GetMVP();
     };
 
     struct TextureDataComponent {
         std::shared_ptr<TextureManager> m_texture_manager = nullptr;
-        std::unordered_set<TextureID> m_texture_requests;
+        std::unordered_set<glTextureID> m_texture_requests;
         
         /*
             Initializes the TextureManager 
@@ -193,47 +192,5 @@ namespace rdt::glCore {
            Runs procedure for component when a draw call finishes.
         */
         void OnFinishedDrawCall();
-    };
-
-    struct CameraDataComponent {
-        std::unordered_map<CameraID, Camera> m_cameras;
-        CameraID m_current_camera;
-        CameraID cameraIDCounter;
-
-        /*
-            Creates default camera BUT does NOT bind it.
-        */
-        void Init();
-
-        /*
-            Generates the next cameraID
-        */
-        CameraID NextCameraID();
-
-        /*
-            Binds the given camera. Returns true if the camera
-            did in fact change.
-        */
-        bool BindCamera(CameraID camera);
-
-        /*
-            Creates a new camera and returns its ID
-        */
-        CameraID CreateCamera();
-
-        /*
-            Returns true if the camera is registered
-        */
-        bool CameraExists(CameraID camera);
-
-        /*
-            Gets a reference to the current camera
-        */
-        Camera& GetCurrentCamera();
-
-        /*
-            Gets a camera from the camera map, does not check if it exists.
-        */
-        Camera& GetAnyCamera(CameraID camera);
     };
 }

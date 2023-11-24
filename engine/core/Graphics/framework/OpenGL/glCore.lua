@@ -33,8 +33,7 @@ project "glCore"
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.stb}",
 
-        "%{IncludeModule.Logger}",
-        "%{IncludeDir.spdlog}",
+        GetAllModuleIncludes('glCore')
     }
 
     links

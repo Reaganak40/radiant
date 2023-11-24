@@ -37,12 +37,12 @@ namespace rdt::glCore {
 		}
 
 		template<>
-		void SetUniform<std::array<TextureID, MAX_TEXTURES>>(std::string uName, std::array<TextureID, MAX_TEXTURES>& samplers) {
+		void SetUniform<std::array<glTextureID, MAX_TEXTURES>>(std::string uName, std::array<glTextureID, MAX_TEXTURES>& samplers) {
 			glUniform1iv(GetUniform(uName), MAX_TEXTURES, (int*)samplers.data());
 		}
 
 		template<>
-		void SetUniform<TextureID>(std::string uName, TextureID& sampler) {
+		void SetUniform<glTextureID>(std::string uName, glTextureID& sampler) {
 			glUniform1i(GetUniform(uName), (int)sampler);
 		}
 

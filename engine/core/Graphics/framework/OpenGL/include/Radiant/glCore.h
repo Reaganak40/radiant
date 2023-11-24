@@ -12,7 +12,5 @@
 #include "../gl_core_api.h"
 
 // Interface headers relative to this file
-#include "../../src/Application.h"
-#include "../../src/Texture/Texture.h"
+#include "../../src/glWindow.h"
 #include "../../src/Vertex.h"
-#include "../../src/View/Camera.h"

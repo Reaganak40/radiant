@@ -45,7 +45,7 @@
     <ClInclude Include="include\gl_core_api.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="src\Application.h">
+    <ClInclude Include="src\glWindow.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\Buffers\FrameBuffer.h">
@@ -60,16 +60,7 @@
     <ClInclude Include="src\Buffers\VertexBuffer.h">
       <Filter>src\Buffers</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="src\Internal\DataComponents.h">
-      <Filter>src\Internal</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Internal\State.h">
-      <Filter>src\Internal</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Internal\Window.h">
       <Filter>src\Internal</Filter>
     </ClInclude>
     <ClInclude Include="src\Shader\Shader.h">
@@ -87,9 +78,6 @@
     <ClInclude Include="src\Vertex.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\View\Camera.h">
-      <Filter>src\View</Filter>
-    </ClInclude>
     <ClInclude Include="src\View\Viewport.h">
       <Filter>src\View</Filter>
     </ClInclude>
@@ -101,7 +89,7 @@
     <ClCompile Include="..\..\..\..\..\thirdparty\stb\stb\stb_image.cpp">
       <Filter>thirdparty\stb\stb</Filter>
     </ClCompile>
-    <ClCompile Include="src\Application.cpp">
+    <ClCompile Include="src\glWindow.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Buffers\FrameBuffer.cpp">
@@ -119,12 +107,6 @@
     <ClCompile Include="src\Internal\DataComponents.cpp">
       <Filter>src\Internal</Filter>
     </ClCompile>
-    <ClCompile Include="src\Internal\State.cpp">
-      <Filter>src\Internal</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Internal\Window.cpp">
-      <Filter>src\Internal</Filter>
-    </ClCompile>
     <ClCompile Include="src\Shader\Shader.cpp">
       <Filter>src\Shader</Filter>
     </ClCompile>
@@ -139,9 +121,6 @@
     </ClCompile>
     <ClCompile Include="src\Vertex.cpp">
       <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\View\Camera.cpp">
-      <Filter>src\View</Filter>
     </ClCompile>
     <ClCompile Include="src\View\Viewport.cpp">
       <Filter>src\View</Filter>

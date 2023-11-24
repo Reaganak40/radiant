@@ -3,7 +3,6 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
-
 #ifdef RDT_PLATFORM_WINDOWS
 #include <direct.h>
 #define GetCurrentDir _getcwd
@@ -12,10 +11,12 @@
 #define GetCurrentDir getcwd
 #endif
 
+// STL
 #include <filesystem>
 #include <string>
 #include <sstream>
 #include <fstream>
 #include <unordered_map>
+#include <vector>
 #include <chrono>
 #include <type_traits>

@@ -12,7 +12,7 @@
 // Forward Declarations
 namespace rdt::glCore {
 	using TextureSlot = unsigned int;
-	using TextureID = unsigned int;
+	using glTextureID = unsigned int;
 	class Texture;
 }
 
@@ -29,14 +29,14 @@ namespace rdt::glCore {
 	class TextureManager {
 	private:
 		// Texture Storage and Lookup
-		std::unordered_map<TextureID, Texture> m_textures;
+		std::unordered_map<glTextureID, Texture> m_textures;
 
 		// OpenGL texture slot map
 		TextureSlotMap m_texture_slots;
 		TextureSlot m_next_slot;
 		bool m_texture_slots_changed;
 
-		TextureID idCounter = 0;
+		glTextureID idCounter = 0;
 
 	public:
 		TextureManager();
@@ -46,17 +46,17 @@ namespace rdt::glCore {
 			Loads a texture from a png file. Returns the TextureID for future
 			lookups.
 		*/
-		TextureID LoadTextureFromPNG(const std::string& filepath);
+		glTextureID LoadTextureFromPNG(const std::string& filepath);
 
 		/*
 			Returns true if a texture with the provided ID exists.
 		*/
-		bool TextureExists(TextureID tID);
+		bool TextureExists(glTextureID tID);
 
 		/*
 			Returns a reference to a texture through its textureID
 		*/
-		Texture& GetTexture(TextureID tID);
+		Texture& GetTexture(glTextureID tID);
 
 		/*
 			Returns the current texture slot map configuration
@@ -67,19 +67,19 @@ namespace rdt::glCore {
 			Binds the texture indicated by the provided ID to a texture slot.
 			Returns true if the texure slot map has changed. 
 		*/
-		bool BindTexture(TextureID tID);
+		bool BindTexture(glTextureID tID);
 
 		/*
 			Binds all thw textures in the given set. If the number of textures
 			in the set exceeds the maximum textures, none will be set.
 		*/
-		void BindTextures(const std::unordered_set<TextureID>& textures);
+		void BindTextures(const std::unordered_set<glTextureID>& textures);
 
 		/*
 			Gets the texture slot for a texure through its textureID.
 			Returns RDT_NULL_TEXTURE_SLOT if not found.
 		*/
-		TextureSlot GetTextureSlot(TextureID tID);
+		TextureSlot GetTextureSlot(glTextureID tID);
 
 		/*
 			Returns true if the texture slots have been changed since the last reset.
@@ -92,7 +92,7 @@ namespace rdt::glCore {
 		void Reset();
 	private:
 
-		TextureID NextTextureID();
+		glTextureID NextTextureID();
 		TextureSlot NextTextureSlot();
 		void AddNoneTexture();
 	};
