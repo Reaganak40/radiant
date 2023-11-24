@@ -26,6 +26,8 @@ namespace rdt {
 
 	class UTILS_API WindowConfig {
 	public:
+		virtual ~WindowConfig() {}
+
 		virtual void SetWindowName(const char* name) = 0;
 		virtual const char* GetWindowName() const = 0;
 		
@@ -43,5 +45,5 @@ namespace rdt {
 		virtual bool ShouldMaximizeWindow() const = 0;
 	};
 
-	WindowConfig* CreateWindowConfig();
+	UTILS_API std::shared_ptr<WindowConfig> CreateWindowConfig();
 }

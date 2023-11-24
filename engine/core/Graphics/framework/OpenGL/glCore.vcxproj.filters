@@ -45,9 +45,6 @@
     <ClInclude Include="include\gl_core_api.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="src\glWindow.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="src\Buffers\FrameBuffer.h">
       <Filter>src\Buffers</Filter>
     </ClInclude>
@@ -81,6 +78,9 @@
     <ClInclude Include="src\View\Viewport.h">
       <Filter>src\View</Filter>
     </ClInclude>
+    <ClInclude Include="src\glWindow.h">
+      <Filter>src</Filter>
+    </ClInclude>
     <ClInclude Include="src\pch.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -88,9 +88,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\..\thirdparty\stb\stb\stb_image.cpp">
       <Filter>thirdparty\stb\stb</Filter>
-    </ClCompile>
-    <ClCompile Include="src\glWindow.cpp">
-      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Buffers\FrameBuffer.cpp">
       <Filter>src\Buffers</Filter>
@@ -124,6 +121,9 @@
     </ClCompile>
     <ClCompile Include="src\View\Viewport.cpp">
       <Filter>src\View</Filter>
+    </ClCompile>
+    <ClCompile Include="src\glWindow.cpp">
+      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\pch.cpp">
       <Filter>src</Filter>

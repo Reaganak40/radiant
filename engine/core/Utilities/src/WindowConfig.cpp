@@ -11,7 +11,7 @@ namespace rdt {
 		std::string windowName = "Radiant App";
 		unsigned int m_windowWidth = 1280;
 		unsigned int m_windowHeight = 720;
-		AspectRatio m_aspectRatio = AR_16_9;
+		AspectRatio m_aspectRatio = NoAspectRatio;
 		Color m_backgroundColor = WHITE;
 		bool m_should_maximize_window = false;
 
@@ -56,7 +56,7 @@ namespace rdt {
 }
 
 // ================================================
-rdt::WindowConfig* rdt::CreateWindowConfig()
+std::shared_ptr<rdt::WindowConfig> rdt::CreateWindowConfig()
 {
-    return new WindowConfigImpl;
+	return std::make_shared<WindowConfigImpl>();
 }

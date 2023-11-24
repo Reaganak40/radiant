@@ -141,7 +141,6 @@ namespace rdt::glCore {
         ShaderID m_current_shader = GL_CORE_NULL_SHADER_ID;
         
         glm::mat4 m_MVP;
-        bool mvp_initialized = false;
 
         /*
             Initializes the default shader and binds it.

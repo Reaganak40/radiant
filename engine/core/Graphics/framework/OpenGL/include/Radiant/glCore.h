@@ -11,6 +11,10 @@
 
 #include "../gl_core_api.h"
 
+// Required third party libraries
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 // Interface headers relative to this file
 #include "../../src/glWindow.h"
 #include "../../src/Vertex.h"

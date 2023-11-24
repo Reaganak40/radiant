@@ -107,7 +107,6 @@
   <ItemGroup>
     <ClInclude Include="include\Radiant\glCore.h" />
     <ClInclude Include="include\gl_core_api.h" />
-    <ClInclude Include="src\glWindow.h" />
     <ClInclude Include="src\Buffers\FrameBuffer.h" />
     <ClInclude Include="src\Buffers\IndexBuffer.h" />
     <ClInclude Include="src\Buffers\VertexArray.h" />
@@ -119,13 +118,13 @@
     <ClInclude Include="src\Utils\ErrorHandling.h" />
     <ClInclude Include="src\Vertex.h" />
     <ClInclude Include="src\View\Viewport.h" />
+    <ClInclude Include="src\glWindow.h" />
     <ClInclude Include="src\pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\..\thirdparty\stb\stb\stb_image.cpp">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\glWindow.cpp" />
     <ClCompile Include="src\Buffers\FrameBuffer.cpp" />
     <ClCompile Include="src\Buffers\IndexBuffer.cpp" />
     <ClCompile Include="src\Buffers\VertexArray.cpp" />
@@ -137,6 +136,7 @@
     <ClCompile Include="src\Utils\ErrorHandling.cpp" />
     <ClCompile Include="src\Vertex.cpp" />
     <ClCompile Include="src\View\Viewport.cpp" />
+    <ClCompile Include="src\glWindow.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>

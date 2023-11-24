@@ -44,12 +44,14 @@ IncludeModule["Engine"]    = (solutionDir .. "/engine/include")
 
 -- Module Depedency graph
 md_graph = {}
-md_graph["glCore"]   = {"Logger", "Utilities"}
-md_graph["Utilities"]   = {}
-md_graph["Graphics"] = {"glCore", "Logger", "Utilities"}
-md_graph["Logger"]   = {"Utilities"}
-md_graph["Engine"]   = {"Graphics", "Logger", "Utilities"}
-md_graph["Editor"]   = {"Engine"}
+md_graph["glCore"]    = {"Logger", "Utilities"}
+md_graph["Utilities"] = {}
+md_graph["Graphics"]  = {"glCore", "Logger", "Utilities"}
+md_graph["Logger"]    = {"Utilities"}
+md_graph["Engine"]    = {"Graphics", "Logger", "Utilities"}
+md_graph["Editor"]    = {"Engine"}
+
+md_graph["glCore-Showcase"] = {"glCore", "Logger", "Utilities"}
 
 -- Queue structure
 function Queue()
@@ -110,12 +112,14 @@ function GetAllModuleIncludes(projName)
         table.insert(includes, ("%{IncludeModule." .. module_name .."}"))
         if module_name == "Logger" then
             table.insert(includes, "%{IncludeDir.spdlog}")
+        elseif module_name == "glCore" then
+            table.insert(includes, "%{IncludeDir.glm}")
         end
     end
     return includes
 end
 
--- Projects
+-- Visual Studio Projects
 group "Third-Party"
 include "thirdparty/glfw/glfw.lua"
 include "thirdparty/glad/glad.lua"
@@ -129,6 +133,10 @@ group "Core"
     include "engine/core/Logger/Logger.lua"
     include "engine/core/Graphics/framework/OpenGL/glCore.lua"
     include "engine/core/Graphics/Graphics.lua"
+group ""
+
+group "Tests"
+    include "tests/glCore/glCore-Showcase.lua"
 group ""
 
 include "engine/Engine.lua"

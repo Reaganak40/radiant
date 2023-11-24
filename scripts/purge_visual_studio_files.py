@@ -26,15 +26,19 @@ target_dirs = [
     "thirdparty/glfw",
     "thirdparty/imgui",
     "thirdparty/glm",
-    "editor",
-    "sandbox",
-    "engine",
+    
     "engine/core/Audio",
     "engine/core/Graphics",
     "engine/core/Graphics/framework/OpenGL",
     "engine/core/Logger",
     "engine/core/Physics",
     "engine/core/Utilities",
+    
+    "tests/glCore",
+    
+    "editor",
+    "sandbox",
+    "engine",
 ]
 
 for target in target_dirs:

@@ -88,8 +88,9 @@ void rdt::glCore::ViewportDataComponent::SetAspectRatio(AspectRatio aspect_ratio
 	if (m_aspect_ratio == aspect_ratio) {
 		return;
 	}
-
-	if (aspect_ratio == NoAspectRatio) {
+	
+	m_aspect_ratio = aspect_ratio;
+	if (m_aspect_ratio == NoAspectRatio) {
 		m_current_viewport.Bind();
 		return;
 	}
@@ -232,14 +233,9 @@ rdt::glCore::Shader& rdt::glCore::ShaderDataComponent::GetCurrentShader()
 void rdt::glCore::ShaderDataComponent::SetMVP(const glm::mat4& mvp)
 {
 	m_MVP = mvp;
-	mvp_initialized = true;
 }
 glm::mat4& rdt::glCore::ShaderDataComponent::GetMVP()
 {
-	if (!mvp_initialized) {
-		RDT_CORE_WARN("glCore - Using unitialized model view projection matrix!");
-	}
-
 	return m_MVP;
 }
 // ======================================================

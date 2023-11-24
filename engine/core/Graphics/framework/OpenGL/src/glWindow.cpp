@@ -48,9 +48,15 @@ public:
 
         // Set default viewport
         m_viewport_component.Init(m_window_data.m_window_width, m_window_data.m_window_height);
+        SetClearColor(windowConfig->GetBackgroundColor());
+        m_viewport_component.SetAspectRatio(windowConfig->GetAspectRatio());
 
         // Set default shader
         m_shader_component.Init();
+        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+        glm::mat4 proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
+        m_shader_component.SetMVP(proj * model * view);
 
         // Initialize texture resources
         glEnable(GL_BLEND);

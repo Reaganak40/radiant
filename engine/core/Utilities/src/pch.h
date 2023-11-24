@@ -12,6 +12,7 @@
 #endif
 
 // STL
+#include <memory>
 #include <filesystem>
 #include <string>
 #include <sstream>
