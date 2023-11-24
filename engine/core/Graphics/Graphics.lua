@@ -34,7 +34,7 @@ project "Graphics"
 
     postbuildcommands
     {
-        SendProjectDLL("Editor")
+        SendProjectDLL("Sandbox")
     }
 
     pchheader "pch.h"
@@ -44,22 +44,38 @@ project "Graphics"
         cppdialect "C++20"
         staticruntime "On"
         systemversion "latest"
-
         defines
         {
             "RDT_PLATFORM_WINDOWS",
             "GRAPHICS_BUILD_DLL"
         }
-    
+
     filter "configurations:Debug"
-        defines "RDT_DEBUG"
         symbols "On"
         staticruntime "off"
         runtime "Debug"
+        defines
+        {
+            "RDT_DEBUG",
+            "RDT_USE_EDITOR"
+        }   
 
     filter "configurations:Release"
-        defines "RDT_RELEASE"
         optimize "On"
         staticruntime "off"
         runtime "Release"
+        defines
+        {
+            "RDT_RELEASE",
+            "RDT_USE_EDITOR"
+        }
+
+    filter "configurations:Publish"
+        optimize "On"
+        staticruntime "off"
+        runtime "Release"
+        defines
+        {
+            "RDT_RELEASE",
+        }
     

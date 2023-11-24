@@ -15,7 +15,6 @@ int main(void) {
 	config->SetWindowName("OpenGL Showcase");
 	config->SetBackgroundColor({0.1f, 0.1f, 0.1, 1.0f});
 	config->SetAspectRatio(AR_1_1);
-	config->SetShouldMaximizeWindow(true);
 
 	glCore::glWindow testApp;
 	testApp.LaunchWindow(config);

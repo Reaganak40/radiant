@@ -36,6 +36,15 @@ namespace rdt::graphics {
 			described configurations
 		*/
 		static void LaunchWindow();
+
+		static bool WindowShouldClose();
+
+		static void OnBeginFrame();
+
+		static void OnRenderUpdate();
+
+		static void OnEndFrame();
+
 	};
 
 }

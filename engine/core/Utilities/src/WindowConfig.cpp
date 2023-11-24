@@ -28,6 +28,11 @@ namespace rdt {
 		void SetWindowHeight(unsigned int windowHeight) override final {
 			m_windowHeight = windowHeight;
 		}
+		void SetWindowSize(unsigned int windowWidth, unsigned int windowHeight) override final {
+			m_windowWidth = windowWidth;
+			m_windowHeight = windowHeight;
+		}
+
 		Vec2i GetWindowSize() const override final {
 			return Vec2i(m_windowWidth, m_windowHeight);
 		}

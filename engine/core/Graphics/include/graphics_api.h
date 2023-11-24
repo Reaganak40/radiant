@@ -8,5 +8,5 @@
 		#define GRAPHICS_API __declspec(dllimport)
 	#endif // GL_CORE_BUILD_DLL
 #else
-	#error Unsupported Platformn - Windows Only
+	#error Unsupported Platform - Windows Only
 #endif // !GL_CORE_PLATFORM_WINDOWS

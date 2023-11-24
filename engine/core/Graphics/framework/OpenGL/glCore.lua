@@ -43,7 +43,7 @@ project "glCore"
 
     postbuildcommands
     {
-        SendProjectDLL("Editor")
+        SendProjectDLL("Sandbox")
     }
 
     pchheader "pch.h"
@@ -66,14 +66,31 @@ project "glCore"
         }
     
     filter "configurations:Debug"
-        defines "GL_CORE_DEBUG"
         symbols "On"
         staticruntime "off"
         runtime "Debug"
+        defines
+        {
+            "RDT_DEBUG",
+            "RDT_USE_EDITOR"
+        }   
 
     filter "configurations:Release"
-        defines "GL_CORE_RELEASE"
         optimize "On"
         staticruntime "off"
         runtime "Release"
+        defines
+        {
+            "RDT_RELEASE",
+            "RDT_USE_EDITOR"
+        }
+
+    filter "configurations:Publish"
+        optimize "On"
+        staticruntime "off"
+        runtime "Release"
+        defines
+        {
+            "RDT_RELEASE",
+        }
     

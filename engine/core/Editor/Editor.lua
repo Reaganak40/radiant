@@ -2,7 +2,7 @@
 -- Editor Build Configuration
 -- ===============================================================================================
 project "Editor"
-    kind "ConsoleApp"
+    kind "SharedLib"
     language "C++"
     uuid (os.uuid("EditorUUID"))
 	targetdir (solutionDir .. "/bin/" .. outputdir .. "/%{prj.name}")
@@ -13,12 +13,14 @@ project "Editor"
         -- Editor Implementation
         "src/**.h",
         "src/**.cpp",
+        "include/**.h",
     }
 
     includedirs
     {
+        "include",
         "src",
-        "%{IncludeModule.Engine}",
+        GetAllModuleIncludes('Editor')
     }
 
     links
@@ -28,7 +30,7 @@ project "Editor"
 
     postbuildcommands
     {
-        GetAllDllDependencies('Editor')
+        SendProjectDLL("Sandbox")
     }
 
     filter "system:windows"
@@ -39,16 +41,34 @@ project "Editor"
         defines
         {
             "RDT_PLATFORM_WINDOWS",
+            "EDITOR_BUILD_DLL"
         }
     
     filter "configurations:Debug"
-        defines "RDT_DEBUG"
         symbols "On"
         staticruntime "off"
         runtime "Debug"
+        defines
+        {
+            "RDT_DEBUG",
+            "RDT_USE_EDITOR"
+        }   
 
     filter "configurations:Release"
-        defines "RDT_RELEASE"
         optimize "On"
         staticruntime "off"
         runtime "Release"
+        defines
+        {
+            "RDT_RELEASE",
+            "RDT_USE_EDITOR"
+        }
+
+    filter "configurations:Publish"
+        optimize "On"
+        staticruntime "off"
+        runtime "Release"
+        defines
+        {
+            "RDT_RELEASE",
+        }

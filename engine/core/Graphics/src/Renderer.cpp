@@ -1,3 +1,4 @@
+#include "Renderer.h"
 #include "pch.h"
 #include "Renderer.h"
 
@@ -18,6 +19,10 @@ struct rdt::graphics::Renderer::Impl {
 	}
 
 	virtual void LaunchWindow() = 0;
+	virtual bool ShouldWindowClose() = 0;
+	virtual void OnBeginFrame() = 0;
+	virtual void OnRenderUpdate() = 0;
+	virtual void OnEndFrame() = 0;
 };
 
 #ifdef RDT_USE_DIRECTX
@@ -50,8 +55,8 @@ struct Renderer_DirectX : public rdt::graphics::Renderer::Impl {
 // ======================================================
 namespace rdt {
 	struct Renderer_OpenGL : public rdt::graphics::Renderer::Impl {
+		std::unique_ptr<glCore::glWindow> glApp;
 
-		rdt::glCore::glApplication* glApp = nullptr;
 		Renderer_OpenGL()
 		{
 		}
@@ -63,11 +68,27 @@ namespace rdt {
 		void LaunchWindow() override final {
 
 			if (m_window_config == nullptr) {
-				m_window_config = std::make_shared<WindowConfig>(CreateWindowConfig());
+				m_window_config = CreateWindowConfig();
 			}
 
-			glApp = rdt::glCore::CreateApplication(m_window_config->GetWindowName());
-			glApp->LaunchWindow();
+			glApp = std::make_unique<glCore::glWindow>();
+			glApp->LaunchWindow(m_window_config);
+		}
+
+		bool ShouldWindowClose() override final {
+			return glApp->AppShouldClose();
+		}
+
+		void OnBeginFrame() override final {
+			glApp->BeginFrame();
+		}
+
+		void OnRenderUpdate() override final {
+			glApp->Clear();
+		}
+
+		void OnEndFrame() override final {
+			glApp->EndFrame();
 		}
 	};
 }
@@ -98,4 +119,24 @@ void rdt::graphics::Renderer::SetWindowConfig(std::shared_ptr<WindowConfig> wind
 void rdt::graphics::Renderer::LaunchWindow()
 {
 	m_impl->LaunchWindow();
+}
+
+bool rdt::graphics::Renderer::WindowShouldClose()
+{
+	return m_impl->ShouldWindowClose();
+}
+
+void rdt::graphics::Renderer::OnBeginFrame()
+{
+	m_impl->OnBeginFrame();
+}
+
+void rdt::graphics::Renderer::OnRenderUpdate()
+{
+	m_impl->OnRenderUpdate();
+}
+
+void rdt::graphics::Renderer::OnEndFrame()
+{
+	m_impl->OnEndFrame();
 }

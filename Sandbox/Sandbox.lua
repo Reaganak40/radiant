@@ -10,37 +10,24 @@ project "Sandbox"
 
     files
     {
-        "Source/**.h",
-        "Source/**.cpp"
+        "src/**.h",
+        "src/**.cpp"
     }
 
     includedirs
     {
-        "Source",
-        
-        "../Radiant/Source",
-        "../Radiant/Source/Engine",
-
-        "../Radiant/%{IncludeDir.GLFW}",
-		"../Radiant/%{IncludeDir.glad}",
-		"../Radiant/%{IncludeDir.ImGui}",
-		"../Radiant/%{IncludeDir.ImGuiBackend}",
-		"../Radiant/%{IncludeDir.glm}",
-		"../Radiant/%{IncludeDir.stb}",
-        "../Radiant/%{IncludeDir.openal}",
-		"../Radiant/%{IncludeDir.AudioFile}",
-		"../Radiant/%{IncludeDir.spdlog}",
+        "src",
+        GetAllModuleIncludes('Sandbox')
     }
 
     links
     {
-        "Radiant"
+        md_graph["Sandbox"]
     }
 
     postbuildcommands
     {
-        ("{COPY} %{cfg.targetdir}/../Radiant/Radiant.dll %{cfg.targetdir}"),
-        ("{COPY} %{cfg.targetdir}/../Radiant/OpenAL32.dll %{cfg.targetdir}")
+        GetAllDllDependencies('Sandbox')
     }
 
     filter "system:windows"
@@ -54,13 +41,30 @@ project "Sandbox"
         }
     
     filter "configurations:Debug"
-        defines "RDT_DEBUG"
         symbols "On"
         staticruntime "off"
         runtime "Debug"
+        defines
+        {
+            "RDT_DEBUG",
+            "RDT_USE_EDITOR"
+        }   
 
     filter "configurations:Release"
-        defines "RDT_RELEASE"
         optimize "On"
         staticruntime "off"
         runtime "Release"
+        defines
+        {
+            "RDT_RELEASE",
+            "RDT_USE_EDITOR"
+        }
+
+    filter "configurations:Publish"
+        optimize "On"
+        staticruntime "off"
+        runtime "Release"
+        defines
+        {
+            "RDT_RELEASE",
+        }

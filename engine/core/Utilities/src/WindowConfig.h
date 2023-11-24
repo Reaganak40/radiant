@@ -33,6 +33,7 @@ namespace rdt {
 		
 		virtual void SetWindowWidth(unsigned int windowWidth) = 0;
 		virtual void SetWindowHeight(unsigned int windowHeight) = 0;
+		virtual void SetWindowSize(unsigned int windowWidth, unsigned int windowHeight) = 0;
 		virtual Vec2i GetWindowSize() const = 0;
 
 		virtual void SetAspectRatio(AspectRatio aspectRatio) = 0;

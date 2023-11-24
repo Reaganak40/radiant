@@ -1,11 +1,12 @@
 workspace "Radiant"
     architecture "x64"
-    startproject "Editor"
+    startproject "Sandbox"
 
     configurations 
     {
         "Debug",
-        "Release"
+        "Release",
+        "Publish",
     }
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
@@ -40,6 +41,7 @@ IncludeModule["Graphics"]  = (solutionDir .. "/engine/core/Graphics/include")
 IncludeModule["glCore"]    = (solutionDir .. "/engine/core/Graphics/framework/OpenGL/include")
 IncludeModule["Logger"]    = (solutionDir .. "/engine/core/Logger/include")
 IncludeModule["Utilities"] = (solutionDir .. "/engine/core/Utilities/include")
+IncludeModule["Editor"]    = (solutionDir .. "/engine/core/Editor/include")
 IncludeModule["Engine"]    = (solutionDir .. "/engine/include")
 
 -- Module Depedency graph
@@ -48,8 +50,9 @@ md_graph["glCore"]    = {"Logger", "Utilities"}
 md_graph["Utilities"] = {}
 md_graph["Graphics"]  = {"glCore", "Logger", "Utilities"}
 md_graph["Logger"]    = {"Utilities"}
-md_graph["Engine"]    = {"Graphics", "Logger", "Utilities"}
-md_graph["Editor"]    = {"Engine"}
+md_graph["Engine"]    = {"Editor", "Graphics", "Logger", "Utilities"}
+md_graph["Editor"]    = {'Utilities', 'Logger'}
+md_graph["Sandbox"]   = {'Engine', "Utilities"}
 
 md_graph["glCore-Showcase"] = {"glCore", "Logger", "Utilities"}
 
@@ -133,6 +136,7 @@ group "Core"
     include "engine/core/Logger/Logger.lua"
     include "engine/core/Graphics/framework/OpenGL/glCore.lua"
     include "engine/core/Graphics/Graphics.lua"
+    include "engine/core/Editor/Editor.lua"
 group ""
 
 group "Tests"
@@ -140,5 +144,4 @@ group "Tests"
 group ""
 
 include "engine/Engine.lua"
-include "editor/Editor.lua"
---include "sandbox/Sandbox.lua"
+include "sandbox/Sandbox.lua"

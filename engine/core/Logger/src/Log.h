@@ -71,6 +71,8 @@ namespace rdt::logger {
 	};
 }
 
+#ifdef RDT_USE_EDITOR
+
 // Core Logging Macros
 #define RDT_CORE_TRACE(...) ::rdt::logger::Log::GetCoreLogger()->trace(__VA_ARGS__)
 #define RDT_CORE_INFO(...)  ::rdt::logger::Log::GetCoreLogger()->info(__VA_ARGS__)
@@ -84,4 +86,22 @@ namespace rdt::logger {
 #define RDT_WARN(...)  ::rdt::logger::Log::GetClientLogger()->warn(__VA_ARGS__)
 #define RDT_ERROR(...) ::rdt::logger::Log::GetClientLogger()->error(__VA_ARGS__)
 #define RDT_FATAL(...) ::rdt::logger::Log::GetClientLogger()->critical(__VA_ARGS__)
+
+#else
+
+// Core Logging Macros
+#define RDT_CORE_TRACE(...)
+#define RDT_CORE_INFO(...)
+#define RDT_CORE_WARN(...)
+#define RDT_CORE_ERROR(...)
+#define RDT_CORE_FATAL(...)
+
+// Client Logging Macros
+#define RDT_TRACE(...)
+#define RDT_INFO(...)
+#define RDT_WARN(...)
+#define RDT_ERROR(...)
+#define RDT_FATAL(...)
+
+#endif
 

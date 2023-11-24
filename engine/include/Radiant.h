@@ -10,5 +10,10 @@
 *******************************************************************/
 #pragma once
 
+// STL Libraries
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "radiant_api.h"
 #include "../src/Application.h"
