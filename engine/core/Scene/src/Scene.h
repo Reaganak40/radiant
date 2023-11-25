@@ -7,6 +7,7 @@
 // Forward Declarations
 namespace rdt {
 	using SceneID = unsigned int;
+	enum LoopPhase;
 }
 namespace rdt::scene {
 	class SceneManager;
@@ -88,7 +89,14 @@ namespace rdt::scene {
 
 	/*
 		Sets/changed the scene to the one with the registered
-		name (if it exists)
+		ID (if it exists)
 	*/
 	SCENE_API void SetScene(SceneID sceneID);
+
+	/*
+		Calls the update step for the given loop phase, on the
+		current scene.
+		NOTE: This is called internally by the Radiant Engine (DO NOT USE)
+	*/
+	void CallUpdate(LoopPhase step);
 }

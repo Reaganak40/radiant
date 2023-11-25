@@ -59,9 +59,12 @@ rdt::SceneID rdt::scene::GetSceneID(const char* sceneName)
 
 void rdt::scene::SetScene(const char* sceneName)
 {
-
 }
 
 void rdt::scene::SetScene(SceneID sceneID)
+{
+}
+
+void rdt::scene::CallUpdate(LoopPhase step)
 {
 }
