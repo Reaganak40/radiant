@@ -32,8 +32,10 @@ target_dirs = [
     "engine/core/Graphics/framework/OpenGL",
     "engine/core/Logger",
     "engine/core/Physics",
+    "engine/core/Scene",
     "engine/core/Utilities",
     "engine/core/Editor",
+    
     
     "tests/glCore",
     

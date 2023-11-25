@@ -1,34 +1,43 @@
--- ===============================================================================================
--- Sandbox Build Configuration
--- ===============================================================================================
-project "Sandbox"
-    kind "ConsoleApp"
+--[[ 
+    Premake for Module: Scene
+
+--]]
+
+
+project "Scene"
+    kind "SharedLib"
     language "C++"
-    uuid (os.uuid("SandboxUUID"))
-    targetdir ("../bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("../bin/obj/" .. outputdir .. "/%{prj.name}")
+    uuid (os.uuid("SceneUUID"))
+	targetdir (solutionDir .. "/bin/" .. outputdir .. "/%{prj.name}")
+    objdir (solutionDir .. "/bin/obj/" .. outputdir .. "/%{prj.name}")
+    ignoredefaultlibraries { "LIBCMTD" }
 
     files
     {
         "src/**.h",
-        "src/**.cpp"
+        "src/**.cpp",
+        "include/**.h",
     }
 
     includedirs
     {
         "src",
-        GetAllModuleIncludes('Sandbox')
+        "include",
+        GetAllModuleIncludes('Scene')
     }
 
     links
     {
-        md_graph["Sandbox"]
+        md_graph["Scene"]
     }
 
     postbuildcommands
     {
-        GetAllDllDependencies('Sandbox')
+        SendProjectDLL("Sandbox")
     }
+
+    pchheader "pch.h"
+    pchsource "src/pch.cpp"
 
     filter "system:windows"
         cppdialect "C++20"
@@ -38,6 +47,7 @@ project "Sandbox"
         defines
         {
             "RDT_PLATFORM_WINDOWS",
+            "SCENE_BUILD_DLL"
         }
     
     filter "configurations:Debug"
@@ -64,9 +74,8 @@ project "Sandbox"
         optimize "On"
         staticruntime "off"
         runtime "Release"
-        kind "WindowedApp"
-        entrypoint "mainCRTStartup"
         defines
         {
             "RDT_RELEASE",
         }
+    

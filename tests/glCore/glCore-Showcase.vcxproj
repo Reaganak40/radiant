@@ -79,7 +79,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;RDT_DEBUG;RDT_USE_EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;..\..\engine\core\Logger\include;..\..\thirdparty\spdlog\spdlog\include;..\..\engine\core\Graphics\framework\OpenGL\include;..\..\thirdparty\glm\glm;..\..\engine\core\Utilities\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;..\..\engine\core\Graphics\framework\OpenGL\include;..\..\thirdparty\glm\glm;..\..\engine\core\Logger\include;..\..\thirdparty\spdlog\spdlog\include;..\..\engine\core\Utilities\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -91,8 +91,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>IF EXIST ..\..\bin\Debug-windows-x86_64\Logger\Logger.dll\ (xcopy /Q /E /Y /I ..\..\bin\Debug-windows-x86_64\Logger\Logger.dll ..\..\bin\Debug-windows-x86_64\glCore-Showcase &gt; nul) ELSE (xcopy /Q /Y /I ..\..\bin\Debug-windows-x86_64\Logger\Logger.dll ..\..\bin\Debug-windows-x86_64\glCore-Showcase &gt; nul)
-IF EXIST ..\..\bin\Debug-windows-x86_64\glCore\glCore.dll\ (xcopy /Q /E /Y /I ..\..\bin\Debug-windows-x86_64\glCore\glCore.dll ..\..\bin\Debug-windows-x86_64\glCore-Showcase &gt; nul) ELSE (xcopy /Q /Y /I ..\..\bin\Debug-windows-x86_64\glCore\glCore.dll ..\..\bin\Debug-windows-x86_64\glCore-Showcase &gt; nul)
+      <Command>IF EXIST ..\..\bin\Debug-windows-x86_64\glCore\glCore.dll\ (xcopy /Q /E /Y /I ..\..\bin\Debug-windows-x86_64\glCore\glCore.dll ..\..\bin\Debug-windows-x86_64\glCore-Showcase &gt; nul) ELSE (xcopy /Q /Y /I ..\..\bin\Debug-windows-x86_64\glCore\glCore.dll ..\..\bin\Debug-windows-x86_64\glCore-Showcase &gt; nul)
+IF EXIST ..\..\bin\Debug-windows-x86_64\Logger\Logger.dll\ (xcopy /Q /E /Y /I ..\..\bin\Debug-windows-x86_64\Logger\Logger.dll ..\..\bin\Debug-windows-x86_64\glCore-Showcase &gt; nul) ELSE (xcopy /Q /Y /I ..\..\bin\Debug-windows-x86_64\Logger\Logger.dll ..\..\bin\Debug-windows-x86_64\glCore-Showcase &gt; nul)
 IF EXIST ..\..\bin\Debug-windows-x86_64\Utilities\Utilities.dll\ (xcopy /Q /E /Y /I ..\..\bin\Debug-windows-x86_64\Utilities\Utilities.dll ..\..\bin\Debug-windows-x86_64\glCore-Showcase &gt; nul) ELSE (xcopy /Q /Y /I ..\..\bin\Debug-windows-x86_64\Utilities\Utilities.dll ..\..\bin\Debug-windows-x86_64\glCore-Showcase &gt; nul)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -101,7 +101,7 @@ IF EXIST ..\..\bin\Debug-windows-x86_64\Utilities\Utilities.dll\ (xcopy /Q /E /Y
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;RDT_RELEASE;RDT_USE_EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;..\..\engine\core\Logger\include;..\..\thirdparty\spdlog\spdlog\include;..\..\engine\core\Graphics\framework\OpenGL\include;..\..\thirdparty\glm\glm;..\..\engine\core\Utilities\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;..\..\engine\core\Graphics\framework\OpenGL\include;..\..\thirdparty\glm\glm;..\..\engine\core\Logger\include;..\..\thirdparty\spdlog\spdlog\include;..\..\engine\core\Utilities\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -117,8 +117,8 @@ IF EXIST ..\..\bin\Debug-windows-x86_64\Utilities\Utilities.dll\ (xcopy /Q /E /Y
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>IF EXIST ..\..\bin\Release-windows-x86_64\Logger\Logger.dll\ (xcopy /Q /E /Y /I ..\..\bin\Release-windows-x86_64\Logger\Logger.dll ..\..\bin\Release-windows-x86_64\glCore-Showcase &gt; nul) ELSE (xcopy /Q /Y /I ..\..\bin\Release-windows-x86_64\Logger\Logger.dll ..\..\bin\Release-windows-x86_64\glCore-Showcase &gt; nul)
-IF EXIST ..\..\bin\Release-windows-x86_64\glCore\glCore.dll\ (xcopy /Q /E /Y /I ..\..\bin\Release-windows-x86_64\glCore\glCore.dll ..\..\bin\Release-windows-x86_64\glCore-Showcase &gt; nul) ELSE (xcopy /Q /Y /I ..\..\bin\Release-windows-x86_64\glCore\glCore.dll ..\..\bin\Release-windows-x86_64\glCore-Showcase &gt; nul)
+      <Command>IF EXIST ..\..\bin\Release-windows-x86_64\glCore\glCore.dll\ (xcopy /Q /E /Y /I ..\..\bin\Release-windows-x86_64\glCore\glCore.dll ..\..\bin\Release-windows-x86_64\glCore-Showcase &gt; nul) ELSE (xcopy /Q /Y /I ..\..\bin\Release-windows-x86_64\glCore\glCore.dll ..\..\bin\Release-windows-x86_64\glCore-Showcase &gt; nul)
+IF EXIST ..\..\bin\Release-windows-x86_64\Logger\Logger.dll\ (xcopy /Q /E /Y /I ..\..\bin\Release-windows-x86_64\Logger\Logger.dll ..\..\bin\Release-windows-x86_64\glCore-Showcase &gt; nul) ELSE (xcopy /Q /Y /I ..\..\bin\Release-windows-x86_64\Logger\Logger.dll ..\..\bin\Release-windows-x86_64\glCore-Showcase &gt; nul)
 IF EXIST ..\..\bin\Release-windows-x86_64\Utilities\Utilities.dll\ (xcopy /Q /E /Y /I ..\..\bin\Release-windows-x86_64\Utilities\Utilities.dll ..\..\bin\Release-windows-x86_64\glCore-Showcase &gt; nul) ELSE (xcopy /Q /Y /I ..\..\bin\Release-windows-x86_64\Utilities\Utilities.dll ..\..\bin\Release-windows-x86_64\glCore-Showcase &gt; nul)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -127,7 +127,7 @@ IF EXIST ..\..\bin\Release-windows-x86_64\Utilities\Utilities.dll\ (xcopy /Q /E 
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;RDT_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;..\..\engine\core\Logger\include;..\..\thirdparty\spdlog\spdlog\include;..\..\engine\core\Graphics\framework\OpenGL\include;..\..\thirdparty\glm\glm;..\..\engine\core\Utilities\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;..\..\engine\core\Graphics\framework\OpenGL\include;..\..\thirdparty\glm\glm;..\..\engine\core\Logger\include;..\..\thirdparty\spdlog\spdlog\include;..\..\engine\core\Utilities\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -143,8 +143,8 @@ IF EXIST ..\..\bin\Release-windows-x86_64\Utilities\Utilities.dll\ (xcopy /Q /E 
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>IF EXIST ..\..\bin\Publish-windows-x86_64\Logger\Logger.dll\ (xcopy /Q /E /Y /I ..\..\bin\Publish-windows-x86_64\Logger\Logger.dll ..\..\bin\Publish-windows-x86_64\glCore-Showcase &gt; nul) ELSE (xcopy /Q /Y /I ..\..\bin\Publish-windows-x86_64\Logger\Logger.dll ..\..\bin\Publish-windows-x86_64\glCore-Showcase &gt; nul)
-IF EXIST ..\..\bin\Publish-windows-x86_64\glCore\glCore.dll\ (xcopy /Q /E /Y /I ..\..\bin\Publish-windows-x86_64\glCore\glCore.dll ..\..\bin\Publish-windows-x86_64\glCore-Showcase &gt; nul) ELSE (xcopy /Q /Y /I ..\..\bin\Publish-windows-x86_64\glCore\glCore.dll ..\..\bin\Publish-windows-x86_64\glCore-Showcase &gt; nul)
+      <Command>IF EXIST ..\..\bin\Publish-windows-x86_64\glCore\glCore.dll\ (xcopy /Q /E /Y /I ..\..\bin\Publish-windows-x86_64\glCore\glCore.dll ..\..\bin\Publish-windows-x86_64\glCore-Showcase &gt; nul) ELSE (xcopy /Q /Y /I ..\..\bin\Publish-windows-x86_64\glCore\glCore.dll ..\..\bin\Publish-windows-x86_64\glCore-Showcase &gt; nul)
+IF EXIST ..\..\bin\Publish-windows-x86_64\Logger\Logger.dll\ (xcopy /Q /E /Y /I ..\..\bin\Publish-windows-x86_64\Logger\Logger.dll ..\..\bin\Publish-windows-x86_64\glCore-Showcase &gt; nul) ELSE (xcopy /Q /Y /I ..\..\bin\Publish-windows-x86_64\Logger\Logger.dll ..\..\bin\Publish-windows-x86_64\glCore-Showcase &gt; nul)
 IF EXIST ..\..\bin\Publish-windows-x86_64\Utilities\Utilities.dll\ (xcopy /Q /E /Y /I ..\..\bin\Publish-windows-x86_64\Utilities\Utilities.dll ..\..\bin\Publish-windows-x86_64\glCore-Showcase &gt; nul) ELSE (xcopy /Q /Y /I ..\..\bin\Publish-windows-x86_64\Utilities\Utilities.dll ..\..\bin\Publish-windows-x86_64\glCore-Showcase &gt; nul)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

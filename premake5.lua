@@ -50,6 +50,7 @@ md_graph["glCore"]    = {"Logger", "Utilities"}
 md_graph["Utilities"] = {}
 md_graph["Graphics"]  = {"glCore", "Logger", "Utilities"}
 md_graph["Logger"]    = {"Utilities"}
+md_graph["Scene"]     = {"Graphics", "Logger"}
 md_graph["Engine"]    = {"Editor", "Graphics", "Logger", "Utilities"}
 md_graph["Editor"]    = {'Utilities', 'Logger'}
 md_graph["Sandbox"]   = {'Engine', "Utilities"}
@@ -136,6 +137,7 @@ group "Core"
     include "engine/core/Logger/Logger.lua"
     include "engine/core/Graphics/framework/OpenGL/glCore.lua"
     include "engine/core/Graphics/Graphics.lua"
+    include "engine/core/Scene/Scene.lua"
     include "engine/core/Editor/Editor.lua"
 group ""
 

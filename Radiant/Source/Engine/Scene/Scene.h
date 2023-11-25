@@ -128,6 +128,4 @@ namespace rdt {
 		*/
 		void SetSceneName(const std::string& name);
 	};
-
-
 }
