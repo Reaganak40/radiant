@@ -4,13 +4,13 @@ project "ImGui"
 	architecture "x86_64"
     uuid (os.uuid("ImGuiUUID"))
 
-	targetdir (solutionDir .. "/bin/" .. outputdir .. "/%{prj.name}")
-    objdir (solutionDir .. "/bin/obj/" .. outputdir .. "/%{prj.name}")
+	targetdir (thirdparty_output_dir)
+    objdir (thirdparty_obj_dir)
 	
 	includedirs {
 		 "imgui/",
-		 "%{IncludeDir.glad}",
-		 "%{IncludeDir.GLFW}",
+		 "%{tp_include.glad}",
+		 "%{tp_include.GLFW}",
 	}
 
 	files

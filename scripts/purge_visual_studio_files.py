@@ -22,25 +22,27 @@ def purge_files(parent_dir):
                 
 target_dirs = [
     "",
+    "thirdparty/AL",
     "thirdparty/glad",
     "thirdparty/glfw",
     "thirdparty/imgui",
     "thirdparty/glm",
     
-    "engine/core/Audio",
-    "engine/core/Graphics",
-    "engine/core/Graphics/framework/OpenGL",
-    "engine/core/Logger",
-    "engine/core/Physics",
-    "engine/core/Scene",
-    "engine/core/Utilities",
-    "engine/core/Editor",
+    "engine/src/Utils",
+    "engine/src/Window",
+    "engine/src/Graphics",
+    "engine/src/Physics",
+    "engine/src/Audio",
+    "engine/src/ECS",
+    "engine/src/Scene",
+    "engine/src/Editor",
+    "engine/src/Application",
     
+    "engine/src/Core/src/Logger",
+    "engine/src/Core/src/OpenGL",
     
     "tests/glCore",
-    
     "sandbox",
-    "engine",
 ]
 
 for target in target_dirs:

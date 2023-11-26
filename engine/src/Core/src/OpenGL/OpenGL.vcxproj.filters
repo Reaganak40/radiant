@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Buffers">
+      <UniqueIdentifier>{92479EF4-FE26-1D90-073F-A866739D83F1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Internal">
+      <UniqueIdentifier>{0291F903-EE5D-540F-1777-42B703A3899D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{FC0C0CD1-E8AE-36A7-D169-4AFBBDAABDF7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Texture">
+      <UniqueIdentifier>{76AD313A-E28C-B0D5-EBA4-3BAC57031737}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="View">
+      <UniqueIdentifier>{40048E7C-2C3B-8F0D-D527-7510C13D0B0F}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Buffers\FrameBuffer.h">
+      <Filter>Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Buffers\IndexBuffer.h">
+      <Filter>Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Buffers\VertexArray.h">
+      <Filter>Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Buffers\VertexBuffer.h">
+      <Filter>Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Internal\DataComponents.h">
+      <Filter>Internal</Filter>
+    </ClInclude>
+    <ClInclude Include="Internal\ErrorHandling.h">
+      <Filter>Internal</Filter>
+    </ClInclude>
+    <ClInclude Include="Internal\Timestep.h">
+      <Filter>Internal</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\Shader.h">
+      <Filter>Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture\Texture.h">
+      <Filter>Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture\TextureManager.h">
+      <Filter>Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="View\Viewport.h">
+      <Filter>View</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Buffers\FrameBuffer.cpp">
+      <Filter>Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Buffers\IndexBuffer.cpp">
+      <Filter>Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Buffers\VertexArray.cpp">
+      <Filter>Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Buffers\VertexBuffer.cpp">
+      <Filter>Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Internal\DataComponents.cpp">
+      <Filter>Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Internal\ErrorHandling.cpp">
+      <Filter>Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Internal\Timestep.cpp">
+      <Filter>Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\Shader.cpp">
+      <Filter>Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture\Texture.cpp">
+      <Filter>Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture\TextureManager.cpp">
+      <Filter>Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Vertex.cpp" />
+    <ClCompile Include="View\Viewport.cpp">
+      <Filter>View</Filter>
+    </ClCompile>
+    <ClCompile Include="glWindow.cpp" />
+  </ItemGroup>
+</Project>

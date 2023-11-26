@@ -4,8 +4,8 @@ project "GLM"
 	architecture "x86_64"
     uuid (os.uuid("GLMUUID"))
 
-	targetdir (solutionDir .. "/bin/" .. outputdir .. "/%{prj.name}")
-    objdir (solutionDir .. "/bin/obj/" .. outputdir .. "/%{prj.name}")
+	targetdir (thirdparty_output_dir)
+    objdir (thirdparty_obj_dir)
 	
 	includedirs { "glm/" }
 

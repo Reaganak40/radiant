@@ -54,20 +54,20 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>..\..\bin\Debug-windows-x86_64\ImGui\</OutDir>
-    <IntDir>..\..\bin\obj\Debug-windows-x86_64\ImGui\</IntDir>
+    <OutDir>..\bin\Debug-windows-x86_64\ImGui\</OutDir>
+    <IntDir>..\bin\obj\Debug-windows-x86_64\ImGui\</IntDir>
     <TargetName>ImGui</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>..\..\bin\Release-windows-x86_64\ImGui\</OutDir>
-    <IntDir>..\..\bin\obj\Release-windows-x86_64\ImGui\</IntDir>
+    <OutDir>..\bin\Release-windows-x86_64\ImGui\</OutDir>
+    <IntDir>..\bin\obj\Release-windows-x86_64\ImGui\</IntDir>
     <TargetName>ImGui</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Publish|x64'">
-    <OutDir>..\..\bin\Publish-windows-x86_64\ImGui\</OutDir>
-    <IntDir>..\..\bin\obj\Publish-windows-x86_64\ImGui\</IntDir>
+    <OutDir>..\bin\Publish-windows-x86_64\ImGui\</OutDir>
+    <IntDir>..\bin\obj\Publish-windows-x86_64\ImGui\</IntDir>
     <TargetName>ImGui</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>

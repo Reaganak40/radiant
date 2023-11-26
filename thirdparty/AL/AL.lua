@@ -4,8 +4,8 @@ project "AL"
 	architecture "x86_64"
     uuid (os.uuid("ALUUID"))
 
-	targetdir ("../../bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("../../bin/obj/" .. outputdir .. "/%{prj.name}")
+	targetdir (thirdparty_output_dir)
+    objdir (thirdparty_obj_dir)
 	
 	includedirs { "AL/" }
 

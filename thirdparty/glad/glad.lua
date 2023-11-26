@@ -4,8 +4,8 @@ project "GLAD"
 	architecture "x86_64"
     uuid (os.uuid("GLADUUID"))
 
-	targetdir (solutionDir .. "/bin/" .. outputdir .. "/%{prj.name}")
-    objdir (solutionDir .. "/bin/obj/" .. outputdir .. "/%{prj.name}")
+	targetdir (thirdparty_output_dir)
+    objdir (thirdparty_obj_dir)
     
     includedirs { "glad/include/" }
 

@@ -5,8 +5,8 @@ project "Sandbox"
     kind "ConsoleApp"
     language "C++"
     uuid (os.uuid("SandboxUUID"))
-    targetdir ("../bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("../bin/obj/" .. outputdir .. "/%{prj.name}")
+    targetdir (sandbox_output_dir)
+    objdir (sandbox_obj_dir)
 
     files
     {
@@ -17,17 +17,27 @@ project "Sandbox"
     includedirs
     {
         "src",
-        GetAllModuleIncludes('Sandbox')
+        radiant_public_headers,
     }
 
     links
     {
-        md_graph["Sandbox"]
     }
 
     postbuildcommands
     {
-        GetAllDllDependencies('Sandbox')
+        GetProjectDLL("Utils"),
+        GetProjectDLL("Window"),
+        GetProjectDLL("Graphics"),
+        GetProjectDLL("Physics"),
+        GetProjectDLL("Audio"),
+        GetProjectDLL("ECS"),
+        GetProjectDLL("Scene"),
+        GetProjectDLL("Editor"),
+        GetProjectDLL("Application"),
+        GetProjectDLL("Logger"),
+        GetProjectDLL("OpenGL"),
+        GetProjectDLL("Engine")      
     }
 
     filter "system:windows"

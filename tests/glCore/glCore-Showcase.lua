@@ -5,8 +5,8 @@ project "glCore-Showcase"
     kind "ConsoleApp"
     language "C++"
     uuid (os.uuid("glCoreShowcaseUUID"))
-	targetdir (solutionDir .. "/bin/" .. outputdir .. "/%{prj.name}")
-    objdir (solutionDir .. "/bin/obj/" .. outputdir .. "/%{prj.name}")
+	targetdir (test_output_dir)
+    objdir (test_obj_dir)
 
     files
     {
@@ -18,7 +18,8 @@ project "glCore-Showcase"
     includedirs
     {
         "src",
-        GetAllModuleIncludes('glCore-Showcase')
+        radiant_public_headers,
+        radiant_private_headers
     }
 
     links
@@ -28,7 +29,7 @@ project "glCore-Showcase"
 
     postbuildcommands
     {
-        GetAllDllDependencies('glCore-Showcase')
+        GetProjectDLL("OpenGL"),
     }
 
     filter "system:windows"
