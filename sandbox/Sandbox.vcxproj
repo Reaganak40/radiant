@@ -79,7 +79,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;RDT_DEBUG;RDT_USE_EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;..\engine\core\Editor\include;..\engine\include;..\engine\core\Graphics\include;..\engine\core\Graphics\framework\OpenGL\include;..\thirdparty\glm\glm;..\engine\core\Logger\include;..\thirdparty\spdlog\spdlog\include;..\engine\core\Utilities\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;..\engine\core\Graphics\include;..\engine\core\Editor\include;..\engine\core\Logger\include;..\thirdparty\spdlog\spdlog\include;..\engine\core\Scene\include;..\engine\include;..\engine\core\Graphics\framework\OpenGL\include;..\thirdparty\glm\glm;..\engine\core\Utilities\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -91,11 +91,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>IF EXIST ..\bin\Debug-windows-x86_64\Editor\Editor.dll\ (xcopy /Q /E /Y /I ..\bin\Debug-windows-x86_64\Editor\Editor.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Debug-windows-x86_64\Editor\Editor.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul)
-IF EXIST ..\bin\Debug-windows-x86_64\Engine\Engine.dll\ (xcopy /Q /E /Y /I ..\bin\Debug-windows-x86_64\Engine\Engine.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Debug-windows-x86_64\Engine\Engine.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul)
-IF EXIST ..\bin\Debug-windows-x86_64\Graphics\Graphics.dll\ (xcopy /Q /E /Y /I ..\bin\Debug-windows-x86_64\Graphics\Graphics.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Debug-windows-x86_64\Graphics\Graphics.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul)
-IF EXIST ..\bin\Debug-windows-x86_64\glCore\glCore.dll\ (xcopy /Q /E /Y /I ..\bin\Debug-windows-x86_64\glCore\glCore.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Debug-windows-x86_64\glCore\glCore.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul)
+      <Command>IF EXIST ..\bin\Debug-windows-x86_64\Graphics\Graphics.dll\ (xcopy /Q /E /Y /I ..\bin\Debug-windows-x86_64\Graphics\Graphics.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Debug-windows-x86_64\Graphics\Graphics.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul)
+IF EXIST ..\bin\Debug-windows-x86_64\Editor\Editor.dll\ (xcopy /Q /E /Y /I ..\bin\Debug-windows-x86_64\Editor\Editor.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Debug-windows-x86_64\Editor\Editor.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul)
 IF EXIST ..\bin\Debug-windows-x86_64\Logger\Logger.dll\ (xcopy /Q /E /Y /I ..\bin\Debug-windows-x86_64\Logger\Logger.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Debug-windows-x86_64\Logger\Logger.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul)
+IF EXIST ..\bin\Debug-windows-x86_64\Scene\Scene.dll\ (xcopy /Q /E /Y /I ..\bin\Debug-windows-x86_64\Scene\Scene.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Debug-windows-x86_64\Scene\Scene.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul)
+IF EXIST ..\bin\Debug-windows-x86_64\Engine\Engine.dll\ (xcopy /Q /E /Y /I ..\bin\Debug-windows-x86_64\Engine\Engine.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Debug-windows-x86_64\Engine\Engine.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul)
+IF EXIST ..\bin\Debug-windows-x86_64\glCore\glCore.dll\ (xcopy /Q /E /Y /I ..\bin\Debug-windows-x86_64\glCore\glCore.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Debug-windows-x86_64\glCore\glCore.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul)
 IF EXIST ..\bin\Debug-windows-x86_64\Utilities\Utilities.dll\ (xcopy /Q /E /Y /I ..\bin\Debug-windows-x86_64\Utilities\Utilities.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Debug-windows-x86_64\Utilities\Utilities.dll ..\bin\Debug-windows-x86_64\Sandbox &gt; nul)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -104,7 +105,7 @@ IF EXIST ..\bin\Debug-windows-x86_64\Utilities\Utilities.dll\ (xcopy /Q /E /Y /I
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;RDT_RELEASE;RDT_USE_EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;..\engine\core\Editor\include;..\engine\include;..\engine\core\Graphics\include;..\engine\core\Graphics\framework\OpenGL\include;..\thirdparty\glm\glm;..\engine\core\Logger\include;..\thirdparty\spdlog\spdlog\include;..\engine\core\Utilities\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;..\engine\core\Graphics\include;..\engine\core\Editor\include;..\engine\core\Logger\include;..\thirdparty\spdlog\spdlog\include;..\engine\core\Scene\include;..\engine\include;..\engine\core\Graphics\framework\OpenGL\include;..\thirdparty\glm\glm;..\engine\core\Utilities\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -120,11 +121,12 @@ IF EXIST ..\bin\Debug-windows-x86_64\Utilities\Utilities.dll\ (xcopy /Q /E /Y /I
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>IF EXIST ..\bin\Release-windows-x86_64\Editor\Editor.dll\ (xcopy /Q /E /Y /I ..\bin\Release-windows-x86_64\Editor\Editor.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Release-windows-x86_64\Editor\Editor.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul)
-IF EXIST ..\bin\Release-windows-x86_64\Engine\Engine.dll\ (xcopy /Q /E /Y /I ..\bin\Release-windows-x86_64\Engine\Engine.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Release-windows-x86_64\Engine\Engine.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul)
-IF EXIST ..\bin\Release-windows-x86_64\Graphics\Graphics.dll\ (xcopy /Q /E /Y /I ..\bin\Release-windows-x86_64\Graphics\Graphics.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Release-windows-x86_64\Graphics\Graphics.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul)
-IF EXIST ..\bin\Release-windows-x86_64\glCore\glCore.dll\ (xcopy /Q /E /Y /I ..\bin\Release-windows-x86_64\glCore\glCore.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Release-windows-x86_64\glCore\glCore.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul)
+      <Command>IF EXIST ..\bin\Release-windows-x86_64\Graphics\Graphics.dll\ (xcopy /Q /E /Y /I ..\bin\Release-windows-x86_64\Graphics\Graphics.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Release-windows-x86_64\Graphics\Graphics.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul)
+IF EXIST ..\bin\Release-windows-x86_64\Editor\Editor.dll\ (xcopy /Q /E /Y /I ..\bin\Release-windows-x86_64\Editor\Editor.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Release-windows-x86_64\Editor\Editor.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul)
 IF EXIST ..\bin\Release-windows-x86_64\Logger\Logger.dll\ (xcopy /Q /E /Y /I ..\bin\Release-windows-x86_64\Logger\Logger.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Release-windows-x86_64\Logger\Logger.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul)
+IF EXIST ..\bin\Release-windows-x86_64\Scene\Scene.dll\ (xcopy /Q /E /Y /I ..\bin\Release-windows-x86_64\Scene\Scene.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Release-windows-x86_64\Scene\Scene.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul)
+IF EXIST ..\bin\Release-windows-x86_64\Engine\Engine.dll\ (xcopy /Q /E /Y /I ..\bin\Release-windows-x86_64\Engine\Engine.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Release-windows-x86_64\Engine\Engine.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul)
+IF EXIST ..\bin\Release-windows-x86_64\glCore\glCore.dll\ (xcopy /Q /E /Y /I ..\bin\Release-windows-x86_64\glCore\glCore.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Release-windows-x86_64\glCore\glCore.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul)
 IF EXIST ..\bin\Release-windows-x86_64\Utilities\Utilities.dll\ (xcopy /Q /E /Y /I ..\bin\Release-windows-x86_64\Utilities\Utilities.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Release-windows-x86_64\Utilities\Utilities.dll ..\bin\Release-windows-x86_64\Sandbox &gt; nul)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -133,7 +135,7 @@ IF EXIST ..\bin\Release-windows-x86_64\Utilities\Utilities.dll\ (xcopy /Q /E /Y 
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;RDT_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;..\engine\core\Editor\include;..\engine\include;..\engine\core\Graphics\include;..\engine\core\Graphics\framework\OpenGL\include;..\thirdparty\glm\glm;..\engine\core\Logger\include;..\thirdparty\spdlog\spdlog\include;..\engine\core\Utilities\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;..\engine\core\Graphics\include;..\engine\core\Editor\include;..\engine\core\Logger\include;..\thirdparty\spdlog\spdlog\include;..\engine\core\Scene\include;..\engine\include;..\engine\core\Graphics\framework\OpenGL\include;..\thirdparty\glm\glm;..\engine\core\Utilities\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -150,11 +152,12 @@ IF EXIST ..\bin\Release-windows-x86_64\Utilities\Utilities.dll\ (xcopy /Q /E /Y 
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
     <PostBuildEvent>
-      <Command>IF EXIST ..\bin\Publish-windows-x86_64\Editor\Editor.dll\ (xcopy /Q /E /Y /I ..\bin\Publish-windows-x86_64\Editor\Editor.dll ..\bin\Publish-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Publish-windows-x86_64\Editor\Editor.dll ..\bin\Publish-windows-x86_64\Sandbox &gt; nul)
-IF EXIST ..\bin\Publish-windows-x86_64\Engine\Engine.dll\ (xcopy /Q /E /Y /I ..\bin\Publish-windows-x86_64\Engine\Engine.dll ..\bin\Publish-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Publish-windows-x86_64\Engine\Engine.dll ..\bin\Publish-windows-x86_64\Sandbox &gt; nul)
-IF EXIST ..\bin\Publish-windows-x86_64\Graphics\Graphics.dll\ (xcopy /Q /E /Y /I ..\bin\Publish-windows-x86_64\Graphics\Graphics.dll ..\bin\Publish-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Publish-windows-x86_64\Graphics\Graphics.dll ..\bin\Publish-windows-x86_64\Sandbox &gt; nul)
-IF EXIST ..\bin\Publish-windows-x86_64\glCore\glCore.dll\ (xcopy /Q /E /Y /I ..\bin\Publish-windows-x86_64\glCore\glCore.dll ..\bin\Publish-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Publish-windows-x86_64\glCore\glCore.dll ..\bin\Publish-windows-x86_64\Sandbox &gt; nul)
+      <Command>IF EXIST ..\bin\Publish-windows-x86_64\Graphics\Graphics.dll\ (xcopy /Q /E /Y /I ..\bin\Publish-windows-x86_64\Graphics\Graphics.dll ..\bin\Publish-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Publish-windows-x86_64\Graphics\Graphics.dll ..\bin\Publish-windows-x86_64\Sandbox &gt; nul)
+IF EXIST ..\bin\Publish-windows-x86_64\Editor\Editor.dll\ (xcopy /Q /E /Y /I ..\bin\Publish-windows-x86_64\Editor\Editor.dll ..\bin\Publish-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Publish-windows-x86_64\Editor\Editor.dll ..\bin\Publish-windows-x86_64\Sandbox &gt; nul)
 IF EXIST ..\bin\Publish-windows-x86_64\Logger\Logger.dll\ (xcopy /Q /E /Y /I ..\bin\Publish-windows-x86_64\Logger\Logger.dll ..\bin\Publish-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Publish-windows-x86_64\Logger\Logger.dll ..\bin\Publish-windows-x86_64\Sandbox &gt; nul)
+IF EXIST ..\bin\Publish-windows-x86_64\Scene\Scene.dll\ (xcopy /Q /E /Y /I ..\bin\Publish-windows-x86_64\Scene\Scene.dll ..\bin\Publish-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Publish-windows-x86_64\Scene\Scene.dll ..\bin\Publish-windows-x86_64\Sandbox &gt; nul)
+IF EXIST ..\bin\Publish-windows-x86_64\Engine\Engine.dll\ (xcopy /Q /E /Y /I ..\bin\Publish-windows-x86_64\Engine\Engine.dll ..\bin\Publish-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Publish-windows-x86_64\Engine\Engine.dll ..\bin\Publish-windows-x86_64\Sandbox &gt; nul)
+IF EXIST ..\bin\Publish-windows-x86_64\glCore\glCore.dll\ (xcopy /Q /E /Y /I ..\bin\Publish-windows-x86_64\glCore\glCore.dll ..\bin\Publish-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Publish-windows-x86_64\glCore\glCore.dll ..\bin\Publish-windows-x86_64\Sandbox &gt; nul)
 IF EXIST ..\bin\Publish-windows-x86_64\Utilities\Utilities.dll\ (xcopy /Q /E /Y /I ..\bin\Publish-windows-x86_64\Utilities\Utilities.dll ..\bin\Publish-windows-x86_64\Sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Publish-windows-x86_64\Utilities\Utilities.dll ..\bin\Publish-windows-x86_64\Sandbox &gt; nul)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -165,8 +168,17 @@ IF EXIST ..\bin\Publish-windows-x86_64\Utilities\Utilities.dll\ (xcopy /Q /E /Y 
     <ProjectReference Include="..\engine\Engine.vcxproj">
       <Project>{D24C0A03-BE04-4C50-270C-25AC13E3E640}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\engine\core\Scene\Scene.vcxproj">
+      <Project>{AAA88F7A-1613-44F1-5F51-F596CBFA2146}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\engine\core\Utilities\Utilities.vcxproj">
       <Project>{F831B7B8-64F2-32EF-2D2D-7C6C99AC77CB}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\engine\core\Graphics\Graphics.vcxproj">
+      <Project>{8DFD7D4A-7960-0DEF-22E6-45A50E28D971}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\engine\core\Logger\Logger.vcxproj">
+      <Project>{1C0DC9E5-08C5-0A33-71CC-E38E5DA3A523}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

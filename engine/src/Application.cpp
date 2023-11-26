@@ -5,12 +5,14 @@
 #include <Radiant/Graphics.h>
 #include <Radiant/Logger.h>
 #include <Radiant/Editor.h>
+#include <Radiant/Scene.h>
 
 namespace rdt {
 
 	struct Application::Impl {
-		Timestep m_timestep;
 		std::shared_ptr<WindowConfig> m_config;
+		LoopPhase m_current_phase = LoopPhase_Begin;
+		float deltaTime = 0.0f;
 
 		Impl()
 		{
@@ -37,6 +39,12 @@ namespace rdt {
 			while (IsRunning()) {
 				
 				BeginFrame();
+
+				ProcessInput();
+
+				WorldUpdate();
+
+				FinalUpdate();
 
 				RenderUpdate();
 
@@ -65,18 +73,40 @@ namespace rdt {
 		}
 
 		void BeginFrame() {
+			m_current_phase = LoopPhase_Begin;
 			graphics::Renderer::OnBeginFrame();
+			deltaTime = graphics::Renderer::GetDeltaTime();
+
+		}
+
+		void ProcessInput() {
+			m_current_phase = LoopPhase_ProcessInput;
+			scene::CallUpdate(m_current_phase, deltaTime);
+		}
+
+		void WorldUpdate() {
+			m_current_phase = LoopPhase_WorldUpdate;
+			scene::CallUpdate(m_current_phase, deltaTime);
+		}
+
+		void FinalUpdate() {
+			m_current_phase = LoopPhase_FinalUpdate;
+			scene::CallUpdate(m_current_phase);
 		}
 
 		void RenderUpdate() {
-			graphics::Renderer::OnRenderUpdate();
+			m_current_phase = LoopPhase_RenderUpdate;
+			scene::CallUpdate(m_current_phase);
+			graphics::Renderer::Render();
 		}
 
 		void EndFrame() {
+			m_current_phase = LoopPhase_End;
 			graphics::Renderer::OnEndFrame();
 		}
 
 		void TearDown() {
+			scene::TearDown();
 			graphics::Renderer::Destroy();
 			logger::Log::Destroy();
 		}

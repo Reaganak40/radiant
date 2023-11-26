@@ -12,7 +12,7 @@
 // Interface files relative to this file
 #include "../utils_api.h"
 #include "../../src/MathTypes.h"
+#include "../../src/Common.h"
 #include "../../src/Color.h"
-#include "../../src/Timestep.h"
 #include "../../src/WindowConfig.h"
 #include "../../src/UtilFuncs.h"

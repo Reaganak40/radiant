@@ -23,6 +23,8 @@ struct rdt::graphics::Renderer::Impl {
 	virtual void OnBeginFrame() = 0;
 	virtual void OnRenderUpdate() = 0;
 	virtual void OnEndFrame() = 0;
+	virtual void SetClearColor(const Color& color) = 0;
+	virtual float GetDeltaTime() = 0;
 };
 
 #ifdef RDT_USE_DIRECTX
@@ -90,6 +92,16 @@ namespace rdt {
 		void OnEndFrame() override final {
 			glApp->EndFrame();
 		}
+
+		void SetClearColor(const Color& color) override final {
+			glApp->SetClearColor(color);
+		}
+
+		float GetDeltaTime() override final {
+			return glApp->GetDeltaTime();
+		}
+
+
 	};
 }
 #define RENDERER_IMPL Renderer_OpenGL
@@ -131,7 +143,7 @@ void rdt::graphics::Renderer::OnBeginFrame()
 	m_impl->OnBeginFrame();
 }
 
-void rdt::graphics::Renderer::OnRenderUpdate()
+void rdt::graphics::Renderer::Render()
 {
 	m_impl->OnRenderUpdate();
 }
@@ -139,4 +151,14 @@ void rdt::graphics::Renderer::OnRenderUpdate()
 void rdt::graphics::Renderer::OnEndFrame()
 {
 	m_impl->OnEndFrame();
+}
+
+void rdt::graphics::Renderer::SetClearColor(const Color& nColor)
+{
+	m_impl->SetClearColor(nColor);
+}
+
+float rdt::graphics::Renderer::GetDeltaTime()
+{
+	return m_impl->GetDeltaTime();
 }

@@ -4,6 +4,7 @@
 // Forward Delcarations
 namespace rdt {
 	class WindowConfig;
+	class Color;
 }
 
 namespace rdt::graphics {
@@ -41,10 +42,13 @@ namespace rdt::graphics {
 
 		static void OnBeginFrame();
 
-		static void OnRenderUpdate();
+		static void Render();
 
 		static void OnEndFrame();
 
+		static void SetClearColor(const Color& nColor);
+
+		static float GetDeltaTime();
 	};
 
 }

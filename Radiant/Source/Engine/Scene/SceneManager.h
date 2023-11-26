@@ -14,6 +14,7 @@
 
 #define RDT_NULL_SCENE_ID 0
 #define RDT_NULL_LAYER_ID 0
+
 namespace rdt {
 	using SceneID = unsigned int;
 	using LayerID = unsigned int;

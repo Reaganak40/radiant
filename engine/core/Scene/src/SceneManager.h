@@ -17,6 +17,7 @@ namespace rdt {
 
 // Required Definitions for Struct/Class Members
 #include "Scene.h"
+#include "Layer.h"
 
 namespace rdt::scene {
 
@@ -28,32 +29,33 @@ namespace rdt::scene {
 
 		static SceneManager* Get();
 	public:
+		static void TearDown();
 
-		/*
-			Adds a scene to the manager's map of name-associated scenes.
-		*/
 		static SceneID RegisterScene(const char* sceneName, Scene* scene);
-
 		static SceneID GetSceneID(const char* sceneName);
-
-		/*
-			Sets the current scene by providing its scene name. The associated
-			scene will be returned next time the current scene is requested.
-		*/
 		static void SetScene(const char* sceneName);
 
+		static LayerID RegisterLayer(const char* layerName, Layer* nLayer);
+		static LayerID GetLayerID(const char* layerName);
 
+		static Layer* AttachLayerToScene(const char* layerName, SceneID scene);
+
+		static void CallUpdate(LoopPhase step, float deltaTime);
 	private:
 		SceneID RegisterSceneImpl(const char* sceneName, Scene* scene);
 		SceneID GetSceneIDImpl(const char* sceneName);
-
+		void SetSceneImpl(const char* sceneName);
+		
+		LayerID RegisterLayerImpl(const char* layerName, Layer* nLayer);
+		LayerID GetLayerIDImpl(const char* layerName);
+		Layer* AttachLayerToSceneImpl(LayerID layer, SceneID scene);
 
 		std::unordered_map<std::string, SceneID> sceneAliasToId;
 		std::unordered_map<SceneID, Scene*> m_scenes;
 		SceneID m_current_scene_id;
 
 		std::unordered_map<std::string, LayerID> layerAliasToId;
-		std::unordered_map<LayerID, Scene*> m_layers;
+		std::unordered_map<LayerID, Layer*> m_layers;
 
 		SceneID sceneIdCounter;
 		LayerID layerIdCounter;
@@ -63,6 +65,8 @@ namespace rdt::scene {
 
 		bool LayerExists(const std::string& layerName);
 		bool LayerExists(LayerID layer);
+		
+		Scene* GetCurrentScene();
 
 		/*
 			Gets the next available sceneID

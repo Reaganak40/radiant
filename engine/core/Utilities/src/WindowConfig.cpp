@@ -2,6 +2,7 @@
 #include "WindowConfig.h"
 
 #include "Color.h"
+#include "Common.h"
 
 // ================================================
 // Window Config Implementation

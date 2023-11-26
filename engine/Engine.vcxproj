@@ -80,7 +80,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;RDT_BUILD_DLL;RDT_DEBUG;RDT_USE_EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;include;core\Editor\include;core\Utilities\include;core\Graphics\include;core\Graphics\framework\OpenGL\include;..\thirdparty\glm\glm;core\Logger\include;..\thirdparty\spdlog\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;include;core\Graphics\include;core\Logger\include;..\thirdparty\spdlog\spdlog\include;core\Editor\include;core\Scene\include;core\Graphics\framework\OpenGL\include;..\thirdparty\glm\glm;core\Utilities\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -103,7 +103,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;RDT_BUILD_DLL;RDT_RELEASE;RDT_USE_EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;include;core\Editor\include;core\Utilities\include;core\Graphics\include;core\Graphics\framework\OpenGL\include;..\thirdparty\glm\glm;core\Logger\include;..\thirdparty\spdlog\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;include;core\Graphics\include;core\Logger\include;..\thirdparty\spdlog\spdlog\include;core\Editor\include;core\Scene\include;core\Graphics\framework\OpenGL\include;..\thirdparty\glm\glm;core\Utilities\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -130,7 +130,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;RDT_BUILD_DLL;RDT_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;include;core\Editor\include;core\Utilities\include;core\Graphics\include;core\Graphics\framework\OpenGL\include;..\thirdparty\glm\glm;core\Logger\include;..\thirdparty\spdlog\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;include;core\Graphics\include;core\Logger\include;..\thirdparty\spdlog\spdlog\include;core\Editor\include;core\Scene\include;core\Graphics\framework\OpenGL\include;..\thirdparty\glm\glm;core\Utilities\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -167,6 +167,9 @@
   <ItemGroup>
     <ProjectReference Include="core\Editor\Editor.vcxproj">
       <Project>{0390B2A0-EF47-F4ED-584F-CD4944268FDE}</Project>
+    </ProjectReference>
+    <ProjectReference Include="core\Scene\Scene.vcxproj">
+      <Project>{AAA88F7A-1613-44F1-5F51-F596CBFA2146}</Project>
     </ProjectReference>
     <ProjectReference Include="core\Graphics\Graphics.vcxproj">
       <Project>{8DFD7D4A-7960-0DEF-22E6-45A50E28D971}</Project>

@@ -15,14 +15,11 @@
 namespace rdt {
 	struct Vec2i;
 	class Color;
+
+	enum AspectRatio;
 }
 
 namespace rdt {
-	enum AspectRatio {
-		NoAspectRatio,  // No aspect ratio is maintained (stretch)
-		AR_16_9,		// Window Projection = (1920px, 1080px)
-		AR_1_1,			// Window Projection = (1000px, 1000px)
-	};
 
 	class UTILS_API WindowConfig {
 	public:

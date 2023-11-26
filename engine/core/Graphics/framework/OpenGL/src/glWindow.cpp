@@ -4,13 +4,16 @@
 #include "Internal/DataComponents.h"
 #include "Texture/Texture.h"
 #include "Texture/TextureManager.h"
+#include "Utils/Timestep.h"
 #include "Utils/ErrorHandling.h"
+
 
 #include <Radiant/Utils.h>
 #include <Radiant/Logger.h>
 
 struct rdt::glCore::glWindow::Impl {
 private:
+    Timestep m_timestep;
     WindowDataComponent       m_window_data;
     VertexArrayDataComponent  m_VAO_component;
     ViewportDataComponent     m_viewport_component;
@@ -69,6 +72,10 @@ public:
         return true;
     }
 
+    float DeltaTime() {
+        return m_timestep.deltaTime;
+    }
+
     const char* GetName()
     {
         return m_window_data.m_window_title.c_str();
@@ -84,6 +91,8 @@ public:
         m_VBO_component.Reset();
         m_IBO_component.Reset();
         ClearWindow();
+
+        m_timestep.Update();
     }
 
     void EndFrame()
@@ -288,6 +297,11 @@ void rdt::glCore::glWindow::Clear()
 void rdt::glCore::glWindow::SetClearColor(const Color& color)
 {
     m_impl->SetClearColor(color);
+}
+
+float rdt::glCore::glWindow::GetDeltaTime()
+{
+    return m_impl->DeltaTime();
 }
 
 void rdt::glCore::glWindow::SetMVPMatrix(const glm::mat4& mvp)

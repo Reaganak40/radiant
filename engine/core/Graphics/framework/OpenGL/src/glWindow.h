@@ -57,6 +57,11 @@ namespace rdt::glCore {
 		void SetClearColor(const Color& color);
 
 		/*
+			Gets the delta time for the last frame
+		*/
+		float GetDeltaTime();
+
+		/*
 			Runs start-up procedures for the beginning of a new draw frame
 		*/
 		void BeginFrame();

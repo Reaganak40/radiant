@@ -2,11 +2,11 @@
 #include "scene_api.h"
 
 #define RDT_NULL_SCENE_ID 0
-#define RDT_NULL_LAYER_ID 0
 
 // Forward Declarations
 namespace rdt {
 	using SceneID = unsigned int;
+	using LayerID = unsigned int;
 	enum LoopPhase;
 }
 namespace rdt::scene {
@@ -19,6 +19,8 @@ namespace rdt::scene {
 	private:
 		struct Impl;
 		Impl* m_impl;
+
+	protected:
 		Scene();
 		~Scene();
 	public:
@@ -34,6 +36,11 @@ namespace rdt::scene {
 			Returns the registered name for this scene.
 		*/
 		const char* GetName();
+
+		/*
+			Returns true if this is the currently bound scene
+		*/
+		bool IsBound();
 
 		template<typename T>
 		friend SceneID RegisterScene(const char* sceneName);
@@ -56,10 +63,32 @@ namespace rdt::scene {
 		*/
 		virtual void OnRelease() {}
 
+		/*
+			Attaches a layer to the end of the layer stack.
+		*/
+		void AttachLayer(const char* layerName);
+		
+		/*
+			Inserts and attaches the layer into the layer stack at
+			the given index.
+		*/
+		void AttachLayer(const char* layerName, size_t insertIndex);
+
 	private:
 
+		static SceneID RegisterSceneImpl(const char* sceneName, Scene* scene);
 		void SetSceneID(SceneID nID);
 		void SetSceneName(const char* nName);
+		void RemoveFromLayerStack(LayerID layer);
+		void DetachAll();
+
+		void Bind();
+		void Release();
+
+		void ProcessInput(const float deltaTime);
+		void WorldUpdate(const float deltaTime);
+		void FinalUpdate();
+		void RenderUpdate();
 	};
 
 	/*
@@ -67,13 +96,11 @@ namespace rdt::scene {
 		child template T.
 	*/
 	template<typename T>
-	SCENE_API SceneID RegisterScene(const char* sceneName)
+	SceneID RegisterScene(const char* sceneName)
 	{
-		Scene* nScene = new T();
-		return RegisterScene(sceneName, nScene);
+		Scene* nScene = new T;
+		return Scene::RegisterSceneImpl(sceneName, nScene);
 	}
-	
-	SceneID RegisterScene(const char* sceneName, Scene* scene);
 
 	/*
 		Returns the registered sceneID for the scene with the
@@ -98,5 +125,11 @@ namespace rdt::scene {
 		current scene.
 		NOTE: This is called internally by the Radiant Engine (DO NOT USE)
 	*/
-	void CallUpdate(LoopPhase step);
+	SCENE_API void CallUpdate(LoopPhase step, float deltaTime = 0);
+
+	/*
+		Destroys the SceneManager and frees all scene resources.
+		NOTE: This is called internally by the Radiant Engine (DO NOT USE)
+	*/
+	SCENE_API void TearDown();
 }

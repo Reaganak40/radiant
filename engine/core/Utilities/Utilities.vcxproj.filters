@@ -21,13 +21,13 @@
     <ClInclude Include="src\Color.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\Common.h">
+      <Filter>src</Filter>
+    </ClInclude>
     <ClInclude Include="src\ConfigReader.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\MathTypes.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Timestep.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\UniqueID.h">
@@ -54,9 +54,6 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\MathTypes.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Timestep.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\UniqueID.cpp">

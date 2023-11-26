@@ -80,7 +80,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;GL_CORE_BUILD_DLL;RDT_DEBUG;RDT_USE_EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;include;..\..\..\..\..\thirdparty\glfw\glfw\include;..\..\..\..\..\thirdparty\glad\glad\include;..\..\..\..\..\thirdparty\imgui\imgui;..\..\..\..\..\thirdparty\imgui\imgui\backends;..\..\..\..\..\thirdparty\glm\glm;..\..\..\..\..\thirdparty\stb;..\..\..\Logger\include;..\..\..\..\..\thirdparty\spdlog\spdlog\include;..\..\..\Utilities\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;include;..\..\..\..\..\thirdparty\glfw\glfw\include;..\..\..\..\..\thirdparty\glad\glad\include;..\..\..\..\..\thirdparty\imgui\imgui;..\..\..\..\..\thirdparty\imgui\imgui\backends;..\..\..\..\..\thirdparty\glm\glm;..\..\..\..\..\thirdparty\stb;..\..\..\Utilities\include;..\..\..\Logger\include;..\..\..\..\..\thirdparty\spdlog\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -103,7 +103,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;GL_CORE_BUILD_DLL;RDT_RELEASE;RDT_USE_EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;include;..\..\..\..\..\thirdparty\glfw\glfw\include;..\..\..\..\..\thirdparty\glad\glad\include;..\..\..\..\..\thirdparty\imgui\imgui;..\..\..\..\..\thirdparty\imgui\imgui\backends;..\..\..\..\..\thirdparty\glm\glm;..\..\..\..\..\thirdparty\stb;..\..\..\Logger\include;..\..\..\..\..\thirdparty\spdlog\spdlog\include;..\..\..\Utilities\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;include;..\..\..\..\..\thirdparty\glfw\glfw\include;..\..\..\..\..\thirdparty\glad\glad\include;..\..\..\..\..\thirdparty\imgui\imgui;..\..\..\..\..\thirdparty\imgui\imgui\backends;..\..\..\..\..\thirdparty\glm\glm;..\..\..\..\..\thirdparty\stb;..\..\..\Utilities\include;..\..\..\Logger\include;..\..\..\..\..\thirdparty\spdlog\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -130,7 +130,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>RDT_PLATFORM_WINDOWS;GL_CORE_BUILD_DLL;RDT_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;include;..\..\..\..\..\thirdparty\glfw\glfw\include;..\..\..\..\..\thirdparty\glad\glad\include;..\..\..\..\..\thirdparty\imgui\imgui;..\..\..\..\..\thirdparty\imgui\imgui\backends;..\..\..\..\..\thirdparty\glm\glm;..\..\..\..\..\thirdparty\stb;..\..\..\Logger\include;..\..\..\..\..\thirdparty\spdlog\spdlog\include;..\..\..\Utilities\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;include;..\..\..\..\..\thirdparty\glfw\glfw\include;..\..\..\..\..\thirdparty\glad\glad\include;..\..\..\..\..\thirdparty\imgui\imgui;..\..\..\..\..\thirdparty\imgui\imgui\backends;..\..\..\..\..\thirdparty\glm\glm;..\..\..\..\..\thirdparty\stb;..\..\..\Utilities\include;..\..\..\Logger\include;..\..\..\..\..\thirdparty\spdlog\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -163,6 +163,7 @@
     <ClInclude Include="src\Texture\Texture.h" />
     <ClInclude Include="src\Texture\TextureManager.h" />
     <ClInclude Include="src\Utils\ErrorHandling.h" />
+    <ClInclude Include="src\Utils\Timestep.h" />
     <ClInclude Include="src\Vertex.h" />
     <ClInclude Include="src\View\Viewport.h" />
     <ClInclude Include="src\glWindow.h" />
@@ -181,6 +182,7 @@
     <ClCompile Include="src\Texture\Texture.cpp" />
     <ClCompile Include="src\Texture\TextureManager.cpp" />
     <ClCompile Include="src\Utils\ErrorHandling.cpp" />
+    <ClCompile Include="src\Utils\Timestep.cpp" />
     <ClCompile Include="src\Vertex.cpp" />
     <ClCompile Include="src\View\Viewport.cpp" />
     <ClCompile Include="src\glWindow.cpp" />

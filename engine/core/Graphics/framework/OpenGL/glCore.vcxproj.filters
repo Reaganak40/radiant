@@ -84,6 +84,7 @@
     <ClInclude Include="src\pch.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\Utils\Timestep.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\..\thirdparty\stb\stb\stb_image.cpp">
@@ -128,5 +129,6 @@
     <ClCompile Include="src\pch.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Utils\Timestep.cpp" />
   </ItemGroup>
 </Project>

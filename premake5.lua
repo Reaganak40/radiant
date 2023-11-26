@@ -40,6 +40,7 @@ IncludeModule = {}
 IncludeModule["Graphics"]  = (solutionDir .. "/engine/core/Graphics/include")
 IncludeModule["glCore"]    = (solutionDir .. "/engine/core/Graphics/framework/OpenGL/include")
 IncludeModule["Logger"]    = (solutionDir .. "/engine/core/Logger/include")
+IncludeModule["Scene"]     = (solutionDir .. "/engine/core/Scene/include")
 IncludeModule["Utilities"] = (solutionDir .. "/engine/core/Utilities/include")
 IncludeModule["Editor"]    = (solutionDir .. "/engine/core/Editor/include")
 IncludeModule["Engine"]    = (solutionDir .. "/engine/include")
@@ -51,9 +52,9 @@ md_graph["Utilities"] = {}
 md_graph["Graphics"]  = {"glCore", "Logger", "Utilities"}
 md_graph["Logger"]    = {"Utilities"}
 md_graph["Scene"]     = {"Graphics", "Logger"}
-md_graph["Engine"]    = {"Editor", "Graphics", "Logger", "Utilities"}
+md_graph["Engine"]    = {"Editor", "Scene", "Graphics", "Logger", "Utilities"}
 md_graph["Editor"]    = {'Utilities', 'Logger'}
-md_graph["Sandbox"]   = {'Engine', "Utilities"}
+md_graph["Sandbox"]   = {'Engine', "Scene", "Utilities", "Graphics", "Logger"}
 
 md_graph["glCore-Showcase"] = {"glCore", "Logger", "Utilities"}
 

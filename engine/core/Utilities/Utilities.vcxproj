@@ -155,9 +155,9 @@
     <ClInclude Include="include\Radiant\Utils.h" />
     <ClInclude Include="include\utils_api.h" />
     <ClInclude Include="src\Color.h" />
+    <ClInclude Include="src\Common.h" />
     <ClInclude Include="src\ConfigReader.h" />
     <ClInclude Include="src\MathTypes.h" />
-    <ClInclude Include="src\Timestep.h" />
     <ClInclude Include="src\UniqueID.h" />
     <ClInclude Include="src\UtilFuncs.h" />
     <ClInclude Include="src\WindowConfig.h" />
@@ -168,7 +168,6 @@
     <ClCompile Include="src\Color.cpp" />
     <ClCompile Include="src\ConfigReader.cpp" />
     <ClCompile Include="src\MathTypes.cpp" />
-    <ClCompile Include="src\Timestep.cpp" />
     <ClCompile Include="src\UniqueID.cpp" />
     <ClCompile Include="src\UtilFuncs.cpp" />
     <ClCompile Include="src\WindowConfig.cpp" />

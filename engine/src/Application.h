@@ -11,15 +11,6 @@ namespace rdt {
 
 namespace rdt {
 
-	enum LoopPhase {
-		LoopPhase_Begin,
-		LoopPhase_ProcessInput,
-		LoopPhase_WorldUpdate,
-		LoopPhase_FinalUpdate,
-		LoopPhase_RenderUpdate,
-		LoopPhase_End,
-	};
-
 	class RADIANT_API Application
 	{
 	private:
