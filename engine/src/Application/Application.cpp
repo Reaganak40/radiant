@@ -1,11 +1,5 @@
-#include "pch.h"
-#include "Application.h"
-
-#include <Radiant/Utils.h>
-#include <Radiant/Graphics.h>
-#include <Radiant/Logger.h>
-#include <Radiant/Editor.h>
-#include <Radiant/Scene.h>
+#include <Radiant/Application/Application.hpp>
+#include <Radiant/Window/WindowConfig.hpp>
 
 namespace rdt {
 

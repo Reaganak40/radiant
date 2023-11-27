@@ -33,7 +33,7 @@ project "Window"
     }
 
     pchheader "pch.h"
-    pchsource "src/pch.cpp"
+    pchsource "pch.cpp"
 
     filter "system:windows"
         cppdialect "C++20"

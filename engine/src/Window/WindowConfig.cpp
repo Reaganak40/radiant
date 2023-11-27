@@ -1,8 +1,4 @@
-#include "pch.h"
-#include "WindowConfig.h"
-
-#include "Color.h"
-#include "Common.h"
+#include <Radiant/Window/WindowConfig.hpp>
 
 // ================================================
 // Window Config Implementation

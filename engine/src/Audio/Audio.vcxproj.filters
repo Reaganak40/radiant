@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Sound">
+      <UniqueIdentifier>{4ED01B0E-BAE4-43BF-8366-E71EEF3940F0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AudioError.h" />
+    <ClInclude Include="Sound\Sound.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound\SoundEffect.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundData.h" />
+    <ClInclude Include="SoundEngine.h" />
+    <ClInclude Include="SoundSource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AudioError.cpp" />
+    <ClCompile Include="Sound\Sound.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="Sound\SoundEffect.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="SoundData.cpp" />
+    <ClCompile Include="SoundEngine.cpp" />
+    <ClCompile Include="SoundSource.cpp" />
+  </ItemGroup>
+</Project>

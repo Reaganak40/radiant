@@ -9,18 +9,16 @@ md_graph                = {}
 
 -- public modules
 md_graph["Utils"]       = {}
-md_graph["Window"]      = {"Utils"}
-md_graph["Graphics"]    = {"Utils"}
+md_graph["OpenGL"]      = {"Utils"}
+md_graph["Window"]      = {"Utils, OpenGL"}
+md_graph["Graphics"]    = {"Utils, OpenGL"}
 md_graph["Physics"]     = {"Utils"}
 md_graph["Audio"]       = {"Utils"}
-md_graph["ECS"]         = {"Graphics", "Physics", "Audio", "Utils"}
-md_graph["Scene"]       = {"ECS", "Utils"}
-md_graph["Editor"]      = {"Scene", "ECS", "Audio", "Physics", "Graphics", "Window", "Utils"}
-md_graph["Application"] = {"Editor", "Scene", "Window"}
-
--- core/private modules
 md_graph["Logger"]      = {"Utils"}
-md_graph["OpenGL"]      = {"Utils"}
+md_graph["ECS"]         = {"Utils", "Graphics", "Physics", "Audio"}
+md_graph["Scene"]       = {"Utils", "ECS"}
+md_graph["Editor"]      = {"Utils", "Window", "Graphics", "Physics", "Audio", "Logger", "ECS", "Scene"}
+md_graph["Application"] = {"Utils", "Window", "Scene", "Editor"}
 
 -- Test Modules
 md_graph['glCore-Showcase'] = {"OpenGL", "Utils"}
@@ -66,6 +64,15 @@ mtpd["OpenGL"]      = {"GLFW", "GLM", "GLAD", "ImGui"}
 
 outputFolder = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+-- 
+--[[
+    Seperate the project output containers to propograte release files
+
+    radiant    - libraries used by the client and is present in release files
+    thirdparty - libraries used in the implementation and should be statically compiled into radiant modules
+    test       - test binaries that don't get distributed to the client
+    sandbox    - primary child testing application, does not get distributed to client
+--]]
 radiant_output_dir = ("{%wks.location}/engine/bin/" .. outputFolder .. "/%{prj.name}")
 radiant_obj_dir = ("{%wks.location}/engine/bin/obj/" .. outputFolder .. "/%{prj.name}")
 
@@ -78,7 +85,10 @@ sandbox_obj_dir = ("%{wks.location}/bin/obj/" .. outputFolder .. "/%{prj.name}")
 test_output_dir = ("%{wks.location}/tests/bin/" .. outputFolder .. "/%{prj.name}")
 test_obj_dir = ("%{wks.location}/tests/bin/obj/" .. outputFolder .. "/%{prj.name}")
 
+-- header directory visible to client
 radiant_public_headers = "%{wks.location}/engine/include"
+
+-- header directory only visible to implementation
 radiant_private_headers = "%{wks.location}/engine/src/Core/include"
 
 -- Copies the dll from the given Project Name to the target directory of the in-scope project
@@ -120,6 +130,7 @@ group ""
 
 group "Engine"
     include "engine/src/Utils/Utils.lua"
+    include "engine/src/Logger/Logger.lua" 
     include "engine/src/Window/Window.lua"
     include "engine/src/Graphics/Graphics.lua"
     include "engine/src/Physics/Physics.lua"
@@ -132,7 +143,6 @@ group ""
 
 group "Engine/Core"
     include "engine/src/Core/src/OpenGL/OpenGL.lua"
-    include "engine/src/Core/src/Logger/Logger.lua" 
 group ""
     
 group "Tests"

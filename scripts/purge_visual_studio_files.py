@@ -31,6 +31,7 @@ target_dirs = [
     "engine/src/Utils",
     "engine/src/Window",
     "engine/src/Graphics",
+    "engine/src/Logger",
     "engine/src/Physics",
     "engine/src/Audio",
     "engine/src/ECS",
@@ -38,7 +39,6 @@ target_dirs = [
     "engine/src/Editor",
     "engine/src/Application",
     
-    "engine/src/Core/src/Logger",
     "engine/src/Core/src/OpenGL",
     
     "tests/glCore",

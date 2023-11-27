@@ -143,6 +143,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Editor.h" />
+    <ClInclude Include="IconsForkAwesome.h" />
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="Editor.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -143,6 +143,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CommonComponents.h" />
+    <ClInclude Include="ComponentManager.h" />
+    <ClInclude Include="ECS.h" />
+    <ClInclude Include="ECSTypes.h" />
+    <ClInclude Include="EntityFactory.h" />
+    <ClInclude Include="EntityManager.h" />
+    <ClInclude Include="SystemManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CommonComponents.cpp" />
+    <ClCompile Include="ComponentManager.cpp" />
+    <ClCompile Include="EntityFactory.cpp" />
+    <ClCompile Include="EntityManager.cpp" />
+    <ClCompile Include="SystemManager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Graphics\Graphics.vcxproj">
       <Project>{8DFD7D4A-7960-0DEF-22E6-45A50E28D971}</Project>
     </ProjectReference>

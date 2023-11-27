@@ -143,9 +143,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Application.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="Application.cpp" />
   </ItemGroup>
   <ItemGroup>

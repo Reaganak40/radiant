@@ -143,6 +143,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AudioError.h" />
+    <ClInclude Include="Sound\Sound.h" />
+    <ClInclude Include="Sound\SoundEffect.h" />
+    <ClInclude Include="SoundData.h" />
+    <ClInclude Include="SoundEngine.h" />
+    <ClInclude Include="SoundSource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AudioError.cpp" />
+    <ClCompile Include="Sound\Sound.cpp" />
+    <ClCompile Include="Sound\SoundEffect.cpp" />
+    <ClCompile Include="SoundData.cpp" />
+    <ClCompile Include="SoundEngine.cpp" />
+    <ClCompile Include="SoundSource.cpp" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Utils\Utils.vcxproj">
       <Project>{6DA62344-D910-D8BA-224F-89608EF8B50F}</Project>
     </ProjectReference>
