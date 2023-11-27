@@ -1,13 +1,46 @@
-/*******************************************************************
-*	Module:  Application
-*
-*	Application is the centeral interface to communicate with the
-*	rdt::glCore internals.
-*******************************************************************/
-#pragma once
-#include "gl_core_api.h"
+/***************************************************************/
+/*  (core) OpenGL/glWindow.hpp                                 */
+/* *************************************************************/
+/*                 This file is a part of:                     */
+/*                -- RADIANT GAME ENGINE --                    */
+/*         https://github.com/Reaganak40/radiant               */
+/***************************************************************/
+/*            Copyright(c) 2023 Reagan Kelley                  */
+/*                                                             */
+/*  Permission  is  hereby  granted, free  of charge, to  any  */
+/*  person obtaining a copy of this  software and  associated  */
+/*  documentation  files(the  "Software"), to  deal  in   the  */
+/*  Software without restriction,including without limitation  */
+/*  the   rights   to  use,  copy,  modify,  merge,  publish,  */
+/*  distribute,  sublicense,  and  /or  sell  copies  of  the  */
+/*  Software,  and to permit persons to whom the  Software is  */
+/*  furnished to do so, subject to the following conditions:   */
+/*                                                             */
+/*  The  above  copyright  notice  and this permission notice  */
+/*  shall  be  included in all copies or substantial portions  */
+/*  of the Software.                                           */
+/*                                                             */
+/*  THE  SOFTWARE  IS PROVIDED  "AS IS",  WITHOUT WARRANTY OF  */
+/*  ANY KIND,  EXPRESS OR IMPLIED, INCLUDING  BUT NOT LIMITED  */
+/*  TO THE  WARRANTIES  OF  MERCHANTABILITY,  FITNESS  FOR  A  */
+/*  PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT  SHALL  */
+/*  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,  */
+/*  DAMAGES OR OTHER  LIABILITY,  WHETHER  IN  AN  ACTION  OF  */
+/*  CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT  OF  OR IN  */
+/*  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS  */
+/*  IN THE SOFTWARE.                                           */
+/***************************************************************/
 
-// Forward Declarations
+#pragma once
+
+/***************************************************************
+* Headers
+***************************************************************/
+#include <Core/OpenGL/Export.hpp>
+
+/***************************************************************
+* Forward Delcarations
+***************************************************************/
 namespace rdt::glCore {
 	using glTextureID = unsigned int;
 	struct glVertex;
@@ -18,10 +51,12 @@ namespace rdt {
 	struct Vec2i;
 	enum AspectRatio;
 }
-
+namespace glm {
+	class mat4;
+}
 namespace rdt::glCore {
 
-	class GL_CORE_API glWindow {
+	class RDT_GL_CORE_API glWindow {
 	private:
 		struct Impl;
 		Impl* m_impl;
@@ -39,7 +74,7 @@ namespace rdt::glCore {
 			Launches a new OpenGL window, using the provided window name, or
 			uses the instance name if no windowName provided.
 		*/
-		bool LaunchWindow(std::shared_ptr<WindowConfig> windowConfig);
+		bool LaunchWindow(const WindowConfig& windowConfig);
 
 		/*
 			Returns true if the application should terminate (close window requested)

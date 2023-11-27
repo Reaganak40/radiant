@@ -1,15 +1,13 @@
 #include "pch.h"
-#include "glWindow.h"
+#include <Core/OpenGL/glWindow.hpp>
 
 #include "Internal/DataComponents.h"
 #include "Texture/Texture.h"
 #include "Texture/TextureManager.h"
-#include "Utils/Timestep.h"
-#include "Utils/ErrorHandling.h"
+#include "Internal/Timestep.h"
+#include "Internal/ErrorHandling.h"
 
-
-#include <Radiant/Utils.h>
-#include <Radiant/Logger.h>
+#include <Radiant/Logger.hpp>
 
 struct rdt::glCore::glWindow::Impl {
 private:
@@ -254,7 +252,7 @@ const char* rdt::glCore::glWindow::GetName()
     return m_impl->GetName();
 }
 
-bool rdt::glCore::glWindow::LaunchWindow(std::shared_ptr<WindowConfig> windowConfig)
+bool rdt::glCore::glWindow::LaunchWindow(const WindowConfig& windowConfig)
 {
     return m_impl->LaunchWindow(windowConfig);
 }

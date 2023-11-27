@@ -55,22 +55,22 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>{%wks.location}\engine\bin\Debug-windows-x86_64\Application\</OutDir>
-    <IntDir>{%wks.location}\engine\bin\obj\Debug-windows-x86_64\Application\</IntDir>
+    <OutDir>..\..\bin\Debug-windows-x86_64\Application\</OutDir>
+    <IntDir>..\..\bin\obj\Debug-windows-x86_64\Application\</IntDir>
     <TargetName>Application</TargetName>
     <TargetExt>.dll</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>{%wks.location}\engine\bin\Release-windows-x86_64\Application\</OutDir>
-    <IntDir>{%wks.location}\engine\bin\obj\Release-windows-x86_64\Application\</IntDir>
+    <OutDir>..\..\bin\Release-windows-x86_64\Application\</OutDir>
+    <IntDir>..\..\bin\obj\Release-windows-x86_64\Application\</IntDir>
     <TargetName>Application</TargetName>
     <TargetExt>.dll</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Publish|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>{%wks.location}\engine\bin\Publish-windows-x86_64\Application\</OutDir>
-    <IntDir>{%wks.location}\engine\bin\obj\Publish-windows-x86_64\Application\</IntDir>
+    <OutDir>..\..\bin\Publish-windows-x86_64\Application\</OutDir>
+    <IntDir>..\..\bin\obj\Publish-windows-x86_64\Application\</IntDir>
     <TargetName>Application</TargetName>
     <TargetExt>.dll</TargetExt>
   </PropertyGroup>
@@ -90,7 +90,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>{%wks.location}\engine\bin\Debug-windows-x86_64\Application\Application.lib</ImportLibrary>
+      <ImportLibrary>..\..\bin\Debug-windows-x86_64\Application\Application.lib</ImportLibrary>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
@@ -114,7 +114,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <ImportLibrary>{%wks.location}\engine\bin\Release-windows-x86_64\Application\Application.lib</ImportLibrary>
+      <ImportLibrary>..\..\bin\Release-windows-x86_64\Application\Application.lib</ImportLibrary>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
@@ -138,7 +138,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <ImportLibrary>{%wks.location}\engine\bin\Publish-windows-x86_64\Application\Application.lib</ImportLibrary>
+      <ImportLibrary>..\..\bin\Publish-windows-x86_64\Application\Application.lib</ImportLibrary>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
@@ -146,14 +146,17 @@
     <ClCompile Include="Application.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Editor\Editor.vcxproj">
-      <Project>{0390B2A0-EF47-F4ED-584F-CD4944268FDE}</Project>
+    <ProjectReference Include="..\Utils\Utils.vcxproj">
+      <Project>{6DA62344-D910-D8BA-224F-89608EF8B50F}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Window\Window.vcxproj">
+      <Project>{34D0DEFD-2088-204B-898F-F9A67566BB3B}</Project>
     </ProjectReference>
     <ProjectReference Include="..\Scene\Scene.vcxproj">
       <Project>{AAA88F7A-1613-44F1-5F51-F596CBFA2146}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Window\Window.vcxproj">
-      <Project>{34D0DEFD-2088-204B-898F-F9A67566BB3B}</Project>
+    <ProjectReference Include="..\Editor\Editor.vcxproj">
+      <Project>{0390B2A0-EF47-F4ED-584F-CD4944268FDE}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

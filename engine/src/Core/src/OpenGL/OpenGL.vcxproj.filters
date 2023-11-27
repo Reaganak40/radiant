@@ -1,6 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Filter Include="..">
+      <UniqueIdentifier>{61705900-4DFC-870B-B6AA-880BA255880B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\..">
+      <UniqueIdentifier>{CC6E590B-3883-81BC-0105-251C6DD87DED}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\..\..">
+      <UniqueIdentifier>{57597B35-4326-D640-6C3F-C4E8586B0BCF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\..\..\..">
+      <UniqueIdentifier>{023C99B8-6EF1-11AE-F7E5-0B85639A08B2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\..\..\..\thirdparty">
+      <UniqueIdentifier>{BC83F4B5-A87D-1D08-91EA-B3187D838374}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\..\..\..\thirdparty\stb">
+      <UniqueIdentifier>{14C0E3DF-00D0-8FB0-6989-F4CE55B87E49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\..\..\..\thirdparty\stb\stb">
+      <UniqueIdentifier>{6C6849AD-588E-1314-41D4-98DF2D9938E0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\include">
+      <UniqueIdentifier>{D4687DD8-C020-BF25-2928-988115FF5916}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\include\Core">
+      <UniqueIdentifier>{AC311D39-18BD-8AFD-21CE-0DF28DD8E6FD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\include\Core\OpenGL">
+      <UniqueIdentifier>{60C1D36E-4CBB-FCC0-3528-93D121C1622D}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Buffers">
       <UniqueIdentifier>{92479EF4-FE26-1D90-073F-A866739D83F1}</UniqueIdentifier>
     </Filter>
@@ -18,6 +48,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\Core\OpenGL\Export.hpp">
+      <Filter>..\include\Core\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Core\OpenGL\glWindow.hpp">
+      <Filter>..\include\Core\OpenGL</Filter>
+    </ClInclude>
     <ClInclude Include="Buffers\FrameBuffer.h">
       <Filter>Buffers</Filter>
     </ClInclude>
@@ -51,8 +87,12 @@
     <ClInclude Include="View\Viewport.h">
       <Filter>View</Filter>
     </ClInclude>
+    <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\thirdparty\stb\stb\stb_image.cpp">
+      <Filter>..\..\..\..\thirdparty\stb\stb</Filter>
+    </ClCompile>
     <ClCompile Include="Buffers\FrameBuffer.cpp">
       <Filter>Buffers</Filter>
     </ClCompile>
@@ -88,5 +128,6 @@
       <Filter>View</Filter>
     </ClCompile>
     <ClCompile Include="glWindow.cpp" />
+    <ClCompile Include="pch.cpp" />
   </ItemGroup>
 </Project>

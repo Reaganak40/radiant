@@ -1,4 +1,7 @@
+#include "pch.h"
 #include <Radiant/Window/WindowConfig.hpp>
+#include <Radiant/Utils/AspectRatio.hpp>
+#include <Radiant/Utils/Color.hpp>
 
 // ================================================
 // Window Config Implementation
@@ -55,10 +58,4 @@ namespace rdt {
 			return m_should_maximize_window;
 		}
 	};
-}
-
-// ================================================
-std::shared_ptr<rdt::WindowConfig> rdt::CreateWindowConfig()
-{
-	return std::make_shared<WindowConfigImpl>();
 }

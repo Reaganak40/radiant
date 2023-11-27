@@ -15,17 +15,25 @@ project "OpenGL"
         "**.h",
         "**.hpp",
         "**.cpp",
+        GetModuleHeaders('OpenGL'),
+
+        -- Include the stb_image.cpp file in compilation
+        "%{tp_include.stb}/**.cpp"
     }
 
     includedirs
     {
         radiant_public_headers,
-        radiant_private_headers
+        radiant_private_headers,
+        GetThirdPartyIncludes('OpenGL'),
+
+        -- Special exception for stb
+        "%{tp_include.stb}",
     }
 
     links
     {
-        md_graph["OpenGL"]
+        md_graph["OpenGL"], mtpd['OpenGL']
     }
 
     postbuildcommands
@@ -33,7 +41,12 @@ project "OpenGL"
     }
 
     pchheader "pch.h"
-    pchsource "src/pch.cpp"
+    pchsource "pch.cpp"
+
+    -- Need actual path to stb because tokens cannot be expanded on filter
+    -- ! Issue: https://github.com/premake/premake-core/issues/1036
+    filter {"files: ../../../../../thirdparty/stb/**.cpp"}
+        flags {"NoPCH"}
 
     filter "system:windows"
         cppdialect "C++20"

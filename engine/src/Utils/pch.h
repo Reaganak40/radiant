@@ -1,6 +1,9 @@
 /***************************************************************
-* Windows Module Precompiled Header
+* Utils Module Precompiled Header
 ***************************************************************/
+#pragma once
+
+#include <cmath>
+#include <fstream>
+#include <sstream>
 #include <string>
-#include <memory>
-#include <stdexcept>

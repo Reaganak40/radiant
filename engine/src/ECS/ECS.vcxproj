@@ -55,22 +55,22 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>{%wks.location}\engine\bin\Debug-windows-x86_64\ECS\</OutDir>
-    <IntDir>{%wks.location}\engine\bin\obj\Debug-windows-x86_64\ECS\</IntDir>
+    <OutDir>..\..\bin\Debug-windows-x86_64\ECS\</OutDir>
+    <IntDir>..\..\bin\obj\Debug-windows-x86_64\ECS\</IntDir>
     <TargetName>ECS</TargetName>
     <TargetExt>.dll</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>{%wks.location}\engine\bin\Release-windows-x86_64\ECS\</OutDir>
-    <IntDir>{%wks.location}\engine\bin\obj\Release-windows-x86_64\ECS\</IntDir>
+    <OutDir>..\..\bin\Release-windows-x86_64\ECS\</OutDir>
+    <IntDir>..\..\bin\obj\Release-windows-x86_64\ECS\</IntDir>
     <TargetName>ECS</TargetName>
     <TargetExt>.dll</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Publish|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>{%wks.location}\engine\bin\Publish-windows-x86_64\ECS\</OutDir>
-    <IntDir>{%wks.location}\engine\bin\obj\Publish-windows-x86_64\ECS\</IntDir>
+    <OutDir>..\..\bin\Publish-windows-x86_64\ECS\</OutDir>
+    <IntDir>..\..\bin\obj\Publish-windows-x86_64\ECS\</IntDir>
     <TargetName>ECS</TargetName>
     <TargetExt>.dll</TargetExt>
   </PropertyGroup>
@@ -90,7 +90,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>{%wks.location}\engine\bin\Debug-windows-x86_64\ECS\ECS.lib</ImportLibrary>
+      <ImportLibrary>..\..\bin\Debug-windows-x86_64\ECS\ECS.lib</ImportLibrary>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
@@ -114,7 +114,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <ImportLibrary>{%wks.location}\engine\bin\Release-windows-x86_64\ECS\ECS.lib</ImportLibrary>
+      <ImportLibrary>..\..\bin\Release-windows-x86_64\ECS\ECS.lib</ImportLibrary>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
@@ -138,7 +138,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <ImportLibrary>{%wks.location}\engine\bin\Publish-windows-x86_64\ECS\ECS.lib</ImportLibrary>
+      <ImportLibrary>..\..\bin\Publish-windows-x86_64\ECS\ECS.lib</ImportLibrary>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
@@ -159,6 +159,9 @@
     <ClCompile Include="SystemManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Utils\Utils.vcxproj">
+      <Project>{6DA62344-D910-D8BA-224F-89608EF8B50F}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Graphics\Graphics.vcxproj">
       <Project>{8DFD7D4A-7960-0DEF-22E6-45A50E28D971}</Project>
     </ProjectReference>
@@ -167,9 +170,6 @@
     </ProjectReference>
     <ProjectReference Include="..\Audio\Audio.vcxproj">
       <Project>{8E9B818E-FA05-3605-4344-E7AAAFED135A}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Utils\Utils.vcxproj">
-      <Project>{6DA62344-D910-D8BA-224F-89608EF8B50F}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

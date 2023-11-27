@@ -15,17 +15,19 @@ project "Logger"
         "**.h",
         "**.hpp",
         "**.cpp",
+        GetModuleHeaders('Logger'),
     }
 
     includedirs
     {
         radiant_public_headers,
-        radiant_private_headers
+        radiant_private_headers,
+        GetThirdPartyIncludes('Logger')
     }
 
     links
     {
-        md_graph["Logger"]
+        md_graph["Logger"], mtpd['Logger']
     }
 
     postbuildcommands
@@ -33,7 +35,7 @@ project "Logger"
     }
 
     pchheader "pch.h"
-    pchsource "src/pch.cpp"
+    pchsource "pch.cpp"
 
     filter "system:windows"
         cppdialect "C++20"

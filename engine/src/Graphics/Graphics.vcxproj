@@ -55,22 +55,22 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>{%wks.location}\engine\bin\Debug-windows-x86_64\Graphics\</OutDir>
-    <IntDir>{%wks.location}\engine\bin\obj\Debug-windows-x86_64\Graphics\</IntDir>
+    <OutDir>..\..\bin\Debug-windows-x86_64\Graphics\</OutDir>
+    <IntDir>..\..\bin\obj\Debug-windows-x86_64\Graphics\</IntDir>
     <TargetName>Graphics</TargetName>
     <TargetExt>.dll</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>{%wks.location}\engine\bin\Release-windows-x86_64\Graphics\</OutDir>
-    <IntDir>{%wks.location}\engine\bin\obj\Release-windows-x86_64\Graphics\</IntDir>
+    <OutDir>..\..\bin\Release-windows-x86_64\Graphics\</OutDir>
+    <IntDir>..\..\bin\obj\Release-windows-x86_64\Graphics\</IntDir>
     <TargetName>Graphics</TargetName>
     <TargetExt>.dll</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Publish|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>{%wks.location}\engine\bin\Publish-windows-x86_64\Graphics\</OutDir>
-    <IntDir>{%wks.location}\engine\bin\obj\Publish-windows-x86_64\Graphics\</IntDir>
+    <OutDir>..\..\bin\Publish-windows-x86_64\Graphics\</OutDir>
+    <IntDir>..\..\bin\obj\Publish-windows-x86_64\Graphics\</IntDir>
     <TargetName>Graphics</TargetName>
     <TargetExt>.dll</TargetExt>
   </PropertyGroup>
@@ -90,7 +90,8 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>{%wks.location}\engine\bin\Debug-windows-x86_64\Graphics\Graphics.lib</ImportLibrary>
+      <AdditionalDependencies>Utils, OpenGL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary>..\..\bin\Debug-windows-x86_64\Graphics\Graphics.lib</ImportLibrary>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
@@ -114,7 +115,8 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <ImportLibrary>{%wks.location}\engine\bin\Release-windows-x86_64\Graphics\Graphics.lib</ImportLibrary>
+      <AdditionalDependencies>Utils, OpenGL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary>..\..\bin\Release-windows-x86_64\Graphics\Graphics.lib</ImportLibrary>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
@@ -138,7 +140,8 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <ImportLibrary>{%wks.location}\engine\bin\Publish-windows-x86_64\Graphics\Graphics.lib</ImportLibrary>
+      <AdditionalDependencies>Utils, OpenGL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary>..\..\bin\Publish-windows-x86_64\Graphics\Graphics.lib</ImportLibrary>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
@@ -161,7 +164,6 @@
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="AnimationSystem.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Color.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="RenderSystem.cpp" />
@@ -171,11 +173,6 @@
     <ClCompile Include="Texture\Texture.cpp" />
     <ClCompile Include="Texture\TextureAtlas.cpp" />
     <ClCompile Include="Texture\TextureManager.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Utils\Utils.vcxproj">
-      <Project>{6DA62344-D910-D8BA-224F-89608EF8B50F}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

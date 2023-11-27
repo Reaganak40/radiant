@@ -1,5 +1,5 @@
 /***************************************************************/
-/*  Logger.hpp                                                 */
+/*  Utils/String.hpp                                           */
 /* *************************************************************/
 /*                 This file is a part of:                     */
 /*                -- RADIANT GAME ENGINE --                    */
@@ -36,4 +36,29 @@
 /***************************************************************
 * Headers
 ***************************************************************/
-#include <Radiant/Logger/Log.hpp>
+#include <Radiant/Utils/Export.hpp>
+
+namespace rdt {
+
+	// Radiant string data structure
+	class RDT_UTILS_API String {
+	private:
+		struct Impl;
+		Impl* m_impl;
+	public:
+
+		String();
+		String(const String& other);
+		~String();
+
+		String(const std::string& str);
+		String(const char* str);
+
+		const char* c_str() const;
+
+		void clear();
+
+		String& operator+=(const char c);
+		String& operator+=(const std::string& str);
+	};
+}

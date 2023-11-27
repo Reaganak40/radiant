@@ -15,6 +15,7 @@ project "Window"
         "**.h",
         "**.hpp",
         "**.cpp",
+        GetModuleHeaders('Window')
     }
 
     includedirs

@@ -1,5 +1,7 @@
 #include "pch.h"
-#include "UtilFuncs.h"
+#include <Radiant/Utils/UtilFuncs.hpp>
+#include <Radiant/Utils/String.hpp>
+#include <Radiant/Utils/MathTypes.hpp>
 
 constexpr float FLOAT_EPSILON = 0.0001f;
 
@@ -83,12 +85,12 @@ namespace rdt::utils {
         return (rand() % (max - min + 1)) + min;
     }
 
-    int ReadTextFile(const std::string& filepath, std::string& outContents)
+    int ReadTextFile(const String& filepath, String& outContents)
     {
         outContents.clear();
 
         // Read from the text file
-        std::ifstream infile(filepath);
+        std::ifstream infile(filepath.c_str());
 
         if (!infile.is_open()) {
             return -1;

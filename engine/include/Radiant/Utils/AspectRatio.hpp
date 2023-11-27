@@ -1,5 +1,5 @@
 /***************************************************************/
-/*  Logger.hpp                                                 */
+/*  Utils/AspectRatio.hpp                                      */
 /* *************************************************************/
 /*                 This file is a part of:                     */
 /*                -- RADIANT GAME ENGINE --                    */
@@ -33,7 +33,12 @@
 
 #pragma once
 
-/***************************************************************
-* Headers
-***************************************************************/
-#include <Radiant/Logger/Log.hpp>
+namespace rdt {
+
+	// Defines the width and height dimensions of the camera window
+	enum AspectRatio {
+		NoAspectRatio,  // No aspect ratio is maintained (stretch)
+		AR_16_9,		// Window Projection = (1920px, 1080px)
+		AR_1_1,			// Window Projection = (1000px, 1000px)
+	};
+}

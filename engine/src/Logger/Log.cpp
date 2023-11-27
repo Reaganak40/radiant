@@ -1,9 +1,8 @@
 #include "pch.h"
-#include "Log.h"
-
-#include <Radiant/Utils.h>
-
-namespace rdt::logger {
+#include <Radiant/Logger/Log.hpp>
+#include <Radiant/Utils/Color.hpp>
+#include <Radiant/Utils/Array.hpp>
+namespace rdt {
 
 	constexpr size_t MaxLogs = 250;
 

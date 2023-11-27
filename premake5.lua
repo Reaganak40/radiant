@@ -60,7 +60,7 @@ mtpd["Scene"]       = {}
 mtpd["Editor"]      = {"ImGui"}
 mtpd["Application"] = {}
 mtpd["Logger"]      = {"spdlog"}
-mtpd["OpenGL"]      = {"GLFW", "GLM", "GLAD", "ImGui"}
+mtpd["OpenGL"]      = {"GLFW", "glm", "glad", "ImGui"}
 
 outputFolder = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
@@ -73,8 +73,8 @@ outputFolder = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
     test       - test binaries that don't get distributed to the client
     sandbox    - primary child testing application, does not get distributed to client
 --]]
-radiant_output_dir = ("{%wks.location}/engine/bin/" .. outputFolder .. "/%{prj.name}")
-radiant_obj_dir = ("{%wks.location}/engine/bin/obj/" .. outputFolder .. "/%{prj.name}")
+radiant_output_dir = ("%{wks.location}/engine/bin/" .. outputFolder .. "/%{prj.name}")
+radiant_obj_dir = ("%{wks.location}/engine/bin/obj/" .. outputFolder .. "/%{prj.name}")
 
 thirdparty_output_dir = ("%{wks.location}/thirdparty/bin/" .. outputFolder .. "/%{prj.name}")
 thirdparty_obj_dir = ("%{wks.location}/thirdparty/bin/obj/" .. outputFolder .. "/%{prj.name}")
@@ -101,11 +101,35 @@ function GetProjectLocation(projName)
         error("Undefined project:", projName)
     end
 
-    if projName == "OpenGL" or projName == "Logger" then
+    if projName == "OpenGL" then
         return ("%{wks.location}/engine/src/Core/src/" .. projName)
     end
     
     return ("%{wks.location}/engine/src/" .. projName)
+end
+
+-- Used by radiant modules to get the header files their implementation uses
+function GetModuleHeaders(projName)
+    if projName == "OpenGL" then
+        return (radiant_private_headers .. "/Core/" .. projName .. "/*.hpp")
+    end
+    return (radiant_public_headers .. "/Radiant/" .. projName .. "/*.hpp")
+end
+
+-- Returns all the third party include directories a project uses
+function GetThirdPartyIncludes(projName)
+    local includes = {}
+    if mtpd[projName] == nil then
+        error("Undefined project:", projName)
+    end
+
+    for idx, third_party_proj in pairs(mtpd[projName]) do
+        table.insert(includes, tp_include[third_party_proj])
+        if third_party_proj == "ImGui" then
+            table.insert(includes, tp_include['ImGuiBackend'])
+        end
+    end
+    return includes
 end
 
 workspace "Radiant"

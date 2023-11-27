@@ -15,12 +15,13 @@ project "Utils"
         "**.h",
         "**.hpp",
         "**.cpp",
+        GetModuleHeaders('Utils')
     }
 
     includedirs
     {
         radiant_public_headers,
-        radiant_private_headers
+        radiant_private_headers,
     }
 
     links
@@ -33,7 +34,7 @@ project "Utils"
     }
 
     pchheader "pch.h"
-    pchsource "src/pch.cpp"
+    pchsource "pch.cpp"
 
     filter "system:windows"
         cppdialect "C++20"
