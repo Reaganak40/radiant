@@ -55,10 +55,10 @@ namespace rdt::scene {
 		~SceneManager();
 		static SceneManager* m_instance;
 
-		static void Destroy();
 	public:
-
 		static SceneManager& Get();
+		static void Destroy();
+		
 		SceneID RegisterScene(const char* sceneName, Scene* scene);
 		SceneID GetSceneID(const char* sceneName);
 		Scene* SetScene(const char* sceneName);

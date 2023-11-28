@@ -24,17 +24,17 @@
     <ClInclude Include="..\..\include\Radiant\Scene\UILayer.hpp">
       <Filter>include\Radiant\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="LayerImpl.hpp" />
     <ClInclude Include="SceneImpl.hpp" />
     <ClInclude Include="SceneManager.hpp" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="LayerImpl.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Layer.cpp" />
+    <ClCompile Include="LayerImpl.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneImpl.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="pch.cpp" />
-    <ClCompile Include="LayerImpl.cpp" />
   </ItemGroup>
 </Project>

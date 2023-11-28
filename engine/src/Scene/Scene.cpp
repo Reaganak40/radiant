@@ -113,7 +113,7 @@ void rdt::Scene::RenderUpdate()
 
 void rdt::Scene::SetCurrentScene(const char* sceneName)
 {
-	scene::SceneManager::
+	m_current_scene = scene::SceneManager::Get().SetScene(sceneName);
 }
 
 rdt::Scene& rdt::Scene::GetCurrentScene()
@@ -123,6 +123,11 @@ rdt::Scene& rdt::Scene::GetCurrentScene()
 	}
 
 	return *m_current_scene;
+}
+
+void rdt::Scene::Destroy()
+{
+	scene::SceneManager::Destroy();
 }
 
 

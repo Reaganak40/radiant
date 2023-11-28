@@ -2,6 +2,8 @@
     Premake for Module: Logger
 --]]
 
+project_name = "Logger"
+
 project "Logger"
     kind "SharedLib"
     language "C++"
@@ -10,25 +12,9 @@ project "Logger"
     objdir (radiant_obj_dir)
     ignoredefaultlibraries { "LIBCMTD" }
 
-    files
-    {
-        "**.h",
-        "**.hpp",
-        "**.cpp",
-        GetModuleHeaders('Logger'),
-    }
-
-    includedirs
-    {
-        radiant_public_headers,
-        radiant_private_headers,
-        GetThirdPartyIncludes('Logger')
-    }
-
-    links
-    {
-        md_graph["Logger"], mtpd['Logger']
-    }
+    files { GetModuleFiles(project_name) }
+    includedirs { GetModuleIncludes(project_name) }
+    links { GetModuleLinks(project_name) }
 
     postbuildcommands
     {
@@ -74,6 +60,6 @@ project "Logger"
         runtime "Release"
         defines
         {
-            "RDT_RELEASE",
+            "RDT_PUBLISH",
         }
     

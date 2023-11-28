@@ -2,6 +2,8 @@
     Premake for Module: OpenGL
 --]]
 
+project_name = "OpenGL"
+
 project "OpenGL"
     kind "SharedLib"
     language "C++"
@@ -10,31 +12,16 @@ project "OpenGL"
     objdir (radiant_obj_dir)
     ignoredefaultlibraries { "LIBCMTD" }
 
-    files
-    {
-        "**.h",
-        "**.hpp",
-        "**.cpp",
-        GetModuleHeaders('OpenGL'),
+
+    files 
+    { 
+        GetModuleFiles(project_name),
 
         -- Include the stb_image.cpp file in compilation
         "%{tp_include.stb}/**.cpp"
-    }
-
-    includedirs
-    {
-        radiant_public_headers,
-        radiant_private_headers,
-        GetThirdPartyIncludes('OpenGL'),
-
-        -- Special exception for stb
-        "%{tp_include.stb}",
-    }
-
-    links
-    {
-        md_graph["OpenGL"], mtpd['OpenGL']
-    }
+     }
+    includedirs { GetModuleIncludes(project_name) }
+    links { GetModuleLinks(project_name) }
 
     postbuildcommands
     {
@@ -85,6 +72,6 @@ project "OpenGL"
         runtime "Release"
         defines
         {
-            "RDT_RELEASE",
+            "RDT_PUBLISH",
         }
     

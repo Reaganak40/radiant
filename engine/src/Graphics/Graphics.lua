@@ -2,6 +2,8 @@
     Premake for Module: Graphics
 --]]
 
+project_name = "Graphics"
+
 project "Graphics"
     kind "SharedLib"
     language "C++"
@@ -10,24 +12,9 @@ project "Graphics"
     objdir (radiant_obj_dir)
     ignoredefaultlibraries { "LIBCMTD" }
 
-    files
-    {
-        "**.h",
-        "**.hpp",
-        "**.cpp",
-        GetModuleHeaders('Graphics'),
-    }
-
-    includedirs
-    {
-        radiant_public_headers,
-        radiant_private_headers
-    }
-
-    links
-    {
-        md_graph["Graphics"]
-    }
+    files { GetModuleFiles(project_name) }
+    includedirs { GetModuleIncludes(project_name) }
+    links { GetModuleLinks(project_name) }
 
     postbuildcommands
     {
@@ -73,6 +60,6 @@ project "Graphics"
         runtime "Release"
         defines
         {
-            "RDT_RELEASE",
+            "RDT_PUBLISH",
         }
     

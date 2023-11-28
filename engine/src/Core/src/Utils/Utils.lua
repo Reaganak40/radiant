@@ -2,6 +2,8 @@
     Premake for Module: Utils
 --]]
 
+project_name = "Utils"
+
 project "Utils"
     kind "SharedLib"
     language "C++"
@@ -10,24 +12,9 @@ project "Utils"
     objdir (radiant_obj_dir)
     ignoredefaultlibraries { "LIBCMTD" }
 
-    files
-    {
-        "**.h",
-        "**.hpp",
-        "**.cpp",
-        GetModuleHeaders('Utils')
-    }
-
-    includedirs
-    {
-        radiant_public_headers,
-        radiant_private_headers,
-    }
-
-    links
-    {
-        md_graph["Utils"]
-    }
+    files { GetModuleFiles(project_name) }
+    includedirs { GetModuleIncludes(project_name) }
+    links { GetModuleLinks(project_name) }
 
     postbuildcommands
     {
@@ -73,6 +60,6 @@ project "Utils"
         runtime "Release"
         defines
         {
-            "RDT_RELEASE",
+            "RDT_PUBLISH",
         }
     

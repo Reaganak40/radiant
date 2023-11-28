@@ -18,6 +18,9 @@
     <ClInclude Include="..\..\include\Radiant\Graphics\Camera.hpp">
       <Filter>include\Radiant\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\Radiant\Graphics\Color.hpp">
+      <Filter>include\Radiant\Graphics</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\include\Radiant\Graphics\Export.hpp">
       <Filter>include\Radiant\Graphics</Filter>
     </ClInclude>
@@ -47,6 +50,7 @@
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="AnimationSystem.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Color.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="RenderSystem.cpp" />

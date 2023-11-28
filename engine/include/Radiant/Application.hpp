@@ -37,3 +37,5 @@
 * Headers
 ***************************************************************/
 #include <Radiant/Application/Application.hpp>
+#include <Radiant/Window/WindowConfig.hpp>
+#include <Radiant/Window/AspectRatio.hpp>

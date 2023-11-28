@@ -1,5 +1,5 @@
 /***************************************************************/
-/*  Utils/AspectRatio.hpp                                      */
+/*  Window/AspectRatio.hpp                                     */
 /* *************************************************************/
 /*                 This file is a part of:                     */
 /*                -- RADIANT GAME ENGINE --                    */

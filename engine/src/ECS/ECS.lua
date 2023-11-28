@@ -2,6 +2,8 @@
     Premake for Module: ECS
 --]]
 
+project_name = "ECS"
+
 project "ECS"
     kind "SharedLib"
     language "C++"
@@ -10,24 +12,9 @@ project "ECS"
     objdir (radiant_obj_dir)
     ignoredefaultlibraries { "LIBCMTD" }
 
-    files
-    {
-        "**.h",
-        "**.hpp",
-        "**.cpp",
-        GetModuleHeaders('ECS'),
-    }
-
-    includedirs
-    {
-        radiant_public_headers,
-        radiant_private_headers
-    }
-
-    links
-    {
-        md_graph["ECS"]
-    }
+    files { GetModuleFiles(project_name) }
+    includedirs { GetModuleIncludes(project_name) }
+    links { GetModuleLinks(project_name) }
 
     postbuildcommands
     {
@@ -73,6 +60,6 @@ project "ECS"
         runtime "Release"
         defines
         {
-            "RDT_RELEASE",
+            "RDT_PUBLISH",
         }
     

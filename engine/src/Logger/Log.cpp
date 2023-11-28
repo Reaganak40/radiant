@@ -1,7 +1,9 @@
 #include "pch.h"
 #include <Radiant/Logger/Log.hpp>
-#include <Radiant/Utils/Color.hpp>
-#include <Radiant/Utils/Array.hpp>
+#include <Radiant/System/MathTypes.hpp>
+#include <Core/Utils/Array.hpp>
+#include <Core/Utils/UtilFuncs.hpp>
+
 namespace rdt {
 
 	constexpr size_t MaxLogs = 250;
@@ -16,9 +18,9 @@ namespace rdt {
 		std::ostringstream m_log_oss;
 
 		std::string m_logs[MaxLogs];
-		Color m_logColors[MaxLogs];
+		Vec4f m_logColors[MaxLogs];
 		LogLevel m_log_levels[MaxLogs];
-		Color m_level_color[5];
+		Vec4f m_level_color[5];
 
 		int logIndex;
 		bool maxReached;
@@ -42,11 +44,11 @@ namespace rdt {
 			logIndex = 0;
 			maxReached = false;
 
-			m_level_color[L_INFO] = GREEN;
-			m_level_color[L_TRACE] = WHITE;
-			m_level_color[L_WARNING] = { 0.97f, 0.74f, 0.23f, 1.0f };
-			m_level_color[L_ERROR] = RED;
-			m_level_color[L_CRITICAL] = { 0.808f, 0.0f, 0.058f, 1.0f };
+			m_level_color[L_INFO]     = { 0.2f,   0.8f,  0.2f,   1.0f };
+			m_level_color[L_TRACE]    = { 1.0f,   1.0f,  1.0f,   1.0f };
+			m_level_color[L_WARNING]  = { 0.97f,  0.74f, 0.23f,  1.0f };
+			m_level_color[L_ERROR]    = { 0.8f,   0.2f,  0.2f,   1.0f };
+			m_level_color[L_CRITICAL] = { 0.808f, 0.0f,  0.058f, 1.0f };
 		}
 
 		~Impl()
@@ -121,7 +123,7 @@ namespace rdt {
 			m_log_oss.clear();
 		}
 
-		const char* GetLog(int index, Color& msgColor)
+		const char* GetLog(int index, Vec4f& msgColor)
 		{
 			if (index >= MaxLogs) {
 				return nullptr;
@@ -212,17 +214,17 @@ namespace rdt {
 		m_impl->OnUpdate();
 	}
 
-	spdlog::logger* Log::GetCoreLogger()
+	spdlog::logger& Log::GetCoreLogger()
 	{
-		return GetImpl()->m_CoreLogger.get();
+		return *GetImpl()->m_CoreLogger;
 	}
 
-	spdlog::logger* Log::GetClientLogger()
+	spdlog::logger& Log::GetClientLogger()
 	{
-		return GetImpl()->m_ClientLogger.get();
+		return *GetImpl()->m_ClientLogger;
 	}
 
-	const char* Log::GetLog(int index, Color& msgColor)
+	const char* Log::GetLog(int index, Vec4f& msgColor)
 	{
 		return m_impl->GetLog(index, msgColor);
 	}
@@ -236,7 +238,7 @@ namespace rdt {
 		return m_impl->logIndex;
 	}
 
-	void Log::SetLogColor(LogLevel level, Color nColor)
+	void Log::SetLogColor(LogLevel level, Vec4f nColor)
 	{
 		m_impl->m_level_color[level] = nColor;
 
@@ -247,12 +249,12 @@ namespace rdt {
 		}
 	}
 
-	void rdt::logger::Log::log_to_stdout(bool yes_log)
+	void rdt::Log::log_to_stdout(bool yes_log)
 	{
 		GetImpl()->log_to_stdout(yes_log);
 	}
 
-	rdt::logger::Log::Impl* Log::GetImpl()
+	rdt::Log::Impl* Log::GetImpl()
 	{
 		if (m_impl == nullptr) {
 			Initialize();

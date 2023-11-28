@@ -12,6 +12,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\Radiant\Window\AspectRatio.hpp">
+      <Filter>include\Radiant\Window</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\include\Radiant\Window\Export.hpp">
       <Filter>include\Radiant\Window</Filter>
     </ClInclude>

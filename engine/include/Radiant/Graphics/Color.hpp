@@ -1,5 +1,5 @@
 /***************************************************************/
-/*  Utils/Color.hpp                                            */
+/*  Graphics/Color.hpp                                         */
 /* *************************************************************/
 /*                 This file is a part of:                     */
 /*                -- RADIANT GAME ENGINE --                    */
@@ -36,7 +36,8 @@
 /***************************************************************
 * Headers
 ***************************************************************/
-#include <Radiant/Utils/MathTypes.hpp>
+#include <Radiant/Graphics/Export.hpp>
+#include <Radiant/System/MathTypes.hpp>
 
 namespace rdt {
 	enum ColorType {
@@ -51,7 +52,7 @@ namespace rdt {
 		PINK
 	};
 
-	class RDT_UTILS_API Color {
+	class RDT_GRAPHICS_API Color {
 	private:
 		Vec4f m_color;
 

@@ -42,9 +42,9 @@
 * Define import/export macros for this module
 ***************************************************************/
 #if defined(RDT_BUILD_DLL)
-#define RDT_UTILS_API RDT_API_EXPORT
-#define RDT_UTILS_EXTERN extern
+	#define RDT_UTILS_API RDT_API_EXPORT
+	#define RDT_UTILS_EXTERN extern
 #else
-#define RDT_UTILS_API RDT_API_IMPORT
-#define RDT_UTILS_EXTERN
+	#define RDT_UTILS_API RDT_API_IMPORT
+	#define RDT_UTILS_EXTERN
 #endif // RADIANT_BUILD_DLL

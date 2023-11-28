@@ -2,6 +2,8 @@
     Premake for Module: Audio
 --]]
 
+project_name = "Audio"
+
 project "Audio"
     kind "SharedLib"
     language "C++"
@@ -10,25 +12,10 @@ project "Audio"
     objdir (radiant_obj_dir)
     ignoredefaultlibraries { "LIBCMTD" }
 
-    files
-    {
-        "**.h",
-        "**.hpp",
-        "**.cpp",
-        GetModuleHeaders('Audio'),
+    files { GetModuleFiles(project_name) }
+    includedirs { GetModuleIncludes(project_name) }
+    links { GetModuleLinks(project_name) }
 
-    }
-
-    includedirs
-    {
-        radiant_public_headers,
-        radiant_private_headers
-    }
-
-    links
-    {
-        md_graph["Audio"]
-    }
 
     postbuildcommands
     {
@@ -74,6 +61,6 @@ project "Audio"
         runtime "Release"
         defines
         {
-            "RDT_RELEASE",
+            "RDT_PUBLISH",
         }
     

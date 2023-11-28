@@ -1,6 +1,7 @@
 #include "pch.h"
 #include <Radiant/Scene/Layer.hpp>
 #include <Radiant/Scene/Scene.hpp>
+#include "SceneManager.hpp"
 #include "LayerImpl.hpp"
 
 #include <Radiant/Logger.hpp>
@@ -45,7 +46,7 @@ bool rdt::Layer::IsBound()
 
 rdt::LayerID rdt::Layer::RegisterLayerImpl(const char* layerName, Layer* nLayer)
 {
-	return SceneManager::RegisterLayer(layerName, nLayer);
+	return scene::SceneManager::Get().RegisterLayer(layerName, nLayer);
 }
 
 

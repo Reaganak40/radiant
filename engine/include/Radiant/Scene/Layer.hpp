@@ -59,74 +59,55 @@ namespace rdt {
 		Layer();
 		~Layer();
 	public:
-		/*
-			Gets the ID for this layer. Returns 0 if this layer
-			has no registered ID.
-		*/
+		
+		// Gets the ID for this layer. Returns 0 if this layer
+		// has no registered ID.
 		LayerID GetID();
 
-		/*
-			Gets the registered name for this Layer
-		*/
+		// Gets the registered name for this Layer
 		const char* GetName();
 
-		/*
-			Returns true if this layer is attached to a scene.
-		*/
+		// Returns true if this layer is attached to a scene.
 		bool IsAttached();
 
-		/*
-			Returns true if this layer has been bounded by the scene
-		*/
+		// Returns true if this layer has been bounded by the scene
 		bool IsBound();
 
 	protected:
 
-		/*
-			To implement function, called after this layer is assigned to a scene.
-		*/
+		// To implement function, called after this layer is assigned to a scene.
 		virtual void OnAttach() {}
 
-		/*
-			To implement function, called before this layer is unassigned from a scene.
-		*/
+		// To implement function, called before this layer is unassigned from a scene.
 		virtual void OnDetach() {}
 
-		/*
-			To implement function, called when the host layer scene is binded (making it
-			the active scene).
-		*/
+		// To implement function, called when the host layer scene is binded (making it
+		// the active scene).
 		virtual void OnBind() {}
 
-		/*
-			To implement function, called when the host layer scene is released
-			(no longer the active scene)
-		*/
+		// To implement function, called when the host layer scene is released
+		// (no longer the active scene)
 		virtual void OnRelease() {}
 
-		/*
-			To implement function, called right before the base class
-			calls ProcessInput.
-		*/
+		// To implement function, called right before the base class
+		// calls ProcessInput.
 		virtual void OnProcessInput(const float deltaTime) {}
 
-		/*
-			To implement function, called right before the base class
-			calls UpdateWorld.
-		*/
+		// To implement function, called right before the base class
+		// calls UpdateWorld.
 		virtual void OnUpdateWorld(const float deltaTime) {}
 
-		/*
-			To implement function, called right before the base class
-			calls FinalUpdate.
-		*/
+		// To implement function, called right before the base class
+		// calls FinalUpdate.
 		virtual void OnFinalUpdate() {}
 
-		/*
-			To implement function, called right before the base class
-			calls RenderUpdate.
-		*/
+		// To implement function, called right before the base class
+		// calls RenderUpdate.
 		virtual void OnRenderUpdate() {}
+
+		// Calls to change to a new scene, which will happen at the end
+		// of the current game loop.
+		void ChangeScene(const char* nScene);
 
 	private:
 		template<typename T>

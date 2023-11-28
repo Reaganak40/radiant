@@ -2,6 +2,8 @@
     Premake for Module: Scene
 --]]
 
+project_name = "Scene"
+
 project "Scene"
     kind "SharedLib"
     language "C++"
@@ -10,25 +12,9 @@ project "Scene"
     objdir (radiant_obj_dir)
     ignoredefaultlibraries { "LIBCMTD" }
 
-    files
-    {
-        "**.h",
-        "**.hpp",
-        "**.cpp",
-        GetModuleHeaders('Scene'),
-
-    }
-
-    includedirs
-    {
-        radiant_public_headers,
-        radiant_private_headers
-    }
-
-    links
-    {
-        md_graph["Scene"]
-    }
+    files { GetModuleFiles(project_name) }
+    includedirs { GetModuleIncludes(project_name) }
+    links { GetModuleLinks(project_name) }
 
     postbuildcommands
     {
@@ -74,6 +60,6 @@ project "Scene"
         runtime "Release"
         defines
         {
-            "RDT_RELEASE",
+            "RDT_PUBLISH",
         }
     

@@ -38,16 +38,22 @@
 ***************************************************************/
 #include <Radiant/Logger/Export.hpp>
 
+#ifndef RDT_DISABLE_LOGGING
+// spdlog is a header-only library that relies on templated
+// variadic functions, making it TERRIBLY incapatible with
+// traditional implementation hiding patterns. So, the library
+// must be available by the module or client to use it.
+//
+// if library not found, logging is disabled.
+#include <spdlog/spdlog.h>
+
 /***************************************************************
-* Define import/export macros for this module
+* Forward Declarations
 ***************************************************************/
 namespace rdt {
-	class Color;
+	struct Vec4f;
 }
 
-namespace spdlog {
-	class logger;
-}
 namespace rdt {
 	
 	enum LogLevel {
@@ -79,15 +85,15 @@ namespace rdt {
 		*/
 		static void Update();
 
-		static spdlog::logger* GetCoreLogger();
-		static spdlog::logger* GetClientLogger();
+		static spdlog::logger& GetCoreLogger();
+		static spdlog::logger& GetClientLogger();
 
 		/*
 			Gets a log message fro mthe log buffer at the given index. If no
 			log found at the given index returns nullptr. Changes the msgColor
 			reference to the intended text color of the log.
 		*/
-		static const char* GetLog(int index, Color& msgColor);
+		static const char* GetLog(int index, Vec4f& msgColor);
 
 		/*
 			Returns the number of logs in the log buffer
@@ -97,7 +103,7 @@ namespace rdt {
 		/*
 			Set the log color for logs at the given log level.
 		*/
-		static void SetLogColor(LogLevel level, Color nColor);
+		static void SetLogColor(LogLevel level, Vec4f nColor);
 
 		/*
 			Activates the stdout buffer stream sink, allowing logging
@@ -110,45 +116,56 @@ namespace rdt {
 	};
 }
 
-#ifdef RDT_USE_EDITOR
+
+#endif //RDT_DISABLE_LOGGING
 
 
-// Core Logging Macros
-#define RDT_CORE_TRACE(...)
-#define RDT_CORE_INFO(...)
-#define RDT_CORE_WARN(...)
-#define RDT_CORE_ERROR(...)
-#define RDT_CORE_FATAL(...)
+/***************************************************************
+* No logging available -- delete functions
+***************************************************************/
+#ifdef RDT_DISABLE_LOGGING
+	// Core Logging Macros
+	#define RDT_CORE_TRACE(...)
+	#define RDT_CORE_INFO(...)
+	#define RDT_CORE_WARN(...)
+	#define RDT_CORE_ERROR(...)
+	#define RDT_CORE_FATAL(...)
 
-// Core Logging Macros
-//#define RDT_CORE_TRACE(...) ::rdt::logger::Log::GetCoreLogger()->trace(__VA_ARGS__)
-//#define RDT_CORE_INFO(...)  ::rdt::logger::Log::GetCoreLogger()->info(__VA_ARGS__)
-//#define RDT_CORE_WARN(...)  ::rdt::logger::Log::GetCoreLogger()->warn(__VA_ARGS__)
-//#define RDT_CORE_ERROR(...) ::rdt::logger::Log::GetCoreLogger()->error(__VA_ARGS__)
-//#define RDT_CORE_FATAL(...) ::rdt::logger::Log::GetCoreLogger()->critical(__VA_ARGS__)
-
-// Client Logging Macros
-#define RDT_TRACE(...) ::rdt::logger::Log::GetClientLogger()->trace(__VA_ARGS__)
-#define RDT_INFO(...)  ::rdt::logger::Log::GetClientLogger()->info(__VA_ARGS__)
-#define RDT_WARN(...)  ::rdt::logger::Log::GetClientLogger()->warn(__VA_ARGS__)
-#define RDT_ERROR(...) ::rdt::logger::Log::GetClientLogger()->error(__VA_ARGS__)
-#define RDT_FATAL(...) ::rdt::logger::Log::GetClientLogger()->critical(__VA_ARGS__)
-
+	// Client Logging Macros
+	#define RDT_TRACE(...)
+	#define RDT_INFO(...)
+	#define RDT_WARN(...)
+	#define RDT_ERROR(...)
+	#define RDT_FATAL(...)
 #else
 
-// Core Logging Macros
-#define RDT_CORE_TRACE(...)
-#define RDT_CORE_INFO(...)
-#define RDT_CORE_WARN(...)
-#define RDT_CORE_ERROR(...)
-#define RDT_CORE_FATAL(...)
+/***************************************************************
+* Enable core logger if using editor / in debug mode
+***************************************************************/
+	#ifdef RDT_USE_EDITOR
+		// Core Logging Macros
+		#define RDT_CORE_TRACE(...) ::rdt::Log::GetCoreLogger().trace(__VA_ARGS__)
+		#define RDT_CORE_INFO(...)  ::rdt::Log::GetCoreLogger().info(__VA_ARGS__)
+		#define RDT_CORE_WARN(...)  ::rdt::Log::GetCoreLogger().warn(__VA_ARGS__)
+		#define RDT_CORE_ERROR(...) ::rdt::Log::GetCoreLogger().error(__VA_ARGS__)
+		#define RDT_CORE_FATAL(...) ::rdt::Log::GetCoreLogger().critical(__VA_ARGS__)
+	#else
+		// Core Logging Macros
+		#define RDT_CORE_TRACE(...)
+		#define RDT_CORE_INFO(...)
+		#define RDT_CORE_WARN(...)
+		#define RDT_CORE_ERROR(...)
+		#define RDT_CORE_FATAL(...)
+	#endif
+	
 
-// Client Logging Macros
-#define RDT_TRACE(...)
-#define RDT_INFO(...)
-#define RDT_WARN(...)
-#define RDT_ERROR(...)
-#define RDT_FATAL(...)
-
+/***************************************************************
+* Enable client logger if not in publish mode
+***************************************************************/
+	// Client Logging Macros
+	#define RDT_TRACE(...) ::rdt::logger::Log::GetClientLogger().trace(__VA_ARGS__)
+	#define RDT_INFO(...)  ::rdt::logger::Log::GetClientLogger().info(__VA_ARGS__)
+	#define RDT_WARN(...)  ::rdt::logger::Log::GetClientLogger().warn(__VA_ARGS__)
+	#define RDT_ERROR(...) ::rdt::logger::Log::GetClientLogger().error(__VA_ARGS__)
+	#define RDT_FATAL(...) ::rdt::logger::Log::GetClientLogger().critical(__VA_ARGS__)
 #endif
-

@@ -15,12 +15,6 @@
     <ClInclude Include="..\..\include\Core\Utils\Array.hpp">
       <Filter>include\Core\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Core\Utils\AspectRatio.hpp">
-      <Filter>include\Core\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Core\Utils\Color.hpp">
-      <Filter>include\Core\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\Core\Utils\Common.hpp">
       <Filter>include\Core\Utils</Filter>
     </ClInclude>
@@ -33,9 +27,6 @@
     <ClInclude Include="..\..\include\Core\Utils\Export.hpp">
       <Filter>include\Core\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Core\Utils\MathTypes.hpp">
-      <Filter>include\Core\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\Core\Utils\String.hpp">
       <Filter>include\Core\Utils</Filter>
     </ClInclude>
@@ -45,10 +36,8 @@
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Color.cpp" />
     <ClCompile Include="ConfigReader.cpp" />
     <ClCompile Include="Error.cpp" />
-    <ClCompile Include="MathTypes.cpp" />
     <ClCompile Include="String.cpp" />
     <ClCompile Include="UtilFuncs.cpp" />
     <ClCompile Include="pch.cpp" />

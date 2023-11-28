@@ -2,6 +2,8 @@
     Premake for Module: Window
 --]]
 
+project_name = "Window"
+
 project "Window"
     kind "SharedLib"
     language "C++"
@@ -10,24 +12,10 @@ project "Window"
     objdir (radiant_obj_dir)
     ignoredefaultlibraries { "LIBCMTD" }
 
-    files
-    {
-        "**.h",
-        "**.hpp",
-        "**.cpp",
-        GetModuleHeaders('Window')
-    }
+    files { GetModuleFiles(project_name) }
+    includedirs { GetModuleIncludes(project_name) }
+    links { GetModuleLinks(project_name) }
 
-    includedirs
-    {
-        radiant_public_headers,
-        radiant_private_headers
-    }
-
-    links
-    {
-        md_graph["Window"]
-    }
 
     postbuildcommands
     {
@@ -73,6 +61,6 @@ project "Window"
         runtime "Release"
         defines
         {
-            "RDT_RELEASE",
+            "RDT_PUBLISH",
         }
     

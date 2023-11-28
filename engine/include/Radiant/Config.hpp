@@ -61,3 +61,24 @@
 	#pragma message("Graphics platform not defined... using OpenGL by default.") 
 	#define RDT_USE_OPENGL
 #endif
+
+/***************************************************************
+* Detect spdlog availability
+***************************************************************/
+#ifndef RDT_DISABLE_LOGGING
+	#if !__has_include("spdlog/spdlog.h")
+		#pragma message("spdlog.h not found, logging is disabled.") 
+		#define RDT_DISABLE_LOGGING
+	#elif defined(RDT_PUBLISH)
+		#pragma message("compiling in publish mode, logging is disabled.") 
+		#define RDT_DISABLE_LOGGING
+	#endif
+#endif
+
+/***************************************************************
+* Sanity check - in debug/release/publish configuration
+***************************************************************/
+#if defined(RDT_DEBUG) || defined(RDT_RELEASE) || defined(RDT_PUBLISH)
+#else
+#error Unsupported configuration! (supported types: debug, release, publish)
+#endif

@@ -52,17 +52,17 @@ tp_include["spdlog"]        = "%{wks.location}/thirdparty/spdlog/spdlog/include"
     NOTE: This only includes third party vs projects
 --]]
 mtpd = {}
-mtpd["Utils"]       = {}
-mtpd["Window"]      = {}
-mtpd["Graphics"]    = {"GLM"}
-mtpd["Physics"]     = {}
-mtpd["Audio"]       = {"openal"}
-mtpd["ECS"]         = {}
-mtpd["Scene"]       = {}
-mtpd["Editor"]      = {"ImGui"}
-mtpd["Application"] = {}
+mtpd["Utils"]       = {"spdlog"}
+mtpd["Window"]      = {"spdlog"}
+mtpd["Graphics"]    = {"spdlog","GLM"}
+mtpd["Physics"]     = {"spdlog"}
+mtpd["Audio"]       = {"spdlog","openal"}
+mtpd["ECS"]         = {"spdlog"}
+mtpd["Scene"]       = {"spdlog"}
+mtpd["Editor"]      = {"spdlog","ImGui"}
+mtpd["Application"] = {"spdlog"}
 mtpd["Logger"]      = {"spdlog"}
-mtpd["OpenGL"]      = {"GLFW", "glm", "glad", "ImGui"}
+mtpd["OpenGL"]      = {"spdlog","GLFW", "glm", "glad", "ImGui", "stb"}
 
 outputFolder = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
@@ -119,16 +119,25 @@ function GetProjectLocation(projName)
 end
 
 -- Used by radiant modules to get the header files their implementation uses
-function GetModuleHeaders(projName)
-    if IsCoreModule(projName) then
-        return (radiant_private_headers .. "/Core/" .. projName .. "/*.hpp")
+function GetModuleFiles(projName)
+    local ret_files = {  "**.h", "**.hpp", "**.cpp"}
+    if md_graph[projName] == nil then
+        error("Undefined project:", projName)
     end
-    return (radiant_public_headers .. "/Radiant/" .. projName .. "/*.hpp")
+
+    if IsCoreModule(projName) then
+        table.insert(ret_files, (radiant_private_headers .. "/Core/" .. projName .. "/*.hpp"))
+    else
+        table.insert(ret_files, (radiant_public_headers .. "/Radiant/" .. projName .. "/*.hpp"))
+    end
+
+    return ret_files
 end
 
--- Returns all the third party include directories a project uses
-function GetThirdPartyIncludes(projName)
-    local includes = {}
+-- Returns the list of include directories for the given project
+function GetModuleIncludes(projName)
+    local includes = { radiant_public_headers, radiant_private_headers }
+    
     if mtpd[projName] == nil then
         error("Undefined project:", projName)
     end
@@ -140,6 +149,10 @@ function GetThirdPartyIncludes(projName)
         end
     end
     return includes
+end
+
+function GetModuleLinks(projName)
+    return { md_graph[projName], mtpd[projName] }
 end
 
 workspace "Radiant"
