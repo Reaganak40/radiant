@@ -1,5 +1,5 @@
 /***************************************************************/
-/*  Application/Application.hpp                                */
+/*  (Core) Utils/Error.hpp                                     */
 /* *************************************************************/
 /*                 This file is a part of:                     */
 /*                -- RADIANT GAME ENGINE --                    */
@@ -36,53 +36,16 @@
 /***************************************************************
 * Headers
 ***************************************************************/
-#include <Radiant/Application/Export.hpp>
+#include <Core/Utils/Export.hpp>
+#include <Radiant/Logger.hpp>
 
-/***************************************************************
-* Forward Delcarations
-***************************************************************/
-namespace rdt {
-	class Scene;
-	class WindowConfig;
-}
+namespace rdt::core {
 
-namespace rdt {
-
-	// Serves as the central module that defines child applications
-	// and controls the flow of the program. Application is
-	// reponsible for launching windows, handling scenes between
-	// the client and the back-end, and running the game loop.
-	class RDT_APP_API Application
-	{
-	private:
-		struct Impl;
-		static Impl* m_impl;
-
-	public:
-		Application();
-		virtual ~Application();
-
-		// Runs and manages the game loop, and will continue to run until the application is closed.
-		void Run();
-
-	protected:
-		
-		// Returns the application's window configuration struct, which can be
-		// edited before OnStart to configurate the game window.
-		WindowConfig& GetWindowConfig();
-
-		// Called right before the game loop begins to define and setup scenes.
-		virtual void OnGameBegin() {}
-
-		// Sets the starting scene that is called at the beginning of the
-		// game. This function should be called in the body of OnGameBegin().
-		void BeginScene(const char* sceneName);
-
-	private:
+	enum RadiantErrorType {
+		RadiantErrorType_NotAssigned = 0,
 	};
 
-	// To be implemented by client, this function is used by the entry
-	// point to create a new instance of a Radiant application. Should
-	// return a child implementation of Application.
-	Application* CreateApplication();
+	void ThrowRadiantError(RadiantErrorType type);
 }
+
+#define RDT_THROW_NOT_ASSIGNED_EXCEPTION(...) RDT_CORE_FATAL(__VA_ARGS__); ::rdt::core::ThrowRadiantError(::rdt::core::RadiantErrorType_NotAssigned)

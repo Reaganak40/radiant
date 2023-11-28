@@ -4,8 +4,26 @@
     <Filter Include="Texture">
       <UniqueIdentifier>{76AD313A-E28C-B0D5-EBA4-3BAC57031737}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{89AF369E-F58E-B539-FEA6-40106A051C9B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Radiant">
+      <UniqueIdentifier>{1BEADCCD-8775-4A92-9086-CD86FC90A692}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Radiant\Graphics">
+      <UniqueIdentifier>{BB401556-A765-64D6-D0B0-4966BC3463F4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\Radiant\Graphics\Camera.hpp">
+      <Filter>include\Radiant\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Radiant\Graphics\Export.hpp">
+      <Filter>include\Radiant\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Radiant\Graphics\Renderer.hpp">
+      <Filter>include\Radiant\Graphics</Filter>
+    </ClInclude>
     <ClInclude Include="Animation.h" />
     <ClInclude Include="AnimationSystem.h" />
     <ClInclude Include="Camera.h" />
@@ -14,8 +32,6 @@
     <ClInclude Include="RenderSystem.h" />
     <ClInclude Include="RenderTypes.h" />
     <ClInclude Include="RenderWindow.h" />
-    <ClInclude Include="Renderer-Old.h" />
-    <ClInclude Include="Renderer.h" />
     <ClInclude Include="Texture\Texture.h">
       <Filter>Texture</Filter>
     </ClInclude>
@@ -25,6 +41,7 @@
     <ClInclude Include="Texture\TextureManager.h">
       <Filter>Texture</Filter>
     </ClInclude>
+    <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
@@ -34,7 +51,6 @@
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="RenderSystem.cpp" />
     <ClCompile Include="RenderWindow.cpp" />
-    <ClCompile Include="Renderer-Old.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Texture\Texture.cpp">
       <Filter>Texture</Filter>
@@ -45,5 +61,6 @@
     <ClCompile Include="Texture\TextureManager.cpp">
       <Filter>Texture</Filter>
     </ClCompile>
+    <ClCompile Include="pch.cpp" />
   </ItemGroup>
 </Project>

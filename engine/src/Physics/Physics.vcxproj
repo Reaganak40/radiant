@@ -143,6 +143,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\Radiant\Physics\Collider.hpp" />
+    <ClInclude Include="..\..\include\Radiant\Physics\Collision.hpp" />
+    <ClInclude Include="..\..\include\Radiant\Physics\Physics.hpp" />
+    <ClInclude Include="..\..\include\Radiant\Physics\Realm.hpp" />
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Physics.cpp" />
@@ -150,7 +156,7 @@
     <ClCompile Include="Realm.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Utils\Utils.vcxproj">
+    <ProjectReference Include="..\Core\src\Utils\Utils.vcxproj">
       <Project>{6DA62344-D910-D8BA-224F-89608EF8B50F}</Project>
     </ProjectReference>
   </ItemGroup>

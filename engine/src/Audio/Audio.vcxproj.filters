@@ -4,8 +4,20 @@
     <Filter Include="Sound">
       <UniqueIdentifier>{4ED01B0E-BAE4-43BF-8366-E71EEF3940F0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{89AF369E-F58E-B539-FEA6-40106A051C9B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Radiant">
+      <UniqueIdentifier>{1BEADCCD-8775-4A92-9086-CD86FC90A692}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Radiant\Audio">
+      <UniqueIdentifier>{5C60450F-C8CC-000A-91C0-9867FDEB2272}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\Radiant\Audio\Export.hpp">
+      <Filter>include\Radiant\Audio</Filter>
+    </ClInclude>
     <ClInclude Include="AudioError.h" />
     <ClInclude Include="Sound\Sound.h">
       <Filter>Sound</Filter>

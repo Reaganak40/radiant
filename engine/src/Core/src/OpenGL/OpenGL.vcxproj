@@ -178,7 +178,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Utils\Utils.vcxproj">
+    <ProjectReference Include="..\Utils\Utils.vcxproj">
       <Project>{6DA62344-D910-D8BA-224F-89608EF8B50F}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\thirdparty\glfw\GLFW.vcxproj">

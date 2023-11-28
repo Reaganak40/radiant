@@ -28,7 +28,6 @@ target_dirs = [
     "thirdparty/imgui",
     "thirdparty/glm",
     
-    "engine/src/Utils",
     "engine/src/Window",
     "engine/src/Graphics",
     "engine/src/Logger",
@@ -36,10 +35,11 @@ target_dirs = [
     "engine/src/Audio",
     "engine/src/ECS",
     "engine/src/Scene",
-    "engine/src/Editor",
     "engine/src/Application",
     
+    "engine/src/Core/src/Utils",
     "engine/src/Core/src/OpenGL",
+    "engine/src/Core/src/Editor",
     
     "tests/glCore",
     "sandbox",

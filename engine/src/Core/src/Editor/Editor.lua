@@ -15,6 +15,8 @@ project "Editor"
         "**.h",
         "**.hpp",
         "**.cpp",
+        GetModuleHeaders('Editor'),
+
     }
 
     includedirs
@@ -33,7 +35,7 @@ project "Editor"
     }
 
     pchheader "pch.h"
-    pchsource "src/pch.cpp"
+    pchsource "pch.cpp"
 
     filter "system:windows"
         cppdialect "C++20"

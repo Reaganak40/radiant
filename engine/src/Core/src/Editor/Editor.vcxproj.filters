@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{89AF369E-F58E-B539-FEA6-40106A051C9B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Core">
+      <UniqueIdentifier>{81F1C769-6D54-570E-16DA-8FC4021C2391}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Core\Editor">
+      <UniqueIdentifier>{9753AD94-03B5-8AA2-8C22-D154F882C161}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\Core\Editor\Editor.hpp">
+      <Filter>include\Core\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Core\Editor\Export.hpp">
+      <Filter>include\Core\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor.h" />
+    <ClInclude Include="IconsForkAwesome.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Editor.cpp" />
+  </ItemGroup>
+</Project>

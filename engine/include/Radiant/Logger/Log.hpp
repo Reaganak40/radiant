@@ -112,12 +112,20 @@ namespace rdt {
 
 #ifdef RDT_USE_EDITOR
 
+
 // Core Logging Macros
-#define RDT_CORE_TRACE(...) ::rdt::logger::Log::GetCoreLogger()->trace(__VA_ARGS__)
-#define RDT_CORE_INFO(...)  ::rdt::logger::Log::GetCoreLogger()->info(__VA_ARGS__)
-#define RDT_CORE_WARN(...)  ::rdt::logger::Log::GetCoreLogger()->warn(__VA_ARGS__)
-#define RDT_CORE_ERROR(...) ::rdt::logger::Log::GetCoreLogger()->error(__VA_ARGS__)
-#define RDT_CORE_FATAL(...) ::rdt::logger::Log::GetCoreLogger()->critical(__VA_ARGS__)
+#define RDT_CORE_TRACE(...)
+#define RDT_CORE_INFO(...)
+#define RDT_CORE_WARN(...)
+#define RDT_CORE_ERROR(...)
+#define RDT_CORE_FATAL(...)
+
+// Core Logging Macros
+//#define RDT_CORE_TRACE(...) ::rdt::logger::Log::GetCoreLogger()->trace(__VA_ARGS__)
+//#define RDT_CORE_INFO(...)  ::rdt::logger::Log::GetCoreLogger()->info(__VA_ARGS__)
+//#define RDT_CORE_WARN(...)  ::rdt::logger::Log::GetCoreLogger()->warn(__VA_ARGS__)
+//#define RDT_CORE_ERROR(...) ::rdt::logger::Log::GetCoreLogger()->error(__VA_ARGS__)
+//#define RDT_CORE_FATAL(...) ::rdt::logger::Log::GetCoreLogger()->critical(__VA_ARGS__)
 
 // Client Logging Macros
 #define RDT_TRACE(...) ::rdt::logger::Log::GetClientLogger()->trace(__VA_ARGS__)

@@ -143,10 +143,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\Radiant\Application\Application.hpp" />
+    <ClInclude Include="..\..\include\Radiant\Application\Export.hpp" />
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="Application.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Utils\Utils.vcxproj">
+    <ProjectReference Include="..\Core\src\Utils\Utils.vcxproj">
       <Project>{6DA62344-D910-D8BA-224F-89608EF8B50F}</Project>
     </ProjectReference>
     <ProjectReference Include="..\Window\Window.vcxproj">
@@ -155,7 +159,7 @@
     <ProjectReference Include="..\Scene\Scene.vcxproj">
       <Project>{AAA88F7A-1613-44F1-5F51-F596CBFA2146}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Editor\Editor.vcxproj">
+    <ProjectReference Include="..\Core\src\Editor\Editor.vcxproj">
       <Project>{0390B2A0-EF47-F4ED-584F-CD4944268FDE}</Project>
     </ProjectReference>
   </ItemGroup>

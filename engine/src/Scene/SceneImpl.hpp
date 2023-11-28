@@ -1,5 +1,5 @@
 /***************************************************************/
-/*  Application/Application.hpp                                */
+/*  (impl) Scene/SceneImpl.hpp                                 */
 /* *************************************************************/
 /*                 This file is a part of:                     */
 /*                -- RADIANT GAME ENGINE --                    */
@@ -34,55 +34,33 @@
 #pragma once
 
 /***************************************************************
-* Headers
-***************************************************************/
-#include <Radiant/Application/Export.hpp>
-
-/***************************************************************
-* Forward Delcarations
+* Forward Declarations
 ***************************************************************/
 namespace rdt {
-	class Scene;
-	class WindowConfig;
+	using SceneID = unsigned int;
+	using LayerID = unsigned int;
+	class Layer;
 }
 
-namespace rdt {
+namespace rdt::scene {
 
-	// Serves as the central module that defines child applications
-	// and controls the flow of the program. Application is
-	// reponsible for launching windows, handling scenes between
-	// the client and the back-end, and running the game loop.
-	class RDT_APP_API Application
-	{
-	private:
-		struct Impl;
-		static Impl* m_impl;
+	struct SceneImpl {
+		SceneID m_ID = RDT_NULL_SCENE_ID;
+		std::string m_name;
 
-	public:
-		Application();
-		virtual ~Application();
+		std::vector<Layer*> m_layer_stack;
+		bool is_bound = false;
 
-		// Runs and manages the game loop, and will continue to run until the application is closed.
-		void Run();
+		SceneImpl();
+		~SceneImpl();
 
-	protected:
-		
-		// Returns the application's window configuration struct, which can be
-		// edited before OnStart to configurate the game window.
-		WindowConfig& GetWindowConfig();
+		inline void SetSceneID(SceneID nID) { m_ID = nID; }
+		void SetSceneName(const char* nName);
 
-		// Called right before the game loop begins to define and setup scenes.
-		virtual void OnGameBegin() {}
-
-		// Sets the starting scene that is called at the beginning of the
-		// game. This function should be called in the body of OnGameBegin().
-		void BeginScene(const char* sceneName);
-
-	private:
+		void RemoveFromLayerStack(LayerID lID);
+		void AddToLayerStack(Layer* layer, size_t index);
+		void BindLayers();
+		void ReleaseLayers();
+		void DetachAll();
 	};
-
-	// To be implemented by client, this function is used by the entry
-	// point to create a new instance of a Radiant application. Should
-	// return a child implementation of Application.
-	Application* CreateApplication();
 }

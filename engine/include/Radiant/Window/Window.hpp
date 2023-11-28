@@ -51,6 +51,16 @@ namespace rdt {
 	class RDT_WINDOW_API Window {
 	public:
 
+		// Returns the current instance's window configuration struct, which allows
+		// the client to configure the window before launch
+		virtual WindowConfig& GetWindowConfig() = 0;
+
+		// Returns true if the window is launched and current running
+		virtual bool IsOpen() = 0;
+
+	private:
+		friend class Application; // application handles the window internally
+
 		// Creates a new instance of a Radiant window, but does not launch it.
 		// There can only be one window instance at a time. If one is active
 		// it will be deleted.
@@ -62,14 +72,7 @@ namespace rdt {
 		// Gets the instantiated window
 		static Window& GetInstance();
 
-		// Returns the current instance's window configuration struct, which allows
-		// the client to configure the window before launch
-		virtual WindowConfig& GetWindowConfig() = 0;
-
 		// Launches the window instance under its current configurations
 		virtual void LaunchWindow() = 0;
-
-		// Returns true if the window is launched and current running
-		virtual bool IsOpen() = 0;
 	};
 }

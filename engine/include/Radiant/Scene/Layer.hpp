@@ -1,5 +1,42 @@
+/***************************************************************/
+/*  Scene/Layer.hpp                                            */
+/* *************************************************************/
+/*                 This file is a part of:                     */
+/*                -- RADIANT GAME ENGINE --                    */
+/*         https://github.com/Reaganak40/radiant               */
+/***************************************************************/
+/*            Copyright(c) 2023 Reagan Kelley                  */
+/*                                                             */
+/*  Permission  is  hereby  granted, free  of charge, to  any  */
+/*  person obtaining a copy of this  software and  associated  */
+/*  documentation  files(the  "Software"), to  deal  in   the  */
+/*  Software without restriction,including without limitation  */
+/*  the   rights   to  use,  copy,  modify,  merge,  publish,  */
+/*  distribute,  sublicense,  and  /or  sell  copies  of  the  */
+/*  Software,  and to permit persons to whom the  Software is  */
+/*  furnished to do so, subject to the following conditions:   */
+/*                                                             */
+/*  The  above  copyright  notice  and this permission notice  */
+/*  shall  be  included in all copies or substantial portions  */
+/*  of the Software.                                           */
+/*                                                             */
+/*  THE  SOFTWARE  IS PROVIDED  "AS IS",  WITHOUT WARRANTY OF  */
+/*  ANY KIND,  EXPRESS OR IMPLIED, INCLUDING  BUT NOT LIMITED  */
+/*  TO THE  WARRANTIES  OF  MERCHANTABILITY,  FITNESS  FOR  A  */
+/*  PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT  SHALL  */
+/*  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,  */
+/*  DAMAGES OR OTHER  LIABILITY,  WHETHER  IN  AN  ACTION  OF  */
+/*  CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT  OF  OR IN  */
+/*  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS  */
+/*  IN THE SOFTWARE.                                           */
+/***************************************************************/
+
 #pragma once
-#include "scene_api.h"
+
+/***************************************************************
+* Headers
+***************************************************************/
+#include <Radiant/Scene/Export.hpp>
 
 // Forward Declarations
 namespace rdt {
@@ -7,16 +44,16 @@ namespace rdt {
 	using SceneID = unsigned int;
 }
 namespace rdt::scene {
+	struct LayerImpl;
 	class SceneManager;
 }
 
 #define RDT_NULL_LAYER_ID 0
 
-namespace rdt::scene {
-	class SCENE_API Layer {
+namespace rdt {
+	class RDT_SCENE_API Layer {
 	private:
-		struct Impl;
-		Impl* m_impl;
+		scene::LayerImpl* m_impl;
 
 	protected:
 		Layer();
@@ -42,11 +79,6 @@ namespace rdt::scene {
 			Returns true if this layer has been bounded by the scene
 		*/
 		bool IsBound();
-
-		template<typename T>
-		friend LayerID RegisterLayer(const char* layerName);
-		friend class SceneManager;
-		friend class Scene;
 
 	protected:
 
@@ -97,17 +129,18 @@ namespace rdt::scene {
 		virtual void OnRenderUpdate() {}
 
 	private:
+		template<typename T>
+		friend LayerID RegisterLayer(const char* layerName);
 		static LayerID RegisterLayerImpl(const char* layerName, Layer* nLayer);
-		void SetLayerID(LayerID nID);
-		void SetName(const char* name);
 
-		SceneID GetAttachedSceneID();
+		friend class scene::SceneManager;
+		friend class Scene;
 
+		scene::LayerImpl& GetImpl();
 		void Attach(SceneID sID);
 		void Detach();
 		void Bind();
 		void Release();
-
 		void ProcessInput(const float deltaTime);
 		void WorldUpdate(const float deltaTime);
 		void FinalUpdate();

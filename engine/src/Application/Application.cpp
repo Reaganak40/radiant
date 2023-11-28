@@ -1,34 +1,26 @@
 #include <Radiant/Application/Application.hpp>
+
+#include <Radiant/Window/Window.hpp>
 #include <Radiant/Window/WindowConfig.hpp>
+#include <Radiant/Graphics/Renderer.hpp>
+#include <Radiant/Scene/Scene.hpp>
 
 namespace rdt {
 
 	struct Application::Impl {
-		std::shared_ptr<WindowConfig> m_config;
-		LoopPhase m_current_phase = LoopPhase_Begin;
+		size_t refCount = 0; // used to avoid more than one application instance
 		float deltaTime = 0.0f;
 
 		Impl()
 		{
-			
-			logger::Log::Initialize();
-#ifdef RDT_DEBUG
-			logger::Log::log_to_stdout();
-#endif // RDT_DEBUG
-
-			m_config = CreateWindowConfig();
+			Window::Create(); // create but do not launch window
 		}
 
 		~Impl()
 		{
-			TearDown();
 		}
 
 		void RunGameLoop() {
-
-#ifdef RDT_USE_EDITOR
-			editor::Editor::Test();
-#endif
 
 			while (IsRunning()) {
 				
@@ -44,78 +36,71 @@ namespace rdt {
 
 				EndFrame();
 			}
-		}
 
-		WindowConfig& GetWindowConfig() {
-			return *m_config;
+			TearDown();
 		}
-
-		/*
-			Starts a new Radiant application, launching the window instance. Aspect ratio is 16:9 by default.
-			Window is resizable by default.
-		*/
+		
+		// Initializes the rest of the Radiant modules
 		void OnStart() {
-			utils::SetRandomSeed();
-
-			graphics::Renderer::Initialize();
-			graphics::Renderer::SetWindowConfig(m_config);
-			graphics::Renderer::LaunchWindow();
+			Window::GetInstance().LaunchWindow();
+			Renderer::Initialize();
 		}
 
 		bool IsRunning() {
-			return !graphics::Renderer::WindowShouldClose();
+			return Window::GetInstance().IsOpen();
 		}
 
 		void BeginFrame() {
-			m_current_phase = LoopPhase_Begin;
-			graphics::Renderer::OnBeginFrame();
-			deltaTime = graphics::Renderer::GetDeltaTime();
-
+			Renderer::OnBeginFrame();
 		}
 
 		void ProcessInput() {
-			m_current_phase = LoopPhase_ProcessInput;
-			scene::CallUpdate(m_current_phase, deltaTime);
+			Scene::GetCurrentScene().ProcessInput(deltaTime);
 		}
 
 		void WorldUpdate() {
-			m_current_phase = LoopPhase_WorldUpdate;
-			scene::CallUpdate(m_current_phase, deltaTime);
+			Scene::GetCurrentScene().WorldUpdate(deltaTime);
 		}
 
 		void FinalUpdate() {
-			m_current_phase = LoopPhase_FinalUpdate;
-			scene::CallUpdate(m_current_phase);
+			Scene::GetCurrentScene().FinalUpdate();
 		}
 
 		void RenderUpdate() {
-			m_current_phase = LoopPhase_RenderUpdate;
-			scene::CallUpdate(m_current_phase);
-			graphics::Renderer::Render();
+			Scene::GetCurrentScene().RenderUpdate();
+			Renderer::Render();
 		}
 
 		void EndFrame() {
-			m_current_phase = LoopPhase_End;
-			graphics::Renderer::OnEndFrame();
+			Renderer::OnEndFrame();
 		}
 
 		void TearDown() {
-			scene::TearDown();
-			graphics::Renderer::Destroy();
-			logger::Log::Destroy();
+			Renderer::Destroy();
+			Window::Destroy();
 		}
 	};
 }
 
 // =============================================================
+rdt::Application::Impl* rdt::Application::m_impl = nullptr;
+
 rdt::Application::Application()
-	: m_impl(new Application::Impl)
 {
+	if (m_impl == nullptr) {
+		m_impl = new Application::Impl;
+	}
+	m_impl->refCount++;
 }
 
 rdt::Application::~Application()
 {
-	delete m_impl;
+	if (m_impl != nullptr) {
+		if ((--m_impl->refCount) == 0) {
+			delete m_impl;
+			m_impl = nullptr;
+		}
+	}
 }
 
 void rdt::Application::Run()
@@ -127,5 +112,10 @@ void rdt::Application::Run()
 
 rdt::WindowConfig& rdt::Application::GetWindowConfig()
 {
-	return m_impl->GetWindowConfig();
+	return Window::GetInstance().GetWindowConfig();
+}
+
+void rdt::Application::BeginScene(const char* sceneName)
+{
+	Scene::SetCurrentScene(sceneName);
 }

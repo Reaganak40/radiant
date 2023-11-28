@@ -15,6 +15,8 @@ project "Scene"
         "**.h",
         "**.hpp",
         "**.cpp",
+        GetModuleHeaders('Scene'),
+
     }
 
     includedirs
@@ -33,7 +35,7 @@ project "Scene"
     }
 
     pchheader "pch.h"
-    pchsource "src/pch.cpp"
+    pchsource "pch.cpp"
 
     filter "system:windows"
         cppdialect "C++20"

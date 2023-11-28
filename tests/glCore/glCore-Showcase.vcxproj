@@ -149,7 +149,7 @@
     <ProjectReference Include="..\..\engine\src\Core\src\OpenGL\OpenGL.vcxproj">
       <Project>{01CB0E60-ED82-50AD-568A-29094261EB9D}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\engine\src\Utils\Utils.vcxproj">
+    <ProjectReference Include="..\..\engine\src\Core\src\Utils\Utils.vcxproj">
       <Project>{6DA62344-D910-D8BA-224F-89608EF8B50F}</Project>
     </ProjectReference>
   </ItemGroup>

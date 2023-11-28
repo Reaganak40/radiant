@@ -15,6 +15,7 @@ project "Physics"
         "**.h",
         "**.hpp",
         "**.cpp",
+        GetModuleHeaders('Physics'),
     }
 
     includedirs

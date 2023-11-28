@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\Radiant\Audio\Export.hpp" />
     <ClInclude Include="AudioError.h" />
     <ClInclude Include="Sound\Sound.h" />
     <ClInclude Include="Sound\SoundEffect.h" />
@@ -159,7 +160,7 @@
     <ClCompile Include="SoundSource.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Utils\Utils.vcxproj">
+    <ProjectReference Include="..\Core\src\Utils\Utils.vcxproj">
       <Project>{6DA62344-D910-D8BA-224F-89608EF8B50F}</Project>
     </ProjectReference>
   </ItemGroup>

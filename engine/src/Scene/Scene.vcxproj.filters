@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{89AF369E-F58E-B539-FEA6-40106A051C9B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Radiant">
+      <UniqueIdentifier>{1BEADCCD-8775-4A92-9086-CD86FC90A692}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Radiant\Scene">
+      <UniqueIdentifier>{783F8110-E4AB-3C0B-AD9F-D46819CB5E73}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\Radiant\Scene\Export.hpp">
+      <Filter>include\Radiant\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Radiant\Scene\Layer.hpp">
+      <Filter>include\Radiant\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Radiant\Scene\Scene.hpp">
+      <Filter>include\Radiant\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Radiant\Scene\UILayer.hpp">
+      <Filter>include\Radiant\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneImpl.hpp" />
+    <ClInclude Include="SceneManager.hpp" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="LayerImpl.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Layer.cpp" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="SceneImpl.cpp" />
+    <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="LayerImpl.cpp" />
+  </ItemGroup>
+</Project>

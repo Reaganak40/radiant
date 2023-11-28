@@ -1,5 +1,5 @@
 /***************************************************************/
-/*  Utils/Export.hpp                                           */
+/*  (impl) Scene/SceneManager.hpp                              */
 /* *************************************************************/
 /*                 This file is a part of:                     */
 /*                -- RADIANT GAME ENGINE --                    */
@@ -36,15 +36,64 @@
 /***************************************************************
 * Headers
 ***************************************************************/
-#include <Radiant/Config.hpp>
+#include <Radiant/Scene/Scene.hpp>
+#include <Radiant/Scene/Layer.hpp>
 
 /***************************************************************
-* Define import/export macros for this module
+* Forward Declarations
 ***************************************************************/
-#if defined(RDT_BUILD_DLL)
-#define RDT_UTILS_API RDT_API_EXPORT
-#define RDT_UTILS_EXTERN extern
-#else
-#define RDT_UTILS_API RDT_API_IMPORT
-#define RDT_UTILS_EXTERN
-#endif // RADIANT_BUILD_DLL
+namespace rdt {
+	using SceneID = unsigned int;
+	using LayerID = unsigned int;
+}
+
+namespace rdt::scene {
+
+	class SceneManager {
+	private:
+		SceneManager();
+		~SceneManager();
+		static SceneManager* m_instance;
+
+		static void Destroy();
+	public:
+
+		static SceneManager& Get();
+		SceneID RegisterScene(const char* sceneName, Scene* scene);
+		SceneID GetSceneID(const char* sceneName);
+		Scene* SetScene(const char* sceneName);
+
+		LayerID RegisterLayer(const char* layerName, Layer* nLayer);
+		LayerID GetLayerID(const char* layerName);
+
+		Layer* AttachLayerToScene(const char* layerName, SceneID scene);
+
+	private:
+
+		std::unordered_map<std::string, SceneID> sceneAliasToId;
+		std::unordered_map<SceneID, Scene*> m_scenes;
+		SceneID m_current_scene_id;
+
+		std::unordered_map<std::string, LayerID> layerAliasToId;
+		std::unordered_map<LayerID, Layer*> m_layers;
+
+		SceneID sceneIdCounter;
+		LayerID layerIdCounter;
+
+		bool SceneExists(const std::string& sceneName);
+		bool SceneExists(SceneID sceneID);
+
+		bool LayerExists(const std::string& layerName);
+		bool LayerExists(LayerID layer);
+		
+		/*
+			Gets the next available sceneID
+		*/
+		SceneID NextSceneID();
+
+		/*
+			Gets the next available layerID
+		*/
+		LayerID NextLayerID();
+	};
+}

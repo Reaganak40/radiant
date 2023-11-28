@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{89AF369E-F58E-B539-FEA6-40106A051C9B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Radiant">
+      <UniqueIdentifier>{1BEADCCD-8775-4A92-9086-CD86FC90A692}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Radiant\Physics">
+      <UniqueIdentifier>{8DD8F65B-F90F-3FF3-021A-A3166ED065EC}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\Radiant\Physics\Collider.hpp">
+      <Filter>include\Radiant\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Radiant\Physics\Collision.hpp">
+      <Filter>include\Radiant\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Radiant\Physics\Physics.hpp">
+      <Filter>include\Radiant\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Radiant\Physics\Realm.hpp">
+      <Filter>include\Radiant\Physics</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Collider.cpp" />
+    <ClCompile Include="Collision.cpp" />
+    <ClCompile Include="Physics.cpp" />
+    <ClCompile Include="PhysicsSystem.cpp" />
+    <ClCompile Include="Realm.cpp" />
+  </ItemGroup>
+</Project>

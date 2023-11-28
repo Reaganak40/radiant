@@ -15,6 +15,7 @@ project "Application"
         "**.h",
         "**.hpp",
         "**.cpp",
+        GetModuleHeaders('Application'),
     }
 
     includedirs

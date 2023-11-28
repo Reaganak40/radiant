@@ -146,6 +146,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\Radiant\Graphics\Camera.hpp" />
+    <ClInclude Include="..\..\include\Radiant\Graphics\Export.hpp" />
+    <ClInclude Include="..\..\include\Radiant\Graphics\Renderer.hpp" />
     <ClInclude Include="Animation.h" />
     <ClInclude Include="AnimationSystem.h" />
     <ClInclude Include="Camera.h" />
@@ -154,11 +157,10 @@
     <ClInclude Include="RenderSystem.h" />
     <ClInclude Include="RenderTypes.h" />
     <ClInclude Include="RenderWindow.h" />
-    <ClInclude Include="Renderer-Old.h" />
-    <ClInclude Include="Renderer.h" />
     <ClInclude Include="Texture\Texture.h" />
     <ClInclude Include="Texture\TextureAtlas.h" />
     <ClInclude Include="Texture\TextureManager.h" />
+    <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
@@ -168,11 +170,13 @@
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="RenderSystem.cpp" />
     <ClCompile Include="RenderWindow.cpp" />
-    <ClCompile Include="Renderer-Old.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Texture\Texture.cpp" />
     <ClCompile Include="Texture\TextureAtlas.cpp" />
     <ClCompile Include="Texture\TextureManager.cpp" />
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

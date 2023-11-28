@@ -15,6 +15,7 @@ project "ECS"
         "**.h",
         "**.hpp",
         "**.cpp",
+        GetModuleHeaders('ECS'),
     }
 
     includedirs

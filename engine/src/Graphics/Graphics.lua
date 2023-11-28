@@ -15,6 +15,7 @@ project "Graphics"
         "**.h",
         "**.hpp",
         "**.cpp",
+        GetModuleHeaders('Graphics'),
     }
 
     includedirs
@@ -33,7 +34,7 @@ project "Graphics"
     }
 
     pchheader "pch.h"
-    pchsource "src/pch.cpp"
+    pchsource "pch.cpp"
 
     filter "system:windows"
         cppdialect "C++20"

@@ -15,6 +15,8 @@ project "Audio"
         "**.h",
         "**.hpp",
         "**.cpp",
+        GetModuleHeaders('Audio'),
+
     }
 
     includedirs

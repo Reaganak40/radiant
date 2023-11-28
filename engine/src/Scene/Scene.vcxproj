@@ -143,15 +143,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="SceneManager.h" />
+    <ClInclude Include="..\..\include\Radiant\Scene\Export.hpp" />
+    <ClInclude Include="..\..\include\Radiant\Scene\Layer.hpp" />
+    <ClInclude Include="..\..\include\Radiant\Scene\Scene.hpp" />
+    <ClInclude Include="..\..\include\Radiant\Scene\UILayer.hpp" />
+    <ClInclude Include="LayerImpl.hpp" />
+    <ClInclude Include="SceneImpl.hpp" />
+    <ClInclude Include="SceneManager.hpp" />
+    <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Layer.cpp" />
+    <ClCompile Include="LayerImpl.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="SceneImpl.cpp" />
     <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Utils\Utils.vcxproj">
+    <ProjectReference Include="..\Core\src\Utils\Utils.vcxproj">
       <Project>{6DA62344-D910-D8BA-224F-89608EF8B50F}</Project>
     </ProjectReference>
     <ProjectReference Include="..\ECS\ECS.vcxproj">

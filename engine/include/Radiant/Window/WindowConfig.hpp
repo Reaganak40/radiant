@@ -49,25 +49,35 @@ namespace rdt {
 
 namespace rdt {
 
+	enum WindowConfigFlags {
+		WindowConfigFlags_None = 0,
+		WindowConfigFlags_Fullscreen	 = 1 << 0, // Sets the window to fullscreen, encapsulating the entire monitor
+		WindowConfigFlags_MaximizeWindow = 1 << 1, // When the window is launched, it will be maximized by default
+
+		WindowConfigFlags_Default = WindowConfigFlags_None,
+	};
+
 	class RDT_WINDOW_API WindowConfig {
 	public:
 		virtual ~WindowConfig() {}
 
+		// Returns a reference to the config flags that can be changed to
+		// change the behavior of the window
+		virtual WindowConfigFlags& GetConfigFlags() = 0;
+
 		virtual void SetWindowName(const char* name) = 0;
 		virtual const char* GetWindowName() const = 0;
 		
+		// Sets the window's width at launch in pixels 
 		virtual void SetWindowWidth(unsigned int windowWidth) = 0;
+
+		// Sets the window's height at launch in pixels 
 		virtual void SetWindowHeight(unsigned int windowHeight) = 0;
 		virtual void SetWindowSize(unsigned int windowWidth, unsigned int windowHeight) = 0;
 		virtual Vec2i GetWindowSize() const = 0;
 
+		// Sets the aspect ratio that is maintained by the camera viewport
 		virtual void SetAspectRatio(AspectRatio aspectRatio) = 0;
 		virtual AspectRatio GetAspectRatio() const = 0;
-
-		virtual void SetBackgroundColor(const Color& color) = 0;
-		virtual Color GetBackgroundColor() const = 0;
-
-		virtual void SetShouldMaximizeWindow(bool shouldMaximize = true) = 0;
-		virtual bool ShouldMaximizeWindow() const = 0;
 	};
 }

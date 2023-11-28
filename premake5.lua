@@ -7,9 +7,12 @@
 --]]
 md_graph                = {}
 
--- public modules
+-- private/core modules
 md_graph["Utils"]       = {}
 md_graph["OpenGL"]      = {"Utils"}
+md_graph["Editor"]      = {"Utils", "Window", "Graphics", "Physics", "Audio", "Logger", "ECS", "Scene"}
+
+-- public modules
 md_graph["Window"]      = {"Utils, OpenGL"}
 md_graph["Graphics"]    = {"Utils, OpenGL"}
 md_graph["Physics"]     = {"Utils"}
@@ -17,7 +20,6 @@ md_graph["Audio"]       = {"Utils"}
 md_graph["Logger"]      = {"Utils"}
 md_graph["ECS"]         = {"Utils", "Graphics", "Physics", "Audio"}
 md_graph["Scene"]       = {"Utils", "ECS"}
-md_graph["Editor"]      = {"Utils", "Window", "Graphics", "Physics", "Audio", "Logger", "ECS", "Scene"}
 md_graph["Application"] = {"Utils", "Window", "Scene", "Editor"}
 
 -- Test Modules
@@ -91,11 +93,19 @@ radiant_public_headers = "%{wks.location}/engine/include"
 -- header directory only visible to implementation
 radiant_private_headers = "%{wks.location}/engine/src/Core/include"
 
+function IsCoreModule(projName)
+    if projName == "OpenGL" or projName == "Utils" or projName == "Editor" then
+        return true
+    end
+    return false
+end
+
 -- Copies the dll from the given Project Name to the target directory of the in-scope project
 function GetProjectDLL(projName)
     return ("{COPY} {%wks.location}/engine/bin/" .. outputFolder .. "/" .. projName .. ".dll %{cfg.targetdir}")
 end
 
+-- Returns the vs-project directory for the given projName
 function GetProjectLocation(projName)
     if md_graph[projName] == nil then
         error("Undefined project:", projName)
@@ -110,7 +120,7 @@ end
 
 -- Used by radiant modules to get the header files their implementation uses
 function GetModuleHeaders(projName)
-    if projName == "OpenGL" then
+    if IsCoreModule(projName) then
         return (radiant_private_headers .. "/Core/" .. projName .. "/*.hpp")
     end
     return (radiant_public_headers .. "/Radiant/" .. projName .. "/*.hpp")
@@ -153,7 +163,6 @@ group "Third-Party"
 group ""
 
 group "Engine"
-    include "engine/src/Utils/Utils.lua"
     include "engine/src/Logger/Logger.lua" 
     include "engine/src/Window/Window.lua"
     include "engine/src/Graphics/Graphics.lua"
@@ -161,11 +170,12 @@ group "Engine"
     include "engine/src/Audio/Audio.lua"
     include "engine/src/ECS/ECS.lua"
     include "engine/src/Scene/Scene.lua"
-    include "engine/src/Editor/Editor.lua"
     include "engine/src/Application/Application.lua"
 group ""
-
+    
 group "Engine/Core"
+    include "engine/src/Core/src/Utils/Utils.lua"
+    include "engine/src/Core/src/Editor/Editor.lua"
     include "engine/src/Core/src/OpenGL/OpenGL.lua"
 group ""
     

@@ -1,9 +1,10 @@
 /***************************************************************
-* Utils Module Precompiled Header
+* Scene Module Precompiled Header
 ***************************************************************/
 #pragma once
 
-#include <cmath>
-#include <fstream>
-#include <sstream>
+// STL
 #include <string>
+#include <vector>
+#include <unordered_map>
+#include <stdexcept>

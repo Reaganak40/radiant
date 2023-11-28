@@ -143,6 +143,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\Radiant\ECS\CommonComponents.hpp" />
+    <ClInclude Include="..\..\include\Radiant\ECS\Component.hpp" />
+    <ClInclude Include="..\..\include\Radiant\ECS\Entity.hpp" />
+    <ClInclude Include="..\..\include\Radiant\ECS\EntityFactory.hpp" />
+    <ClInclude Include="..\..\include\Radiant\ECS\Export.hpp" />
+    <ClInclude Include="..\..\include\Radiant\ECS\System.hpp" />
     <ClInclude Include="CommonComponents.h" />
     <ClInclude Include="ComponentManager.h" />
     <ClInclude Include="ECS.h" />
@@ -159,7 +165,7 @@
     <ClCompile Include="SystemManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Utils\Utils.vcxproj">
+    <ProjectReference Include="..\Core\src\Utils\Utils.vcxproj">
       <Project>{6DA62344-D910-D8BA-224F-89608EF8B50F}</Project>
     </ProjectReference>
     <ProjectReference Include="..\Graphics\Graphics.vcxproj">
