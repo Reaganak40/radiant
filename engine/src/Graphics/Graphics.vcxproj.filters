@@ -30,7 +30,7 @@
     <ClInclude Include="Animation.h" />
     <ClInclude Include="AnimationSystem.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Mesh.hpp" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="RenderSystem.h" />
     <ClInclude Include="RenderTypes.h" />

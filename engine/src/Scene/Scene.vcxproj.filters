@@ -21,12 +21,15 @@
     <ClInclude Include="..\..\include\Radiant\Scene\Scene.hpp">
       <Filter>include\Radiant\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\Radiant\Scene\SceneManager.hpp">
+      <Filter>include\Radiant\Scene</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\include\Radiant\Scene\UILayer.hpp">
       <Filter>include\Radiant\Scene</Filter>
     </ClInclude>
     <ClInclude Include="LayerImpl.hpp" />
     <ClInclude Include="SceneImpl.hpp" />
-    <ClInclude Include="SceneManager.hpp" />
+    <ClInclude Include="SceneManagerImpl.hpp" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
@@ -35,6 +38,7 @@
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneImpl.cpp" />
     <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="SceneManagerImpl.cpp" />
     <ClCompile Include="pch.cpp" />
   </ItemGroup>
 </Project>

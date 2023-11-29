@@ -1,85 +1,83 @@
-/*******************************************************************
-*	Module:  ECS
-*	File:    EntityManager.h
-*
-*	Author: Reagan Kelley
-*
-*   The file contains the EntityManager which creates new entities,
-*	manages there signatures, and lifetimes.
-*******************************************************************/
+/***************************************************************/
+/*  (Impl) ECS/EntityManager.hpp                               */
+/* *************************************************************/
+/*                 This file is a part of:                     */
+/*                -- RADIANT GAME ENGINE --                    */
+/*         https://github.com/Reaganak40/radiant               */
+/***************************************************************/
+/*            Copyright(c) 2023 Reagan Kelley                  */
+/*                                                             */
+/*  Permission  is  hereby  granted, free  of charge, to  any  */
+/*  person obtaining a copy of this  software and  associated  */
+/*  documentation  files(the  "Software"), to  deal  in   the  */
+/*  Software without restriction,including without limitation  */
+/*  the   rights   to  use,  copy,  modify,  merge,  publish,  */
+/*  distribute,  sublicense,  and  /or  sell  copies  of  the  */
+/*  Software,  and to permit persons to whom the  Software is  */
+/*  furnished to do so, subject to the following conditions:   */
+/*                                                             */
+/*  The  above  copyright  notice  and this permission notice  */
+/*  shall  be  included in all copies or substantial portions  */
+/*  of the Software.                                           */
+/*                                                             */
+/*  THE  SOFTWARE  IS PROVIDED  "AS IS",  WITHOUT WARRANTY OF  */
+/*  ANY KIND,  EXPRESS OR IMPLIED, INCLUDING  BUT NOT LIMITED  */
+/*  TO THE  WARRANTIES  OF  MERCHANTABILITY,  FITNESS  FOR  A  */
+/*  PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT  SHALL  */
+/*  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,  */
+/*  DAMAGES OR OTHER  LIABILITY,  WHETHER  IN  AN  ACTION  OF  */
+/*  CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT  OF  OR IN  */
+/*  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS  */
+/*  IN THE SOFTWARE.                                           */
+/***************************************************************/
+
 #pragma once
-#include "Core.h"
-#include "ECSTypes.h"
+
+/***************************************************************
+* Headers
+***************************************************************/
 #include "ComponentManager.h"
+
+/***************************************************************
+* Forward Declarations
+***************************************************************/
 
 #define RDT_NULL_ENTITY_ID 0
 
-#ifdef RDT_USE_DEV_TOOLS
-	#define RDT_NUM_HIDDEN_COMPONENTS 2
-#else
-	#define RDT_NUM_HIDDEN_COMPONENTS 1
-#endif
+namespace rdt::ecs {
 
-namespace rdt {
-	class Layer;
-
-	class RADIANT_API EntityManager {
+	class EntityManager {
 	private:
-		struct Impl;
-		Impl* m_impl;
-		
 		EntityManager();
 		~EntityManager();
 		static EntityManager* m_instance;
 
+		// EntityID management
+		EntityID m_idCounter = RDT_NULL_ENTITY_ID;
+		std::vector<EntityID> m_idCache;
+
+		// Entity Signature
+		std::vector<Signature> m_signatures;
 	public:
 
-		/*
-			Create a new singleton instance of the EntityManager
-		*/
-		static void Initialize();
-
-		/*
-			Destroy the current singleton instance of the EntityManager
-		*/
+		static EntityManager& Get();
 		static void Destroy();
 
-		/*
-			Create a new entity by registering the returned EntityID. An EnityConfig
-			component will automatically be added to this entity.
-
-			alias - the name of the entity, when alias string is empty, the EntityManager will provide
-			a name to it.
-
-			owner - a pointer to the layer that tracks this entity, nullptr indicates this entity
-			has no owner.
-
-		*/
-		static Entity RegisterEntity(const std::string& alias = "", Layer* owner = nullptr);
-
-		/*
-			Removes a registered entity that is referenced by the eID
-		*/
-		static void RemoveEntity(Entity eID);
-
-		/*
-			Sets the component signature for this entity.
-		*/
-		static void SetSignature(Entity eID, const Signature& signature);
-
-		/*
-			Gets the component signature for this entity.
-		*/
-		static Signature GetSignature(Entity eID);
-
-		/*
-			Returns a constant reference to the registered entities.
-		*/
-		static const std::unordered_map<Entity, Signature>& GetEntityMap();
-
+		// Create a new entity by registering the returned EntityID. An EnityConfig
+		// component will automatically be added to this entity.
+		// 
+		// \param alias - the name of the entity, when alias string is empty, the EntityManager will provide
+		// a name to it.
+		// 
+		// \param owner - a pointer to the layer that tracks this entity, nullptr indicates this entity
+		// has no owner.
+		EntityID RegisterEntity(const std::string& alias = "");
+		void RemoveEntity(EntityID entity);
+		void SetSignature(EntityID entity, const Signature& signature);
+		Signature GetSignature(EntityID eID);
 
 		template<typename T>
-		static bool HasComponent(Entity eID)
+		static bool HasComponent(EntityID eID)
 		{
 			ComponentID cID = ComponentManager::GetComponentID<T>();
 
@@ -102,7 +100,7 @@ namespace rdt {
 			stores the component data in the component manager.
 		*/
 		template<typename T>
-		static void AddComponent(Entity eID, const T& nData = T())
+		static void AddComponent(EntityID eID, const T& nData = T())
 		{
 			ComponentID cID = ComponentManager::GetComponentID<T>();
 
@@ -121,7 +119,7 @@ namespace rdt {
 			and removing its component data from the component manager.
 		*/
 		template<typename T>
-		static void RemoveComponent(Entity eID)
+		static void RemoveComponent(EntityID eID)
 		{
 			ComponentID cID = ComponentManager::GetComponentID<T>();
 
@@ -140,7 +138,7 @@ namespace rdt {
 			if this entity has added that component.
 		*/
 		template<typename T>
-		static T* GetComponent(Entity eID)
+		static T* GetComponent(EntityID eID)
 		{
 			if (!EntityExists(eID)) {
 				RDT_CORE_WARN("EntityManager - Could get get component from unregistered entity [{}].", eID);
@@ -166,48 +164,48 @@ namespace rdt {
 		/*
 			Gets the alias of the provided entity.
 		*/
-		static const char* GetEntityAlias(Entity entity);
+		static const char* GetEntityAlias(EntityID entity);
 
 		/*
 			Returns a pointer to the layer that owns this entity,
 			or nullptr if it is not owned by anyone.
 		*/
-		static Layer* GetEntityOwner(Entity entity);
+		static Layer* GetEntityOwner(EntityID entity);
 
 		/*
 			Maintains the entity signature but disables the use
 			of the entity's component data.
 		*/
-		static void DisableComponent(Entity eID, ComponentID cID);
+		static void DisableComponent(EntityID eID, ComponentID cID);
 
 		/*
 			Reintroduced this component, and restoring data access.
 		*/
-		static void EnableComponent(Entity eID, ComponentID cID);
+		static void EnableComponent(EntityID eID, ComponentID cID);
 
 		/*
 			Returns true if the given component is in use.
 		*/
-		static bool IsComponentEnabled(Entity eID, ComponentID cID);
+		static bool IsComponentEnabled(EntityID eID, ComponentID cID);
 
 	private:
 		/*
 			Adds this component to the entity's signature.
 		*/
-		static void AddToSignature(Entity eID, ComponentID cID);
+		static void AddToSignature(EntityID eID, ComponentID cID);
 
 
 		/*
 			Adds this component to the entity's signature.
 		*/
-		static void RemoveFromSignature(Entity eID, ComponentID cID);
+		static void RemoveFromSignature(EntityID eID, ComponentID cID);
 
 		/*
 			Returns true if the entity is registered
 		*/
-		static bool EntityExists(Entity eID);
+		static bool EntityExists(EntityID eID);
 
 
-		bool HasComponentImpl(Entity eID, ComponentID cID);
+		bool HasComponentImpl(EntityID eID, ComponentID cID);
 	};
 }

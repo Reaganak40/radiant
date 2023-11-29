@@ -100,8 +100,6 @@ namespace rdt::core {
 		void SetAttribute<std::string>(const std::string& section, const std::string& key, const std::string& out) {
 			m_sections[section][key] = out;
 		}
-
-
 		
 	private:
 		/*

@@ -1,138 +1,52 @@
-/*******************************************************************
-*	Module:  ECS
-*	File:    ComponentManager.h
-*
-*	Author: Reagan Kelley
-*
-*   The file contains declarations and definitions for ECS 
-*   components. Components hold entity data, and posses unique
-*   IDs controlled by the ComponentManager for client access.
-*******************************************************************/
+/***************************************************************/
+/*  (Impl) ECS/EntityManager.hpp                               */
+/* *************************************************************/
+/*                 This file is a part of:                     */
+/*                -- RADIANT GAME ENGINE --                    */
+/*         https://github.com/Reaganak40/radiant               */
+/***************************************************************/
+/*            Copyright(c) 2023 Reagan Kelley                  */
+/*                                                             */
+/*  Permission  is  hereby  granted, free  of charge, to  any  */
+/*  person obtaining a copy of this  software and  associated  */
+/*  documentation  files(the  "Software"), to  deal  in   the  */
+/*  Software without restriction,including without limitation  */
+/*  the   rights   to  use,  copy,  modify,  merge,  publish,  */
+/*  distribute,  sublicense,  and  /or  sell  copies  of  the  */
+/*  Software,  and to permit persons to whom the  Software is  */
+/*  furnished to do so, subject to the following conditions:   */
+/*                                                             */
+/*  The  above  copyright  notice  and this permission notice  */
+/*  shall  be  included in all copies or substantial portions  */
+/*  of the Software.                                           */
+/*                                                             */
+/*  THE  SOFTWARE  IS PROVIDED  "AS IS",  WITHOUT WARRANTY OF  */
+/*  ANY KIND,  EXPRESS OR IMPLIED, INCLUDING  BUT NOT LIMITED  */
+/*  TO THE  WARRANTIES  OF  MERCHANTABILITY,  FITNESS  FOR  A  */
+/*  PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT  SHALL  */
+/*  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,  */
+/*  DAMAGES OR OTHER  LIABILITY,  WHETHER  IN  AN  ACTION  OF  */
+/*  CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT  OF  OR IN  */
+/*  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS  */
+/*  IN THE SOFTWARE.                                           */
+/***************************************************************/
+
 #pragma once
-#include "Core.h"
+
+/***************************************************************
+* Headers
+***************************************************************/
+#include <Radiant/ECS/ECSTypes.hpp>
+#include <Radiant/Logger.hpp>
 
 // Forward Delcarations
 namespace rdt::core {
 	class Realm;
 }
 
-#include "ECSTypes.h"
-#include "Logging/Log.h"
+namespace rdt::ecs {
 
-namespace rdt {
-
-	class IComponentArray {
-	public:
-		virtual ~IComponentArray() = default;
-
-		virtual void RemoveData(Entity eID) = 0;
-		virtual void* GetDataPtr(Entity eID) = 0;
-		virtual void SetEntityVisible(Entity eID, bool visible) = 0;
-		virtual bool IsEntityDisabled(Entity eID) = 0;
-	};
-
-	template <typename T>
-	class Component : public IComponentArray {
-	private:
-
-		std::unordered_map<Entity, size_t> m_entity_map;
-		std::unordered_map<Entity, size_t> m_disabled_entites;
-
-		std::vector<Entity> m_entities;
-		std::vector<T> m_data;
-	public:
-
-		/*
-			Adds data to the component array while tracking the associated
-			entity.
-		*/
-		void InsertData(Entity eID, const T& data) {
-			if (m_entity_map.find(eID) != m_entity_map.end()) {
-				RDT_CORE_WARN("Component - Tried to insert duplicate entity [eID: {}]", eID);
-				return;
-			}
-
-			m_entity_map[eID] = m_data.size();
-			m_entities.push_back(eID);
-			m_data.push_back(data);
-		}
-
-		/*
-			Removes the data from this component data array that is associated with this
-			Entity.
-		*/
-		void RemoveData(Entity eID) override final {
-
-			size_t index = 0;
-			if (HasEntity(eID)) {
-				size_t index = m_entity_map.at(eID);
-				m_entity_map.erase(eID);
-			}
-			else if (IsEntityDisabled(eID)) {
-				size_t index = m_disabled_entites.at(eID);
-				m_disabled_entites.erase(eID);
-			}
-			else {
-				return;
-			}
-
-			m_data.erase(m_data.begin() + index);
-			m_entities.erase(m_entities.begin() + index);
-
-			// Update the data index location of all entities using this component
-			for (size_t i = index; i < m_entities.size(); i++) {
-
-				if (HasEntity(m_entities[i])) {
-					m_entity_map.at(m_entities[i]) = i;
-				}
-				else {
-					m_disabled_entites.at(m_entities[i]) = i;
-				}
-			}
-		}
-
-		/*
-			Enabled/Disables the entity, determining its data access to systems. 
-		*/
-		void SetEntityVisible(Entity eID, bool visible) override final {
-			if (!visible) {
-				if (HasEntity(eID)) {
-					m_disabled_entites[eID] = m_entity_map.at(eID);
-					m_entity_map.erase(eID);
-				}
-			}
-			else {
-				if (IsEntityDisabled(eID)) {
-					m_entity_map[eID] = m_disabled_entites.at(eID);
-					m_disabled_entites.erase(eID);
-				}
-			}
-		}
-
-		T& GetData(Entity eID) {
-			return m_data[m_entity_map.at(eID)];
-		}
-
-		bool HasEntity(Entity eID) {
-			return m_entity_map.find(eID) != m_entity_map.end();
-		}
-
-		bool IsEntityDisabled(Entity eID) override final {
-			return m_disabled_entites.find(eID) != m_disabled_entites.end();
-		}
-
-		void* GetDataPtr(Entity eID) override final {
-
-			if (HasEntity(eID)) {
-				return &m_data[m_entity_map.at(eID)];
-			}
-			else if (IsEntityDisabled(eID)) {
-				return &m_data[m_disabled_entites.at(eID)];
-			}
-
-			return nullptr;
-		}
-	};
+	
 	// ====================================================================
 
 	class RADIANT_API ComponentManager {

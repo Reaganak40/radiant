@@ -1,17 +1,27 @@
 #include "pch.h"
 #include <Radiant/Graphics/Renderer.hpp>
 
-struct rdt::Renderer::Impl {
+namespace rdt::graphics { struct RendererImpl; }
 
+struct rdt::graphics::RendererImpl {
+
+	RendererImpl()
+	{
+	}
+
+	~RendererImpl()
+	{
+	}
 };
 
-// ================================================
-rdt::Renderer::Impl* rdt::Renderer::m_impl = nullptr;
+// ======================================================================
+
+static rdt::graphics::RendererImpl* m_impl = nullptr;
 
 void rdt::Renderer::Initialize()
 {
 	Destroy();
-	m_impl = new rdt::Renderer::Impl;
+	m_impl = new rdt::graphics::RendererImpl;
 }
 
 void rdt::Renderer::Destroy() 
@@ -20,4 +30,16 @@ void rdt::Renderer::Destroy()
 		delete m_impl;
 		m_impl = nullptr;
 	}
+}
+
+void rdt::Renderer::OnBeginFrame()
+{
+}
+
+void rdt::Renderer::Render()
+{
+}
+
+void rdt::Renderer::OnEndFrame()
+{
 }

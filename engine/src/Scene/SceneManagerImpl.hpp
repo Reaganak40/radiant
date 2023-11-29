@@ -1,5 +1,5 @@
 /***************************************************************/
-/*  Config.hpp                                                 */
+/*  (impl) Scene/SceneManager.hpp                              */
 /* *************************************************************/
 /*                 This file is a part of:                     */
 /*                -- RADIANT GAME ENGINE --                    */
@@ -34,51 +34,75 @@
 #pragma once
 
 /***************************************************************
-* Define the Radiant Version
+* Headers
 ***************************************************************/
-#define RDT_VERSION_MAJOR 0
-#define RDT_VERSION_MINOR 1
-#define RDT_VERSION_PATCH 1
-#define RDT_VERSION_IS_RELEASE false
+#include <Radiant/Scene/Scene.hpp>
+#include <Radiant/Scene/Layer.hpp>
 
 /***************************************************************
-* Define sysem macros
+* Forward Declarations
 ***************************************************************/
-#ifdef RDT_PLATFORM_WINDOWS
-	#define RDT_API_EXPORT __declspec(dllexport)
-	#define RDT_API_IMPORT __declspec(dllimport)
-#else
-	#error Unsupported Platform - Windows Only
-#endif
+namespace rdt {
+	using SceneID = unsigned int;
+	using LayerID = unsigned int;
+}
 
-/***************************************************************
-* Define the core platform library to use
-***************************************************************/
-#if defined(RDT_USE_DIRECTX)
-	#error DirectX not currently available! Use OpenGL instead.
-#elif defined(RDT_USE_OPENGL)
-#else
-	#pragma message("Graphics platform not defined... using OpenGL by default.") 
-	#define RDT_USE_OPENGL
-#endif
+#define RDT_SCENE_CHANGED 1
 
-/***************************************************************
-* Detect spdlog availability
-***************************************************************/
-#ifndef RDT_DISABLE_LOGGING
-	#if !__has_include("spdlog/spdlog.h")
-		#pragma message("spdlog.h not found, logging is disabled.") 
-		#define RDT_DISABLE_LOGGING
-	#elif defined(RDT_PUBLISH)
-		#pragma message("compiling in publish mode, logging is disabled.") 
-		#define RDT_DISABLE_LOGGING
-	#endif
-#endif
+namespace rdt::scene {
 
-/***************************************************************
-* Sanity check - in debug/release/publish configuration
-***************************************************************/
-#if defined(RDT_DEBUG) || defined(RDT_RELEASE) || defined(RDT_PUBLISH)
-#else
-	#error Unsupported configuration! (supported types: debug, release, publish)
-#endif
+	class SceneManagerImpl {
+	private:
+		SceneManagerImpl();
+		~SceneManagerImpl();
+		static SceneManagerImpl* m_instance;
+
+	public:
+		static SceneManagerImpl& Get();
+		static void Destroy();
+		
+		SceneID RegisterScene(const char* sceneName, Scene* scene);
+		SceneID GetSceneID(const char* sceneName);
+		
+		Scene* SetScene(const char* sceneName);
+		Scene* GetCurrentScene();
+
+		LayerID RegisterLayer(const char* layerName, Layer* nLayer);
+		LayerID GetLayerID(const char* layerName);
+
+		Layer* AttachLayerToScene(const char* layerName, SceneID scene);
+
+		void RequestToChangeScene(const char* sceneName);
+		int OnEndFrame();
+	private:
+
+		std::unordered_map<std::string, SceneID> sceneAliasToId;
+		std::unordered_map<SceneID, Scene*> m_scenes;
+		SceneID m_current_scene_id;
+		SceneID m_scene_request;
+
+		std::unordered_map<std::string, LayerID> layerAliasToId;
+		std::unordered_map<LayerID, Layer*> m_layers;
+
+		SceneID sceneIdCounter;
+		LayerID layerIdCounter;
+
+		bool SceneExists(const std::string& sceneName);
+		bool SceneExists(SceneID sceneID);
+
+		bool LayerExists(const std::string& layerName);
+		bool LayerExists(LayerID layer);
+		
+		Scene* SetScene(SceneID scene);
+
+		/*
+			Gets the next available sceneID
+		*/
+		SceneID NextSceneID();
+
+		/*
+			Gets the next available layerID
+		*/
+		LayerID NextLayerID();
+	};
+}

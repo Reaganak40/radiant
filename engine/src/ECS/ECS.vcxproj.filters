@@ -18,6 +18,12 @@
     <ClInclude Include="..\..\include\Radiant\ECS\Component.hpp">
       <Filter>include\Radiant\ECS</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\Radiant\ECS\ECSManager.hpp">
+      <Filter>include\Radiant\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Radiant\ECS\ECSTypes.hpp">
+      <Filter>include\Radiant\ECS</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\include\Radiant\ECS\Entity.hpp">
       <Filter>include\Radiant\ECS</Filter>
     </ClInclude>
@@ -27,22 +33,24 @@
     <ClInclude Include="..\..\include\Radiant\ECS\Export.hpp">
       <Filter>include\Radiant\ECS</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\Radiant\ECS\Reflection.hpp">
+      <Filter>include\Radiant\ECS</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\include\Radiant\ECS\System.hpp">
       <Filter>include\Radiant\ECS</Filter>
     </ClInclude>
-    <ClInclude Include="CommonComponents.h" />
     <ClInclude Include="ComponentManager.h" />
-    <ClInclude Include="ECS.h" />
-    <ClInclude Include="ECSTypes.h" />
-    <ClInclude Include="EntityFactory.h" />
     <ClInclude Include="EntityManager.h" />
     <ClInclude Include="SystemManager.h" />
+    <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CommonComponents.cpp" />
     <ClCompile Include="ComponentManager.cpp" />
-    <ClCompile Include="EntityFactory.cpp" />
+    <ClCompile Include="ECSManager.cpp" />
+    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="SystemManager.cpp" />
+    <ClCompile Include="pch.cpp" />
   </ItemGroup>
 </Project>

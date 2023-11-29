@@ -43,7 +43,6 @@
 ***************************************************************/
 namespace rdt {
 	struct Vec2i;
-	class Color;
 	enum AspectRatio;
 }
 

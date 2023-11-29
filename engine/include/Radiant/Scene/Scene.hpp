@@ -48,7 +48,7 @@ namespace rdt {
 }
 namespace rdt::scene {
 	struct SceneImpl;
-	class SceneManager;
+	class SceneManagerImpl;
 }
 
 namespace rdt {
@@ -78,23 +78,60 @@ namespace rdt {
 		// To implement function that is called before Bind(), allowing
 		// child scenes to add additional functionality before binding
 		// a scene.
-		virtual void OnBind() {}
+		virtual void OnBind() = 0;
 
 		// To implement function that is called before Release(), allowing
 		// child scenes to add additional functionality before releasing a
 		// scene.
-		virtual void OnRelease() {}
+		virtual void OnRelease() = 0;
 
 		// Attaches a layer to the end of the layer stack.
+		// Layers can only have one owner. If the layer is attached to another
+		// scene, it will be detached and reattached to this scene instead.
 		void AttachLayer(const char* layerName);
 		
 		// Inserts and attaches the layer into the layer stack at
 		// the given index.
+		// Layers can only have one owner. If the layer is attached to another
+		// scene, it will be detached and reattached to this scene instead.
 		void AttachLayer(const char* layerName, size_t insertIndex);
 
 		// Calls to change to a new scene, which will happen at the end
 		// of the current game loop.
 		void ChangeScene(const char* nScene);
+
+/***************************************************************
+* Layer Binding Functions
+***************************************************************/
+		// Binds a single layer, that matches the name in the scene's layer stack.
+		// NOTE: Layers can only be binded when the scene is bound. Only call this
+		// function during OnBind() or while bounded.
+		void BindLayer(const char* layerName);
+
+		// Binds a single layer, the one that is at the given index on the scene's layer stack
+		// NOTE: Layers can only be binded when the scene is bound. Only call this
+		// function during OnBind() or while bounded.
+		void BindLayer(size_t layerIndex);
+
+		// Binds all the layers in this scene's layer stack
+		// NOTE: Layers can only be binded when the scene is bound. Only call this
+		// function during OnBind() or while bounded.
+		void BindAllLayers();
+
+/***************************************************************
+* Layer Binding Functions
+***************************************************************/
+		// Binds a single layer, that matches the name in the scene's layer stack.
+		// NOTE: Layers are released automatically when the scene is released. Call
+		// this function when the scene is bound and the layer no longer serves its
+		// use, but the other layers should remain bound.
+		void ReleaseLayer(const char* layerName);
+
+		// Binds a single layer, the one that is at the given index on the scene's layer stack
+		// NOTE: Layers are released automatically when the scene is released. Call
+		// this function when the scene is bound and the layer no longer serves its
+		// use, but the other layers should remain bound.
+		void ReleaseLayer(size_t layerIndex);
 
 	private:
 		void Bind();
@@ -110,7 +147,7 @@ namespace rdt {
 /***************************************************************
 * Used by Scene internals
 ***************************************************************/
-		friend class scene::SceneManager;
+		friend class scene::SceneManagerImpl;
 		scene::SceneImpl& GetImpl();
 
 /***************************************************************
@@ -121,9 +158,6 @@ namespace rdt {
 		void WorldUpdate(const float deltaTime);
 		void FinalUpdate();
 		void RenderUpdate();
-		static void SetCurrentScene(const char* sceneName);
-		static Scene& GetCurrentScene();
-		static void Destroy();
 	};
 
 	// Registers a new scene according to the child template T.

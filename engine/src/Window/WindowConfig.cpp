@@ -1,19 +1,23 @@
 #include "pch.h"
 #include <Radiant/Window/WindowConfig.hpp>
-#include <Radiant/Utils/AspectRatio.hpp>
-#include <Radiant/Utils/Color.hpp>
+#include <Radiant/Window/AspectRatio.hpp>
+#include <Radiant/System/MathTypes.hpp>
 
 // ================================================
 // Window Config Implementation
 // ================================================
 namespace rdt {
 	class WindowConfigImpl : public rdt::WindowConfig {
+		
+		WindowConfigFlags m_flags = WindowConfigFlags_Default;
 		std::string windowName = "Radiant App";
 		unsigned int m_windowWidth = 1280;
 		unsigned int m_windowHeight = 720;
 		AspectRatio m_aspectRatio = NoAspectRatio;
-		Color m_backgroundColor = WHITE;
-		bool m_should_maximize_window = false;
+
+		WindowConfigFlags& GetConfigFlags() override final {
+			return m_flags;
+		}
 
 		void SetWindowName(const char* name) override final {
 			windowName = name;
@@ -42,20 +46,6 @@ namespace rdt {
 		}
 		AspectRatio GetAspectRatio() const override final {
 			return m_aspectRatio;
-		}
-
-		void SetBackgroundColor(const Color& color) override final {
-			m_backgroundColor = color;
-		}
-		Color GetBackgroundColor() const override final {
-			return m_backgroundColor;
-		}
-
-		void SetShouldMaximizeWindow(bool shouldMaximize) override final {
-			m_should_maximize_window = shouldMaximize;
-		}
-		bool ShouldMaximizeWindow() const override final {
-			return m_should_maximize_window;
 		}
 	};
 }

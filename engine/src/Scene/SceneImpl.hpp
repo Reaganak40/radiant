@@ -59,8 +59,15 @@ namespace rdt::scene {
 
 		void RemoveFromLayerStack(LayerID lID);
 		void AddToLayerStack(Layer* layer, size_t index);
+		
+		void BindLayer(const std::string& layerName);
+		void BindLayer(size_t stackIndex);
 		void BindLayers();
+		
+		void ReleaseLayer(const std::string& layerName);
+		void ReleaseLayer(size_t stackIndex);
 		void ReleaseLayers();
+
 		void DetachAll();
 	};
 }

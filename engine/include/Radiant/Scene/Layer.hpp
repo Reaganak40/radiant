@@ -38,14 +38,18 @@
 ***************************************************************/
 #include <Radiant/Scene/Export.hpp>
 
+// 
+#include <Radiant/ECS/Entity.hpp>
+
 // Forward Declarations
 namespace rdt {
-	using LayerID = unsigned int;
-	using SceneID = unsigned int;
+	using LayerID  = unsigned int;
+	using SceneID  = unsigned int;
 }
 namespace rdt::scene {
 	struct LayerImpl;
-	class SceneManager;
+	struct SceneImpl;
+	class SceneManagerImpl;
 }
 
 #define RDT_NULL_LAYER_ID 0
@@ -81,8 +85,8 @@ namespace rdt {
 		// To implement function, called before this layer is unassigned from a scene.
 		virtual void OnDetach() {}
 
-		// To implement function, called when the host layer scene is binded (making it
-		// the active scene).
+		// To implement function, called when the owner of the scene becomes the active
+		// scene.
 		virtual void OnBind() {}
 
 		// To implement function, called when the host layer scene is released
@@ -109,14 +113,24 @@ namespace rdt {
 		// of the current game loop.
 		void ChangeScene(const char* nScene);
 
+
+		// Adds a new entity to the layer using the given entity definition and arguments. Returns the
+		// new entity's global unique identifier. If the creation of the entity failed, returns 0.
+		template <class EntityDef, typename... EntityArgs>
+		EntityID AddEntity(EntityArgs... args);
+
 	private:
+
+		EntityID AddEntityImpl(EntityDefinition& entityDef);
+
+
 		template<typename T>
 		friend LayerID RegisterLayer(const char* layerName);
 		static LayerID RegisterLayerImpl(const char* layerName, Layer* nLayer);
 
-		friend class scene::SceneManager;
-		friend class Scene;
-
+		friend class scene::SceneManagerImpl;
+		friend struct scene::SceneImpl;
+		
 		scene::LayerImpl& GetImpl();
 		void Attach(SceneID sID);
 		void Detach();
@@ -133,5 +147,11 @@ namespace rdt {
 	{
 		Layer* nLayer = new T();
 		return Layer::RegisterLayerImpl(layerName, nLayer);
+	}
+	template<class EntityDef, typename ...EntityArgs>
+	inline EntityID Layer::AddEntity(EntityArgs ...args)
+	{
+		EntityDef nEntity(args..);
+		return AddEntityImpl(static_cast<EntityDefinition>(nEntity));
 	}
 }

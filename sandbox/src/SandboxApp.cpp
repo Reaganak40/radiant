@@ -6,7 +6,22 @@
 
 #include <Radiant/Graphics.hpp>
 
+
 using namespace rdt;
+
+class RedBox : public EntityDefinition {
+private:
+public:
+
+	RedBox(int arg1, int arg2, int arg3) {
+		RDT_TRACE("{}, {}, {}", arg1, arg2, arg3);
+	}
+
+	void OnCreate() override final {
+	}
+};
+
+
 
 class TestLayer : public Layer {
 private:
@@ -31,6 +46,8 @@ public:
 
 	void OnAttach() override final {
 		RDT_TRACE("OnAttach called for TestLayer!");
+
+		AddEntity<RedBox>(1, 2, 3);
 	}
 
 	void OnBind() override final {
@@ -81,6 +98,8 @@ public:
 
 		RDT_TRACE("Binding SandboxScene!");
 		AttachLayer("testLayer");
+
+		BindAllLayers();
 	}
 
 	void OnRelease() override final {

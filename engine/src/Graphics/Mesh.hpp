@@ -1,5 +1,5 @@
 /***************************************************************/
-/*  (impl) Scene/SceneManager.hpp                              */
+/*  (Impl) Graphics/Mesh.hpp                                   */
 /* *************************************************************/
 /*                 This file is a part of:                     */
 /*                -- RADIANT GAME ENGINE --                    */
@@ -36,64 +36,39 @@
 /***************************************************************
 * Headers
 ***************************************************************/
-#include <Radiant/Scene/Scene.hpp>
-#include <Radiant/Scene/Layer.hpp>
+#include <Radiant/System/MathTypes.hpp>
+#include "Texture/TextureAtlas.h"
+#include <Radiant/ECS/CommonComponents.hpp>
 
 /***************************************************************
-* Forward Declarations
+* Foward Declarations
 ***************************************************************/
 namespace rdt {
-	using SceneID = unsigned int;
-	using LayerID = unsigned int;
+	using UniqueID = unsigned int;
+	using TextureID = unsigned int;   // Unique Identifier for a Texture
+	using ModelID = unsigned int;
+
+	struct Transform;
 }
 
-namespace rdt::scene {
+// Required Definitions for Struct/Class Members
 
-	class SceneManager {
-	private:
-		SceneManager();
-		~SceneManager();
-		static SceneManager* m_instance;
+namespace rdt::graphics {
 
-	public:
-		static SceneManager& Get();
-		static void Destroy();
-		
-		SceneID RegisterScene(const char* sceneName, Scene* scene);
-		SceneID GetSceneID(const char* sceneName);
-		Scene* SetScene(const char* sceneName);
+	struct Mesh {
+		ModelID modelID;
+		TextureID textureID;
+		AtlasProfile atlasProfile;
+		Transform transform;
+		bool flipTexture;
+		Vec4f fillColor;
+		unsigned int layer;
 
-		LayerID RegisterLayer(const char* layerName, Layer* nLayer);
-		LayerID GetLayerID(const char* layerName);
-
-		Layer* AttachLayerToScene(const char* layerName, SceneID scene);
-
-	private:
-
-		std::unordered_map<std::string, SceneID> sceneAliasToId;
-		std::unordered_map<SceneID, Scene*> m_scenes;
-		SceneID m_current_scene_id;
-
-		std::unordered_map<std::string, LayerID> layerAliasToId;
-		std::unordered_map<LayerID, Layer*> m_layers;
-
-		SceneID sceneIdCounter;
-		LayerID layerIdCounter;
-
-		bool SceneExists(const std::string& sceneName);
-		bool SceneExists(SceneID sceneID);
-
-		bool LayerExists(const std::string& layerName);
-		bool LayerExists(LayerID layer);
-		
-		/*
-			Gets the next available sceneID
-		*/
-		SceneID NextSceneID();
+		Mesh();
 
 		/*
-			Gets the next available layerID
+			Resets a mesh back to its default constructor
 		*/
-		LayerID NextLayerID();
+		void Reset();
 	};
 }

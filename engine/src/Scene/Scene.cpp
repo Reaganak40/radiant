@@ -1,11 +1,11 @@
 #include "pch.h"
 #include <Radiant/Scene/Scene.hpp>
+#include <Radiant/Scene/Layer.hpp>
 #include <Core/Utils/Error.hpp>
 
 #include "SceneImpl.hpp"
-#include "SceneManager.hpp"
+#include "SceneManagerImpl.hpp"
 
-static rdt::Scene* m_current_scene = nullptr;
 
 rdt::Scene::Scene()
 	: m_impl(new scene::SceneImpl)
@@ -38,19 +38,43 @@ bool rdt::Scene::IsBound()
 
 void rdt::Scene::AttachLayer(const char* layerName)
 {
-	Layer* layer = SceneManager::AttachLayerToScene(layerName, m_impl->m_ID);
-	m_impl->AddToLayerStack(layer, m_impl->m_layer_stack.size());
+	// handles the attaching and binding of the layer
+	Layer* layer = scene::SceneManagerImpl::Get().AttachLayerToScene(layerName, m_impl->m_ID);
+
+	if (layer != nullptr) {
+		m_impl->AddToLayerStack(layer, m_impl->m_layer_stack.size());
+	}
 }
 
 void rdt::Scene::AttachLayer(const char* layerName, size_t insertIndex)
 {
-	Layer* layer = SceneManager::AttachLayerToScene(layerName, m_impl->m_ID);
+	Layer* layer = scene::SceneManagerImpl::Get().AttachLayerToScene(layerName, m_impl->m_ID);
 	m_impl->AddToLayerStack(layer, insertIndex);
 }
 
-rdt::SceneID rdt::scene::Scene::RegisterSceneImpl(const char* sceneName, Scene* nScene)
+void rdt::Scene::BindLayer(const char* layerName)
 {
-	return SceneManager::RegisterScene(sceneName, nScene);
+	m_impl->BindLayer(layerName);
+}
+
+void rdt::Scene::BindLayer(size_t layerIndex)
+{
+	m_impl->BindLayer(layerIndex);
+}
+
+void rdt::Scene::BindAllLayers()
+{
+	m_impl->BindLayers();
+}
+
+void rdt::Scene::ReleaseLayer(const char* layerName)
+{
+	m_impl->ReleaseLayer(layerName);
+}
+
+rdt::SceneID rdt::Scene::RegisterSceneImpl(const char* sceneName, Scene* nScene)
+{
+	return scene::SceneManagerImpl::Get().RegisterScene(sceneName, nScene);
 }
 
 rdt::scene::SceneImpl& rdt::Scene::GetImpl()
@@ -58,6 +82,15 @@ rdt::scene::SceneImpl& rdt::Scene::GetImpl()
 	return *m_impl;
 }
 
+void rdt::Scene::ReleaseLayer(size_t layerIndex)
+{
+	m_impl->ReleaseLayer(layerIndex);
+}
+
+void rdt::Scene::ChangeScene(const char* nScene)
+{
+	scene::SceneManagerImpl::Get().RequestToChangeScene(nScene);
+}
 
 void rdt::Scene::Bind()
 {
@@ -66,9 +99,8 @@ void rdt::Scene::Bind()
 		return;
 	}
 
-	OnBind(); // child implementation
-	m_impl->BindLayers();
 	m_impl->is_bound = true;
+	OnBind(); // child implementation
 }
 
 void rdt::Scene::Release()
@@ -79,8 +111,8 @@ void rdt::Scene::Release()
 	}
 
 	m_impl->is_bound = false;
-	m_impl->ReleaseLayers();
 	OnRelease(); // child implementation
+	m_impl->ReleaseLayers();
 }
 
 void rdt::Scene::ProcessInput(const float deltaTime)
@@ -110,24 +142,3 @@ void rdt::Scene::RenderUpdate()
 		layer->RenderUpdate();
 	}
 }
-
-void rdt::Scene::SetCurrentScene(const char* sceneName)
-{
-	m_current_scene = scene::SceneManager::Get().SetScene(sceneName);
-}
-
-rdt::Scene& rdt::Scene::GetCurrentScene()
-{
-	if (m_current_scene == nullptr) {
-		RDT_THROW_NOT_ASSIGNED_EXCEPTION("Scene - current scene pointer was null");
-	}
-
-	return *m_current_scene;
-}
-
-void rdt::Scene::Destroy()
-{
-	scene::SceneManager::Destroy();
-}
-
-

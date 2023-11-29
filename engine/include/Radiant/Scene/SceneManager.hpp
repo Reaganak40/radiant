@@ -1,5 +1,5 @@
 /***************************************************************/
-/*  Config.hpp                                                 */
+/*  Scene/SceneManager.hpp                                     */
 /* *************************************************************/
 /*                 This file is a part of:                     */
 /*                -- RADIANT GAME ENGINE --                    */
@@ -34,51 +34,33 @@
 #pragma once
 
 /***************************************************************
-* Define the Radiant Version
+* Headers
 ***************************************************************/
-#define RDT_VERSION_MAJOR 0
-#define RDT_VERSION_MINOR 1
-#define RDT_VERSION_PATCH 1
-#define RDT_VERSION_IS_RELEASE false
+#include <Radiant/Scene/Export.hpp>
+
 
 /***************************************************************
-* Define sysem macros
+* Forward Declarations
 ***************************************************************/
-#ifdef RDT_PLATFORM_WINDOWS
-	#define RDT_API_EXPORT __declspec(dllexport)
-	#define RDT_API_IMPORT __declspec(dllimport)
-#else
-	#error Unsupported Platform - Windows Only
-#endif
+namespace rdt {
+	class Application;
+	class Scene;
+}
 
-/***************************************************************
-* Define the core platform library to use
-***************************************************************/
-#if defined(RDT_USE_DIRECTX)
-	#error DirectX not currently available! Use OpenGL instead.
-#elif defined(RDT_USE_OPENGL)
-#else
-	#pragma message("Graphics platform not defined... using OpenGL by default.") 
-	#define RDT_USE_OPENGL
-#endif
+namespace rdt::scene {
 
-/***************************************************************
-* Detect spdlog availability
-***************************************************************/
-#ifndef RDT_DISABLE_LOGGING
-	#if !__has_include("spdlog/spdlog.h")
-		#pragma message("spdlog.h not found, logging is disabled.") 
-		#define RDT_DISABLE_LOGGING
-	#elif defined(RDT_PUBLISH)
-		#pragma message("compiling in publish mode, logging is disabled.") 
-		#define RDT_DISABLE_LOGGING
-	#endif
-#endif
+	// Interface used by the application to initiate,
+	// communicate, and destroy the scene module.
+	class RDT_SCENE_API SceneManager {
+	private:
+		friend class Application;
 
-/***************************************************************
-* Sanity check - in debug/release/publish configuration
-***************************************************************/
-#if defined(RDT_DEBUG) || defined(RDT_RELEASE) || defined(RDT_PUBLISH)
-#else
-	#error Unsupported configuration! (supported types: debug, release, publish)
-#endif
+		static void Initialize();
+		static void Destroy();
+
+		static void SetCurrentScene(const char* sceneName);
+		static Scene* GetCurrentScene();
+
+		static void OnEndFrame();
+	};
+}

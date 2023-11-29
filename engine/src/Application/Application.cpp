@@ -3,13 +3,24 @@
 #include <Radiant/Window/Window.hpp>
 #include <Radiant/Window/WindowConfig.hpp>
 #include <Radiant/Graphics/Renderer.hpp>
+
+#include <Radiant/Scene/SceneManager.hpp>
 #include <Radiant/Scene/Scene.hpp>
 
+#include <Radiant/ECS/EntityManager.hpp>
+
+#include <string>
+
 namespace rdt {
+
+	using namespace scene;
+	using namespace ecs;
 
 	struct Application::Impl {
 		size_t refCount = 0; // used to avoid more than one application instance
 		float deltaTime = 0.0f;
+		Scene* m_current_scene = nullptr;
+		std::string m_start_scene = "";
 
 		Impl()
 		{
@@ -21,6 +32,8 @@ namespace rdt {
 		}
 
 		void RunGameLoop() {
+
+			SetStartScene();
 
 			while (IsRunning()) {
 				
@@ -40,42 +53,64 @@ namespace rdt {
 			TearDown();
 		}
 		
-		// Initializes the rest of the Radiant modules
-		void OnStart() {
+		void InitModules() {
+			
+			// Initializes the rest of the Radiant modules
 			Window::GetInstance().LaunchWindow();
 			Renderer::Initialize();
+			SceneManager::Initialize();
+
+			InitECS();
+		}
+
+		void InitECS() {
+			EntityManager::Initialize();
+		}
+
+		void SetStartScene() {
+			// Set the starting scene
+			SceneManager::SetCurrentScene(m_start_scene.c_str());
 		}
 
 		bool IsRunning() {
-			return Window::GetInstance().IsOpen();
+			// window is open and scene is not nullptr
+			return Window::GetInstance().IsOpen() && (SceneManager::GetCurrentScene());
 		}
 
 		void BeginFrame() {
 			Renderer::OnBeginFrame();
+			m_current_scene = SceneManager::GetCurrentScene();
 		}
 
 		void ProcessInput() {
-			Scene::GetCurrentScene().ProcessInput(deltaTime);
+			m_current_scene->ProcessInput(deltaTime);
 		}
 
 		void WorldUpdate() {
-			Scene::GetCurrentScene().WorldUpdate(deltaTime);
+			m_current_scene->WorldUpdate(deltaTime);
 		}
 
 		void FinalUpdate() {
-			Scene::GetCurrentScene().FinalUpdate();
+			m_current_scene->FinalUpdate();
 		}
 
 		void RenderUpdate() {
-			Scene::GetCurrentScene().RenderUpdate();
+			m_current_scene->RenderUpdate();
 			Renderer::Render();
 		}
 
 		void EndFrame() {
 			Renderer::OnEndFrame();
+			SceneManager::OnEndFrame();
 		}
 
 		void TearDown() {
+
+			// ECS
+			EntityManager::Destroy();
+
+
+			SceneManager::Destroy();
 			Renderer::Destroy();
 			Window::Destroy();
 		}
@@ -105,7 +140,7 @@ rdt::Application::~Application()
 
 void rdt::Application::Run()
 {
-	m_impl->OnStart();
+	m_impl->InitModules();
 	OnGameBegin();
 	m_impl->RunGameLoop();
 }
@@ -117,5 +152,5 @@ rdt::WindowConfig& rdt::Application::GetWindowConfig()
 
 void rdt::Application::BeginScene(const char* sceneName)
 {
-	Scene::SetCurrentScene(sceneName);
+	m_impl->m_start_scene = sceneName;
 }

@@ -51,7 +51,7 @@ namespace rdt::scene {
 		SceneID m_owner = RDT_NULL_SCENE_ID;
 		bool is_bound = false;
 
-		inline SceneID GetAttachedSceneID() { return m_ID; }
+		inline SceneID GetAttachedSceneID() { return m_owner; }
 		inline void SetLayerID(LayerID nID) { m_ID = nID; }
 		void SetName(const char* name);
 	};

@@ -8,3 +8,4 @@
 #include <vector>
 #include <unordered_map>
 #include <stdexcept>
+#include <type_traits>

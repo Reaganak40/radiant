@@ -57,11 +57,7 @@ namespace rdt {
 	// Renderer is a global pipeline tool that is used by the client
 	// to render meshes, manipulate the camera, and draw scenes.
 	class RDT_GRAPHICS_API Renderer {
-	private:
-		struct Impl;
-		static Impl* m_impl;
 	public:
-
 		// Sets the color that is used to clear the screen each frame.
 		// default: BLACK
 		static void SetBackgroundColor(const Color& color);

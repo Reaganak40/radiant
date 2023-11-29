@@ -1,5 +1,5 @@
 /***************************************************************/
-/*  Config.hpp                                                 */
+/*  System/Bitset.hpp                                          */
 /* *************************************************************/
 /*                 This file is a part of:                     */
 /*                -- RADIANT GAME ENGINE --                    */
@@ -34,51 +34,40 @@
 #pragma once
 
 /***************************************************************
-* Define the Radiant Version
+* Headers
 ***************************************************************/
-#define RDT_VERSION_MAJOR 0
-#define RDT_VERSION_MINOR 1
-#define RDT_VERSION_PATCH 1
-#define RDT_VERSION_IS_RELEASE false
 
-/***************************************************************
-* Define sysem macros
-***************************************************************/
-#ifdef RDT_PLATFORM_WINDOWS
-	#define RDT_API_EXPORT __declspec(dllexport)
-	#define RDT_API_IMPORT __declspec(dllimport)
-#else
-	#error Unsupported Platform - Windows Only
-#endif
+namespace rdt {
+	using _byte = unsigned char;
 
-/***************************************************************
-* Define the core platform library to use
-***************************************************************/
-#if defined(RDT_USE_DIRECTX)
-	#error DirectX not currently available! Use OpenGL instead.
-#elif defined(RDT_USE_OPENGL)
-#else
-	#pragma message("Graphics platform not defined... using OpenGL by default.") 
-	#define RDT_USE_OPENGL
-#endif
+	template<size_t size>
+	class bitset {
+	private:
+		_byte bytes[(size / 64) + 1];
 
-/***************************************************************
-* Detect spdlog availability
-***************************************************************/
-#ifndef RDT_DISABLE_LOGGING
-	#if !__has_include("spdlog/spdlog.h")
-		#pragma message("spdlog.h not found, logging is disabled.") 
-		#define RDT_DISABLE_LOGGING
-	#elif defined(RDT_PUBLISH)
-		#pragma message("compiling in publish mode, logging is disabled.") 
-		#define RDT_DISABLE_LOGGING
-	#endif
-#endif
+		bitset()
+		{
+			for (size_t i = 0; i < sizeof(bytes); i++) {
+				bytes[i] = 0;
+			}
+		}
 
-/***************************************************************
-* Sanity check - in debug/release/publish configuration
-***************************************************************/
-#if defined(RDT_DEBUG) || defined(RDT_RELEASE) || defined(RDT_PUBLISH)
-#else
-	#error Unsupported configuration! (supported types: debug, release, publish)
-#endif
+		void set(size_t bitIndex, bool value) {
+			static_assert(bitIndex < size);
+
+			if (value) {
+				bytes[bitIndex / 64] |= (1 << (bitIndex % 64))
+			}
+			else {
+				bytes[bitIndex / 64] ^= (1 << (bitIndex % 64))
+			}
+		}
+		
+		bool operator [](size_t i) const 
+		{
+			static_assert(i < size);
+			return bytes[i / 64] & (1 << (i % 64) 
+		}
+	};
+
+}

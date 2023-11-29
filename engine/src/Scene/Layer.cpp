@@ -1,10 +1,11 @@
 #include "pch.h"
 #include <Radiant/Scene/Layer.hpp>
 #include <Radiant/Scene/Scene.hpp>
-#include "SceneManager.hpp"
+#include "SceneManagerImpl.hpp"
 #include "LayerImpl.hpp"
 
 #include <Radiant/Logger.hpp>
+#include <Radiant/ECS/Entity.hpp>
 
 rdt::Layer::Layer()
 	: m_impl(new scene::LayerImpl)
@@ -44,11 +45,22 @@ bool rdt::Layer::IsBound()
 	return m_impl->is_bound;
 }
 
-rdt::LayerID rdt::Layer::RegisterLayerImpl(const char* layerName, Layer* nLayer)
+void rdt::Layer::ChangeScene(const char* nScene)
 {
-	return scene::SceneManager::Get().RegisterLayer(layerName, nLayer);
+	scene::SceneManagerImpl::Get().RequestToChangeScene(nScene);
 }
 
+rdt::EntityID rdt::Layer::AddEntityImpl(EntityDefinition& entityDef)
+{
+	entityDef.OnCreate();
+	
+	return 0;
+}
+
+rdt::LayerID rdt::Layer::RegisterLayerImpl(const char* layerName, Layer* nLayer)
+{
+	return scene::SceneManagerImpl::Get().RegisterLayer(layerName, nLayer);
+}
 
 rdt::scene::LayerImpl& rdt::Layer::GetImpl()
 {
@@ -81,7 +93,8 @@ void rdt::Layer::Bind()
 void rdt::Layer::Release()
 {
 	if (!IsBound()) {
-		RDT_CORE_WARN("Layer - Tried to release unbound layer '{}'", m_impl->m_name);
+		// no warning because there are cases when some layers are not bound
+		// and ReleaseAllLayers is called.
 		return;
 	}
 
