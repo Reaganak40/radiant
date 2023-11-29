@@ -12,9 +12,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\Core\Utils\Array.hpp">
-      <Filter>include\Core\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\Core\Utils\Common.hpp">
       <Filter>include\Core\Utils</Filter>
     </ClInclude>
@@ -27,9 +24,6 @@
     <ClInclude Include="..\..\include\Core\Utils\Export.hpp">
       <Filter>include\Core\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Core\Utils\String.hpp">
-      <Filter>include\Core\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\Core\Utils\UtilFuncs.hpp">
       <Filter>include\Core\Utils</Filter>
     </ClInclude>
@@ -38,9 +32,7 @@
   <ItemGroup>
     <ClCompile Include="ConfigReader.cpp" />
     <ClCompile Include="Error.cpp" />
-    <ClCompile Include="String.cpp" />
     <ClCompile Include="UtilFuncs.cpp" />
     <ClCompile Include="pch.cpp" />
-    <ClCompile Include="rdt_array.cpp" />
   </ItemGroup>
 </Project>

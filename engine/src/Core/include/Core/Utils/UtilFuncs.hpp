@@ -43,7 +43,11 @@
 ***************************************************************/
 namespace rdt {
     struct Vec2i;
-    class String;
+    struct Vec2d;
+    struct Vec2d;
+    struct Vec2f;
+
+    using STRING_ARRAY = std::vector<std::string>;
 }
 
 namespace rdt::utils {
@@ -85,12 +89,12 @@ namespace rdt::utils {
     /*
         Reads an ASCII text file and returns the contents to the passed reference.
     */
-    RDT_UTILS_API int ReadTextFile(const String& filepath, String& outContents);
+    RDT_UTILS_API int ReadTextFile(const std::string& filepath, std::string& outContents);
 
     /*
         Replaces all occurances of the target string in src with the replace string.
     */
-    RDT_UTILS_API void ReplaceAll(String& src, const String& target, const String& replace);
+    RDT_UTILS_API void ReplaceAll(std::string& src, const std::string& target, const std::string& replace);
 
     /*
         Returns the max between two types
@@ -155,7 +159,7 @@ namespace rdt::utils {
     /*
         Tokenizes a string by the provided delimeter and returns a vector of the tokenized strings
     */
-    void RDT_UTILS_API Tokenize(const char* str, const char* delimeter, STRING_ARRAY& tokens);
+    void RDT_UTILS_API Tokenize(const std::string& str, const std::string& delimeter, STRING_ARRAY& tokens);
 
     /*
         Returns the parent directory of the filepath

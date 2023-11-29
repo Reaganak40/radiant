@@ -43,6 +43,9 @@ tp_include["openal"]        = "%{wks.location}/thirdparty/AL"
 tp_include["AudioFile"]     = "%{wks.location}/thirdparty/AudioFile-1.1.1"
 tp_include["spdlog"]        = "%{wks.location}/thirdparty/spdlog/spdlog/include"
 
+-- which third party libraries are static library vs-projects 
+tp_projects = {"GLFW", "glad", "ImGui", "glm", "openal"}
+
 --[[
     Module third party dependencies
     Defines what third party libaries a given module references
@@ -52,7 +55,7 @@ tp_include["spdlog"]        = "%{wks.location}/thirdparty/spdlog/spdlog/include"
     NOTE: This only includes third party vs projects
 --]]
 mtpd = {}
-mtpd["Utils"]       = {"spdlog"}
+mtpd["Utils"]       = {}
 mtpd["Window"]      = {"spdlog"}
 mtpd["Graphics"]    = {"spdlog","GLM"}
 mtpd["Physics"]     = {"spdlog"}
@@ -151,8 +154,26 @@ function GetModuleIncludes(projName)
     return includes
 end
 
+-- from: https://stackoverflow.com/a/66699630
+function utils_Set(list)
+    local set = {}
+    for _, l in ipairs(list) do set[l] = true end
+    return set
+end
+
 function GetModuleLinks(projName)
-    return { md_graph[projName], mtpd[projName] }
+    local ret_links = { md_graph[projName] }
+
+    __tp_project = utils_Set(tp_projects)
+
+    -- only include third party projects that are vs projects
+    for idx, third_party_proj in pairs(mtpd[projName]) do
+        if __tp_project[third_party_proj] then
+            table.insert(ret_links, third_party_proj)
+        end
+    end
+
+    return ret_links
 end
 
 workspace "Radiant"

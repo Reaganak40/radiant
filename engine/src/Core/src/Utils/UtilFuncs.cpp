@@ -1,7 +1,6 @@
 #include "pch.h"
-#include <Radiant/Utils/UtilFuncs.hpp>
-#include <Radiant/Utils/String.hpp>
-#include <Radiant/Utils/MathTypes.hpp>
+#include <Core/Utils/UtilFuncs.hpp>
+#include <Radiant/System/MathTypes.hpp>
 
 constexpr float FLOAT_EPSILON = 0.0001f;
 
@@ -85,7 +84,7 @@ namespace rdt::utils {
         return (rand() % (max - min + 1)) + min;
     }
 
-    int ReadTextFile(const String& filepath, String& outContents)
+    int ReadTextFile(const std::string& filepath, std::string& outContents)
     {
         outContents.clear();
 
@@ -234,52 +233,9 @@ namespace rdt::utils {
 
     std::string GetCWD()
     {
-        char buff[FILENAME_MAX]; //create string buffer to hold path
-
-#pragma warning( push )
-#pragma warning( disable : 6031)
-        GetCurrentDir(buff, FILENAME_MAX);
-#pragma warning( pop ) 
-
-        std::string current_working_dir(buff);
-        return current_working_dir;
+        return std::filesystem::current_path().string();
     }
-    void Tokenize(const char* _str, const char* _delimeter, STRING_ARRAY& tokens)
-    {
-        std::string delimProgress = "";
-        std::string curr = "";
-        std::string str = _str;
-        std::string delimeter = _delimeter;
-        std::vector<std::string> token_strs;
-
-        for (char c : str) {
-
-            if (delimProgress.size() < delimeter.size() && delimeter[delimProgress.size()] == c) {
-                delimProgress += c;
-            }
-            else {
-                curr += delimProgress + c;
-                delimProgress.clear();
-            }
-
-            if (delimProgress.size() == delimeter.size()) {
-                token_strs.push_back(curr);
-                curr.clear();
-                delimProgress.clear();
-            }
-        }
-
-        if (curr.size() > 0) {
-            token_strs.push_back(curr);
-        }
-
-        tokens.Reset(token_strs.size());
-        for (size_t i = 0; i < token_strs.size(); i++) {
-            tokens.setVal(i, (char*)token_strs[i].c_str());
-        }
-
-    }
-    void Tokenize(const std::string& str, const std::string& delimeter, std::vector<std::string>& out)
+    void Tokenize(const std::string& str, const std::string& delimeter, STRING_ARRAY& tokens)
     {
         std::string delimProgress = "";
         std::string curr = "";
@@ -294,14 +250,14 @@ namespace rdt::utils {
             }
 
             if (delimProgress.size() == delimeter.size()) {
-                out.push_back(curr);
+                tokens.push_back(curr);
                 curr.clear();
                 delimProgress.clear();
             }
         }
 
         if (curr.size() > 0) {
-            out.push_back(curr);
+            tokens.push_back(curr);
         }
     }
 

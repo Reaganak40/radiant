@@ -1,7 +1,6 @@
 #include "pch.h"
-#include "ConfigReader.h"
-#include "UtilFuncs.h"
-
+#include <Core/Utils/ConfigReader.hpp>
+#include <Core/Utils/UtilFuncs.hpp>
 
 namespace rdt::core {
 	ConfigReader::ConfigReader()

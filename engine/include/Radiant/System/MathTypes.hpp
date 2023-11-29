@@ -67,6 +67,10 @@ namespace rdt {
 			return (*this);
 		}
 
+		Vec2d operator/(const double multiplier) const {
+			return Vec2d(x / multiplier, y / multiplier);
+		}
+
 		operator Vec2f() const;
 
 		/*
@@ -146,11 +150,6 @@ namespace rdt {
 	Vec2d operator-(const Vec2d& vector1, const Vec2d& vector2)
 	{
 		return Vec2d(vector1.x - vector2.x, vector1.y - vector2.y);
-	}
-
-	Vec2d operator/(const Vec2d& vector, const double divider)
-	{
-		return Vec2d(vector.x / divider, vector.y / divider);
 	}
 
 	Vec2d operator/(const Vec2d& vector1, const Vec2d& vector2)
