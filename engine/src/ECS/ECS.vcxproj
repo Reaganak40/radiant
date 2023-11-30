@@ -145,13 +145,13 @@
   <ItemGroup>
     <ClInclude Include="..\..\include\Radiant\ECS\CommonComponents.hpp" />
     <ClInclude Include="..\..\include\Radiant\ECS\Component.hpp" />
-    <ClInclude Include="..\..\include\Radiant\ECS\ECSManager.hpp" />
+    <ClInclude Include="..\..\include\Radiant\ECS\ComponentManager.hpp" />
     <ClInclude Include="..\..\include\Radiant\ECS\ECSTypes.hpp" />
     <ClInclude Include="..\..\include\Radiant\ECS\Entity.hpp" />
-    <ClInclude Include="..\..\include\Radiant\ECS\EntityFactory.hpp" />
+    <ClInclude Include="..\..\include\Radiant\ECS\EntityManager.hpp" />
     <ClInclude Include="..\..\include\Radiant\ECS\Export.hpp" />
-    <ClInclude Include="..\..\include\Radiant\ECS\Reflection.hpp" />
     <ClInclude Include="..\..\include\Radiant\ECS\System.hpp" />
+    <ClInclude Include="..\..\include\Radiant\ECS\SystemManager.hpp" />
     <ClInclude Include="ComponentManager.h" />
     <ClInclude Include="EntityManager.h" />
     <ClInclude Include="SystemManager.h" />
@@ -160,8 +160,6 @@
   <ItemGroup>
     <ClCompile Include="CommonComponents.cpp" />
     <ClCompile Include="ComponentManager.cpp" />
-    <ClCompile Include="ECSManager.cpp" />
-    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="SystemManager.cpp" />
     <ClCompile Include="pch.cpp" />

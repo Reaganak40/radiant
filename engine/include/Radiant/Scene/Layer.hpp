@@ -38,10 +38,13 @@
 ***************************************************************/
 #include <Radiant/Scene/Export.hpp>
 
-// 
+// Include ECS with Layer
 #include <Radiant/ECS/Entity.hpp>
+#include <Radiant/ECS/Component.hpp>
 
-// Forward Declarations
+/***************************************************************
+* Forward Declarations
+***************************************************************/
 namespace rdt {
 	using LayerID  = unsigned int;
 	using SceneID  = unsigned int;

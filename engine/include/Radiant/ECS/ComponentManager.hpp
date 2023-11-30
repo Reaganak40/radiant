@@ -1,5 +1,5 @@
 /***************************************************************/
-/*  ECS/ECSManager.hpp                                         */
+/*  ECS/ComponentManager.hpp                                   */
 /* *************************************************************/
 /*                 This file is a part of:                     */
 /*                -- RADIANT GAME ENGINE --                    */
@@ -37,22 +37,65 @@
 * Headers
 ***************************************************************/
 #include <Radiant/ECS/Export.hpp>
+#include <Radiant/ECS/Component.hpp>
 
 /***************************************************************
 * Forward Declarations
 ***************************************************************/
 namespace rdt {
-	class Application;
+	class System;
 }
 
+/***************************************************************
+* Implementation Interface (not intended for client use)
+***************************************************************/
 namespace rdt::ecs {
 
-	// Handles the creation, management, and destruction of the entity component system
-	class RDT_ECS_API ECSManager {
+	class RDT_ECS_API ComponentManager {
 	private:
+/***************************************************************
+* EntityManager creation and destruction
+***************************************************************/
 		friend class Application;
-
 		static void Initialize();
 		static void Destroy();
+/***************************************************************
+* Templates
+***************************************************************/
+		friend class EntityManager;
+		friend class System;
+
+		template<typename T>
+		static void RegisterComponent() {
+
+			RegisterComponentImpl(GetComponentType<T>(), new Component<T>());
+		}
+
+		template<typename T>
+		static void AddToComponent(EntityID eID, const T& nData)
+		{
+			Component<T>* component = static_cast<Component<T>>(GetComponent(GetComponentType<T>()));
+			if (component != nullptr) {
+				component->InsertData(eID, nData);
+			}
+		}
+
+/***************************************************************
+* Inteface to implementation
+***************************************************************/
+
+		// Registers a new component to the ComponentSystem
+		void RegisterComponentImpl(ComponentType type, IComponentArray* component);
+		
+		// Returns the global identfiier for the component, returns RDT_NULL_COMPONENT_ID
+		// if not found.
+		static ComponentID GetComponentID(ComponentType type);
+
+		// Returns an opaque pointer to a registered component, with the expectation
+		// that the caller knows its cast. Returns nullptr if not found. 
+		static void* GetComponent(ComponentType type);
+
+		// Removes an entity's data from a registered component.
+		static void RemoveFromComponent(EntityID eID, ComponentID cID);
 	};
 }

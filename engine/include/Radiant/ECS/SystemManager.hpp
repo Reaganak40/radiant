@@ -1,5 +1,5 @@
 /***************************************************************/
-/*  (Core) Utils/Error.hpp                                     */
+/*  ECS/SystemManager.hpp                                      */
 /* *************************************************************/
 /*                 This file is a part of:                     */
 /*                -- RADIANT GAME ENGINE --                    */
@@ -36,18 +36,44 @@
 /***************************************************************
 * Headers
 ***************************************************************/
-#include <Core/Utils/Export.hpp>
-#include <Radiant/Logger.hpp>
+#include <Radiant/ECS/Export.hpp>
+#include <Radiant/ECS/System.hpp>
 
-namespace rdt::core {
+/***************************************************************
+* Implementation Interface (not intended for client use)
+***************************************************************/
+namespace rdt::ecs {
 
-	enum RadiantErrorType {
-		RadiantErrorType_NotAssigned = 0,
-		RadiantErrorType_ComponentOverflow,
-	};
+	class RDT_ECS_API SystemManager {
+	private:
+		template<typename T>
+		friend void ::rdt::RegisterSystem();
 
-	RDT_UTILS_API void ThrowRadiantError(RadiantErrorType type);
+/***************************************************************
+* EntityManager creation and destruction
+***************************************************************/
+		friend class Application;
+		static void Initialize();
+		static void Destroy();
+
+
+		static void RegisterSystem(const char* name, System* nSystem);
+	};	
 }
 
-#define RDT_THROW_NOT_ASSIGNED_EXCEPTION(...) RDT_CORE_FATAL(__VA_ARGS__); ::rdt::core::ThrowRadiantError(::rdt::core::RadiantErrorType_NotAssigned)
-#define RDT_THROW_COMPONENT_OVERFLOW_EXCEPTION(...) RDT_CORE_FATAL(__VA_ARGS__); ::rdt::core::ThrowRadiantError(::rdt::core::RadiantErrorType_ComponentOverflow)
+/***************************************************************
+* Client Interface
+***************************************************************/
+namespace rdt {
+	// Adds a system/procedure to the ECS instance. This system will be enabled by default.
+	// Systems can be registered from anywhere, but it is best practice to do it in scenes
+	// and child applications.
+	template<typename T>
+	void RegisterSystem()
+	{
+		const char* typeName = typeid(T).name();
+		T* nSystem = new T;
+		static_assert(std::is_base_of<System, T>(nSystem));
+		ecs::SystemManager::RegisterSystem(typeName, static_cast<System>(nSystem));
+	}
+}

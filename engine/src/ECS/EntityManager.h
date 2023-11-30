@@ -72,6 +72,7 @@ namespace rdt::ecs {
 		// \param owner - a pointer to the layer that tracks this entity, nullptr indicates this entity
 		// has no owner.
 		EntityID RegisterEntity(const std::string& alias = "");
+
 		void RemoveEntity(EntityID entity);
 		void SetSignature(EntityID entity, const Signature& signature);
 		Signature GetSignature(EntityID eID);
@@ -95,24 +96,7 @@ namespace rdt::ecs {
 			return m_instance->HasComponentImpl(eID, cID);
 		}
 
-		/*
-			Adds a componenet to this entity, modifying its signature,
-			stores the component data in the component manager.
-		*/
-		template<typename T>
-		static void AddComponent(EntityID eID, const T& nData = T())
-		{
-			ComponentID cID = ComponentManager::GetComponentID<T>();
-
-			if (cID == NOT_REGISTERED_COMPONENT) {
-				const char* typeName = typeid(T).name();
-				RDT_CORE_WARN("EntityManager - Could not add unregistered component '{}' to entity.", typeName);
-				return;
-			}
-
-			AddToSignature(eID, cID);
-			ComponentManager::AddToComponent<T>(eID, nData);
-		}
+		
 
 		/*
 			Removes a component from this entity, modifying its signature,

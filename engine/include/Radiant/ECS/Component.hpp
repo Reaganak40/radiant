@@ -46,9 +46,9 @@
 ***************************************************************/
 namespace rdt {
 	class IComponentArray {
+	private:
 	public:
 		virtual ~IComponentArray() = default;
-
 		virtual void  RemoveData(EntityID eID) = 0;
 		virtual void* GetDataPtr(EntityID eID) = 0;
 		virtual bool  IsEntityDisabled(EntityID eID) = 0;
@@ -79,14 +79,19 @@ namespace rdt {
 		// Removes the data belonging to this entity
 		void RemoveData(Entity eID) override final {
 
-			auto it = m_entities.find(eID);
-			if (it == m_entities.end()) {
+			if ((auto it = m_entities.find(eID)) == m_entities.end()) {
+				size_t index = it - m_entities.begin();
+				m_entities.erase(index);
+				m_data.erase(index);
 				return;
 			}
 
-			size_t index = it - m_entities.begin();
-			m_entities.erase(index);
-			m_data.erase(index);
+			if ((auto it = m_disabled_entities.find(eID)) == m_disabled_entities.end()) {
+				size_t index = it - m_disabled_entities.begin();
+				m_disabled_entities.erase(index);
+				m_disabled_data.erase(index);
+				return;
+			}
 		}
 
 		// Disables access to this entity's component data, effectively

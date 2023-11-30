@@ -64,6 +64,7 @@ namespace rdt {
 		}
 
 		void InitECS() {
+			ComponentManager::Initialize();
 			EntityManager::Initialize();
 		}
 
@@ -108,6 +109,7 @@ namespace rdt {
 
 			// ECS
 			EntityManager::Destroy();
+			ComponentManager::Destroy();
 
 
 			SceneManager::Destroy();

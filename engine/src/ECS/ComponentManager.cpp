@@ -1,163 +1,98 @@
 #include "pch.h"
-#include "ComponentManager.h"
+#include <Radiant/ECS/ComponentManager.hpp>
+#include <Core/Utils/Error.hpp>
 
-namespace rdt {
+namespace rdt::ecs {
+	class ComponentManagerImpl;
+}
 
-	struct ComponentManager::Impl {
-		ComponentID idCounter;
-		std::unordered_map<std::string, ComponentID> m_componentTypes;
-		std::unordered_map<std::string, IComponentArray*> m_components;
+struct rdt::ecs::ComponentManagerImpl
+{
+	ComponentID idCounter = 0;
+	std::unordered_map<ComponentType, ComponentID> m_componentTypes;
+	std::array<IComponentArray*, RDT_MAX_COMPONENTS> m_components;
 
-		Impl()
-		{
-			idCounter = 0;
-		}
-
-		~Impl()
-		{
-			for (auto& [id, component] : m_components) {
-				delete component;
-			}
-		}
-
-		void OnEntityRemoved(Entity eID)
-		{
-			for (auto& [id, component] : m_components) {
-				component->RemoveData(eID);
-			}
-		}
-
-		ComponentID GenerateID() {
-			return idCounter++;
-		}
-
-		ComponentID GetComponentID(const char* typeName)
-		{
-			if (m_componentTypes.find(typeName) == m_componentTypes.end()) {
-				RDT_CORE_WARN("ComponentManager - Could not get component type for '{}'", typeName);
-				return NOT_REGISTERED_COMPONENT;
-			}
-
-			return m_componentTypes.at(typeName);
-		}
-
-		void* GetData(ComponentID cID, Entity entity) {
-
-			for (auto& [componentName, id] : m_componentTypes) {
-				if (id == cID) {
-					return m_components.at(componentName)->GetDataPtr(entity);
-				}
-			}
-
-			RDT_CORE_WARN("ComponentManager - Could not find component '{}'", cID);
-			return nullptr;
-		}
-
-		void RegisterComponent(const char* typeName, IComponentArray* component)
-		{
-			m_componentTypes[typeName] = GenerateID();
-			m_components[typeName] = component;
-		}
-
-		IComponentArray* GetComponentByID(ComponentID cID)
-		{
-			for (auto& [componentName, id] : m_componentTypes) {
-				if (id == cID) {
-					return m_components.at(componentName);
-				}
-			}
-
-			return nullptr;
-		}
-
-	};
-	// =================================================================
-
-	ComponentManager* ComponentManager::m_instance = nullptr;
-
-	ComponentManager::ComponentManager()
-		: m_impl(new ComponentManager::Impl)
+	ComponentID NextComponentID()
 	{
+		return idCounter++;
 	}
 
-	ComponentManager::~ComponentManager()
+	void RegisterComponent(ComponentType type, IComponentArray* component)
+	{
+		if (m_componentTypes.find(type) != m_componentTypes.end()) {
+			RDT_CORE_WARN("ComponentManager - Tried to register duplicate component '{}'", type.name());
+		}
+
+		ComponentID nID = NextComponentID();
+
+		if (nID == RDT_MAX_COMPONENTS) {
+			RDT_THROW_COMPONENT_OVERFLOW_EXCEPTION("Exceeded Component Limit: {}", RDT_MAX_COMPONENTS);
+		}
+
+		m_componentTypes[type] = nID;
+		m_components[nID] = component;
+	}
+
+	ComponentID GetComponentID(ComponentType type)
+	{
+		if (m_componentTypes.find(type) == m_componentTypes.end())
+		{
+			return RDT_NULL_COMPONENT_ID;
+		}
+		return m_componentTypes.at(type);
+	}
+
+	void* GetComponent(ComponentType type)
+	{
+		if (m_componentTypes.find(type) == m_componentTypes.end()) {
+			RDT_CORE_WARN("ComponentManager - Could not find component '{}'", type.name());
+			return nullptr;
+		}
+
+		return m_components[m_componentTypes.at(type)];
+	}
+
+	void RemoveFromComponent(EntityID eID, ComponentID cID)
+	{
+		m_components[cID]->RemoveData(eID);
+	}
+};
+
+// ===================================================================
+
+static rdt::ecs::ComponentManagerImpl* m_impl = nullptr;
+
+void rdt::ecs::ComponentManager::Initialize()
+{
+	Destroy();
+	m_impl = new ComponentManagerImpl;
+}
+
+void rdt::ecs::ComponentManager::Destroy()
+{
+	if (m_impl != nullptr)
 	{
 		delete m_impl;
+		m_impl = nullptr;
 	}
+}
 
-	void ComponentManager::Initialize()
-	{
-		Destroy();
-		m_instance = new ComponentManager;
-	}
-	void ComponentManager::Destroy()
-	{
-		if (m_instance != nullptr) {
-			delete m_instance;
-			m_instance = nullptr;
-		}
-	}
+void rdt::ecs::ComponentManager::RegisterComponentImpl(ComponentType type, IComponentArray* component)
+{
+	m_impl->RegisterComponent(type, component);
+}
 
-	void* ComponentManager::GetData(ComponentID cID, Entity entity)
-	{
-		return m_instance->m_impl->GetData(cID, entity);
-	}
+rdt::ComponentID rdt::ecs::ComponentManager::GetComponentID(ComponentType type)
+{
+	return m_impl->GetComponentID(type);
+}
 
-	const char* ComponentManager::GetComponenentName(ComponentID cID)
-	{
-		for (auto& [name, componentID] : m_instance->m_impl->m_componentTypes) {
-			if (componentID == cID) {
-				return name.c_str();
-			}
-		}
+void* rdt::ecs::ComponentManager::GetComponent(ComponentType type)
+{
+	return m_impl->GetComponent(type);
+}
 
-		RDT_CORE_WARN("ComponentManager - Could not find component with id: {}", cID);
-		return nullptr;
-	}
-
-	bool ComponentManager::IsHiddenComponent(const std::string& name)
-	{
-		return (name == "struct rdt::EntityConfig") || (name == "struct rdt::DebugComponent");
-	}
-
-	size_t ComponentManager::GetComponentCount()
-	{
-		return m_instance->m_impl->idCounter;
-	}
-
-	IComponentArray* ComponentManager::GetComponentByID(ComponentID cID)
-	{
-		return m_instance->m_impl->GetComponentByID(cID);
-	}
-
-	void ComponentManager::OnEntityRemoved(Entity eID)
-	{
-		m_instance->m_impl->OnEntityRemoved(eID);
-	}
-
-	bool ComponentManager::ComponentExists(const char* typeName)
-	{
-		return m_impl->m_components.find(typeName) != m_impl->m_components.end();
-	}
-
-	bool ComponentManager::MaxComponentsReached()
-	{
-		return m_impl->idCounter == MAX_COMPONENTS;
-	}
-
-	void ComponentManager::RegisterComponentImpl(const char* typeName, IComponentArray* component)
-	{
-		m_impl->RegisterComponent(typeName, component);
-	}
-
-	void* ComponentManager::GetComponentImpl(const char* typeName)
-	{
-		return m_impl->m_components.at(typeName);
-	}
-
-	ComponentID ComponentManager::GetComponentIDImpl(const char* typeName)
-	{
-		return m_impl->GetComponentID(typeName);
-	}
-
+void rdt::ecs::ComponentManager::RemoveFromComponent(EntityID eID, ComponentID cID)
+{
+	m_impl->RemoveFromComponent(eID, cID);
 }

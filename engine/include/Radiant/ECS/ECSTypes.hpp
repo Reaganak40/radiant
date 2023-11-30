@@ -37,15 +37,26 @@
 * Headers
 ***************************************************************/
 #include <Radiant/ECS/Export.hpp>
-#include <Radiant/System/Bitset.hpp>
+#include <typeindex>
 
 /***************************************************************
-* ECS types used through the ECS module
+* ECS types used throughout the ECS module
 ***************************************************************/
+#define RDT_NULL_ENTITY_ID 0
+#define RDT_NULL_COMPONENT_ID 33
+#define RDT_MAX_COMPONENTS 32
 namespace rdt {
 	using EntityID = unsigned int;
 	using ComponentID = unsigned int;
-	constexpr ComponentID MAX_COMPONENTS = 32;
-	constexpr ComponentID NOT_REGISTERED_COMPONENT = MAX_COMPONENTS + 1;
-	using Signature = rdt::bitset<MAX_COMPONENTS>;
+}
+
+namespace rdt::ecs {
+
+	using ComponentType = std::type_index;
+
+	template<typename T>
+	ComponentType GetComponentType()
+	{
+		return std::type_index(typeid(T));
+	}
 }

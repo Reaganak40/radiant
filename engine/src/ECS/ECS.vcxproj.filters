@@ -18,7 +18,7 @@
     <ClInclude Include="..\..\include\Radiant\ECS\Component.hpp">
       <Filter>include\Radiant\ECS</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Radiant\ECS\ECSManager.hpp">
+    <ClInclude Include="..\..\include\Radiant\ECS\ComponentManager.hpp">
       <Filter>include\Radiant\ECS</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\Radiant\ECS\ECSTypes.hpp">
@@ -27,16 +27,16 @@
     <ClInclude Include="..\..\include\Radiant\ECS\Entity.hpp">
       <Filter>include\Radiant\ECS</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Radiant\ECS\EntityFactory.hpp">
+    <ClInclude Include="..\..\include\Radiant\ECS\EntityManager.hpp">
       <Filter>include\Radiant\ECS</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\Radiant\ECS\Export.hpp">
       <Filter>include\Radiant\ECS</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Radiant\ECS\Reflection.hpp">
+    <ClInclude Include="..\..\include\Radiant\ECS\System.hpp">
       <Filter>include\Radiant\ECS</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\Radiant\ECS\System.hpp">
+    <ClInclude Include="..\..\include\Radiant\ECS\SystemManager.hpp">
       <Filter>include\Radiant\ECS</Filter>
     </ClInclude>
     <ClInclude Include="ComponentManager.h" />
@@ -47,8 +47,6 @@
   <ItemGroup>
     <ClCompile Include="CommonComponents.cpp" />
     <ClCompile Include="ComponentManager.cpp" />
-    <ClCompile Include="ECSManager.cpp" />
-    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="SystemManager.cpp" />
     <ClCompile Include="pch.cpp" />

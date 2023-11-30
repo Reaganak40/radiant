@@ -52,9 +52,15 @@ void rdt::Layer::ChangeScene(const char* nScene)
 
 rdt::EntityID rdt::Layer::AddEntityImpl(EntityDefinition& entityDef)
 {
+	EntityID eID = ecs::EntityManager::RegisterEntity(entityDef.GetAlias());
+	if (eID == RDT_NULL_ENTITY_ID) {
+		return eID;
+	}
+	
+	entityDef.m_ID = eID;
 	entityDef.OnCreate();
 	
-	return 0;
+	return eID;
 }
 
 rdt::LayerID rdt::Layer::RegisterLayerImpl(const char* layerName, Layer* nLayer)

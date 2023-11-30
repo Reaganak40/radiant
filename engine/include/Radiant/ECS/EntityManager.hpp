@@ -1,5 +1,5 @@
 /***************************************************************/
-/*  ECS/Entity.hpp                                             */
+/*  ECS/EntityManager.hpp                                      */
 /* *************************************************************/
 /*                 This file is a part of:                     */
 /*                -- RADIANT GAME ENGINE --                    */
@@ -37,59 +37,83 @@
 * Headers
 ***************************************************************/
 #include <Radiant/ECS/Export.hpp>
-#include <Radiant/ECS/EntityManager.hpp>
-#include <string>
+#include <Radiant/ECS/ComponentManager.hpp>
 
 /***************************************************************
 * Forward Declarations
 ***************************************************************/
 namespace rdt {
 	using EntityID = unsigned int;
+	class EntityDefinition;
 	class Layer;
 }
 
 /***************************************************************
-* Client Interface
+* Implementation Interface (not intended for client use)
 ***************************************************************/
-namespace rdt {
+namespace rdt::ecs {
 
-	// Wrapper class than includes a virtual OnCreate function. This
-	// is a to-be-implemented factory method that is used to abstract
-	// away the creation of common entities
-	class EntityDefinition {
-	private:
-		// no dll interface (compile on client-side)
+	class RDT_ECS_API EntityManager {
+		struct Impl;
+		static Impl* m_impl;
+
+/***************************************************************
+* EntityManager creation and destruction
+***************************************************************/
+		friend class Application;
+		static void Initialize();
+		static void Destroy();
+
+/***************************************************************
+* Templates
+***************************************************************/
+		friend class EntityDefinition;
 		friend class Layer;
 
-		EntityID m_ID = RDT_NULL_ENTITY_ID;
-		std::string entityAlias = "";
+		// Attaches a new component to an entity, changing its signature
+		// and behavior
+		template<typename T>
+		static void AddComponent(EntityID eID, const T& nData = T())
+		{
+			ComponentID cID = ComponentManager::GetComponentID(GetComponentType<T>());
+			if (cID == RDT_NULL_COMPONENT_ID) {
+				ComponentManager::RegisterComponent<T>();
+			}
 
-	public:
-		EntityDefinition();
-		~EntityDefinition();
+			AddToSignature(eID, cID);
 
-		virtual void OnCreate() = 0;
+			// should not be null here
+			((Component<T>*)ComponentManager::GetComponent(cID))->InsertData(eID, nData);
+		}
 
-		inline const EntityID GetID() const { return m_ID; }
-		inline const char* GetAlias() const { return entityAlias.c_str(); }
 
-	protected:
+		// Removes a component from an entity's signature, but caches
+		// its data for reuse.
+		template<typename T>
+		static void RemoveComponent(EntityID eID)
+		{
+
+		}
+
 /***************************************************************
-* Entity Builder Functions
+* Inteface to implementation
 ***************************************************************/
 
-		// Sets the alias of the entity that is about to be registered.
-		// Call this in the constructor or before OnCreate()
-		void SetEntityAlias(const char* alias)
-		{
-			entityAlias = alias;
-		}
+		// Create a new entity by registering the returned EntityID. An EnityConfig
+		// component will automatically be added to this entity.
+		// 
+		// \param alias - the name of the entity, when alias string is empty, the EntityManager will provide
+		// a name to it.
+		static EntityID RegisterEntity(const char* alias = "");
 
-		// Adds a component to this entity
-		template<typename T>
-		void AddComponent(const T& nData = T())
-		{
-			ecs::EntityManager::AddComponent<T>(GetID(), nData);
-		}
+		// Unregisters an entity, removing it from all systems and stops tracking all its components.
+		static void RemoveEntity(EntityID entity);
+		
+		// Updates the entity signature, denoting that it has the indicated component.
+		static void AddToSignature(EntityID entity, ComponentID cID);
+
+		// Uses an entity's current signature to subscribe to all registered
+		// systems.
+		static void SubscribeToSystems();
 	};
 }
