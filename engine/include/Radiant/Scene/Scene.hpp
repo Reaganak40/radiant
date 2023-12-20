@@ -37,6 +37,7 @@
 * Headers
 ***************************************************************/
 #include <Radiant/Scene/Export.hpp>
+#include <Radiant/ECS/SystemManager.hpp>
 
 #define RDT_NULL_SCENE_ID 0
 
@@ -100,6 +101,17 @@ namespace rdt {
 		// of the current game loop.
 		void ChangeScene(const char* nScene);
 
+		// Adds a system/procedure to the ECS instance. This system will be enabled by default.
+		template<typename T>
+		void RegisterSystem()
+		{
+			const char* typeName = typeid(T).name();
+			ecs::SystemID = ecs::G
+			T* nSystem = new T;
+			static_assert(std::is_base_of<System, T>(nSystem));
+			ecs::SystemManager::RegisterSystem(typeName, static_cast<System>(nSystem));
+		}
+
 /***************************************************************
 * Layer Binding Functions
 ***************************************************************/
@@ -118,9 +130,6 @@ namespace rdt {
 		// function during OnBind() or while bounded.
 		void BindAllLayers();
 
-/***************************************************************
-* Layer Binding Functions
-***************************************************************/
 		// Binds a single layer, that matches the name in the scene's layer stack.
 		// NOTE: Layers are released automatically when the scene is released. Call
 		// this function when the scene is bound and the layer no longer serves its

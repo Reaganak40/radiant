@@ -75,17 +75,19 @@ namespace rdt::ecs {
 		template<typename T>
 		static void AddComponent(EntityID eID, const T& nData = T())
 		{
-			ComponentID cID = ComponentManager::GetComponentID(GetComponentType<T>());
-			if (cID == RDT_NULL_COMPONENT_ID) {
+			ComponentID cID = GetComponentID<T>();
+			ComponentSlot sigBit = ComponentManager::GetComponentSlot(cID);
+			if (sigBit == RDT_NOT_REGISTERED_COMPONENT)
+			{
 				ComponentManager::RegisterComponent<T>();
+				sigBit = ComponentManager::GetComponentSlot(cID);
 			}
 
-			AddToSignature(eID, cID);
+			AddToSignature(eID, sigBit);
 
 			// should not be null here
-			((Component<T>*)ComponentManager::GetComponent(cID))->InsertData(eID, nData);
+			static_cast<ComponentData<T>*>(ComponentManager::GetComponentArray(cID))->InsertData(eID, nData);
 		}
-
 
 		// Removes a component from an entity's signature, but caches
 		// its data for reuse.
@@ -110,10 +112,10 @@ namespace rdt::ecs {
 		static void RemoveEntity(EntityID entity);
 		
 		// Updates the entity signature, denoting that it has the indicated component.
-		static void AddToSignature(EntityID entity, ComponentID cID);
+		static void AddToSignature(EntityID entity, ComponentSlot slot);
 
 		// Uses an entity's current signature to subscribe to all registered
 		// systems.
-		static void SubscribeToSystems();
+		static void SubscribeToSystems(EntityID entity);
 	};
 }

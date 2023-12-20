@@ -5,3 +5,4 @@
 #include <unordered_map>
 #include <vector>
 #include <bitset>
+#include <memory>

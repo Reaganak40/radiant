@@ -145,6 +145,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\include\Radiant\ECS\CommonComponents.hpp" />
     <ClInclude Include="..\..\include\Radiant\ECS\Component.hpp" />
+    <ClInclude Include="..\..\include\Radiant\ECS\ComponentArray.hpp" />
     <ClInclude Include="..\..\include\Radiant\ECS\ComponentManager.hpp" />
     <ClInclude Include="..\..\include\Radiant\ECS\ECSTypes.hpp" />
     <ClInclude Include="..\..\include\Radiant\ECS\Entity.hpp" />
@@ -152,9 +153,6 @@
     <ClInclude Include="..\..\include\Radiant\ECS\Export.hpp" />
     <ClInclude Include="..\..\include\Radiant\ECS\System.hpp" />
     <ClInclude Include="..\..\include\Radiant\ECS\SystemManager.hpp" />
-    <ClInclude Include="ComponentManager.h" />
-    <ClInclude Include="EntityManager.h" />
-    <ClInclude Include="SystemManager.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>

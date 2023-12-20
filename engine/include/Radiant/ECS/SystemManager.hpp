@@ -40,40 +40,40 @@
 #include <Radiant/ECS/System.hpp>
 
 /***************************************************************
+* Forward Declarations
+***************************************************************/
+namespace rdt {
+	using SceneID = unsigned int;
+	using LayerID = unsigned int;
+
+	class Application;
+	class Scene;
+	class Layer;
+}
+
+/***************************************************************
 * Implementation Interface (not intended for client use)
 ***************************************************************/
 namespace rdt::ecs {
 
 	class RDT_ECS_API SystemManager {
 	private:
-		template<typename T>
-		friend void ::rdt::RegisterSystem();
 
-/***************************************************************
-* EntityManager creation and destruction
-***************************************************************/
+		/***************************************************************
+		* EntityManager creation and destruction
+		***************************************************************/
 		friend class Application;
 		static void Initialize();
 		static void Destroy();
 
+		friend class Scene;
+		friend class Layer;
 
-		static void RegisterSystem(const char* name, System* nSystem);
-	};	
-}
+		// Adds a new system 
+		static void RegisterUniversalSystem(SystemID sID, System* nSystem);
 
-/***************************************************************
-* Client Interface
-***************************************************************/
-namespace rdt {
-	// Adds a system/procedure to the ECS instance. This system will be enabled by default.
-	// Systems can be registered from anywhere, but it is best practice to do it in scenes
-	// and child applications.
-	template<typename T>
-	void RegisterSystem()
-	{
-		const char* typeName = typeid(T).name();
-		T* nSystem = new T;
-		static_assert(std::is_base_of<System, T>(nSystem));
-		ecs::SystemManager::RegisterSystem(typeName, static_cast<System>(nSystem));
-	}
+		static void RegisterSceneSystem(SceneID sceneID, SystemID systemID, System* nSystem);
+
+		static void RegisterLayerSystem(LayerID lID, SystemID sID, System* nSystem);
+	};
 }

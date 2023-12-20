@@ -15,6 +15,16 @@ namespace rdt {
 
 struct rdt::ecs::SystemManagerImpl {
 
+	struct SystemContainer {
+		std::vector<std::shared_ptr<System>> layer_systems;
+		std::vector<std::shared_ptr<System>> universal_systems;
+	};
+
+	SystemContainer processInput_systems;
+	SystemContainer worldUpdate_systems;
+	SystemContainer finalUpdate_systems;
+	SystemContainer renderUpdate_systems;
+
 	SystemManagerImpl()
 	{
 	}
@@ -41,4 +51,9 @@ void rdt::ecs::SystemManager::Destroy()
 		delete m_impl;
 		m_impl = nullptr;
 	}
+}
+
+void rdt::ecs::SystemManager::RegisterSystem(SystemID sID, System* nSystem)
+{
+
 }

@@ -3,9 +3,6 @@
 
 #include <Radiant/Logger.hpp>
 
-using Signature = std::bitset<RDT_MAX_COMPONENTS>;
-
-
 struct rdt::ecs::EntityManager::Impl {
 
 	std::unordered_map<std::string, EntityID> aliasToid;
@@ -80,13 +77,13 @@ struct rdt::ecs::EntityManager::Impl {
 		}
 	}
 
-	void AddToSignature(EntityID eID, ComponentID cID)
+	void AddToSignature(EntityID eID, ComponentSlot slot)
 	{
 		if (m_signatures.size() <= eID) {
 			RDT_CORE_WARN("EntityManager - Could not add to signature entityID [{}] out of range!", eID);
 			return;
 		}
-		m_signatures[eID].set(cID, true);
+		m_signatures[eID].set(slot, true);
 	}
 };
 
@@ -117,7 +114,12 @@ void rdt::ecs::EntityManager::RemoveEntity(EntityID entity)
 	m_impl->RemoveEntity(entity);
 }
 
-void rdt::ecs::EntityManager::AddToSignature(EntityID entity, ComponentID cID)
+void rdt::ecs::EntityManager::AddToSignature(EntityID entity, ComponentSlot slot)
 {
-	m_impl->AddToSignature(entity, cID);
+	m_impl->AddToSignature(entity, slot);
+}
+
+void rdt::ecs::EntityManager::SubscribeToSystems(EntityID entity)
+{
+
 }

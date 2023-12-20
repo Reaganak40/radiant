@@ -59,7 +59,8 @@ rdt::EntityID rdt::Layer::AddEntityImpl(EntityDefinition& entityDef)
 	
 	entityDef.m_ID = eID;
 	entityDef.OnCreate();
-	
+	ecs::EntityManager::SubscribeToSystems(eID);
+
 	return eID;
 }
 

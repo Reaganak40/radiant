@@ -38,29 +38,38 @@
 ***************************************************************/
 #include <Radiant/ECS/Export.hpp>
 #include <Radiant/ECS/ComponentManager.hpp>
-#include <type_traits>
 #include <unordered_map>
 #include <typeindex>
 #include <string>
 
-
+/***************************************************************
+* Forward Declarations
+***************************************************************/
 namespace rdt {
-	enum SystemType {
-		SystemNAT,			// NOT A TYPE
-		SystemProcessInput, // System for OnProcessInput()
-		SystemWorldUpdate,  // System for OnWorldUpdate()
-		SystemFinalUpdate,	// System for OnFinalUpdate()
-		SystemRenderUpdate, // System for OnRender()
-	};
+	enum SystemUpdateType;
+	namespace ecs {
+		class EntityManager;
+	}
+}
 
+namespace rdt::ecs {
 
+	/***************************************************************
+	* Base System Class
+	***************************************************************/
 
 	// Systems are used to instantiate unique proecures by the client.
 	class System {
 		// no dll interface (compile on client-side)
 	private:
 
-		std::unordered_map<std::type_index, IComponentArray*> in_use_components;
+		std::unordered_map<ComponentID, IComponentArray*> in_use_components;
+		Signature m_signature;
+		std::vector<EntityID> m_entities;
+
+	public:
+		// The type determines at what update step the system is processed
+		virtual SystemUpdateType GetType() = 0;
 
 	protected:
 
@@ -70,27 +79,102 @@ namespace rdt {
 		template<typename T>
 		static void UseComponent()
 		{
-			ComponentID cID = ecs::ComponentManager::GetComponentID<T>();
-
-			if (cID == RDT_NULL_COMPONENT_ID) {
-				ecs::ComponentManager::RegisterComponent<T>();
-				cID = ecs::ComponentManager::GetComponentID<T>();
+			ComponentID cID = GetComponentID<T>();
+			ComponentSlot sigBit = ComponentManager::GetComponentSlot(cID);
+			if (sigBit == RDT_NOT_REGISTERED_COMPONENT)
+			{
+				ComponentManager::RegisterComponent<T>();
+				sigBit = ComponentManager::GetComponentSlot(cID);
 			}
 
-			const char* typeName = typeid(T).name();
-			in_use_components[typeName] = static_cast<IComponentArray>(ecs::ComponentManager::GetComponent(cID));
+			in_use_components[cID] = ComponentManager::GetComponentArray(cID);
+			m_signature.set(sigSlot, true);
 		}
 
-		// Gets a component used by this system. If the component was not declared to be used
-		// will return nullptr.
+		// Gets the entity's component data. This should only be called
+		// using delcared components and entities in the system's entity list.
 		template<typename T>
-		Component<T>* GetComponent()
+		T& GetComponent(EntityID entity)
 		{
-			const char* typeName = typeid(T).name();
-			if (in_use_components.find(typeName) == in_use_components.end()) {
-				return nullptr;
-			}
-			return static_cast<Component<T>>(in_use_components.at(typeName));
+			// this looks absolutely disgusting
+			*static_cast<T*>(
+				static_cast<ComponentData<T>*>(
+					ComponentManager::GetComponentArray(GetComponentID<T>())
+					)->GetDataPtr(entity)
+				);
 		}
+
+		const std::vector<EntityID>& GetEntities()
+		{
+			return m_entities;
+		}
+
+		// To implement function that contains the logic for the system
+		virtual void Update(float deltaTime = 0.0f) = 0;
+
+	private:
+		friend class ecs::SystemManager;
+
+		Signature& GetSignature() { return m_signature; }
+		void AddEntity(const EntityID nEntity) { m_entities.push_back(nEntity); }
 	};
+}
+
+/***************************************************************
+* Different System Classes: Used by client
+***************************************************************/
+namespace rdt {
+
+	enum SystemUpdateType {
+		SystemNAT,			// NOT A TYPE
+		SystemProcessInput, // System for OnProcessInput()
+		SystemWorldUpdate,  // System for OnWorldUpdate()
+		SystemFinalUpdate,	// System for OnFinalUpdate()
+		SystemRenderUpdate, // System for OnRender()
+	};
+
+	// =====================================================
+	class ProcessInput : public ecs::System {
+	public:
+		ProcessInput() {}
+		~ProcessInput() {}
+		SystemUpdateType GetType() override final { return SystemProcessInput; }
+		virtual void Update(float deltaTime = 0) { RDT_CORE_WARN("System::ProcessInput - virtual update called."); }
+	};
+	// =====================================================
+	class WorldUpdate : public ecs::System {
+	public:
+		WorldUpdate() {}
+		~WorldUpdate() {}
+		SystemUpdateType GetType() override final { return SystemWorldUpdate; }
+		virtual void Update(float deltaTime = 0) { RDT_CORE_WARN("System::WorldUpdate - virtual update called."); }
+	};
+	// =====================================================
+	class FinalUpdate : public ecs::System {
+	public:
+		FinalUpdate() {}
+		~FinalUpdate() {}
+		SystemUpdateType GetType() override final { return SystemFinalUpdate; }
+		virtual void Update(float deltaTime = 0) { RDT_CORE_WARN("System::FinalUpdate - virtual update called."); }
+	};
+	// =====================================================
+	class RenderUpdate : public ecs::System {
+	public:
+		RenderUpdate() {}
+		~RenderUpdate() {}
+		SystemUpdateType GetType() override final { return SystemRenderUpdate; }
+		virtual void Update(float deltaTime = 0) { RDT_CORE_WARN("System::RenderUpdate - virtual update called."); }
+	};
+	// =====================================================
+}
+
+namespace rdt::ecs {
+
+	using SystemID = std::type_index;
+	template<typename T>
+	SystemID GetSystemID()
+	{
+		static_assert(std::is_base_of<System, T>::value);
+		return std::type_index(typeid(T));
+	}
 }

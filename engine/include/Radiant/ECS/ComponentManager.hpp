@@ -38,6 +38,7 @@
 ***************************************************************/
 #include <Radiant/ECS/Export.hpp>
 #include <Radiant/ECS/Component.hpp>
+#include <Radiant/ECS/ComponentArray.hpp>
 
 /***************************************************************
 * Forward Declarations
@@ -66,15 +67,15 @@ namespace rdt::ecs {
 		friend class System;
 
 		template<typename T>
-		static void RegisterComponent() {
-
-			RegisterComponentImpl(GetComponentType<T>(), new Component<T>());
+		static void RegisterComponent()
+		{
+			RegisterComponentImpl(GetComponentID<T>(), new ComponentData<T>());
 		}
 
 		template<typename T>
 		static void AddToComponent(EntityID eID, const T& nData)
 		{
-			Component<T>* component = static_cast<Component<T>>(GetComponent(GetComponentType<T>()));
+			ComponentData<T>* component = static_cast<ComponentData<T>>(GetComponent(GetComponentType<T>()));
 			if (component != nullptr) {
 				component->InsertData(eID, nData);
 			}
@@ -85,17 +86,17 @@ namespace rdt::ecs {
 ***************************************************************/
 
 		// Registers a new component to the ComponentSystem
-		void RegisterComponentImpl(ComponentType type, IComponentArray* component);
-		
-		// Returns the global identfiier for the component, returns RDT_NULL_COMPONENT_ID
-		// if not found.
-		static ComponentID GetComponentID(ComponentType type);
+		void RegisterComponentImpl(ComponentID cID, IComponentArray* component);
 
-		// Returns an opaque pointer to a registered component, with the expectation
-		// that the caller knows its cast. Returns nullptr if not found. 
-		static void* GetComponent(ComponentType type);
+		// Returns a pointer to a registered component array. Returns nullptr
+		// if not found.
+		static IComponentArray* GetComponentArray(ComponentID cID);
 
 		// Removes an entity's data from a registered component.
 		static void RemoveFromComponent(EntityID eID, ComponentID cID);
+
+		bool IsComponentRegistered(ComponentID cID);
+
+		ComponentSlot GetComponentSlot(ComponentID cID);
 	};
 }

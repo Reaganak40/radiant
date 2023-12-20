@@ -8,38 +8,54 @@ namespace rdt::ecs {
 
 struct rdt::ecs::ComponentManagerImpl
 {
-	ComponentID idCounter = 0;
-	std::unordered_map<ComponentType, ComponentID> m_componentTypes;
+	ComponentSlot idCounter = 0;
+	std::unordered_map<ComponentID, ComponentSlot> m_componentTypes;
 	std::array<IComponentArray*, RDT_MAX_COMPONENTS> m_components;
 
-	ComponentID NextComponentID()
+	ComponentSlot NextComponentSlot()
 	{
 		return idCounter++;
 	}
 
-	void RegisterComponent(ComponentType type, IComponentArray* component)
+	void RegisterComponent(ComponentID cID, IComponentArray* component)
 	{
-		if (m_componentTypes.find(type) != m_componentTypes.end()) {
-			RDT_CORE_WARN("ComponentManager - Tried to register duplicate component '{}'", type.name());
+		if (m_componentTypes.find(cID) != m_componentTypes.end()) {
+			RDT_CORE_WARN("ComponentManager - Tried to register duplicate component '{}'", cID.name());
+			delete component;
+			return;
 		}
 
-		ComponentID nID = NextComponentID();
+		ComponentSlot cSlot = NextComponentSlot();
 
-		if (nID == RDT_MAX_COMPONENTS) {
+		if (cSlot == RDT_MAX_COMPONENTS) {
 			RDT_THROW_COMPONENT_OVERFLOW_EXCEPTION("Exceeded Component Limit: {}", RDT_MAX_COMPONENTS);
 		}
 
-		m_componentTypes[type] = nID;
-		m_components[nID] = component;
+		m_componentTypes[cID] = cSlot;
+		m_components[cSlot] = component;
 	}
 
-	ComponentID GetComponentID(ComponentType type)
+	IComponentArray* GetComponentArray(ComponentID cID)
 	{
-		if (m_componentTypes.find(type) == m_componentTypes.end())
-		{
-			return RDT_NULL_COMPONENT_ID;
+		if (m_componentTypes.find(cID) == m_componentTypes.end()) {
+			return nullptr;
 		}
-		return m_componentTypes.at(type);
+
+		return m_components.at(m_componentTypes.at(cID));
+	}
+
+	bool ComponentExists(ComponentID cID)
+	{
+		return m_componentTypes.find(cID) != m_componentTypes.end();
+	}
+
+	ComponentSlot GetComponentSlot(ComponentID cID)
+	{
+		if (!ComponentExists(cID)) {
+			return RDT_NOT_REGISTERED_COMPONENT;
+		}
+
+		return m_componentTypes.at(cID);
 	}
 
 	void* GetComponent(ComponentType type)
@@ -77,22 +93,26 @@ void rdt::ecs::ComponentManager::Destroy()
 	}
 }
 
-void rdt::ecs::ComponentManager::RegisterComponentImpl(ComponentType type, IComponentArray* component)
+void rdt::ecs::ComponentManager::RegisterComponentImpl(ComponentID cID, IComponentArray* component)
 {
-	m_impl->RegisterComponent(type, component);
 }
 
-rdt::ComponentID rdt::ecs::ComponentManager::GetComponentID(ComponentType type)
+rdt::ecs::IComponentArray* rdt::ecs::ComponentManager::GetComponentArray(ComponentID cID)
 {
-	return m_impl->GetComponentID(type);
-}
-
-void* rdt::ecs::ComponentManager::GetComponent(ComponentType type)
-{
-	return m_impl->GetComponent(type);
+	return m_impl->GetComponentArray(cID);
 }
 
 void rdt::ecs::ComponentManager::RemoveFromComponent(EntityID eID, ComponentID cID)
 {
 	m_impl->RemoveFromComponent(eID, cID);
+}
+
+bool rdt::ecs::ComponentManager::IsComponentRegistered(ComponentID cID)
+{
+	return m_impl->ComponentExists(cID);
+}
+
+ComponentSlot rdt::ecs::ComponentManager::GetComponentSlot(ComponentID cID)
+{
+	return ComponentSlot();
 }
